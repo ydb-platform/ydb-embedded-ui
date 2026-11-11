@@ -34,8 +34,16 @@ describe('getStorageGroupsDataIssues', () => {
         ['filter-not-applied', 'filter-not-applied'],
         ['sort-not-applied', 'sort-not-applied'],
         ['group-not-applied', 'group-not-applied'],
+        // without the description of the database its groups are not filtered out of the cluster
+        ['no-database-info', 'filter-not-applied'],
     ])('Should classify %s as %s', (problem, issue) => {
         expect(getStorageGroupsDataIssues(quality([problem]))).toEqual([issue]);
+    });
+
+    test('Should report the dropped database filter once when the backend also names it', () => {
+        expect(
+            getStorageGroupsDataIssues(quality(['no-database-info', 'filter-not-applied'])),
+        ).toEqual(['filter-not-applied']);
     });
 
     test('Should not report an unapplied operation twice when the code comes with its flag', () => {
@@ -93,11 +101,14 @@ describe('getNodesDataIssues', () => {
         // nodes that did not answer in time are marked as disconnected
         ['wb-incomplete', anyNodes, 'nodes-status-unreliable'],
         ['wb-incomplete', groupNodes, 'nodes-status-unreliable'],
-        // the group filter is resolved through BS controller
-        ['bsc-error', groupNodes, 'filter-not-applied'],
-        ['bsc-timeout', groupNodes, 'filter-not-applied'],
+        // the group filter is resolved through the VSlots of BS controller
         ['bsc-storage-slots-no-data', groupNodes, 'filter-not-applied'],
-        ['bsc-pdisks-no-data', {hasGroupFilter: true}, 'filter-not-applied'],
+        ['bsc-storage-slots-no-data', {hasGroupFilter: true}, 'filter-not-applied'],
+        // other problems of BS controller do not drop the group filter
+        ['bsc-error', groupNodes, 'disks-unavailable'],
+        ['bsc-timeout', groupNodes, 'disks-unavailable'],
+        ['bsc-pdisks-no-data', groupNodes, 'disks-unavailable'],
+        ['bsc-pdisks-no-data', {hasGroupFilter: true}, 'partial-data'],
         // disks of unavailable nodes come from BS controller only
         ['bsc-error', storageNodes, 'disks-unavailable'],
         ['bsc-timeout', storageNodes, 'disks-unavailable'],
@@ -136,7 +147,7 @@ describe('getNodesDataIssues', () => {
                 }),
                 groupNodes,
             ),
-        ).toEqual(['filter-not-applied', 'nodes-status-unreliable']);
+        ).toEqual(['filter-not-applied', 'nodes-status-unreliable', 'disks-unavailable']);
 
         expect(
             getNodesDataIssues(

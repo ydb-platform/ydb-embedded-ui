@@ -56,6 +56,13 @@ const STORAGE_GROUPS_LIST_INCOMPLETE_PROBLEMS = new Set([
     'wb-incomplete-groups',
 ]);
 
+/**
+ * The groups of a database are the groups of its storage pools, which the handler takes from
+ * the description of the database. Without it the groups of the whole cluster are returned.
+ * Newer backends send this code together with `filter-not-applied`.
+ */
+const STORAGE_GROUPS_DATABASE_FILTER_DROPPED_PROBLEM = 'no-database-info';
+
 export function getStorageGroupsDataIssues(quality?: ResponseDataQuality): DataIssueKind[] {
     if (!quality) {
         return [];
@@ -67,6 +74,8 @@ export function getStorageGroupsDataIssues(quality?: ResponseDataQuality): DataI
         const notApplied = NOT_APPLIED_PROBLEMS[problem];
         if (notApplied) {
             issues.add(notApplied);
+        } else if (problem === STORAGE_GROUPS_DATABASE_FILTER_DROPPED_PROBLEM) {
+            issues.add('filter-not-applied');
         } else if (STORAGE_GROUPS_LIST_INCOMPLETE_PROBLEMS.has(problem)) {
             issues.add('list-incomplete');
         } else {
@@ -98,6 +107,13 @@ const NODES_DATABASE_BOARD_PROBLEMS = new Set([
     'no-shared-database-board-info',
 ]);
 
+/**
+ * The nodes of a storage group are resolved through the VSlots of BS controller.
+ * Only this code tells that they were not received and the group filter was dropped:
+ * with other `bsc-*` problems (e.g. no PDisks) the filter is still applied.
+ */
+const NODES_GROUP_FILTER_DROPPED_PROBLEM = 'bsc-storage-slots-no-data';
+
 function getNodesProblemIssue(
     problem: string,
     {hasGroupFilter, hasDatabase, storageNodes}: NodesDataIssuesContext,
@@ -121,11 +137,11 @@ function getNodesProblemIssue(
         // The handler marks the nodes that did not answer in time as disconnected
         return 'nodes-status-unreliable';
     }
+    if (problem === NODES_GROUP_FILTER_DROPPED_PROBLEM && hasGroupFilter) {
+        // The group filter is dropped silently, Need* flags stay clean
+        return 'filter-not-applied';
+    }
     if (problem.startsWith('bsc-')) {
-        if (hasGroupFilter) {
-            // The group filter is dropped silently, Need* flags stay clean
-            return 'filter-not-applied';
-        }
         return storageNodes ? 'disks-unavailable' : 'partial-data';
     }
 

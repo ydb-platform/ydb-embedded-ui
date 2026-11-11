@@ -172,13 +172,31 @@ describe('StorageNodesComponent', () => {
         act(() =>
             getTableProps().onChunkDataChange(
                 0,
-                tableData({problems: ['bsc-timeout', 'bsc-storage-slots-no-data']}),
+                tableData({problems: ['bsc-storage-slots-no-data']}),
             ),
         );
 
         const controls = screen.getByTestId('controls');
         expect(controls).toHaveTextContent('Filters were not applied');
         expect(controls).not.toHaveTextContent('Disks of unavailable nodes');
+    });
+
+    test('does not blame the storage group filter for other problems of BS controller', () => {
+        render(
+            <StorageNodesComponent scrollContainerRef={scrollContainerRef} groupId="2181038080" />,
+        );
+
+        // The nodes of the group were resolved, only their disks were not received
+        act(() =>
+            getTableProps().onChunkDataChange(
+                0,
+                tableData({problems: ['bsc-timeout', 'bsc-pdisks-no-data']}),
+            ),
+        );
+
+        const controls = screen.getByTestId('controls');
+        expect(controls).toHaveTextContent('Disks of unavailable nodes');
+        expect(controls).not.toHaveTextContent('Filters were not applied');
     });
 
     test('warns that slow nodes may look unavailable', () => {

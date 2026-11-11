@@ -44,9 +44,9 @@ export interface TNodeInfo {
     UptimeSeconds?: number;
     Disconnected?: boolean;
     /**
-     * The node is reported as disconnected only because it did not answer in time:
-     * no answer and no disconnect were received, so its real state is unknown.
-     * Sent by newer backends only.
+     * The node did not answer in time: neither an answer nor a disconnect was received,
+     * so its real state is unknown. The node has no state then, and `Disconnected`
+     * may or may not be set for it as well. Sent by newer backends only.
      */
     ResponseTimeout?: boolean;
 
