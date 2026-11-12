@@ -106,15 +106,18 @@ export function getStorageGroupsInitialEntitiesCount(
 export function getStorageNodesDataIssuesSubject({
     database,
     groupId,
+    reportsDroppedFilters,
 }: {
     database?: string;
     groupId?: string | number;
+    reportsDroppedFilters?: boolean;
 }): DataIssuesSubject {
     return {
         type: 'nodes',
         storageNodes: true,
         hasDatabase: Boolean(database),
         hasGroupFilter: !isNil(groupId) && groupId !== '',
+        reportsDroppedFilters: Boolean(reportsDroppedFilters),
     };
 }
 

@@ -16,6 +16,13 @@ describe('getStorageNodesDataIssuesSubject', () => {
             storageNodes: true,
             hasDatabase,
             hasGroupFilter,
+            reportsDroppedFilters: false,
         });
+    });
+
+    test('Should pass on that the handler reports dropped filters', () => {
+        expect(
+            getStorageNodesDataIssuesSubject({database: '/Root/db', reportsDroppedFilters: true}),
+        ).toMatchObject({hasDatabase: true, reportsDroppedFilters: true});
     });
 });

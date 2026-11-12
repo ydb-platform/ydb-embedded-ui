@@ -6,6 +6,7 @@ import {ResponseError} from '../../../components/Errors/ResponseError';
 import {PaginatedTableWithLayout} from '../../../components/PaginatedTable/PaginatedTableWithLayout';
 import {TableColumnSetup} from '../../../components/TableColumnSetup/TableColumnSetup';
 import {NODES_COLUMNS_TO_DATA_FIELDS} from '../../../components/nodesColumns/constants';
+import {useViewerNodesHandlerReportsDroppedFilters} from '../../../store/reducers/capabilities/hooks';
 import {storageApi} from '../../../store/reducers/storage/storage';
 import type {NodesGroupByField, NodesRequiredField} from '../../../types/api/nodes';
 import {useGroupedTableDataIssues} from '../../../utils/dataIssues/useTableDataIssues';
@@ -118,6 +119,7 @@ export function GroupedStorageNodesComponent({
 }: PaginatedStorageProps) {
     const [autoRefreshInterval] = useAutoRefreshInterval();
     const {hideUnavailable} = useHideUnavailableNodes();
+    const reportsDroppedFilters = useViewerNodesHandlerReportsDroppedFilters();
 
     const {nodesSearchValue, storageNodesGroupByParam, handleShowAllNodes} =
         useStorageQueryParams();
@@ -164,7 +166,7 @@ export function GroupedStorageNodesComponent({
 
     const {issues, problems, rowsMayBeMissing, getGroupChunkDataChangeHandler} =
         useGroupedTableDataIssues(
-            getStorageNodesDataIssuesSubject({database, groupId}),
+            getStorageNodesDataIssuesSubject({database, groupId, reportsDroppedFilters}),
             currentData,
         );
 

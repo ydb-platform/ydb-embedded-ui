@@ -21,6 +21,20 @@ async function openDatabaseNodes(page: Page, query: Record<string, string> = {})
     await nodesResponse;
 }
 
+/** Opens Storage → Nodes of the database and waits for the response the table is built from */
+async function openDatabaseStorageNodes(page: Page) {
+    const nodesResponse = page.waitForResponse(
+        (response) => response.url().includes('/viewer/json/nodes?') && response.ok(),
+    );
+    await new PageModel(page, 'database', {
+        database: '/local',
+        schema: '/local',
+        databasePage: 'database',
+        diagnosticsTab: 'storage',
+    }).goto({type: 'nodes'});
+    await nodesResponse;
+}
+
 test.describe('Database nodes data issues', () => {
     test('shows no warning when the handler reports no problems', async ({page}) => {
         await setupDataIssuesMocks(page, {});
@@ -120,5 +134,38 @@ test.describe('Database nodes data issues', () => {
         // There are no groups to show, so the reason takes their place
         await expect(new DataIssuesAlert(page).item('group-not-applied')).toBeVisible();
         await expect(new DataIssuesIndicator(page).button).toBeVisible();
+    });
+});
+
+test.describe('Database storage nodes data issues', () => {
+    // The handler filters the storage nodes of a database by its storage pools through BS controller
+    const nodes = () => createNodesResponse({Problems: ['bsc-storage-groups-no-data']});
+
+    test('warns that the database filter was dropped by a handler that does not report it', async ({
+        page,
+    }) => {
+        const requests = await setupDataIssuesMocks(page, {nodes});
+        await openDatabaseStorageNodes(page);
+
+        await expect(
+            page.locator('table').getByText('storage-node-1', {exact: true}),
+        ).toBeVisible();
+        expect(requests.at(-1)?.searchParams.get('database')).toBe('/local');
+
+        const indicator = new DataIssuesIndicator(page);
+        await indicator.open();
+        await expect(indicator.item('filter-not-applied')).toBeVisible();
+        await expect(indicator.item('disks-unavailable')).toBeVisible();
+        await expect(indicator.items).toHaveCount(2);
+    });
+
+    test('leaves the dropped filter to a handler that reports it', async ({page}) => {
+        await setupDataIssuesMocks(page, {nodes, nodesHandlerVersion: 23});
+        await openDatabaseStorageNodes(page);
+
+        const indicator = new DataIssuesIndicator(page);
+        await indicator.open();
+        await expect(indicator.item('disks-unavailable')).toBeVisible();
+        await expect(indicator.items).toHaveCount(1);
     });
 });

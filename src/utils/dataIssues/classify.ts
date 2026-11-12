@@ -96,6 +96,11 @@ export interface NodesDataIssuesContext {
     hasDatabase?: boolean;
     /** Storage nodes with their disks are shown */
     storageNodes?: boolean;
+    /**
+     * The handler adds `filter-not-applied` itself when it drops a filter.
+     * Older handlers drop the storage filters silently, so it has to be told from other problems.
+     */
+    reportsDroppedFilters?: boolean;
 }
 
 const NODES_DATABASE_UNAVAILABLE_PROBLEMS = new Set([
@@ -113,6 +118,29 @@ const NODES_DATABASE_BOARD_PROBLEMS = new Set([
  * with other `bsc-*` problems (e.g. no PDisks) the filter is still applied.
  */
 const NODES_GROUP_FILTER_DROPPED_PROBLEM = 'bsc-storage-slots-no-data';
+
+/**
+ * The storage nodes of a database are the nodes of its storage pools. The handler resolves
+ * them through BS controller: the pools, their groups, the VSlots of the groups. When any
+ * of the steps fails, the nodes of the whole cluster are returned.
+ */
+const NODES_DATABASE_FILTER_DROPPED_PROBLEMS = new Set([
+    'bsc-storage-pools-no-data',
+    'bsc-storage-groups-no-data',
+    'bsc-storage-slots-no-data',
+]);
+
+function isDatabaseFilterDroppedSilently(
+    problem: string,
+    {hasDatabase, storageNodes, reportsDroppedFilters}: NodesDataIssuesContext,
+) {
+    return Boolean(
+        storageNodes &&
+            hasDatabase &&
+            !reportsDroppedFilters &&
+            NODES_DATABASE_FILTER_DROPPED_PROBLEMS.has(problem),
+    );
+}
 
 function getNodesProblemIssue(
     problem: string,
@@ -160,6 +188,10 @@ export function getNodesDataIssues(
     const issues = new Set<DataIssueKind>();
 
     for (const problem of quality.problems) {
+        if (isDatabaseFilterDroppedSilently(problem, context)) {
+            // Next to what the problem means by itself, as with `filter-not-applied` of newer handlers
+            issues.add('filter-not-applied');
+        }
         issues.add(getNodesProblemIssue(problem, context));
     }
 

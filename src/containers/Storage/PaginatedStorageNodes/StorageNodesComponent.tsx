@@ -1,7 +1,10 @@
 import {DataIssuesIndicator} from '../../../components/DataIssuesAlert/DataIssuesIndicator';
 import {PaginatedTableWithLayout} from '../../../components/PaginatedTable/PaginatedTableWithLayout';
 import {TableColumnSetup} from '../../../components/TableColumnSetup/TableColumnSetup';
-import {useViewerNodesHandlerHasGrouping} from '../../../store/reducers/capabilities/hooks';
+import {
+    useViewerNodesHandlerHasGrouping,
+    useViewerNodesHandlerReportsDroppedFilters,
+} from '../../../store/reducers/capabilities/hooks';
 import {useTableDataIssues} from '../../../utils/dataIssues/useTableDataIssues';
 import {useHideUnavailableNodes} from '../../../utils/hooks/useHideUnavailableNodes';
 import {renderPaginatedTableErrorMessage} from '../../../utils/renderPaginatedTableErrorMessage';
@@ -25,6 +28,7 @@ export function StorageNodesComponent({
         useStorageQueryParams();
 
     const viewerNodesHandlerHasGrouping = useViewerNodesHandlerHasGrouping();
+    const reportsDroppedFilters = useViewerNodesHandlerReportsDroppedFilters();
     const {hideUnavailable} = useHideUnavailableNodes();
 
     const expertMode = useIsStorageExpertMode();
@@ -33,7 +37,7 @@ export function StorageNodesComponent({
     });
 
     const {issues, problems, rowsMayBeMissing, handleChunkDataChange} = useTableDataIssues(
-        getStorageNodesDataIssuesSubject({database, groupId}),
+        getStorageNodesDataIssuesSubject({database, groupId, reportsDroppedFilters}),
     );
 
     const {columnsToShow, columnsToSelect, setColumns} = useStorageNodesColumnsToSelect({

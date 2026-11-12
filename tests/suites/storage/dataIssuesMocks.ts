@@ -11,6 +11,8 @@ type NodesResponseFactory = (url: URL) => Partial<TNodesInfo>;
 interface DataIssuesMocks {
     groups?: GroupsResponseFactory;
     nodes?: NodesResponseFactory;
+    /** Version of the /viewer/nodes handler in the capabilities */
+    nodesHandlerVersion?: number;
 }
 
 export function createGroupsResponse(
@@ -70,7 +72,11 @@ export function createNodesResponse(extra: Partial<TNodesInfo> = {}): Partial<TN
 /** Mocks everything the Storage and Nodes pages request, so the specs do not depend on cluster data */
 export async function setupDataIssuesMocks(
     page: Page,
-    {groups = () => createGroupsResponse(), nodes = () => createNodesResponse()}: DataIssuesMocks,
+    {
+        groups = () => createGroupsResponse(),
+        nodes = () => createNodesResponse(),
+        nodesHandlerVersion = 20,
+    }: DataIssuesMocks,
 ) {
     const requests: URL[] = [];
 
@@ -99,7 +105,7 @@ export async function setupDataIssuesMocks(
         if (url.pathname.endsWith('/whoami')) {
             json = {UserSID: 'data-issues-test', IsMonitoringAllowed: true, IsViewerAllowed: true};
         } else if (url.pathname.endsWith('/capabilities')) {
-            json = {Capabilities: {'/viewer/nodes': 20, '/storage/groups': 10}};
+            json = {Capabilities: {'/viewer/nodes': nodesHandlerVersion, '/storage/groups': 10}};
         } else if (url.pathname.endsWith('/nodelist')) {
             json = [
                 {Id: 1, Host: 'storage-node-1'},

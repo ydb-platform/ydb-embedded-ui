@@ -26,11 +26,15 @@ function useDataIssues(
     const hasGroupFilter = subject.type === 'nodes' && Boolean(subject.hasGroupFilter);
     const hasDatabase = subject.type === 'nodes' && Boolean(subject.hasDatabase);
     const storageNodes = subject.type === 'nodes' && Boolean(subject.storageNodes);
+    const reportsDroppedFilters =
+        subject.type === 'nodes' && Boolean(subject.reportsDroppedFilters);
 
     return React.useMemo(() => {
         const issues = getDataIssues(
             dataQuality,
-            type === 'nodes' ? {type, hasGroupFilter, hasDatabase, storageNodes} : {type},
+            type === 'nodes'
+                ? {type, hasGroupFilter, hasDatabase, storageNodes, reportsDroppedFilters}
+                : {type},
         );
 
         return {
@@ -38,7 +42,7 @@ function useDataIssues(
             problems: dataQuality?.problems ?? NO_PROBLEMS,
             rowsMayBeMissing: canDataIssuesHideRows(issues),
         };
-    }, [dataQuality, type, hasGroupFilter, hasDatabase, storageNodes]);
+    }, [dataQuality, type, hasGroupFilter, hasDatabase, storageNodes, reportsDroppedFilters]);
 }
 
 /**

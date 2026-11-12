@@ -35,6 +35,31 @@ describe('useTableDataIssues', () => {
         expect(groupNodes.result.current.problems).toEqual(['bsc-storage-slots-no-data']);
     });
 
+    test('Should follow what becomes known about the handler', () => {
+        // capabilities are loaded after the table is mounted
+        const {result, rerender} = renderHook(
+            ({reportsDroppedFilters}) =>
+                useTableDataIssues({
+                    type: 'nodes',
+                    storageNodes: true,
+                    hasDatabase: true,
+                    reportsDroppedFilters,
+                }),
+            {initialProps: {reportsDroppedFilters: false}},
+        );
+
+        act(() =>
+            result.current.handleChunkDataChange(
+                0,
+                chunkData({problems: ['bsc-storage-groups-no-data']}),
+            ),
+        );
+        expect(result.current.issues).toEqual(['filter-not-applied', 'disks-unavailable']);
+
+        rerender({reportsDroppedFilters: true});
+        expect(result.current.issues).toEqual(['disks-unavailable']);
+    });
+
     test('Should tell whether rows may be missing because of the issues', () => {
         const {result} = renderHook(() => useTableDataIssues(STORAGE_GROUPS));
 

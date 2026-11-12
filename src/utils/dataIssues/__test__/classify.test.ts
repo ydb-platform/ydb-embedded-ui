@@ -136,6 +136,48 @@ describe('getNodesDataIssues', () => {
         expect(getNodesDataIssues(quality([problem]), context)).toEqual([issue]);
     });
 
+    describe('storage nodes of a database', () => {
+        const databaseStorageNodes: NodesDataIssuesContext = {
+            storageNodes: true,
+            hasDatabase: true,
+        };
+
+        // the database filter is resolved through the pools, groups and VSlots of BS controller
+        test.each([
+            'bsc-storage-pools-no-data',
+            'bsc-storage-groups-no-data',
+            'bsc-storage-slots-no-data',
+        ])('Should report the dropped database filter for %s of an older handler', (problem) => {
+            expect(getNodesDataIssues(quality([problem]), databaseStorageNodes)).toEqual([
+                'filter-not-applied',
+                'disks-unavailable',
+            ]);
+        });
+
+        test('Should not suspect the database filter for other problems of BS controller', () => {
+            expect(
+                getNodesDataIssues(
+                    quality(['bsc-timeout', 'bsc-pdisks-no-data']),
+                    databaseStorageNodes,
+                ),
+            ).toEqual(['disks-unavailable']);
+        });
+
+        test('Should leave the dropped filter to a handler that reports it', () => {
+            const context = {...databaseStorageNodes, reportsDroppedFilters: true};
+
+            expect(getNodesDataIssues(quality(['bsc-storage-groups-no-data']), context)).toEqual([
+                'disks-unavailable',
+            ]);
+            expect(
+                getNodesDataIssues(
+                    quality(['bsc-storage-groups-no-data', 'filter-not-applied']),
+                    context,
+                ),
+            ).toEqual(['filter-not-applied', 'disks-unavailable']);
+        });
+    });
+
     test.each<[Partial<ResponseDataQuality>, DataIssueKind]>([
         [{needFilter: true}, 'filter-not-applied'],
         [{needSort: true}, 'sort-not-applied'],
