@@ -1,64 +1,95 @@
 import React from 'react';
 
+import {skipToken} from '@reduxjs/toolkit/query';
 import {throttle} from 'lodash';
 
+import {parseControlPlaneOperation} from '../../services/parsers/parseControlPlaneOperation';
 import {DEFAULT_PAGE_SIZE, operationsApi} from '../../store/reducers/operations';
+import type {ControlPlaneOperationQueryParams} from '../../store/reducers/operations';
 import type {OperationKind} from '../../types/api/operations';
 
+import {filterControlPlaneOperations} from './utils';
+
 interface UseOperationsInfiniteQueryProps {
+    controlPlaneParams?: ControlPlaneOperationQueryParams;
+    skipDatabase?: boolean;
     database: string;
     kind: OperationKind;
     pageSize?: number;
     searchValue: string;
+    controlPlaneSearch?: string;
+    controlPlaneStatus?: string;
     scrollContainerRef?: React.RefObject<HTMLElement>;
 }
 
 const DEFAULT_SCROLL_MARGIN = 100;
 
 export function useOperationsInfiniteQuery({
+    controlPlaneParams,
+    skipDatabase = false,
     database,
     kind,
     pageSize = DEFAULT_PAGE_SIZE,
     searchValue,
+    controlPlaneSearch = '',
+    controlPlaneStatus = '',
     scrollContainerRef,
 }: UseOperationsInfiniteQueryProps) {
-    const {data, error, isLoading, isFetchingNextPage, hasNextPage, fetchNextPage} =
-        operationsApi.useGetOperationListInfiniteQuery({
-            database,
-            kind,
-            page_size: pageSize,
-        });
+    const databaseQuery = operationsApi.useGetOperationListInfiniteQuery(
+        controlPlaneParams || skipDatabase ? skipToken : {database, kind, page_size: pageSize},
+    );
+    const controlPlaneQuery = operationsApi.useGetControlPlaneOperationListInfiniteQuery(
+        controlPlaneParams ?? skipToken,
+    );
+    const {error, isLoading, isFetchingNextPage, hasNextPage, fetchNextPage} = controlPlaneParams
+        ? controlPlaneQuery
+        : databaseQuery;
 
     // Flatten all pages into a single array of operations
     const allOperations = React.useMemo(() => {
-        if (!data?.pages) {
-            return [];
+        if (controlPlaneParams) {
+            return (
+                controlPlaneQuery.currentData?.pages.flatMap((page) =>
+                    (page.operations ?? []).map(parseControlPlaneOperation),
+                ) ?? []
+            );
         }
-        // Each page is a TOperationList, so we need to extract operations from each
-        return data.pages.flatMap((page) => page.operations || []);
-    }, [data]);
+        return databaseQuery.currentData?.pages.flatMap((page) => page.operations ?? []) ?? [];
+    }, [controlPlaneParams, controlPlaneQuery.currentData, databaseQuery.currentData]);
 
     const filteredOperations = React.useMemo(() => {
+        if (controlPlaneParams) {
+            return filterControlPlaneOperations(
+                allOperations,
+                controlPlaneSearch,
+                controlPlaneStatus,
+            );
+        }
         const preparedSearchValue = searchValue.trim().toLowerCase();
 
         if (!preparedSearchValue) {
             return allOperations;
         }
         return allOperations.filter((op) => op.id?.toLowerCase().includes(preparedSearchValue));
-    }, [allOperations, searchValue]);
+    }, [allOperations, searchValue, controlPlaneParams, controlPlaneSearch, controlPlaneStatus]);
 
-    // Auto-load more pages to fill viewport
-    const checkAndLoadMorePages = React.useCallback(async () => {
-        const scrollContainer = scrollContainerRef?.current;
-        if (!scrollContainer || !hasNextPage || isFetchingNextPage) {
-            return;
-        }
+    const checkAndLoadMorePages = React.useCallback(
+        (fromScroll = false) => {
+            const scrollContainer = scrollContainerRef?.current;
+            if (!scrollContainer || !hasNextPage || isFetchingNextPage || error) {
+                return;
+            }
 
-        const {scrollHeight, clientHeight} = scrollContainer;
-        if (scrollHeight <= clientHeight) {
-            await fetchNextPage();
-        }
-    }, [scrollContainerRef, hasNextPage, isFetchingNextPage, fetchNextPage]);
+            const {scrollTop, scrollHeight, clientHeight} = scrollContainer;
+            const shouldLoadMore = fromScroll
+                ? scrollHeight - scrollTop - clientHeight < DEFAULT_SCROLL_MARGIN
+                : scrollHeight <= clientHeight;
+            if (shouldLoadMore) {
+                fetchNextPage();
+            }
+        },
+        [scrollContainerRef, hasNextPage, isFetchingNextPage, fetchNextPage, error],
+    );
 
     // Check after data updates
     React.useLayoutEffect(() => {
@@ -71,25 +102,7 @@ export function useOperationsInfiniteQuery({
         }
 
         return undefined;
-    }, [data, isFetchingNextPage, checkAndLoadMorePages]);
-
-    // Scroll handler for infinite scrolling
-    const handleScroll = React.useCallback(() => {
-        const scrollContainer = scrollContainerRef?.current;
-        if (!scrollContainer) {
-            return;
-        }
-
-        const {scrollTop, scrollHeight, clientHeight} = scrollContainer;
-
-        if (
-            scrollHeight - scrollTop - clientHeight < DEFAULT_SCROLL_MARGIN &&
-            hasNextPage &&
-            !isFetchingNextPage
-        ) {
-            fetchNextPage();
-        }
-    }, [scrollContainerRef, hasNextPage, isFetchingNextPage, fetchNextPage]);
+    }, [filteredOperations, isFetchingNextPage, checkAndLoadMorePages]);
 
     React.useEffect(() => {
         const scrollContainer = scrollContainerRef?.current;
@@ -97,13 +110,14 @@ export function useOperationsInfiniteQuery({
             return undefined;
         }
 
+        const handleScroll = () => checkAndLoadMorePages(true);
         scrollContainer.addEventListener('scroll', handleScroll);
         return () => scrollContainer.removeEventListener('scroll', handleScroll);
-    }, [scrollContainerRef, handleScroll]);
+    }, [scrollContainerRef, checkAndLoadMorePages]);
 
     // Resize handler to check if more content is needed when viewport changes
     React.useEffect(() => {
-        const throttledHandleResize = throttle(checkAndLoadMorePages, 200, {
+        const throttledHandleResize = throttle(() => checkAndLoadMorePages(), 200, {
             trailing: true,
             leading: true,
         });
@@ -117,6 +131,7 @@ export function useOperationsInfiniteQuery({
 
     return {
         operations: filteredOperations,
+        totalLoaded: allOperations.length,
         isLoading,
         isLoadingMore: isFetchingNextPage,
         error,

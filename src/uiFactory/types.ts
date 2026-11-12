@@ -93,6 +93,9 @@ export interface UIFactory<H extends string = CommonIssueCategory, T extends str
 
     emMetaAvailable?: boolean;
 
+    /** Renders a CP operation author. The renderer owns loading and falls back to ID. */
+    resolveUser?: ResolveUser;
+
     useMetaProxy?: boolean;
     useClusterDomain?: boolean;
     clustersDomain?: string;
@@ -288,3 +291,5 @@ export type GetReportProblemUrl = (params: {
     requestUrl?: string;
     traceId?: string;
 }) => string | undefined;
+
+export type ResolveUser = (params: {userId: string; clusterName?: string}) => React.ReactNode;

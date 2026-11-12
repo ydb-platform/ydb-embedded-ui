@@ -1,4 +1,8 @@
 import type {MetaCapabilitiesResponse} from '../../types/api/capabilities';
+import type {
+    ControlPlaneOperationList,
+    ControlPlaneOperationListParams,
+} from '../../types/api/controlPlaneOperations';
 import type {MetaEnvironmentsResponse} from '../../types/api/environments';
 import type {HealthCheckAPIResponse} from '../../types/api/healthcheck';
 import type {
@@ -15,6 +19,24 @@ import type {AxiosOptions} from './base';
 import {BaseMetaAPI} from './baseMeta';
 
 export class MetaAPI extends BaseMetaAPI {
+    getControlPlaneOperationList(
+        {clusterName, folderId, databaseId, pageSize, pageToken}: ControlPlaneOperationListParams,
+        {signal}: AxiosOptions = {},
+    ) {
+        return this.post<ControlPlaneOperationList>(
+            this.getPath('/meta/list_operations', clusterName),
+            {
+                cluster_name: clusterName,
+                folder_id: folderId,
+                resource_id: databaseId,
+                page_size: pageSize,
+                page_token: pageToken,
+            },
+            {},
+            {requestConfig: {signal}},
+        );
+    }
+
     metaAuthenticate(params: {user: string; password: string}) {
         return this.post(this.getPath('/meta/login'), params, {});
     }

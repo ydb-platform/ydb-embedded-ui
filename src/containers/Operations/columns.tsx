@@ -17,13 +17,22 @@ import createToast from '../../utils/createToast';
 import {formatDateTime, formatDurationMs} from '../../utils/dataFormatters/dataFormatters';
 import {parseProtobufTimestampToMs} from '../../utils/timeParsers';
 
+import {OperationError} from './OperationError';
 import {COLUMNS_NAMES, COLUMNS_TITLES} from './constants';
 import i18n from './i18n';
-import {getOperationProgress, isIndexBuildMetadata} from './utils';
+import {getOperationErrorText, getOperationProgress, isIndexBuildMetadata} from './utils';
 
 import './Operations.scss';
 
 function renderStatusCell(row: TOperation) {
+    const errorText = getOperationErrorText(row.issues);
+    const hasError =
+        row.status &&
+        row.status !== EStatusCode.SUCCESS &&
+        row.status !== EStatusCode.STATUS_CODE_UNSPECIFIED;
+    if (row.status && hasError && errorText) {
+        return <OperationError status={row.status} message={errorText} id={row.id} />;
+    }
     const progress = getOperationProgress(row, i18n);
 
     if (row.ready) {
@@ -80,7 +89,8 @@ export function getColumns({
                     return EMPTY_DATA_PLACEHOLDER;
                 }
 
-                const tooltipContent = isBuildIndex ? getDescriptionTooltip(row) || row.id : row.id;
+                const tooltipContent =
+                    (isBuildIndex ? getDescriptionTooltip(row) : undefined) || row.id;
 
                 return (
                     <CellWithPopover placement={['top', 'bottom']} content={tooltipContent}>
@@ -154,6 +164,9 @@ export function getColumns({
                     return EMPTY_DATA_PLACEHOLDER;
                 }
                 const createTime = parseProtobufTimestampToMs(row.create_time);
+                if (!Number.isFinite(createTime)) {
+                    return EMPTY_DATA_PLACEHOLDER;
+                }
                 if (row.end_time) {
                     const endTime = parseProtobufTimestampToMs(row.end_time);
                     durationValue = endTime - createTime;
@@ -181,7 +194,6 @@ export function getColumns({
             return <OperationsActions operation={row} database={database} />;
         },
     });
-
     return columns;
 }
 

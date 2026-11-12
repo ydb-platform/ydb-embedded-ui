@@ -3,10 +3,6 @@ import type {Locator, Page} from '@playwright/test';
 import {BaseModel} from '../../../../models/BaseModel';
 import {VISIBILITY_TIMEOUT} from '../../TenantPage';
 
-export enum OperationTab {
-    Operations = 'Operations',
-}
-
 export class OperationsTable extends BaseModel {
     private tableContainer: Locator;
     private tableRows: Locator;
@@ -115,24 +111,6 @@ export class OperationsTable extends BaseModel {
         return rowData;
     }
 
-    async hasActiveInfiniteScroll(): Promise<boolean> {
-        // Check if scrolling triggers loading more
-        const initialCount = await this.getRowCount();
-        await this.scrollToBottom();
-
-        // Wait a bit to see if loading more appears
-        await this.page.waitForTimeout(1000);
-
-        const hasLoadingMore = await this.isLoadingMoreVisible();
-        if (hasLoadingMore) {
-            await this.waitForLoadingMoreToDisappear();
-            const newCount = await this.getRowCount();
-            return newCount > initialCount;
-        }
-
-        return false;
-    }
-
     async isAccessDeniedVisible(): Promise<boolean> {
         try {
             await this.accessDeniedState.waitFor({state: 'visible', timeout: VISIBILITY_TIMEOUT});
@@ -146,21 +124,6 @@ export class OperationsTable extends BaseModel {
         return await this.accessDeniedTitle.innerText();
     }
 
-    async waitForRowCountToChange(previousCount: number, timeout = 5000): Promise<number> {
-        await this.page.waitForFunction(
-            (prev) => {
-                const rows = document.querySelectorAll(
-                    '.data-table__row:not(.data-table__row_header)',
-                );
-                return rows.length !== prev;
-            },
-            previousCount,
-            {timeout},
-        );
-        // Return the new row count
-        return await this.getRowCount();
-    }
-
     async isResponseErrorVisible(): Promise<boolean> {
         try {
             await this.responseError.waitFor({state: 'visible', timeout: VISIBILITY_TIMEOUT});
@@ -172,9 +135,5 @@ export class OperationsTable extends BaseModel {
 
     async getResponseErrorTitle(): Promise<string> {
         return await this.responseErrorTitle.innerText();
-    }
-
-    async getResponseErrorText(): Promise<string> {
-        return await this.responseError.innerText();
     }
 }
