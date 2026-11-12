@@ -164,15 +164,33 @@ test('does not activate or change the selected row from an unavailable label', a
 test('combines availability with the version filter', async ({page}) => {
     await openClusters(page);
     const list = page.locator('.ydb-clusters');
-    await list.getByRole('combobox').filter({hasText: 'Version:'}).click();
-    await page.getByRole('option', {name: '25.2.1', exact: true}).click();
+    const versionSelect = list.getByRole('combobox').filter({hasText: 'Version:'});
+    const availableVersion = page.getByRole('option', {name: '25.1.1', exact: true});
+    const unavailableVersion = page.getByRole('option', {name: '25.2.1', exact: true});
+
+    // Only versions of available clusters are offered by default
+    await versionSelect.click();
+    await expect(availableVersion).toBeVisible();
+    await expect(unavailableVersion).toHaveCount(0);
     await page.keyboard.press('Escape');
-    await expect(list.getByText('0 clusters found', {exact: true})).toBeVisible();
+
     await toggleAvailability(page, 'Unavailable');
+    await versionSelect.click();
+    await unavailableVersion.click();
+    await page.keyboard.press('Escape');
     await expect(list.getByRole('link', {name: 'unavailable-object', exact: true})).toBeVisible();
     await expect(list.getByRole('link', {name: 'unavailable-json', exact: true})).toHaveCount(0);
     await expect(list.getByRole('link', {name: 'available', exact: true})).toHaveCount(0);
     await expect(list.getByText('1 cluster found', {exact: true})).toBeVisible();
+
+    // Selected version stays in options after unavailable clusters are hidden and can be removed
+    await toggleAvailability(page, 'Unavailable');
+    await expect(list.getByText('0 clusters found', {exact: true})).toBeVisible();
+    await versionSelect.click();
+    await expect(unavailableVersion).toHaveAttribute('aria-selected', 'true');
+    await unavailableVersion.click();
+    await page.keyboard.press('Escape');
+    await expect(list.getByText('2 clusters found', {exact: true})).toBeVisible();
 });
 
 for (const [name, clusterList] of [
