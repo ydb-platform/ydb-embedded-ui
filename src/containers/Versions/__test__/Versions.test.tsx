@@ -12,6 +12,10 @@ jest.mock('../../../components/VersionsBar/VersionsBar', () => ({
     VersionsBar: () => null,
 }));
 
+jest.mock('../../../store/reducers/clusters/clusters', () => ({
+    clustersApi: {useGetClustersListQuery: jest.fn()},
+}));
+
 jest.mock('../../../store/reducers/nodes/nodes', () => ({
     nodesApi: {useGetNodesQuery: jest.fn()},
 }));
@@ -25,36 +29,55 @@ jest.mock('../GroupedNodesTree/GroupedNodesTree', () => ({
 }));
 
 jest.mock('../utils', () => ({
-    useGetPreparedVersions: jest.fn(() => []),
+    ...jest.requireActual('../utils'),
     useVersionsDataMap: jest.fn(() => undefined),
 }));
 
 const {nodesApi} = jest.requireMock('../../../store/reducers/nodes/nodes');
 
-function renderVersions(quality: Partial<ResponseDataQuality>) {
-    const dataQuality: ResponseDataQuality = {
-        problems: [],
-        needFilter: false,
-        needSort: false,
-        needGroup: false,
-        ...quality,
-    };
-    nodesApi.useGetNodesQuery.mockReturnValue({
-        currentData: {nodes: [], found: 0, total: 0, dataQuality},
-        isLoading: false,
+function quality(problems: string[] = [], needGroup = false): ResponseDataQuality {
+    return {problems, needFilter: false, needSort: false, needGroup};
+}
+
+/** The list of nodes and, for a cluster without `MapVersions`, the nodes grouped by version */
+function renderVersions(list: ResponseDataQuality, overall?: ResponseDataQuality) {
+    nodesApi.useGetNodesQuery.mockImplementation((params: unknown) => {
+        const grouped = typeof params === 'object' && params !== null && 'group' in params;
+        if (grouped) {
+            return {currentData: overall && {tableGroups: [], dataQuality: overall}};
+        }
+        return {
+            currentData: {nodes: [], found: 0, total: 0, dataQuality: list},
+            isLoading: false,
+        };
     });
 
     return render(<VersionsContainer />);
 }
 
+function getIssues() {
+    return Array.from(document.querySelectorAll('[data-issue]')).map((item) =>
+        item.getAttribute('data-issue'),
+    );
+}
+
 describe('Versions data issues', () => {
     test('warns that the versions are built from incomplete data of the nodes', () => {
-        renderVersions({problems: ['wb-incomplete', 'hive-timeout']});
+        renderVersions(quality(['wb-incomplete', 'hive-timeout']));
 
-        const issues = Array.from(document.querySelectorAll('[data-issue]')).map((item) =>
-            item.getAttribute('data-issue'),
-        );
         // Hive problems do not make the list of cluster nodes incomplete
-        expect(issues).toEqual(['nodes-status-unreliable', 'partial-data']);
+        expect(getIssues()).toEqual(['nodes-status-unreliable', 'partial-data']);
+    });
+
+    test('warns about the problems of the request the Overall block is built from', () => {
+        renderVersions(quality(), quality(['wb-incomplete']));
+
+        expect(getIssues()).toEqual(['nodes-status-unreliable']);
+    });
+
+    test('does not warn about grouping: without it the versions are counted from the nodes', () => {
+        renderVersions(quality(), quality([], true));
+
+        expect(getIssues()).toEqual([]);
     });
 });

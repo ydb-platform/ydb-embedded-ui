@@ -54,7 +54,15 @@ export function useGetPreparedVersions({
         return parseNodesToPreparedVersions(currentData.nodes, versionsDataMap);
     }, [currentData, versionsDataMap, cluster]);
 
-    return preparedVersions;
+    // The request is skipped when the versions come with the cluster.
+    // Without grouping the handler returns the nodes, and the versions are counted from them
+    const responseQuality = currentData?.dataQuality;
+    const dataQuality = React.useMemo(
+        () => (responseQuality ? {...responseQuality, needGroup: false} : undefined),
+        [responseQuality],
+    );
+
+    return {preparedVersions, dataQuality};
 }
 
 export function useVersionsDataMap(cluster?: TClusterInfo) {

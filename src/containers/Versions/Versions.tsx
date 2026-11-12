@@ -13,6 +13,7 @@ import type {PreparedStorageNode} from '../../store/reducers/storage/types';
 import type {TClusterInfo} from '../../types/api/cluster';
 import {cn} from '../../utils/cn';
 import {getNodesDataIssues} from '../../utils/dataIssues/classify';
+import {mergeDataQuality} from '../../utils/dataIssues/dataQuality';
 import type {ResponseDataQuality} from '../../utils/dataIssues/types';
 import {useAutoRefreshInterval} from '../../utils/hooks';
 import type {PreparedVersion, VersionsDataMap} from '../../utils/versions/types';
@@ -41,18 +42,25 @@ export function VersionsContainer({cluster, loading}: VersionsContainerProps) {
     );
     const versionsDataMap = useVersionsDataMap(cluster);
 
-    const preparedVersions = useGetPreparedVersions({
+    const {preparedVersions, dataQuality: overallDataQuality} = useGetPreparedVersions({
         cluster,
         versionsDataMap,
         clusterLoading: loading,
     });
+
+    // The Overall block may be built from a request of its own
+    const listDataQuality = currentData?.dataQuality;
+    const nodesDataQuality = React.useMemo(
+        () => mergeDataQuality([listDataQuality, overallDataQuality]),
+        [listDataQuality, overallDataQuality],
+    );
 
     return (
         <LoaderWrapper loading={loading || isNodesLoading} className={b('loader')}>
             <Versions
                 preparedVersions={preparedVersions}
                 nodes={currentData?.nodes}
-                nodesDataQuality={currentData?.dataQuality}
+                nodesDataQuality={nodesDataQuality}
                 versionsDataMap={versionsDataMap}
             />
         </LoaderWrapper>
