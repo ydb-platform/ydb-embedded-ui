@@ -217,6 +217,16 @@ describe('getDataIssues', () => {
     });
 });
 
+describe('codes named like the properties of an object', () => {
+    test.each(['constructor', 'toString', '__proto__'])(
+        'Should treat %s as an unknown code',
+        (problem) => {
+            expect(getStorageGroupsDataIssues(quality([problem]))).toEqual(['partial-data']);
+            expect(getNodesDataIssues(quality([problem]))).toEqual(['partial-data']);
+        },
+    );
+});
+
 describe('canDataIssuesHideRows', () => {
     test('Should not suspect missing rows without issues', () => {
         expect(canDataIssuesHideRows([])).toBe(false);

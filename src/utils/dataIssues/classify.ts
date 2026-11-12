@@ -37,11 +37,11 @@ function addUnappliedOperations(issues: Set<DataIssueKind>, quality: ResponseDat
  * Newer backends also name an unapplied operation in `Problems`, next to the `Need*` flag.
  * For /viewer/nodes the code is the only signal of a dropped storage group or pool filter.
  */
-const NOT_APPLIED_PROBLEMS: Partial<Record<string, DataIssueKind>> = {
-    'filter-not-applied': 'filter-not-applied',
-    'sort-not-applied': 'sort-not-applied',
-    'group-not-applied': 'group-not-applied',
-};
+const NOT_APPLIED_PROBLEMS = new Map<string, DataIssueKind>([
+    ['filter-not-applied', 'filter-not-applied'],
+    ['sort-not-applied', 'sort-not-applied'],
+    ['group-not-applied', 'group-not-applied'],
+]);
 
 /**
  * /storage/groups builds the list of groups from BS controller data and falls back
@@ -71,7 +71,7 @@ export function getStorageGroupsDataIssues(quality?: ResponseDataQuality): DataI
     const issues = new Set<DataIssueKind>();
 
     for (const problem of quality.problems) {
-        const notApplied = NOT_APPLIED_PROBLEMS[problem];
+        const notApplied = NOT_APPLIED_PROBLEMS.get(problem);
         if (notApplied) {
             issues.add(notApplied);
         } else if (problem === STORAGE_GROUPS_DATABASE_FILTER_DROPPED_PROBLEM) {
@@ -146,7 +146,7 @@ function getNodesProblemIssue(
     problem: string,
     {hasGroupFilter, hasDatabase, storageNodes}: NodesDataIssuesContext,
 ): DataIssueKind {
-    const notApplied = NOT_APPLIED_PROBLEMS[problem];
+    const notApplied = NOT_APPLIED_PROBLEMS.get(problem);
     if (notApplied) {
         return notApplied;
     }
