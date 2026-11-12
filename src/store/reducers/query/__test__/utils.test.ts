@@ -1,7 +1,6 @@
 import {QUERY_ACTIONS, STATISTICS_MODES} from '../../../../utils/query';
 import {
     getActionAndSyntaxFromQueryMode,
-    getEffectiveQueryDataForAction,
     getEffectiveQuerySettingsForAction,
     getUniqueTabTitle,
     isQueryTabsDirtyPersistedState,
@@ -33,32 +32,6 @@ describe('getActionAndSyntaxFromQueryMode', () => {
             expect(result.syntax).toBe(syntax);
         },
     );
-});
-
-describe('getEffectiveQueryDataForAction', () => {
-    const data = {
-        stats: {DurationUs: '10'},
-        resultSets: [
-            {
-                columns: [{name: 'value', type: 'Int32'}],
-                result: [{value: 1}],
-            },
-        ],
-    };
-
-    test('keeps regular execute data unchanged', () => {
-        expect(getEffectiveQueryDataForAction(QUERY_ACTIONS.execute, data)).toBe(data);
-    });
-
-    test('hides result sets for explain analyze without mutating source data', () => {
-        const result = getEffectiveQueryDataForAction(QUERY_ACTIONS.explainAnalyze, data);
-
-        expect(result).toEqual({
-            stats: {DurationUs: '10'},
-            resultSets: undefined,
-        });
-        expect(data.resultSets).toHaveLength(1);
-    });
 });
 
 describe('getEffectiveQuerySettingsForAction', () => {
