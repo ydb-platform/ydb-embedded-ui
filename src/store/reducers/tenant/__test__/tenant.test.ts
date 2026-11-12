@@ -32,6 +32,39 @@ describe('tenantApi.getTenantInfo', () => {
         window.api = originalApi;
     });
 
+    test('keeps CP identity isolated across environments and backends', async () => {
+        const getTenantInfo = jest.fn();
+        window.api = {viewer: {getTenantInfo}} as unknown as YdbEmbeddedAPI;
+        const store = createTestStore();
+        const endpoint = tenantApi.endpoints.getTenantInfo;
+        const scopes = [
+            {environment: 'env-a', backend: '/runtime-a'},
+            {environment: 'env-b', backend: '/runtime-a'},
+            {environment: 'env-b', backend: '/runtime-b'},
+        ];
+        try {
+            for (const [index, scope] of scopes.entries()) {
+                const args = {...queryArgs, ...scope};
+                expect(endpoint.select(args)(store.getState()).data).toBeUndefined();
+                const tenant = {
+                    Name: queryArgs.database,
+                    ControlPlane: {id: `cp-${index}`, folder_id: `folder-${index}`},
+                };
+                getTenantInfo.mockResolvedValueOnce({TenantInfo: [tenant]});
+                await store.dispatch(endpoint.initiate(args, {subscribe: false}));
+                expect(endpoint.select(args)(store.getState()).data?.ControlPlane).toEqual(
+                    tenant.ControlPlane,
+                );
+            }
+            expect(getTenantInfo).toHaveBeenCalledTimes(3);
+            expect(
+                endpoint.select({...queryArgs, ...scopes[0]})(store.getState()).data?.ControlPlane,
+            ).toEqual({id: 'cp-0', folder_id: 'folder-0'});
+        } finally {
+            store.dispatch(api.util.resetApiState());
+        }
+    });
+
     test('returns EMPTY_TENANT_INFO when TenantInfo is empty', async () => {
         window.api = {
             viewer: {

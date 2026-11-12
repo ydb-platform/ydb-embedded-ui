@@ -76,7 +76,7 @@ export function useOperationsInfiniteQuery({
     const checkAndLoadMorePages = React.useCallback(
         (fromScroll = false) => {
             const scrollContainer = scrollContainerRef?.current;
-            if (!scrollContainer || !hasNextPage || isFetchingNextPage || error) {
+            if (!scrollContainer || !hasNextPage || isFetchingNextPage || (error && !fromScroll)) {
                 return;
             }
 

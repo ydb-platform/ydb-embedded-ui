@@ -1,7 +1,18 @@
 import {expect, test} from '@playwright/test';
 import type {Page} from '@playwright/test';
 
-async function mockApi(page: Page, hasCp: boolean) {
+interface MockOptions {
+    hasCp?: boolean;
+    hasOperationsCapability?: boolean;
+    distinctCpIds?: boolean;
+    cpStatus?: number;
+    nextPageError?: {active: boolean};
+}
+
+async function mockApi(
+    page: Page,
+    {hasCp = true, hasOperationsCapability = true, distinctCpIds}: MockOptions,
+) {
     await page.addInitScript(() => localStorage.setItem('enableTenantNavigationV2', 'true'));
     await page.route('**/*', async (route) => {
         const url = new URL(route.request().url());
@@ -10,12 +21,14 @@ async function mockApi(page: Page, hasCp: boolean) {
             await route.continue();
             return;
         }
+        const scope =
+            distinctCpIds && new URL(page.url()).pathname.startsWith('/env-b/') ? '-b' : '';
         let body: unknown = {};
         if (pathname.endsWith('/meta/databases') || pathname.endsWith('/meta/cp_databases')) {
             body = {
                 databases: [
                     {
-                        Id: 'cp-id',
+                        Id: `cp-id${scope}`,
                         Name: url.searchParams.get('database') || '/db',
                         Type: 'Dedicated',
                         NodeIds: [1],
@@ -23,9 +36,9 @@ async function mockApi(page: Page, hasCp: boolean) {
                         ...(hasCp
                             ? {
                                   ControlPlane: {
-                                      id: 'cp-id',
+                                      id: `cp-id${scope}`,
                                       name: 'test-database',
-                                      folder_id: 'folder',
+                                      folder_id: `folder${scope}`,
                                       endpoint: 'grpcs://example.invalid:2135',
                                       status: 'RUNNING',
                                   },
@@ -37,7 +50,13 @@ async function mockApi(page: Page, hasCp: boolean) {
         } else if (pathname.endsWith('/whoami')) {
             body = {UserSID: 'test', IsViewerAllowed: true, IsMonitoringAllowed: true};
         } else if (pathname.endsWith('/capabilities')) {
-            body = {Capabilities: {}, Settings: {Security: {UseLoginProvider: true}}};
+            body = {
+                Capabilities:
+                    pathname.includes('/viewer/') || !hasOperationsCapability
+                        ? {}
+                        : {'/meta/list_operations': 1},
+                Settings: {Security: {UseLoginProvider: true}},
+            };
         } else if (pathname.endsWith('/meta/db_clusters')) {
             body = {
                 clusters: [{name: url.searchParams.get('name'), settings: {use_meta_proxy: true}}],
@@ -55,8 +74,9 @@ async function mockApi(page: Page, hasCp: boolean) {
 
 type OperationCall = {path: string; body: Record<string, unknown>};
 
-async function mockOperations(page: Page, {hasCp = true, cpStatus = 200} = {}) {
-    await mockApi(page, hasCp);
+async function mockOperations(page: Page, options: MockOptions = {}) {
+    const {cpStatus = 200, nextPageError} = options;
+    await mockApi(page, options);
     const calls: OperationCall[] = [];
     await page.route(/\/(?:operation\/list|meta\/list_operations)(?:\?|$)/, async (route) => {
         const path = new URL(route.request().url()).pathname;
@@ -121,6 +141,10 @@ async function mockOperations(page: Page, {hasCp = true, cpStatus = 200} = {}) {
                       ],
                       next_page_token: 'next-page',
                   };
+        }
+        if (path.endsWith('/meta/list_operations') && body.page_token && nextPageError?.active) {
+            status = 503;
+            data = {message: 'Temporary CP failure'};
         }
         await route.fulfill({
             status,
@@ -250,7 +274,7 @@ test.describe('Operations', () => {
     test('CP rows and cursors reset when environment changes with the same database id', async ({
         page,
     }) => {
-        const calls = await mockOperations(page);
+        const calls = await mockOperations(page, {distinctCpIds: true});
         await page.goto(`/env-a${path}&operationSource=control-plane`);
         await expect(page.getByText('cp-error-a', {exact: true})).toBeVisible();
         await page.getByPlaceholder('Filter by ID').fill('cp-success');
@@ -263,7 +287,55 @@ test.describe('Operations', () => {
         await expect(page.getByText('cp-error-a', {exact: true})).toHaveCount(0);
         const cpCalls = calls.filter((call) => call.path.endsWith('/meta/list_operations'));
         expect(cpCalls).toHaveLength(3);
+        expect(cpCalls[2].body).toMatchObject({resource_id: 'cp-id-b', folder_id: 'folder-b'});
         expect(cpCalls[2].body.page_token).toBeUndefined();
+    });
+
+    test('unsupported CP list falls back to Database and canonicalizes a stale link', async ({
+        page,
+    }) => {
+        const calls = await mockOperations(page, {hasOperationsCapability: false});
+        await page.goto(`${path}&operationSource=control-plane`);
+        await expect(page.getByText('database-error', {exact: true})).toBeVisible();
+        await expect(page.getByRole('radiogroup', {name: 'Operation source'})).toHaveCount(0);
+        await expect(page).toHaveURL(/operationSource=database/);
+        expect(calls.filter((call) => call.path.endsWith('/meta/list_operations'))).toHaveLength(0);
+        await page.goto(path);
+        await expect(page.getByText('database-error', {exact: true})).toBeVisible();
+        expect(calls.filter((call) => call.path.endsWith('/meta/list_operations'))).toHaveLength(0);
+    });
+
+    test('scroll retries a failed next page without an automatic retry loop', async ({page}) => {
+        const nextPageError = {active: true};
+        const calls = await mockOperations(page, {nextPageError});
+        await page.goto(path);
+        await expect(page.getByText('cp-error-a', {exact: true})).toBeVisible();
+        const scrollContainer = page.locator('.kv-tenant-diagnostics__page-wrapper');
+        await scrollContainer.evaluate((element) => element.scrollTo({top: element.scrollHeight}));
+        await expect(page.getByText('Temporary CP failure', {exact: true})).toBeVisible();
+        const failures = calls.filter((call) => call.body.page_token).length;
+        await page.evaluate(
+            () =>
+                new Promise<void>((resolve) =>
+                    requestAnimationFrame(() => requestAnimationFrame(() => resolve())),
+                ),
+        );
+        expect(calls.filter((call) => call.body.page_token)).toHaveLength(failures);
+        nextPageError.active = false;
+        await scrollContainer.evaluate((element) => element.scrollTo({top: 0}));
+        await scrollContainer.evaluate((element) => element.scrollTo({top: element.scrollHeight}));
+        await expect
+            .poll(() => calls.filter((call) => call.body.page_token).length)
+            .toBe(failures + 1);
+        await scrollContainer.evaluate((element) => element.scrollTo({top: 0}));
+        await expect(page.getByText('cp-success-a', {exact: true})).toBeVisible();
+        await expect(page.getByText('Temporary CP failure', {exact: true})).toHaveCount(0);
+        await expect(page.getByText('cp-error-a', {exact: true})).toBeVisible();
+        expect(
+            calls
+                .filter((call) => call.body.page_token)
+                .every((call) => call.body.page_token === 'next-page'),
+        ).toBe(true);
     });
 
     test('defaults to CP when connected and keeps Database reachable after a permission failure', async ({

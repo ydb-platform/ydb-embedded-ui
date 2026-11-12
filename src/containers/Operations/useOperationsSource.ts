@@ -3,10 +3,14 @@ import React from 'react';
 import {StringParam, useQueryParam} from 'use-query-params';
 import {z} from 'zod';
 
-import {backend, environment} from '../../store';
-import {useEmMetaAvailable} from '../../store/reducers/capabilities/hooks';
+import {
+    useEmMetaAvailable,
+    useGetMetaFeatureVersion,
+    useMetaCapabilitiesLoaded,
+} from '../../store/reducers/capabilities/hooks';
 import {useClusterBaseInfo} from '../../store/reducers/cluster/cluster';
 import {useTenantBaseInfo} from '../../store/reducers/tenant/tenant';
+import {backend, environment} from '../../store/runtimeParams';
 
 const operationSourceSchema = z.enum(['database', 'control-plane']).catch('control-plane');
 
@@ -14,10 +18,16 @@ export function useOperationsSource(database: string, controlPlaneOnly: boolean)
     const {name: clusterName} = useClusterBaseInfo();
     const {controlPlane, databaseData, isError: tenantError} = useTenantBaseInfo(database);
     const emMetaAvailable = useEmMetaAvailable();
+    const listOperationsAvailable = useGetMetaFeatureVersion('/meta/list_operations') >= 1;
+    const metaCapabilitiesLoaded = useMetaCapabilitiesLoaded();
     const [rawSource, setSource] = useQueryParam('operationSource', StringParam);
     const requestedSource = operationSourceSchema.parse(rawSource);
     const cpAvailable = Boolean(
-        emMetaAvailable && clusterName && controlPlane?.id && controlPlane?.folder_id,
+        emMetaAvailable &&
+            listOperationsAvailable &&
+            clusterName &&
+            controlPlane?.id &&
+            controlPlane?.folder_id,
     );
     const source =
         cpAvailable && (controlPlaneOnly || requestedSource === 'control-plane')
@@ -28,12 +38,21 @@ export function useOperationsSource(database: string, controlPlaneOnly: boolean)
         if (
             !controlPlaneOnly &&
             rawSource === 'control-plane' &&
+            metaCapabilitiesLoaded &&
             !cpAvailable &&
             (databaseData || tenantError)
         ) {
             setSource('database', 'replaceIn');
         }
-    }, [controlPlaneOnly, rawSource, cpAvailable, databaseData, tenantError, setSource]);
+    }, [
+        controlPlaneOnly,
+        rawSource,
+        metaCapabilitiesLoaded,
+        cpAvailable,
+        databaseData,
+        tenantError,
+        setSource,
+    ]);
     const currentEnvironment = environment;
     const currentBackend = backend;
     const controlPlaneParams = React.useMemo(() => {
@@ -57,6 +76,8 @@ export function useOperationsSource(database: string, controlPlaneOnly: boolean)
     ]);
     const skipDatabase =
         controlPlaneOnly ||
-        (!databaseData && !tenantError && requestedSource === 'control-plane' && emMetaAvailable);
+        (requestedSource === 'control-plane' &&
+            emMetaAvailable &&
+            (!metaCapabilitiesLoaded || (!databaseData && !tenantError)));
     return {source, setSource, cpAvailable, isControlPlane, controlPlaneParams, skipDatabase};
 }
