@@ -172,6 +172,10 @@
         white-space: nowrap;
         text-overflow: ellipsis;
 
+        &_clip {
+            text-overflow: clip;
+        }
+
         &_with-left-trim {
             text-align: end;
             direction: rtl;

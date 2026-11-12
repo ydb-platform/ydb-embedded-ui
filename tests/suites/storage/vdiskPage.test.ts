@@ -942,7 +942,10 @@ test.describe('Storage disk popup snapshots', () => {
                         .first();
                     const clipped =
                         value === LONG_DATACENTER ? text.locator('.g-label__content') : text;
-                    await expect(clipped).toHaveCSS('text-overflow', 'ellipsis');
+                    await expect(clipped).toHaveCSS(
+                        'text-overflow',
+                        value === LONG_DATACENTER ? 'clip' : 'ellipsis',
+                    );
                     await expect(clipped).toHaveCSS('white-space', 'nowrap');
                     await expect
                         .poll(() =>

@@ -82,10 +82,12 @@ export function DiskPopupHeader({
 export function DiskPopupText({
     value,
     withLeftTrim = false,
+    clip = false,
     children,
 }: {
     value?: string | number;
     withLeftTrim?: boolean;
+    clip?: boolean;
     children?: React.ReactNode;
 }) {
     const hasValue = !isNil(value) && value !== '';
@@ -93,7 +95,7 @@ export function DiskPopupText({
     return (
         <Tooltip content={text} disabled={!hasValue} className={b('text-tooltip')}>
             <span
-                className={b('text', {'with-left-trim': withLeftTrim})}
+                className={b('text', {clip, 'with-left-trim': withLeftTrim})}
                 tabIndex={hasValue ? 0 : undefined}
             >
                 {children ?? (withLeftTrim ? <span>{text}</span> : text)}
@@ -118,7 +120,7 @@ export function DiskPopupLocation({
             return {
                 ...item,
                 content: (
-                    <DiskPopupText value={name}>
+                    <DiskPopupText value={name} clip={Boolean(name)}>
                         {name ? (
                             <DatacenterLabel name={name} colorKey={datacenterColorKey} size="xxs" />
                         ) : undefined}

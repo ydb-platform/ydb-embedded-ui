@@ -51,6 +51,7 @@ export function PDiskStorageDetails({
                                     wrapperClassName={b('value-popover')}
                                     className={b('value-popover-content', {
                                         'with-left-trim': id === 'pdisk-path',
+                                        clip: id === 'datacenter' && Boolean(copyText),
                                     })}
                                 >
                                     <span tabIndex={copyText ? 0 : undefined}>

@@ -47,6 +47,7 @@ function DetailItem({
                     wrapperClassName={b('value-popover')}
                     className={b('value-popover-content', {
                         'with-left-trim': item.id === 'pdisk-path',
+                        clip: item.id === 'datacenter' && Boolean(copyText),
                     })}
                 >
                     <span tabIndex={copyText ? 0 : undefined}>
