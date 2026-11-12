@@ -1,5 +1,12 @@
 # Changelog
 
+## [22.9.1](https://github.com/ydb-platform/ydb-embedded-ui/compare/v22.9.0...v22.9.1) (2026-11-12)
+
+
+### Bug Fixes
+
+* **clusters:** build filter options from clusters matching availability ([#4583](https://github.com/ydb-platform/ydb-embedded-ui/issues/4583)) ([7a8fa9f](https://github.com/ydb-platform/ydb-embedded-ui/commit/7a8fa9f4e05114e91f88165a734985a8c0009aca))
+
 ## [22.9.0](https://github.com/ydb-platform/ydb-embedded-ui/compare/v22.8.0...v22.9.0) (2026-11-11)
 
 
