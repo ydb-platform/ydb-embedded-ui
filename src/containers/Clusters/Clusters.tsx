@@ -13,6 +13,7 @@ import {useEmMetaAvailable} from '../../store/reducers/capabilities/hooks';
 import {changeClustersFilters, clustersApi} from '../../store/reducers/clusters/clusters';
 import {
     filterClusters,
+    filterClustersByAvailability,
     selectAvailabilityFilter,
     selectClusterNameFilter,
     selectGalaxyFilter,
@@ -41,6 +42,20 @@ import {b} from './shared';
 import {calculateClusterPath} from './utils';
 
 import './Clusters.scss';
+
+interface FilterOption {
+    value: string;
+    content: string;
+}
+
+function toFilterOptions(values: Iterable<string>, selected: string[]): FilterOption[] {
+    // Keep selected values in options so they stay visible and can be unchecked
+    // even if no cluster matching current availability filter has them
+    const uniqValues = new Set(values);
+    selected.forEach((value) => uniqValues.add(value));
+
+    return Array.from(uniqValues).map((value) => ({value, content: value}));
+}
 
 interface ClustersProps {
     scrollContainerRef: React.RefObject<HTMLElement>;
@@ -181,13 +196,18 @@ export function Clusters({scrollContainerRef}: ClustersProps) {
         return columnsToShow.filter((column) => allowedColumnIds.has(column.name));
     }, [columnsToShow, filteredColumnsToSelect]);
 
+    // Filter options are built only from clusters matching selected availability,
+    // so e.g. values of unavailable clusters are not offered when only available ones are shown
+    const clustersForFilterOptions = React.useMemo(() => {
+        return filterClustersByAvailability(clusters ?? [], availability);
+    }, [clusters, availability]);
+
     const {servicesToSelect, versions, galaxiesToSelect} = React.useMemo(() => {
         const clustersServices = new Set<string>();
         const uniqVersions = new Set<string>();
         const clustersGalaxies = new Set<string>();
 
-        const clusterList = clusters ?? [];
-        clusterList.forEach((cluster) => {
+        clustersForFilterOptions.forEach((cluster) => {
             if (cluster.service) {
                 clustersServices.add(cluster.service);
             }
@@ -200,17 +220,11 @@ export function Clusters({scrollContainerRef}: ClustersProps) {
         });
 
         return {
-            servicesToSelect: Array.from(clustersServices).map((value) => ({
-                value,
-                content: value,
-            })),
-            versions: Array.from(uniqVersions).map((value) => ({value, content: value})),
-            galaxiesToSelect: Array.from(clustersGalaxies).map((value) => ({
-                value,
-                content: value,
-            })),
+            servicesToSelect: toFilterOptions(clustersServices, service),
+            versions: toFilterOptions(uniqVersions, version),
+            galaxiesToSelect: toFilterOptions(clustersGalaxies, galaxy),
         };
-    }, [clusters]);
+    }, [clustersForFilterOptions, service, version, galaxy]);
 
     const filteredClusters = React.useMemo(() => {
         return filterClusters(clusters ?? [], {
@@ -224,14 +238,14 @@ export function Clusters({scrollContainerRef}: ClustersProps) {
     }, [clusterName, clusters, service, status, version, galaxy, availability]);
 
     const statuses = React.useMemo(() => {
-        return Array.from(
-            new Set(
-                (clusters ?? []).map((cluster) => cluster.status).filter(Boolean),
-            ) as Set<string>,
-        )
-            .sort()
-            .map((el) => ({value: el, content: el}));
-    }, [clusters]);
+        const clustersStatuses = clustersForFilterOptions
+            .map((cluster) => cluster.status)
+            .filter((value): value is string => Boolean(value));
+
+        return toFilterOptions(clustersStatuses, status).sort((left, right) =>
+            left.value > right.value ? 1 : -1,
+        );
+    }, [clustersForFilterOptions, status]);
 
     const renderControls = () => {
         return (
