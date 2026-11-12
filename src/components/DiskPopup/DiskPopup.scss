@@ -172,7 +172,7 @@
         white-space: nowrap;
         text-overflow: ellipsis;
 
-        &:has(> .ydb-datacenter-label) {
+        &_clip {
             text-overflow: clip;
         }
 

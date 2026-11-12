@@ -48,7 +48,7 @@
         min-width: 0;
         max-width: 100%;
 
-        &:has(.ydb-datacenter-label) {
+        &_clip {
             text-overflow: clip;
         }
 
