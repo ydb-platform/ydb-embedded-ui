@@ -1,4 +1,4 @@
-import {filterClusters} from '../selectors';
+import {filterClusters, filterClustersByAvailability} from '../selectors';
 import type {ClustersFilters} from '../types';
 import {prepareClustersData} from '../utils';
 
@@ -62,5 +62,25 @@ describe('filterClusters', () => {
 
     test('shows no clusters when no availability states are selected', () => {
         expect(filterClusters(clusters, {...defaultFilters, availability: []})).toEqual([]);
+    });
+});
+
+describe('filterClustersByAvailability', () => {
+    test('returns only available clusters', () => {
+        expect(filterClustersByAvailability(clusters, ['available']).map(({name}) => name)).toEqual(
+            ['available', 'explicitly-available'],
+        );
+    });
+
+    test('returns only unavailable clusters', () => {
+        expect(
+            filterClustersByAvailability(clusters, ['unavailable']).map(({name}) => name),
+        ).toEqual(['unavailable-object', 'unavailable-json']);
+    });
+
+    test('returns all clusters when both availability states are selected', () => {
+        expect(filterClustersByAvailability(clusters, ['available', 'unavailable'])).toHaveLength(
+            4,
+        );
     });
 });
