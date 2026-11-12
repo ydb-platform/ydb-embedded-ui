@@ -1,6 +1,11 @@
 @use '../../../../../../styles/mixins.scss';
 
 .ydb-query-result-sets-viewer {
+    &__throughput.g-label {
+        color: var(--g-color-text-misc-heavy);
+        background-color: var(--g-color-base-misc-light);
+    }
+
     &__tabs {
         margin-bottom: var(--g-spacing-1);
         padding-top: var(--g-spacing-1);
@@ -26,7 +31,7 @@
         flex-grow: 1;
         flex-direction: column;
 
-        padding-left: 10px;
+        padding-left: var(--g-spacing-4);
 
         @include mixins.query-data-table();
         & .data-table__table-wrapper {

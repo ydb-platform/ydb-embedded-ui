@@ -11,7 +11,7 @@ import {
     setStreamQueryResponse as setStreamQueryResponseReducer,
     setStreamSession as setStreamSessionReducer,
 } from './streaming/reducers';
-import type {QueryResult, QueryState, QueryTabState} from './types';
+import type {QueryPlanView, QueryResult, QueryState, QueryTabState} from './types';
 import {
     applyQueryContentToTab,
     createDefaultTabState,
@@ -323,6 +323,10 @@ const slice = createSlice({
                 return;
             }
 
+            if (tab.result?.executionId !== action.payload.result?.executionId) {
+                tab.queryPlanView = undefined;
+                tab.queryPlanColumnSizing = undefined;
+            }
             tab.result = action.payload.result;
         },
         setLastExecutedQueryText: (
@@ -637,6 +641,28 @@ const slice = createSlice({
         setHistoryCurrentQueryId: (state, action: PayloadAction<string | undefined>) => {
             state.historyCurrentQueryId = action.payload;
         },
+        setQueryPlanColumnSizing: (
+            state,
+            action: PayloadAction<{
+                tabId: string;
+                executionId: string;
+                sizing: Record<string, number>;
+            }>,
+        ) => {
+            const tab = state.tabsById[action.payload.tabId];
+            if (tab?.result?.executionId === action.payload.executionId) {
+                tab.queryPlanColumnSizing = action.payload.sizing;
+            }
+        },
+        setQueryPlanView: (
+            state,
+            action: PayloadAction<{tabId: string; executionId: string; view: QueryPlanView}>,
+        ) => {
+            const tab = state.tabsById[action.payload.tabId];
+            if (tab?.result?.executionId === action.payload.executionId) {
+                tab.queryPlanView = action.payload.view;
+            }
+        },
         setResultTab: (state, action: PayloadAction<{queryType: QueryAction; tabId: string}>) => {
             const {queryType, tabId} = action.payload;
             if (!state.selectedResultTab) {
@@ -655,6 +681,12 @@ const slice = createSlice({
         selectNewTabCounter: (state) => state.newTabCounter,
         selectActiveTab: (state) =>
             state.activeTabId ? state.tabsById[state.activeTabId] : undefined,
+        selectQueryPlanView: (state) =>
+            state.activeTabId ? state.tabsById[state.activeTabId]?.queryPlanView : undefined,
+        selectQueryPlanColumnSizing: (state) =>
+            state.activeTabId
+                ? state.tabsById[state.activeTabId]?.queryPlanColumnSizing
+                : undefined,
         selectQueriesHistoryFilter: (state) => state.historyFilter || '',
         selectHistoryCurrentQueryId: (state) => state.historyCurrentQueryId,
         selectTenantPath: (state) => state.tenantPath,
@@ -717,6 +749,8 @@ export const {
     setStreamSession,
     setIsDirty,
     setResultTab,
+    setQueryPlanView,
+    setQueryPlanColumnSizing,
 } = slice.actions;
 
 export const {
@@ -724,6 +758,8 @@ export const {
     selectTabsOrder,
     selectTabsById,
     selectActiveTab,
+    selectQueryPlanView,
+    selectQueryPlanColumnSizing,
     selectQueriesHistoryFilter,
     selectHistoryCurrentQueryId,
     selectTenantPath,

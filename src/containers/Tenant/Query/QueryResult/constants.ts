@@ -4,9 +4,8 @@ import {QUERY_ACTIONS} from '../../../../utils/query';
 
 export const RESULT_OPTIONS_IDS = {
     result: 'result',
-    schema: 'schema',
-    simplified: 'simplified',
-    json: 'json',
+    queryPlan: 'query-plan',
+    executionPlan: 'execution-plan',
     stats: 'stats',
     ast: 'ast',
 } as const;
@@ -22,28 +21,28 @@ const RESULT_VIEW_CONFIG: Record<QueryAction, ResultViewConfig> = {
     [QUERY_ACTIONS.execute]: {
         sections: [
             RESULT_OPTIONS_IDS.result,
-            RESULT_OPTIONS_IDS.schema,
-            RESULT_OPTIONS_IDS.simplified,
+            RESULT_OPTIONS_IDS.queryPlan,
+            RESULT_OPTIONS_IDS.executionPlan,
             RESULT_OPTIONS_IDS.stats,
         ],
         defaultSection: RESULT_OPTIONS_IDS.result,
     },
     [QUERY_ACTIONS.explain]: {
         sections: [
-            RESULT_OPTIONS_IDS.schema,
-            RESULT_OPTIONS_IDS.simplified,
-            RESULT_OPTIONS_IDS.json,
+            RESULT_OPTIONS_IDS.queryPlan,
+            RESULT_OPTIONS_IDS.executionPlan,
             RESULT_OPTIONS_IDS.ast,
         ],
-        defaultSection: RESULT_OPTIONS_IDS.schema,
+        defaultSection: RESULT_OPTIONS_IDS.queryPlan,
     },
     [QUERY_ACTIONS.explainAnalyze]: {
         sections: [
-            RESULT_OPTIONS_IDS.schema,
-            RESULT_OPTIONS_IDS.simplified,
+            RESULT_OPTIONS_IDS.result,
+            RESULT_OPTIONS_IDS.queryPlan,
+            RESULT_OPTIONS_IDS.executionPlan,
             RESULT_OPTIONS_IDS.stats,
         ],
-        defaultSection: RESULT_OPTIONS_IDS.simplified,
+        defaultSection: RESULT_OPTIONS_IDS.queryPlan,
     },
 };
 
@@ -53,4 +52,11 @@ export function getResultSections(resultType: QueryAction): SectionID[] {
 
 export function getDefaultResultSection(resultType: QueryAction): SectionID {
     return RESULT_VIEW_CONFIG[resultType].defaultSection;
+}
+
+export function resolveResultSection(resultType: QueryAction, savedTab?: string): SectionID {
+    return (
+        getResultSections(resultType).find((section) => section === savedTab) ??
+        getDefaultResultSection(resultType)
+    );
 }
