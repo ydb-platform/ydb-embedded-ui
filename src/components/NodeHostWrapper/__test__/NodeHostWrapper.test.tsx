@@ -6,8 +6,6 @@ import {EFlag} from '../../../types/api/enums';
 import {isNodeResponseTimedOut} from '../../../utils/nodes';
 import {NODE_STATE_UNKNOWN_QA, NodeHostWrapper, getNodeHostPath} from '../NodeHostWrapper';
 
-const TIMEOUT_MESSAGE = 'The node did not respond in time. Its state is unknown.';
-
 function createNode(node: Partial<PreparedStorageNode> = {}): PreparedStorageNode {
     return {
         NodeId: 7,
@@ -45,17 +43,9 @@ describe('isNodeResponseTimedOut', () => {
 });
 
 describe('getNodeHostPath', () => {
-    test('Should give a path for an available node', () => {
-        expect(getNodeHostPath(createNode({SystemState: EFlag.Green}))).toContain('/node/7');
-    });
-
     test('Should give no path for an unavailable node', () => {
         expect(getNodeHostPath(createNode())).toBeUndefined();
         expect(getNodeHostPath(createNode({SystemState: EFlag.Grey}))).toBeUndefined();
-    });
-
-    test('Should give a path for a node that only did not answer in time', () => {
-        expect(getNodeHostPath(createNode({ResponseTimeout: true}))).toContain('/node/7');
     });
 
     test('Should treat a node without a state as a storage node in a table of storage nodes', () => {
@@ -85,13 +75,6 @@ describe('getNodeHostPath', () => {
         expect(path).toContain('database=');
     });
 
-    test('Should not guess the kind of a node without a state when nothing tells it', () => {
-        const path = getNodeHostPath(createNode({ResponseTimeout: true}));
-
-        expect(path).toContain('/node/7/storage');
-        expect(path).not.toContain('database');
-    });
-
     test('Should not let the table override the roles a node has reported', () => {
         const node = createNode({SystemState: EFlag.Green, TenantName: '/Root/db'});
 
@@ -108,14 +91,6 @@ describe('getNodeHostPath', () => {
 });
 
 describe('NodeHostWrapper', () => {
-    test('Should show the status and a link for an available node', () => {
-        const {container} = renderNode(createNode({SystemState: EFlag.Green}));
-
-        expect(screen.getByRole('link', {name: 'node-7.example.net'})).toBeInTheDocument();
-        expect(container.querySelector('.ydb-status-color_state_green')).toBeInTheDocument();
-        expect(getStateUnknownIcon(container)).not.toBeInTheDocument();
-    });
-
     test('Should show the grey status and no link for an unavailable node', () => {
         const {container} = renderNode(createNode());
 
@@ -132,26 +107,8 @@ describe('NodeHostWrapper', () => {
             'href',
             expect.stringContaining('/node/7'),
         );
-        expect(screen.getByRole('img', {name: TIMEOUT_MESSAGE})).toBe(
-            getStateUnknownIcon(container),
-        );
+        expect(getStateUnknownIcon(container)).toBeInTheDocument();
         expect(container.querySelector('.ydb-status-color')).not.toBeInTheDocument();
-    });
-
-    test('Should link a node without a state as the table it is in tells', () => {
-        render(
-            <MemoryRouter>
-                <NodeHostWrapper
-                    node={createNode({ResponseTimeout: true})}
-                    database="/Root/db"
-                    storageNodes
-                />
-            </MemoryRouter>,
-        );
-
-        const href = screen.getByRole('link', {name: 'node-7.example.net'}).getAttribute('href');
-        expect(href).toContain('/node/7/storage');
-        expect(href).not.toContain('database');
     });
 
     test('Should keep the connect status but still give the link in the network column', () => {

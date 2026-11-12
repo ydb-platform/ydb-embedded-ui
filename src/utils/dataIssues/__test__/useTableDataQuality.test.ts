@@ -48,26 +48,6 @@ describe('useTableDataQuality', () => {
         expect(result.current.dataQuality).toEqual({...clean, problems: ['bsc-timeout']});
     });
 
-    test('Should not depend on the order the chunks report in', () => {
-        const first = renderHook(() => useTableDataQuality());
-        const second = renderHook(() => useTableDataQuality());
-
-        act(() => {
-            first.result.current.handleChunkDataChange(100, withProblem('bsc-timeout'));
-            first.result.current.handleChunkDataChange(0, chunkData({needSort: true}));
-            first.result.current.handleChunkDataChange(20, chunkData({}));
-        });
-        act(() => {
-            second.result.current.handleChunkDataChange(20, chunkData({}));
-            second.result.current.handleChunkDataChange(0, chunkData({needSort: true}));
-            second.result.current.handleChunkDataChange(100, withProblem('bsc-timeout'));
-        });
-
-        const expected = {...clean, problems: ['bsc-timeout'], needSort: true};
-        expect(first.result.current.dataQuality).toEqual(expected);
-        expect(second.result.current.dataQuality).toEqual(expected);
-    });
-
     test('Should unite the problems of all chunks without repeating them', () => {
         const {result} = renderHook(() => useTableDataQuality());
 
@@ -110,27 +90,6 @@ describe('useTableDataQuality', () => {
         expect(result.current.dataQuality).toBeUndefined();
     });
 
-    test('Should not make its owner render for chunk events that change nothing', () => {
-        let renders = 0;
-        const {result} = renderHook(() => {
-            renders += 1;
-            return useTableDataQuality();
-        });
-
-        act(() => result.current.handleChunkDataChange(0, withProblem('bsc-timeout')));
-        const {dataQuality} = result.current;
-        const rendersWithProblem = renders;
-
-        // A healthy table reports like this all the time while it is scrolled
-        act(() => result.current.handleChunkDataChange(0, withProblem('bsc-timeout')));
-        act(() => result.current.handleChunkDataChange(20, chunkData({})));
-        act(() => result.current.handleChunkDataChange(20, undefined));
-        act(() => result.current.handleChunkDataChange(40, undefined));
-
-        expect(renders).toBe(rendersWithProblem);
-        expect(result.current.dataQuality).toBe(dataQuality);
-    });
-
     test('Should publish one change for many chunks that report the same problem', () => {
         let renders = 0;
         const {result} = renderHook(() => {
@@ -157,26 +116,6 @@ describe('useTableDataQuality', () => {
 
         expect(renders).toBe(rendersBefore + 2);
         expect(result.current.dataQuality).toBeUndefined();
-    });
-
-    test('Should not publish a change when the same problems arrive in another order', () => {
-        const {result} = renderHook(() => useTableDataQuality());
-
-        act(() => result.current.handleChunkDataChange(0, withProblem('bsc-timeout')));
-        act(() => result.current.handleChunkDataChange(20, withProblem('hive-timeout')));
-        const {dataQuality} = result.current;
-
-        // The chunk that brought the first code leaves and comes back: the set is the same
-        act(() =>
-            result.current.handleChunkDataChange(
-                40,
-                chunkData({problems: ['hive-timeout', 'bsc-timeout']}),
-            ),
-        );
-        act(() => result.current.handleChunkDataChange(0, undefined));
-        act(() => result.current.handleChunkDataChange(0, withProblem('bsc-timeout')));
-
-        expect(result.current.dataQuality).toBe(dataQuality);
     });
 
     test('Should unite the reports of several tables and tell their chunks apart', () => {

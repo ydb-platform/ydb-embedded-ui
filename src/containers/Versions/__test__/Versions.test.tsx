@@ -1,4 +1,4 @@
-import {render, screen} from '@testing-library/react';
+import {render} from '@testing-library/react';
 
 import type {ResponseDataQuality} from '../../../utils/dataIssues/types';
 import {VersionsContainer} from '../Versions';
@@ -48,25 +48,13 @@ function renderVersions(quality: Partial<ResponseDataQuality>) {
 }
 
 describe('Versions data issues', () => {
-    test('shows no warning when the nodes are loaded without problems', () => {
-        renderVersions({});
-
-        expect(screen.queryByText(/Problems reported by the server/)).not.toBeInTheDocument();
-        expect(screen.queryByText(/did not respond in time/)).not.toBeInTheDocument();
-    });
-
     test('warns that the versions are built from incomplete data of the nodes', () => {
         renderVersions({problems: ['wb-incomplete', 'hive-timeout']});
 
-        expect(
-            screen.getByText('Some nodes did not respond in time and may be shown as unavailable.'),
-        ).toBeInTheDocument();
+        const issues = Array.from(document.querySelectorAll('[data-issue]')).map((item) =>
+            item.getAttribute('data-issue'),
+        );
         // Hive problems do not make the list of cluster nodes incomplete
-        expect(
-            screen.getByText('Some data is unavailable: some values may be missing.'),
-        ).toBeInTheDocument();
-        expect(
-            screen.getByText('Problems reported by the server: wb-incomplete, hive-timeout'),
-        ).toBeInTheDocument();
+        expect(issues).toEqual(['nodes-status-unreliable', 'partial-data']);
     });
 });

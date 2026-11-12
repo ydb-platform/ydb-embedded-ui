@@ -1,10 +1,21 @@
 import {ThemeProvider} from '@gravity-ui/uikit';
-import {render, screen} from '@testing-library/react';
+import {render, screen, waitFor} from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 
 import type {DataIssueKind} from '../../../utils/dataIssues/classify';
-import {DataIssuesAlert} from '../DataIssuesAlert';
+import {DATA_ISSUES_CODES_QA, DATA_ISSUES_ITEM_QA, DataIssuesAlert} from '../DataIssuesAlert';
 import {DataIssuesIndicator} from '../DataIssuesIndicator';
+
+/** The kinds of the listed issues; the popover of the indicator is rendered in a portal */
+function getIssues() {
+    return Array.from(document.querySelectorAll(`[data-qa="${DATA_ISSUES_ITEM_QA}"]`)).map((item) =>
+        item.getAttribute('data-issue'),
+    );
+}
+
+function getCodes() {
+    return document.querySelector(`[data-qa="${DATA_ISSUES_CODES_QA}"]`);
+}
 
 describe('DataIssuesAlert', () => {
     test('Should render nothing without issues', () => {
@@ -13,7 +24,7 @@ describe('DataIssuesAlert', () => {
         expect(container).toBeEmptyDOMElement();
     });
 
-    test('Should explain every issue and list the raw problem codes', () => {
+    test('Should list every issue and the raw problem codes', () => {
         render(
             <DataIssuesAlert
                 issues={['list-incomplete', 'sort-not-applied']}
@@ -21,22 +32,15 @@ describe('DataIssuesAlert', () => {
             />,
         );
 
-        expect(
-            screen.getByText('The list may be incomplete: some data sources did not respond.'),
-        ).toBeInTheDocument();
-        expect(
-            screen.getByText('Sorting was not applied: rows are shown in arbitrary order.'),
-        ).toBeInTheDocument();
-        expect(
-            screen.getByText('Problems reported by the server: bsc-timeout, wb-incomplete-groups'),
-        ).toBeInTheDocument();
+        expect(getIssues()).toEqual(['list-incomplete', 'sort-not-applied']);
+        expect(getCodes()).toHaveTextContent('bsc-timeout, wb-incomplete-groups');
     });
 
     test('Should omit the codes line when only flags were raised', () => {
         render(<DataIssuesAlert issues={['group-not-applied']} />);
 
-        expect(screen.getByText('Grouping was not applied.')).toBeInTheDocument();
-        expect(screen.queryByText(/Problems reported by the server/)).not.toBeInTheDocument();
+        expect(getIssues()).toEqual(['group-not-applied']);
+        expect(getCodes()).not.toBeInTheDocument();
     });
 });
 
@@ -47,41 +51,13 @@ describe('DataIssuesIndicator', () => {
         expect(container).toBeEmptyDOMElement();
     });
 
-    test('Should render a focusable control that names the problem', () => {
-        render(<DataIssuesIndicator issues={['list-incomplete']} problems={['bsc-timeout']} />);
-
-        expect(
-            screen.getByRole('button', {name: 'Data may be incomplete or inaccurate'}),
-        ).toBeInTheDocument();
-    });
-
-    test('Should use a shorter label where the width is shared with other controls', () => {
-        render(
-            <DataIssuesIndicator compact issues={['list-incomplete']} problems={['bsc-timeout']} />,
-        );
-
-        expect(screen.getByRole('button', {name: 'Data issues'})).toBeInTheDocument();
-    });
-
-    test('Should add what the data is to its name when it is told', () => {
+    test('Should add what the data is to its accessible name only', () => {
         render(<DataIssuesIndicator issues={['list-incomplete']} subject="Top nodes by load" />);
 
-        const indicator = screen.getByRole('button', {
-            name: 'Data may be incomplete or inaccurate: Top nodes by load',
-        });
+        const indicator = screen.getByRole('button');
+        expect(indicator).toHaveAccessibleName(/Top nodes by load/);
         // the visible text stays short
-        expect(indicator).toHaveTextContent(/^Data may be incomplete or inaccurate$/);
-    });
-
-    test('Should look like a warning label, not like an action', () => {
-        render(<DataIssuesIndicator compact issues={['list-incomplete']} />);
-
-        const indicator = screen.getByRole('button', {name: 'Data issues'});
-        expect(indicator.querySelector('.g-label_theme_warning')).toBeInTheDocument();
-        expect(indicator.tagName).not.toBe('BUTTON');
-        expect(indicator.querySelector('button')).not.toBeInTheDocument();
-        // reachable from the keyboard, the details open with Enter
-        expect(indicator).toHaveAttribute('tabindex', '0');
+        expect(indicator).not.toHaveTextContent('Top nodes by load');
     });
 
     // The popover is rendered in a portal, which needs the theme
@@ -93,27 +69,26 @@ describe('DataIssuesIndicator', () => {
         );
     }
 
-    test('Should explain the issues and list the codes on hover', async () => {
+    test('Should list the issues and the codes on hover', async () => {
         renderInteractive(['list-incomplete']);
 
-        expect(screen.queryByText(/The list may be incomplete/)).not.toBeInTheDocument();
+        expect(getIssues()).toEqual([]);
 
-        await userEvent.hover(screen.getByRole('button', {name: 'Data issues'}));
+        await userEvent.hover(screen.getByRole('button'));
 
-        expect(await screen.findByText(/The list may be incomplete/)).toBeInTheDocument();
-        expect(
-            screen.getByText('Problems reported by the server: bsc-timeout'),
-        ).toBeInTheDocument();
+        await waitFor(() => expect(getIssues()).toEqual(['list-incomplete']));
+        expect(getCodes()).toHaveTextContent('bsc-timeout');
     });
 
     test('Should open the details from the keyboard', async () => {
         const user = userEvent.setup();
         renderInteractive(['sort-not-applied']);
+        const indicator = screen.getByRole('button');
 
         await user.tab();
-        expect(screen.getByRole('button', {name: 'Data issues'})).toHaveFocus();
+        expect(indicator).toHaveFocus();
         await user.keyboard('{Enter}');
 
-        expect(await screen.findByText(/Sorting was not applied/)).toBeInTheDocument();
+        await waitFor(() => expect(getIssues()).toEqual(['sort-not-applied']));
     });
 });

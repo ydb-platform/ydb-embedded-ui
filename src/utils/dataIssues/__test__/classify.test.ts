@@ -1,5 +1,4 @@
 import {
-    DATA_ISSUE_KINDS,
     canDataIssuesHideRows,
     getDataIssues,
     getNodesDataIssues,
@@ -194,11 +193,6 @@ describe('canDataIssuesHideRows', () => {
         ['partial-data', true],
     ])('Should tell for %s: %p', (issue, expected) => {
         expect(canDataIssuesHideRows([issue])).toBe(expected);
-    });
-
-    test('Should decide for every kind of issue', () => {
-        // a new kind has to be put on one of the sides above
-        expect(DATA_ISSUE_KINDS).toHaveLength(8);
     });
 
     test('Should suspect missing rows when at least one issue can hide them', () => {

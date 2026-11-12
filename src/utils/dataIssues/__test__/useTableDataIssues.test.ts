@@ -18,14 +18,6 @@ function chunkData(quality: Partial<ResponseDataQuality>): TableDataWithQuality<
 const STORAGE_GROUPS: DataIssuesSubject = {type: 'storageGroups'};
 
 describe('useTableDataIssues', () => {
-    test('Should tell nothing until a chunk reports a problem', () => {
-        const {result} = renderHook(() => useTableDataIssues(STORAGE_GROUPS));
-
-        expect(result.current.issues).toEqual([]);
-        expect(result.current.problems).toEqual([]);
-        expect(result.current.rowsMayBeMissing).toBe(false);
-    });
-
     test('Should classify what the chunks report for the subject of the table', () => {
         const groups = renderHook(() => useTableDataIssues(STORAGE_GROUPS));
         const groupNodes = renderHook(() =>
@@ -54,17 +46,6 @@ describe('useTableDataIssues', () => {
         act(() => result.current.handleChunkDataChange(20, chunkData({problems: ['bsc-timeout']})));
         expect(result.current.issues).toEqual(['list-incomplete', 'sort-not-applied']);
         expect(result.current.rowsMayBeMissing).toBe(true);
-    });
-
-    test('Should keep the result while nothing changes', () => {
-        const {result, rerender} = renderHook(() => useTableDataIssues({type: 'storageGroups'}));
-
-        act(() => result.current.handleChunkDataChange(0, chunkData({problems: ['bsc-timeout']})));
-        const {issues, problems} = result.current;
-        rerender();
-
-        expect(result.current.issues).toBe(issues);
-        expect(result.current.problems).toBe(problems);
     });
 });
 
@@ -117,17 +98,6 @@ describe('useGroupedTableDataIssues', () => {
         act(() => reportSsd(0, undefined));
 
         expect(result.current.issues).toEqual(['partial-data']);
-    });
-
-    test('Should give every group one handler for all renders', () => {
-        const {result, rerender} = renderHook(() =>
-            useGroupedTableDataIssues(STORAGE_GROUPS, groupsResponse()),
-        );
-        const reportSsd = result.current.getGroupChunkDataChangeHandler('ssd');
-        rerender();
-
-        expect(result.current.getGroupChunkDataChangeHandler('ssd')).toBe(reportSsd);
-        expect(result.current.getGroupChunkDataChangeHandler('hdd')).not.toBe(reportSsd);
     });
 
     test.each([

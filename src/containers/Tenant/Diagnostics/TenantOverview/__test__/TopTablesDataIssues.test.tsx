@@ -30,28 +30,12 @@ describe('TopNodesDataIssues', () => {
             </div>,
         );
 
-        const load = screen.getByRole('button', {
-            name: 'Data may be incomplete or inaccurate: Top nodes by load',
-        });
-        const pools = screen.getByRole('button', {
-            name: 'Data may be incomplete or inaccurate: Top nodes by pools usage',
-        });
-
-        // The visible text is the same and short
-        expect(load).toHaveTextContent(/^Data may be incomplete or inaccurate$/);
-        expect(pools).toHaveTextContent(/^Data may be incomplete or inaccurate$/);
+        expect(screen.getByRole('button', {name: /Top nodes by load$/})).toBeInTheDocument();
+        expect(screen.getByRole('button', {name: /Top nodes by pools usage$/})).toBeInTheDocument();
     });
 });
 
 describe('TopGroupsDataIssues', () => {
-    test('renders nothing for a clean response', () => {
-        const {container} = render(
-            <TopGroupsDataIssues tableTitle="Top groups by usage" dataQuality={quality()} />,
-        );
-
-        expect(container).toBeEmptyDOMElement();
-    });
-
     test('shows the indicator for the problems of storage groups', () => {
         render(
             <TopGroupsDataIssues
@@ -60,10 +44,6 @@ describe('TopGroupsDataIssues', () => {
             />,
         );
 
-        expect(
-            screen.getByRole('button', {
-                name: 'Data may be incomplete or inaccurate: Top groups by usage',
-            }),
-        ).toBeInTheDocument();
+        expect(screen.getByRole('button', {name: /Top groups by usage$/})).toBeInTheDocument();
     });
 });

@@ -5,6 +5,7 @@ import {MemoryRouter} from 'react-router-dom';
 import {QueryParamProvider} from 'use-query-params';
 import {ReactRouter5Adapter} from 'use-query-params/adapters/react-router-5';
 
+import {getEmptyDataWithIssuesMessage} from '../../../../components/DataIssuesAlert/DataIssuesAlert';
 import type {ResizeablePaginatedTable} from '../../../../components/PaginatedTable';
 import {PaginatedStorageGroupsTable} from '../PaginatedStorageGroupsTable';
 import {STORAGE_GROUPS_COLUMNS_IDS} from '../columns/constants';
@@ -106,9 +107,7 @@ describe('PaginatedStorageGroupsTable', () => {
         (visibleEntities) => {
             renderTable([], {visibleEntities, rowsMayBeMissing: true});
 
-            const message = renderEmptyDataMessage();
-            expect(message).toHaveTextContent('Nothing to show, but the data may be incomplete');
-            expect(message).not.toHaveTextContent(/No .*groups/);
+            expect(renderEmptyDataMessage()).toHaveTextContent(getEmptyDataWithIssuesMessage());
         },
     );
 });

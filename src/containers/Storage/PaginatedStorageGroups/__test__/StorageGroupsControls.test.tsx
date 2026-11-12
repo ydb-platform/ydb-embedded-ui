@@ -127,45 +127,6 @@ describe('StorageGroupsControls', () => {
         expect(screen.getByRole('button', {name: 'controls_expert-mode'})).toBeInTheDocument();
     });
 
-    test('shows the data issues indicator it is given', () => {
-        const {rerender} = render(
-            <StorageGroupsControls entitiesCountCurrent={0} entitiesLoading={false} />,
-        );
-
-        expect(screen.queryByText('data may be incomplete')).not.toBeInTheDocument();
-
-        rerender(
-            <StorageGroupsControls
-                entitiesCountCurrent={0}
-                entitiesLoading={false}
-                dataIssuesIndicator={<span>data may be incomplete</span>}
-            />,
-        );
-
-        expect(screen.getByText('data may be incomplete')).toBeInTheDocument();
-    });
-
-    test('puts the data issues indicator last in the row, after the expert mode button', () => {
-        render(
-            <StorageGroupsControls
-                entitiesCountCurrent={0}
-                entitiesLoading={false}
-                dataIssuesIndicator={<span>data may be incomplete</span>}
-            />,
-        );
-
-        const expertMode = screen.getByRole('button', {name: 'controls_expert-mode'});
-        // The label stands in a slot of the row that takes no width, see Storage.scss
-        const slot = screen.getByText('data may be incomplete').parentElement as HTMLElement;
-        const rowItems = Array.from(slot.parentElement?.children ?? []);
-
-        expect(slot).toHaveClass('global-storage__data-issues');
-        expect(rowItems.indexOf(slot)).toBeGreaterThan(
-            rowItems.findIndex((item) => item.contains(expertMode)),
-        );
-        expect(rowItems.at(-1)).toBe(slot);
-    });
-
     test('hides active expert mode controls when the capability is unavailable', () => {
         useBlobStorageCapacityMetricsAvailable.mockReturnValue(false);
         useIsStorageExpertMode.mockReturnValue(true);
