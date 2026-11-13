@@ -2,7 +2,7 @@ import {expect, test} from '@playwright/test';
 import type {Page} from '@playwright/test';
 
 import type {StatisticsMode} from '../../../../src/types/store/query';
-import {STATISTICS_MODES} from '../../../../src/utils/query';
+import {QUERY_MODES, STATISTICS_MODES} from '../../../../src/utils/query';
 import {database} from '../../../utils/constants';
 import {TenantPage} from '../TenantPage';
 
@@ -32,6 +32,38 @@ async function openResultActions(page: Page) {
     return controls;
 }
 
+async function downloadExecutionPlan(page: Page) {
+    const statuses: number[] = [];
+    page.on('response', (response) => {
+        if (
+            response.request().method() === 'POST' &&
+            new URL(response.url()).pathname.endsWith('/plan2svg')
+        ) {
+            statuses.push(response.status());
+        }
+    });
+    await openResultActions(page);
+    const image = page.getByRole('img', {name: 'Execution Plan', exact: true});
+    await expect(image).toBeVisible();
+    await expect
+        .poll(() =>
+            image.evaluate(
+                (element) =>
+                    element instanceof HTMLImageElement &&
+                    element.complete &&
+                    element.naturalWidth > 0 &&
+                    element.naturalHeight > 0,
+            ),
+        )
+        .toBe(true);
+    expect(statuses).toEqual([200]);
+
+    const downloadPromise = page.waitForEvent('download');
+    await page.getByRole('button', {name: 'Download .SVG', exact: true}).click();
+    const download = await downloadPromise;
+    expect(download.suggestedFilename()).toBe('query-plan.svg');
+}
+
 test.describe('Plan to SVG functionality @query-editor-redesign', () => {
     test.beforeEach(async ({page}) => {
         const tenantPage = new TenantPage(page);
@@ -59,16 +91,35 @@ test.describe('Plan to SVG functionality @query-editor-redesign', () => {
         const queryEditor = new QueryEditor(page);
         await setStatisticsMode(queryEditor, STATISTICS_MODES.profile);
         await runQuery(queryEditor);
-        await openResultActions(page);
-
-        const downloadPromise = page.waitForEvent('download');
-        const downloadPlanOption = page.getByRole('button', {name: 'Download .SVG', exact: true});
-        await expect(downloadPlanOption).toBeVisible();
-        await downloadPlanOption.click();
-
-        const download = await downloadPromise;
-        expect(download.suggestedFilename()).toBe('query-plan.svg');
+        await downloadExecutionPlan(page);
     });
+
+    for (const mode of [QUERY_MODES.query, QUERY_MODES.script]) {
+        test(`downloads an Explain ${mode} plan without statistics`, async ({page}) => {
+            const queryEditor = new QueryEditor(page);
+            await queryEditor.clickGearButton();
+            await queryEditor.settingsDialog.changeQueryMode(mode);
+            await queryEditor.settingsDialog.changeStatsLevel(STATISTICS_MODES.none);
+            await queryEditor.settingsDialog.clickButton(ButtonNames.Save);
+            const query = `SELECT NodeId FROM \`${database}/.sys/nodes\` LIMIT 1;`;
+            await queryEditor.setQuery(query);
+
+            const requests: {action: string; stats: StatisticsMode}[] = [];
+            page.on('request', (request) => {
+                if (request.method() === 'POST' && request.url().includes('/query?')) {
+                    const payload = request.postDataJSON();
+                    if (payload.query?.includes(query)) {
+                        requests.push({action: payload.action, stats: payload.stats});
+                    }
+                }
+            });
+            await queryEditor.clickExplainButton();
+            await expect(queryEditor.waitForStatus('Completed')).resolves.toBe(true);
+            expect(requests).toEqual([{action: `explain-${mode}`, stats: STATISTICS_MODES.none}]);
+            await downloadExecutionPlan(page);
+            expect(requests).toEqual([{action: `explain-${mode}`, stats: STATISTICS_MODES.none}]);
+        });
+    }
 
     test('handles plan conversion errors', async ({page}) => {
         const queryEditor = new QueryEditor(page);
