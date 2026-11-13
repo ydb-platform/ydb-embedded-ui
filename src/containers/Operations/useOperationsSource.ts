@@ -1,6 +1,6 @@
 import React from 'react';
 
-import {StringParam, useQueryParam} from 'use-query-params';
+import {StringParam, useQueryParam, useQueryParams} from 'use-query-params';
 import {z} from 'zod';
 
 import {
@@ -21,7 +21,9 @@ export function useOperationsSource(database: string, controlPlaneOnly: boolean)
     const listOperationsAvailable = useGetMetaFeatureVersion('/meta/list_operations') >= 1;
     const metaCapabilitiesLoaded = useMetaCapabilitiesLoaded();
     const [rawSource, setSource] = useQueryParam('operationSource', StringParam);
-    const requestedSource = operationSourceSchema.parse(rawSource);
+    const [{kind, search}] = useQueryParams({kind: StringParam, search: StringParam});
+    const defaultSource = kind !== undefined || search !== undefined ? 'database' : 'control-plane';
+    const requestedSource = operationSourceSchema.parse(rawSource ?? defaultSource);
     const cpAvailable = Boolean(
         emMetaAvailable &&
             listOperationsAvailable &&

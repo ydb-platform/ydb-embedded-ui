@@ -255,6 +255,45 @@ test.describe('Operations', () => {
         ).toHaveText('database-error');
     });
 
+    test('legacy kind and search links keep Database mode and their filters', async ({page}) => {
+        const calls = await mockOperations(page);
+        for (const query of [
+            'kind=export',
+            'search=database-error',
+            'kind=export&search=database-error',
+        ]) {
+            await page.goto(`${path}&${query}`);
+            await expect(page.getByRole('radio', {name: 'Database', exact: true})).toBeChecked();
+            await expect(page.getByText('database-error', {exact: true})).toBeVisible();
+            await expect(page.getByPlaceholder('Filter by ID')).toHaveValue(
+                query.includes('search=') ? 'database-error' : '',
+            );
+            if (query.includes('kind=')) {
+                await expect(page.getByRole('combobox').last()).toHaveText('Export');
+            }
+            await expect(page.getByText('database-before', {exact: true})).toHaveCount(
+                query.includes('search=') ? 0 : 1,
+            );
+        }
+        expect(calls.filter((call) => call.path.endsWith('/meta/list_operations'))).toHaveLength(0);
+    });
+
+    test('explicit CP mode overrides legacy filters and preserves them when switching to Database', async ({
+        page,
+    }) => {
+        const calls = await mockOperations(page);
+        await page.goto(`${path}&kind=export&search=database-error&operationSource=control-plane`);
+        await expect(page.getByRole('radio', {name: 'Control plane', exact: true})).toBeChecked();
+        await expect(page.getByText('cp-error-a', {exact: true})).toBeVisible();
+        await expect(page.getByPlaceholder('Filter by ID')).toHaveValue('');
+        expect(calls.filter((call) => call.path.endsWith('/operation/list'))).toHaveLength(0);
+        await page.getByRole('radio', {name: 'Database', exact: true}).click();
+        await expect(page.getByText('database-error', {exact: true})).toBeVisible();
+        await expect(page.getByPlaceholder('Filter by ID')).toHaveValue('database-error');
+        await expect(page.getByRole('combobox').last()).toHaveText('Export');
+        await expect(page.getByText('database-before', {exact: true})).toHaveCount(0);
+    });
+
     test('a stale CP link falls back to Database without CP identity', async ({page}) => {
         const calls = await mockOperations(page, {hasCp: false});
         await page.goto(`${path}&operationSource=control-plane`);
