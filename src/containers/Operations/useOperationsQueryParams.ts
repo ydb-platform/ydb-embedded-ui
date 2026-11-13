@@ -28,12 +28,19 @@ export function useOperationsQueryParams() {
     const [queryParams, setQueryParams] = useQueryParams({
         kind: StringParam,
         search: StringParam,
+        operationId: StringParam,
+        operationStatus: StringParam,
         pageSize: NumberParam,
         pageToken: StringParam,
     });
 
     const queryKind = operationKindSchema.parse(queryParams.kind) as OperationKind;
     const kind = queryKind === 'analyze' && !analyzeOperationAvailable ? 'buildindex' : queryKind;
+    const controlPlaneSearch = queryParams.operationId ?? '';
+    const controlPlaneStatus = z
+        .enum(['DONE', 'PENDING', 'ERROR', ''])
+        .catch('')
+        .parse(queryParams.operationStatus);
     const searchValue = queryParams.search ?? '';
     const pageSize = queryParams.pageSize ?? undefined;
     const pageToken = queryParams.pageToken ?? undefined;
@@ -72,7 +79,16 @@ export function useOperationsQueryParams() {
         [setQueryParams],
     );
 
+    const handleControlPlaneSearchChange = (value: string) =>
+        setQueryParams({operationId: value || undefined}, 'replaceIn');
+    const handleControlPlaneStatusChange = (value: string) =>
+        setQueryParams({operationStatus: value || undefined}, 'replaceIn');
+
     return {
+        controlPlaneSearch,
+        controlPlaneStatus,
+        handleControlPlaneSearchChange,
+        handleControlPlaneStatusChange,
         kind,
         analyzeOperationAvailable,
         searchValue,

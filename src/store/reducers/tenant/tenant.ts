@@ -4,6 +4,7 @@ import type {PayloadAction} from '@reduxjs/toolkit';
 import type {TTenantInfo} from '../../../types/api/tenant';
 import {useClusterNameFromQuery} from '../../../utils/hooks/useDatabaseFromQuery';
 import {useDatabasesV2} from '../../../utils/hooks/useDatabasesV2';
+import {backend, environment} from '../../runtimeParams';
 import {api} from '../api';
 import {getDatabaseDataTag} from '../entityDataTags';
 import {prepareTenants} from '../tenants/utils';
@@ -59,6 +60,8 @@ export const tenantApi = api.injectEndpoints({
                     database: string;
                     clusterName?: string;
                     isMetaDatabasesAvailable: boolean;
+                    environment?: string;
+                    backend?: string;
                 },
                 {signal},
             ) => {
@@ -121,8 +124,12 @@ export const tenantApi = api.injectEndpoints({
                 ];
             },
             serializeQueryArgs: ({queryArgs}) => {
-                const {clusterName, database} = queryArgs;
-                return {clusterName, database};
+                return {
+                    clusterName: queryArgs.clusterName,
+                    database: queryArgs.database,
+                    environment: queryArgs.environment,
+                    backend: queryArgs.backend,
+                };
             },
         }),
     }),
@@ -143,6 +150,8 @@ export function useTenantBaseInfo(
             database,
             clusterName,
             isMetaDatabasesAvailable,
+            environment,
+            backend,
         },
         {skip: skip || !database},
     );

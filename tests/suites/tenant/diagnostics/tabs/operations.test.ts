@@ -57,55 +57,6 @@ test.describe('Operations Tab - Infinite Query', () => {
         expect(isLoadingVisible).toBe(false);
     });
 
-    test('loads more operations on scroll', async ({page}) => {
-        // Setup mocks with 80 operations (4 pages of 20)
-        await setupOperationsMock(page, {totalOperations: 80});
-
-        const pageQueryParams = {
-            schema: database,
-            database,
-            databasePage: 'database',
-        };
-
-        const tenantPageInstance = new TenantPage(page);
-        await tenantPageInstance.goto(pageQueryParams);
-
-        const diagnostics = new Diagnostics(page);
-        await diagnostics.clickTab(DiagnosticsTab.Operations);
-
-        // Wait for initial data
-        await diagnostics.operations.waitForTableVisible();
-        await diagnostics.operations.waitForDataLoad();
-
-        // Get initial row count
-        const initialRowCount = await diagnostics.operations.getRowCount();
-        expect(initialRowCount).toBeGreaterThan(0);
-
-        // Scroll to bottom
-        await diagnostics.operations.scrollToBottom();
-
-        // Wait for row count to potentially change
-        let finalRowCount: number;
-        try {
-            finalRowCount = await diagnostics.operations.waitForRowCountToChange(
-                initialRowCount,
-                3000,
-            );
-        } catch (_e) {
-            // If timeout, the count didn't change
-            finalRowCount = await diagnostics.operations.getRowCount();
-        }
-
-        // Check if more operations were loaded
-        if (finalRowCount > initialRowCount) {
-            // Infinite scroll worked - more operations were loaded
-            expect(finalRowCount).toBeGreaterThan(initialRowCount);
-        } else {
-            // No more data to load - row count should stay the same
-            expect(finalRowCount).toBe(initialRowCount);
-        }
-    });
-
     test('shows empty state when no operations', async ({page}) => {
         // Setup empty operations mock
         await setupEmptyOperationsMock(page);

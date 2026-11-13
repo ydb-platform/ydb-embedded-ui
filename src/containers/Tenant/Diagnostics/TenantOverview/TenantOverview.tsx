@@ -22,6 +22,7 @@ import {setDiagnosticsTab, tenantApi} from '../../../../store/reducers/tenant/te
 import type {TenantMetricsTab} from '../../../../store/reducers/tenant/types';
 import {calculateTenantMetrics} from '../../../../store/reducers/tenants/utils';
 import type {TenantStorageStats} from '../../../../store/reducers/tenants/utils';
+import {backend, environment} from '../../../../store/runtimeParams';
 import type {AdditionalTenantsProps} from '../../../../types/additionalProps';
 import type {EFlag} from '../../../../types/api/enums';
 import type {SelfCheckResult} from '../../../../types/api/healthcheck';
@@ -276,7 +277,7 @@ export function TenantOverview({
         isFetching,
         error,
     } = tenantApi.useGetTenantInfoQuery(
-        {database, clusterName, isMetaDatabasesAvailable},
+        {database, clusterName, isMetaDatabasesAvailable, environment, backend},
         {pollingInterval: autoRefreshInterval},
     );
 
