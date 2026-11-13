@@ -80,4 +80,17 @@ describe('Versions data issues', () => {
 
         expect(getIssues()).toEqual([]);
     });
+
+    test('does not warn about grouping when the handler also reports it with a code', () => {
+        renderVersions(quality(), quality(['group-not-applied'], true));
+
+        expect(getIssues()).toEqual([]);
+        expect(document.body.textContent).not.toContain('group-not-applied');
+    });
+
+    test('keeps the other problems of the request that was not grouped', () => {
+        renderVersions(quality(), quality(['group-not-applied', 'wb-incomplete'], true));
+
+        expect(getIssues()).toEqual(['nodes-status-unreliable']);
+    });
 });
