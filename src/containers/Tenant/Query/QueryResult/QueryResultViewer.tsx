@@ -198,7 +198,7 @@ export function QueryResultViewer({
         </SegmentedRadioGroup.Option>
     ));
 
-    const handleCopy = React.useCallback(async () => {
+    const handleCopy = async () => {
         window.clearTimeout(copyTimeoutRef.current);
 
         const success =
@@ -210,7 +210,7 @@ export function QueryResultViewer({
         copyTimeoutRef.current = window.setTimeout(() => {
             setCopyStatus('pending');
         }, COPY_STATUS_RESET_TIMEOUT);
-    }, [activeSection, currentResultRows, copyData]);
+    };
 
     const getCopyTooltipTitle = (status: CopyToClipboardStatus): string => {
         if (status === 'success') {
