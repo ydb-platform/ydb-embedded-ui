@@ -1,12 +1,17 @@
 .ydb-query-json-viewer {
     width: 100%;
     height: 100%;
-    padding: 15px 0;
+    padding: var(--g-spacing-3) var(--g-spacing-6) var(--g-spacing-3) var(--g-spacing-4);
+    &_dark-theme .unipika {
+        --g-color-text-misc: #9cdcfe;
+        --color-unipika-string: #ce9178;
+        --color-unipika-default: #808080;
+    }
+
     &__tree {
         overflow-y: auto;
 
         width: 100%;
         height: 100%;
-        padding: 0 10px;
     }
 }

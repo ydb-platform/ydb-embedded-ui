@@ -456,7 +456,9 @@ test.describe('Editor tabs', () => {
         await expect.poll(() => queryEditor.getEditorContent(), {timeout: 5000}).toBe(queryText);
     });
 
-    test('Hotkey save query as saves query and updates tab state', async ({page}) => {
+    test('Hotkey save query as saves query and updates tab state @query-editor-redesign', async ({
+        page,
+    }) => {
         const saveQueryDialog = new SaveQueryDialog(page);
         const queryText = 'SELECT 1 AS saved_from_hotkey;';
         const queryName = `Saved From Hotkey ${Date.now()}`;
@@ -487,7 +489,7 @@ test.describe('Editor tabs', () => {
         await expect(queryEditor.editorTabs.getActiveTabTitle()).resolves.toBe('New Query');
     });
 
-    test('Switching between saved and unsaved tabs updates the action button', async () => {
+    test('Switching between saved and unsaved tabs updates the action button @query-editor-redesign', async () => {
         const savedQueryName = `Saved Query ${Date.now()}`;
 
         await tenantPage.saveQuery('SELECT 1;', savedQueryName);
@@ -511,7 +513,7 @@ test.describe('Editor tabs', () => {
         await expect(queryEditor.isEditButtonVisible(1000)).resolves.toBe(false);
     });
 
-    test('Save and Edit controls stay enabled after executing queries', async () => {
+    test('Save and Edit controls stay enabled after executing queries @query-editor-redesign', async () => {
         await expect(queryEditor.isSaveButtonDisabled()).resolves.toBe(false);
 
         await queryEditor.setQuery('SELECT 1 AS dirty_new_query;');

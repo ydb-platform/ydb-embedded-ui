@@ -2,26 +2,26 @@
 
 .ydb-query-editor-button {
     &__run-button {
-        width: 76px;
-        min-width: 76px;
-        max-width: 76px;
+        width: 72px;
+        min-width: 72px;
+        max-width: 72px;
     }
 
     &__explain-analyze-button {
-        width: 111px;
-        min-width: 111px;
-        max-width: 111px;
+        width: 115px;
+        min-width: 115px;
+        max-width: 115px;
     }
 
     &__stop-button {
-        width: 76px;
-        min-width: 76px;
-        max-width: 76px;
+        width: 72px;
+        min-width: 72px;
+        max-width: 72px;
 
         &_explain-analyze {
-            width: 111px;
-            min-width: 111px;
-            max-width: 111px;
+            width: 115px;
+            min-width: 115px;
+            max-width: 115px;
         }
 
         .g-root_theme_dark &,

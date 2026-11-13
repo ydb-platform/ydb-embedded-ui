@@ -121,7 +121,10 @@ export interface QueryResult {
     sourcePosition?: QuerySourcePosition;
 }
 
+export type QueryPlanView = 'table' | 'graph' | 'json';
+
 export interface QueryTabState {
+    queryPlanView?: QueryPlanView;
     id: string;
     title: string;
     /**
