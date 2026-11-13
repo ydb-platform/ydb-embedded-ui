@@ -323,7 +323,7 @@ test.describe('Query editor regressions @query-editor-redesign', () => {
         await analyze(editor);
         await selectView(page, 'Result 1');
         await expect(editor.resultTable.getCellValue(1, 2)).resolves.toBe('1');
-        await expect(page.getByText('2 rows/s', {exact: true})).toBeVisible();
+        await expect(page.getByText('2 result rows/s', {exact: true})).toBeVisible();
         response.result[0].truncated = true;
         await analyze(editor);
         await selectView(page, 'Result 1');
