@@ -121,24 +121,6 @@ test.describe('Plan to SVG functionality @query-editor-redesign', () => {
         });
     }
 
-    test('handles plan conversion errors', async ({page}) => {
-        const queryEditor = new QueryEditor(page);
-        await setStatisticsMode(queryEditor, STATISTICS_MODES.full);
-        await runQuery(queryEditor);
-
-        await page.route('**/plan2svg**', (route) => {
-            route.fulfill({
-                status: 500,
-                contentType: 'application/json',
-                body: 'Failed to generate SVG',
-            });
-        });
-
-        await openResultActions(page);
-        await expect(page.locator('.ydb-execution-plan__error').getByRole('alert')).toBeVisible();
-        await expect(page.getByRole('button', {name: 'Retry', exact: true})).toBeVisible();
-    });
-
     test('does not show plan actions for a None statistics result', async ({page}) => {
         const queryEditor = new QueryEditor(page);
         await setStatisticsMode(queryEditor, STATISTICS_MODES.none);

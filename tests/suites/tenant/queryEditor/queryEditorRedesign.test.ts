@@ -9,6 +9,7 @@ import {toggleEditorSetting} from '../../../utils/toggleExperiment';
 import {Sidebar} from '../../sidebar/Sidebar';
 import {TenantPage} from '../TenantPage';
 
+import {ButtonNames} from './models/QueryEditor';
 import type {QueryEditor} from './models/QueryEditor';
 
 const queryUrl = `${backend}/viewer/json/query?*`;
@@ -93,6 +94,9 @@ test.describe('Query editor regressions @query-editor-redesign', () => {
         const cells = page.locator('.ydb-query-simplified-plan tbody tr').first().locator('td');
         await expect(cells.nth(2)).toHaveText('0');
         await expect(cells.nth(3)).toHaveText('');
+        await expect(headers.first()).toHaveCSS('font-weight', '500');
+        await expect(headers.first()).toHaveCSS('height', '40px');
+        await expect(cells.first()).toHaveCSS('height', '30px');
         const widths = () =>
             headers.evaluateAll((elements) =>
                 elements.map((element) => element.getBoundingClientRect().width),
@@ -127,6 +131,9 @@ test.describe('Query editor regressions @query-editor-redesign', () => {
         await editor.explain('SELECT 2;', 'query');
         await expect(editor.waitForStatus('Completed')).resolves.toBe(true);
         expect((await widths()).slice(1)).toEqual([89, 89, 89, 89, 85]);
+        await resizeMetric();
+        await headers.nth(1).locator('.gt-resize-handle').dblclick();
+        expect((await widths())[1]).toBe(89);
         await resizeMetric();
         await selectView(page, 'AST');
         await selectView(page, 'Query Plan');
@@ -314,6 +321,60 @@ test.describe('Query editor regressions @query-editor-redesign', () => {
         await expect(editor.waitForStatus('Completed')).resolves.toBe(true);
         await expect(views.getByRole('radio', {name: 'Table', exact: true})).toBeChecked();
         await expect(page.locator('.ydb-query-simplified-plan th')).toHaveCount(6);
+    });
+
+    test('disabled plan opens settings without rerunning the query', async ({page}) => {
+        const editor = await openEditor(page);
+        await toggleEditorSetting(page, 'off', 'Query Streaming');
+        await editor.clickGearButton();
+        await editor.settingsDialog.changeStatsLevel('basic');
+        await editor.settingsDialog.clickButton(ButtonNames.Save);
+        let requests = 0;
+        let conversions = 0;
+        await page.route(queryUrl, (route) => {
+            if (!route.request().postDataJSON().query?.includes('SELECT 1;')) {
+                return route.continue();
+            }
+            requests++;
+            return route.fulfill({json: {result: makeResponse().result}});
+        });
+        await page.route('**/plan2svg?*', (route) => {
+            conversions++;
+            return route.abort();
+        });
+        await editor.run('SELECT 1;', 'query');
+        await expect(editor.waitForStatus('Completed')).resolves.toBe(true);
+        const placeholder = page.locator('.ydb-query-data-not-enabled');
+        for (const section of ['Query Plan', 'Execution Plan']) {
+            await selectView(page, section);
+            await expect(
+                placeholder.getByText('Query plan not enabled', {exact: true}),
+            ).toBeVisible();
+            await expect(planViews(page)).toHaveCount(0);
+        }
+        const description = placeholder.locator('.ydb-query-data-not-enabled__description');
+        await expect(description).toContainText('Select Full mode');
+        await expect(description).toHaveCSS('font-size', '13px');
+        await expect(description).toHaveCSS('line-height', '18px');
+        await expect(description).toHaveCSS('font-weight', '400');
+        await placeholder
+            .getByRole('button', {name: 'Open query settings', exact: true})
+            .press('Enter');
+        await expect(page.locator('.ydb-query-settings-dialog')).toBeVisible();
+        expect(requests).toBe(1);
+        expect(conversions).toBe(0);
+        await editor.settingsDialog.changeStatsLevel('full');
+        await editor.settingsDialog.clickButton(ButtonNames.Save);
+        await expect(placeholder.getByText('Query plan not enabled', {exact: true})).toBeVisible();
+        expect(requests).toBe(1);
+        await editor.run('SELECT 1;', 'query');
+        await expect(editor.waitForStatus('Completed')).resolves.toBe(true);
+        await selectView(page, 'Query Plan');
+        await expect(placeholder).toHaveCount(0);
+        await expect(
+            page.getByText('There is no Query Plan for the request', {exact: true}),
+        ).toBeVisible();
+        expect(requests).toBe(2);
     });
 
     test('Analyze keeps parsed result sets, truncation and diagnostics', async ({page}) => {
