@@ -174,7 +174,12 @@ export function SimplifiedPlan({plan, columnSizing, onColumnSizingChange}: Simpl
 
     return (
         <div className={block()} ref={containerRef}>
-            <Table table={table} stickyHeader attributes={{style: {width: table.getTotalSize()}}} />
+            <Table
+                table={table}
+                className={block('table')}
+                stickyHeader
+                attributes={{style: {width: table.getTotalSize()}}}
+            />
         </div>
     );
 }

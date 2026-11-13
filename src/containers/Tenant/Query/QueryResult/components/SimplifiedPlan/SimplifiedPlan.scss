@@ -9,9 +9,9 @@
     height: 100%;
     padding: 0 var(--g-spacing-6) var(--g-spacing-4) var(--g-spacing-4);
 
-    .ydb-table {
+    &__table {
         // Long operation names can grow beyond the normal row height.
-        --ydb-table-cell-height: unset;
+        --ydb-table-cell-height: auto;
         --ydb-table-row-height: 30px;
     }
 
@@ -20,9 +20,7 @@
     }
 
     .ydb-table__table-header-cell {
-        font-size: 15px;
         font-weight: 500;
-        line-height: 20px;
 
         color: var(--g-color-text-complementary);
     }
