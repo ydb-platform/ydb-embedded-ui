@@ -84,9 +84,7 @@ async function analyze(editor: QueryEditor) {
 }
 
 test.describe('Query editor regressions @query-editor-redesign', () => {
-    test('manual column widths survive view switches and reset for a new result', async ({
-        page,
-    }) => {
+    test('resizes columns locally and resets widths for another view or result', async ({page}) => {
         const editor = await openEditor(page);
         await page.route(queryUrl, (route) => route.fulfill({json: makeResponse()}));
         await editor.explain('SELECT 1;', 'query');
@@ -104,42 +102,21 @@ test.describe('Query editor regressions @query-editor-redesign', () => {
         await page.setViewportSize({width: 1640, height: 900});
         await expect.poll(async () => (await widths())[0]).toBeGreaterThan(before[0]);
         expect((await widths()).slice(1)).toEqual([89, 89, 89, 89, 85]);
-        const handle = headers.nth(1).locator('.gt-resize-handle');
-        await handle.hover();
-        const box = await handle.boundingBox();
-        if (!box) {
-            throw new Error('Missing column resize handle');
-        }
-        await page.mouse.move(box.x + box.width / 2, box.y + box.height / 2);
-        await page.mouse.down();
-        await expect(handle).toHaveClass(/gt-resize-handle_resizing/);
-        await page.mouse.move(box.x + box.width / 2 + 40, box.y + box.height / 2, {steps: 4});
-        await page.mouse.up();
-        await expect.poll(async () => (await widths())[1]).toBe(129);
-        await page.mouse.down();
-        await expect(handle).toHaveClass(/gt-resize-handle_resizing/);
-        await page.evaluate(
-            ({x, y}) => {
-                for (const offset of [10, 20, 30, 40]) {
-                    document.dispatchEvent(
-                        new MouseEvent('mousemove', {
-                            clientX: x + offset,
-                            clientY: y,
-                            bubbles: true,
-                        }),
-                    );
-                }
-                document.dispatchEvent(
-                    new MouseEvent('mouseup', {clientX: x + 40, clientY: y, bubbles: true}),
-                );
-            },
-            {x: box.x + box.width / 2 + 40, y: box.y + box.height / 2},
-        );
-        await expect.poll(async () => (await widths())[1]).toBe(169);
+        const resizeMetric = async () => {
+            const handle = headers.nth(1).locator('.gt-resize-handle');
+            await handle.hover();
+            const box = await handle.boundingBox();
+            if (!box) {
+                throw new Error('Missing column resize handle');
+            }
+            await page.mouse.move(box.x + box.width / 2, box.y + box.height / 2);
+            await page.mouse.down();
+            await page.mouse.move(box.x + box.width / 2 + 40, box.y + box.height / 2, {steps: 4});
+            await expect.poll(async () => (await widths())[1]).toBe(129);
+            await page.mouse.up();
+        };
+        await resizeMetric();
         const manual = await widths();
-        await selectView(page, 'AST');
-        await selectView(page, 'Query Plan');
-        expect(await widths()).toEqual(manual);
         await page.setViewportSize({width: 1000, height: 800});
         expect(await widths()).toEqual(manual);
         expect(
@@ -149,6 +126,10 @@ test.describe('Query editor regressions @query-editor-redesign', () => {
         ).toBe(true);
         await editor.explain('SELECT 2;', 'query');
         await expect(editor.waitForStatus('Completed')).resolves.toBe(true);
+        expect((await widths()).slice(1)).toEqual([89, 89, 89, 89, 85]);
+        await resizeMetric();
+        await selectView(page, 'AST');
+        await selectView(page, 'Query Plan');
         expect((await widths()).slice(1)).toEqual([89, 89, 89, 89, 85]);
     });
 

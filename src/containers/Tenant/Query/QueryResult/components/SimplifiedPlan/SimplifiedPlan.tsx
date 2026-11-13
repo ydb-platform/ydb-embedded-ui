@@ -2,14 +2,7 @@ import React from 'react';
 
 import {useTable} from '@gravity-ui/table';
 import {useResizeObserver} from '@gravity-ui/uikit';
-import type {
-    CellContext,
-    ColumnDef,
-    ColumnSizingInfoState,
-    ColumnSizingState,
-    ExpandedState,
-    OnChangeFn,
-} from '@tanstack/react-table';
+import type {CellContext, ColumnDef, ExpandedState} from '@tanstack/react-table';
 
 import {ColumnHeader, Table} from '../../../../../../components/Table/Table';
 import type {SimplifiedPlanItem} from '../../../../../../store/reducers/query/types';
@@ -44,7 +37,6 @@ const columns: ColumnDef<ExtendedSimplifiesPlanItem>[] = [
         accessorKey: 'name',
         accessorFn: nameAccessorFn,
         header: () => <ColumnHeader>Operation</ColumnHeader>,
-        size: 400,
         minSize: 240,
         cell: (info) => (
             <OperationCell
@@ -98,42 +90,37 @@ const columns: ColumnDef<ExtendedSimplifiesPlanItem>[] = [
 
 interface SimplifiedPlanProps {
     plan: SimplifiedPlanItem[];
-    columnSizing?: ColumnSizingState;
-    onColumnSizingChange: (sizing: ColumnSizingState) => void;
 }
 
-export function SimplifiedPlan({plan, columnSizing, onColumnSizingChange}: SimplifiedPlanProps) {
+export function SimplifiedPlan({plan}: SimplifiedPlanProps) {
     const planWithLinesInfo = React.useMemo(() => getExtendedTreeNodes(plan), [plan]);
     const [expanded, setExpanded] = React.useState<ExpandedState>(true);
-    const [localSizing, setLocalSizing] = React.useState(columnSizing);
-    const sizingRef = React.useRef(columnSizing);
-
-    const resizeInfoRef = React.useRef<ColumnSizingInfoState>({
-        startOffset: null,
-        startSize: null,
-        deltaOffset: null,
-        deltaPercentage: null,
-        isResizingColumn: false,
-        columnSizingStart: [],
-    });
-    const [columnSizingInfo, setColumnSizingInfo] = React.useState(resizeInfoRef.current);
-    const handleColumnSizingInfoChange: OnChangeFn<ColumnSizingInfoState> = (update) => {
-        // TanStack computes the next width inside this updater. Resolve it before
-        // committing the final width, including batched move/up events.
-        const wasResizing = resizeInfoRef.current.isResizingColumn;
-        resizeInfoRef.current =
-            typeof update === 'function' ? update(resizeInfoRef.current) : update;
-        setColumnSizingInfo(resizeInfoRef.current);
-        if (wasResizing && !resizeInfoRef.current.isResizingColumn && sizingRef.current) {
-            onColumnSizingChange(sizingRef.current);
-        }
-    };
-
     const containerRef = React.useRef<HTMLDivElement>(null);
     const [availableWidth, setAvailableWidth] = React.useState(0);
+    const tableColumns = React.useMemo(() => {
+        const metricsWidth = columns
+            .slice(1)
+            .reduce((width, column) => width + (column.size ?? 0), 0);
+        return [
+            {...columns[0], size: Math.max(240, availableWidth - metricsWidth)},
+            ...columns.slice(1),
+        ];
+    }, [availableWidth]);
+
+    const table = useTable({
+        columns: tableColumns,
+        data: planWithLinesInfo,
+        getSubRows: (item) => item.children,
+        enableExpanding: true,
+        onExpandedChange: setExpanded,
+        state: {expanded},
+        enableColumnResizing: true,
+        columnResizeMode: 'onChange',
+    });
+
     const measure = React.useCallback(() => {
         const element = containerRef.current;
-        if (element) {
+        if (element && Object.keys(table.getState().columnSizing).length === 0) {
             const style = getComputedStyle(element);
             setAvailableWidth(
                 element.clientWidth -
@@ -141,36 +128,9 @@ export function SimplifiedPlan({plan, columnSizing, onColumnSizingChange}: Simpl
                     parseFloat(style.paddingRight),
             );
         }
-    }, []);
+    }, [table]);
     React.useLayoutEffect(measure, [measure]);
     useResizeObserver({ref: containerRef, onResize: measure});
-    const metricsWidth = columns.slice(1).reduce((width, column) => width + (column.size ?? 0), 0);
-    const sizing = localSizing ?? {name: Math.max(240, availableWidth - metricsWidth)};
-    const handleColumnSizingChange: OnChangeFn<ColumnSizingState> = (update) => {
-        sizingRef.current =
-            typeof update === 'function' ? update(sizingRef.current ?? sizing) : update;
-        setLocalSizing(sizingRef.current);
-        if (!resizeInfoRef.current.isResizingColumn) {
-            onColumnSizingChange(sizingRef.current);
-        }
-    };
-
-    const table = useTable({
-        columns,
-        data: planWithLinesInfo,
-        getSubRows: (item) => item.children,
-        enableExpanding: true,
-        onExpandedChange: setExpanded,
-        state: {
-            expanded,
-            columnSizing: sizing,
-            columnSizingInfo,
-        },
-        onColumnSizingChange: handleColumnSizingChange,
-        onColumnSizingInfoChange: handleColumnSizingInfoChange,
-        enableColumnResizing: true,
-        columnResizeMode: 'onChange',
-    });
 
     return (
         <div className={block()} ref={containerRef}>

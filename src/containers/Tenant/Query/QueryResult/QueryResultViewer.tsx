@@ -19,10 +19,8 @@ import {QueryExecutionStatus} from '../../../../components/QueryExecutionStatus'
 import {disableFullscreen} from '../../../../store/reducers/fullscreen';
 import {
     selectActiveTabId,
-    selectQueryPlanColumnSizing,
     selectQueryPlanView,
     selectResultTab,
-    setQueryPlanColumnSizing,
     setQueryPlanView,
     setResultTab,
 } from '../../../../store/reducers/query/query';
@@ -109,7 +107,6 @@ export function QueryResultViewer({
     const selectedTabs = useTypedSelector(selectResultTab);
     const activeTabId = useTypedSelector(selectActiveTabId);
     const selectedPlanView = useTypedSelector(selectQueryPlanView);
-    const columnSizing = useTypedSelector(selectQueryPlanColumnSizing);
     const onPlanViewChange = (view: QueryPlanView) => {
         if (activeTabId) {
             dispatch(setQueryPlanView({tabId: activeTabId, executionId: result.executionId, view}));
@@ -329,18 +326,6 @@ export function QueryResultViewer({
                 sectionTitle={RESULT_OPTIONS_TITLES[activeSection]}
                 data={data}
                 planView={planView}
-                columnSizing={columnSizing}
-                onColumnSizingChange={(sizing) => {
-                    if (activeTabId) {
-                        dispatch(
-                            setQueryPlanColumnSizing({
-                                tabId: activeTabId,
-                                executionId: result.executionId,
-                                sizing,
-                            }),
-                        );
-                    }
-                }}
                 onPlanViewChange={onPlanViewChange}
                 database={database}
                 executionId={result.executionId}

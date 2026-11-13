@@ -325,7 +325,6 @@ const slice = createSlice({
 
             if (tab.result?.executionId !== action.payload.result?.executionId) {
                 tab.queryPlanView = undefined;
-                tab.queryPlanColumnSizing = undefined;
             }
             tab.result = action.payload.result;
         },
@@ -641,19 +640,6 @@ const slice = createSlice({
         setHistoryCurrentQueryId: (state, action: PayloadAction<string | undefined>) => {
             state.historyCurrentQueryId = action.payload;
         },
-        setQueryPlanColumnSizing: (
-            state,
-            action: PayloadAction<{
-                tabId: string;
-                executionId: string;
-                sizing: Record<string, number>;
-            }>,
-        ) => {
-            const tab = state.tabsById[action.payload.tabId];
-            if (tab?.result?.executionId === action.payload.executionId) {
-                tab.queryPlanColumnSizing = action.payload.sizing;
-            }
-        },
         setQueryPlanView: (
             state,
             action: PayloadAction<{tabId: string; executionId: string; view: QueryPlanView}>,
@@ -683,10 +669,6 @@ const slice = createSlice({
             state.activeTabId ? state.tabsById[state.activeTabId] : undefined,
         selectQueryPlanView: (state) =>
             state.activeTabId ? state.tabsById[state.activeTabId]?.queryPlanView : undefined,
-        selectQueryPlanColumnSizing: (state) =>
-            state.activeTabId
-                ? state.tabsById[state.activeTabId]?.queryPlanColumnSizing
-                : undefined,
         selectQueriesHistoryFilter: (state) => state.historyFilter || '',
         selectHistoryCurrentQueryId: (state) => state.historyCurrentQueryId,
         selectTenantPath: (state) => state.tenantPath,
@@ -750,7 +732,6 @@ export const {
     setIsDirty,
     setResultTab,
     setQueryPlanView,
-    setQueryPlanColumnSizing,
 } = slice.actions;
 
 export const {
@@ -759,7 +740,6 @@ export const {
     selectTabsById,
     selectActiveTab,
     selectQueryPlanView,
-    selectQueryPlanColumnSizing,
     selectQueriesHistoryFilter,
     selectHistoryCurrentQueryId,
     selectTenantPath,
