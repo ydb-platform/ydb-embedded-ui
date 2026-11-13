@@ -20,10 +20,17 @@ export function DiagnosticsButton(props: DiagnosticsButtonProps) {
         <Button
             view="flat-secondary"
             onClick={() => {
-                const {error, ...queryResultsInfo} = props;
+                const {queryText, ast, stats, plan, database, error} = props;
                 const parsedError = error ? parseQueryError(error) : undefined;
                 createAndDownloadJsonFile(
-                    {...queryResultsInfo, ...(parsedError && {error: parsedError})},
+                    {
+                        queryText,
+                        ast,
+                        stats,
+                        plan,
+                        database,
+                        ...(parsedError && {error: parsedError}),
+                    },
                     `query-diagnostics-${Date.now()}`,
                 );
             }}
