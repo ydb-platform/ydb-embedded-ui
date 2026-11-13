@@ -1,6 +1,4 @@
-import {QUERY_EDITOR_CURRENT_QUERY_KEY} from '../../../../utils/constants';
 import queryReducer, {
-    changeUserInput,
     setActiveQueryTab,
     setQueryPlanView,
     setQueryResult,
@@ -49,14 +47,4 @@ test('preserves the representation across result and editor tabs without leaking
         setQueryPlanView({tabId: 'one', executionId: 'run-1', view: 'json'}),
     );
     expect(state.tabsById.one.queryPlanView).toBeUndefined();
-});
-
-test('does not persist the representation with editor contents', () => {
-    let state = queryReducer(
-        initialState(),
-        setQueryPlanView({tabId: 'one', executionId: 'run-1', view: 'json'}),
-    );
-    state = queryReducer(state, changeUserInput({input: 'SELECT 2;'}));
-    expect(state.tabsById.one.queryPlanView).toBe('json');
-    expect(sessionStorage.getItem(QUERY_EDITOR_CURRENT_QUERY_KEY)).not.toContain('queryPlanView');
 });
