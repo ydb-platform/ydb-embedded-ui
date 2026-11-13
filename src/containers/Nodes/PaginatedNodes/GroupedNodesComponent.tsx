@@ -2,6 +2,8 @@ import React from 'react';
 
 import {isNil} from 'lodash';
 
+import {DataIssuesIndicator} from '../../../components/DataIssuesAlert/DataIssuesIndicator';
+import {EmptyTableGroups} from '../../../components/DataIssuesAlert/EmptyTableGroups';
 import {ResponseError} from '../../../components/Errors/ResponseError';
 import type {PaginatedTableData} from '../../../components/PaginatedTable';
 import {PaginatedTableWithLayout} from '../../../components/PaginatedTable/PaginatedTableWithLayout';
@@ -16,6 +18,8 @@ import {useClusterWithProxy} from '../../../store/reducers/cluster/cluster';
 import {nodesApi} from '../../../store/reducers/nodes/nodes';
 import type {PreparedStorageNode} from '../../../store/reducers/storage/types';
 import type {NodesGroupByField, NodesPeerRole, NodesRequiredField} from '../../../types/api/nodes';
+import {useGroupedTableDataIssues} from '../../../utils/dataIssues/useTableDataIssues';
+import type {ChunkDataChangeHandler} from '../../../utils/dataIssues/useTableDataQuality';
 import {useAutoRefreshInterval} from '../../../utils/hooks';
 import {useHideUnavailableNodes} from '../../../utils/hooks/useHideUnavailableNodes';
 import {useSelectedColumns} from '../../../utils/hooks/useSelectedColumns';
@@ -45,6 +49,8 @@ interface NodeGroupProps {
     scrollContainerRef: React.RefObject<HTMLElement>;
     onIsExpandedChange: (name: string, isExpanded: boolean) => void;
     onDataFetched?: (data: PaginatedTableData<PreparedStorageNode>) => void;
+    onChunkDataChange: ChunkDataChangeHandler;
+    rowsMayBeMissing: boolean;
 }
 
 const NodeGroup = React.memo(function NodeGroup({
@@ -61,6 +67,8 @@ const NodeGroup = React.memo(function NodeGroup({
     scrollContainerRef,
     onIsExpandedChange,
     onDataFetched,
+    onChunkDataChange,
+    rowsMayBeMissing,
 }: NodeGroupProps) {
     return (
         <TableGroup
@@ -89,6 +97,8 @@ const NodeGroup = React.memo(function NodeGroup({
                         columns={columns}
                         scrollContainerRef={scrollContainerRef}
                         onDataFetched={onDataFetched}
+                        onChunkDataChange={onChunkDataChange}
+                        rowsMayBeMissing={rowsMayBeMissing}
                     />
                 }
                 tableWrapperProps={{
@@ -179,6 +189,9 @@ export function GroupedNodesComponent({
 
     const {expandedGroups, setIsGroupExpanded} = useExpandedGroups(tableGroups);
 
+    const {issues, problems, rowsMayBeMissing, getGroupChunkDataChangeHandler} =
+        useGroupedTableDataIssues({type: 'nodes', hasDatabase: Boolean(database)}, currentData);
+
     // Initialize the table state with the API data
     const initialState = React.useMemo(
         () => ({
@@ -211,12 +224,21 @@ export function GroupedNodesComponent({
                         scrollContainerRef={scrollContainerRef}
                         onIsExpandedChange={setIsGroupExpanded}
                         onDataFetched={onDataFetched}
+                        onChunkDataChange={getGroupChunkDataChangeHandler(name)}
+                        rowsMayBeMissing={rowsMayBeMissing}
                     />
                 );
             });
         }
 
-        return i18n('no-nodes-groups');
+        return (
+            <EmptyTableGroups
+                issues={issues}
+                problems={problems}
+                rowsMayBeMissing={rowsMayBeMissing}
+                emptyMessage={i18n('no-nodes-groups')}
+            />
+        );
     };
 
     return (
@@ -229,6 +251,9 @@ export function GroupedNodesComponent({
                     entitiesCountCurrent={found}
                     entitiesCountTotal={total}
                     entitiesLoading={isLoading}
+                    dataIssuesIndicator={
+                        <DataIssuesIndicator compact issues={issues} problems={problems} />
+                    }
                     withGroupBySelect
                 />
             }

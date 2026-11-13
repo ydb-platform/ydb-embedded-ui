@@ -5,6 +5,7 @@ import {MemoryRouter} from 'react-router-dom';
 import {QueryParamProvider} from 'use-query-params';
 import {ReactRouter5Adapter} from 'use-query-params/adapters/react-router-5';
 
+import {getEmptyDataWithIssuesMessage} from '../../../../components/DataIssuesAlert/DataIssuesAlert';
 import type {ResizeablePaginatedTable} from '../../../../components/PaginatedTable';
 import {PaginatedStorageGroupsTable} from '../PaginatedStorageGroupsTable';
 import {STORAGE_GROUPS_COLUMNS_IDS} from '../columns/constants';
@@ -38,14 +39,26 @@ const defaultProps = {
     renderErrorMessage: jest.fn(),
 };
 
-function renderTable(columns: StorageGroupsColumn[]) {
+function renderTable(
+    columns: StorageGroupsColumn[],
+    props: Partial<React.ComponentProps<typeof PaginatedStorageGroupsTable>> = {},
+) {
     render(
         <MemoryRouter>
             <QueryParamProvider adapter={ReactRouter5Adapter}>
-                <PaginatedStorageGroupsTable {...defaultProps} columns={columns} />
+                <PaginatedStorageGroupsTable {...defaultProps} {...props} columns={columns} />
             </QueryParamProvider>
         </MemoryRouter>,
     );
+}
+
+function renderEmptyDataMessage() {
+    const {renderEmptyDataMessage: renderMessage} =
+        ResizeablePaginatedTableMock.mock.calls[
+            ResizeablePaginatedTableMock.mock.calls.length - 1
+        ][0];
+
+    return render(<div>{renderMessage?.()}</div>).container;
 }
 
 describe('PaginatedStorageGroupsTable', () => {
@@ -88,4 +101,13 @@ describe('PaginatedStorageGroupsTable', () => {
             {},
         );
     });
+
+    test.each(['all', 'missing', 'space'] as const)(
+        'does not claim there are no groups for %s entities when rows may be missing',
+        (visibleEntities) => {
+            renderTable([], {visibleEntities, rowsMayBeMissing: true});
+
+            expect(renderEmptyDataMessage()).toHaveTextContent(getEmptyDataWithIssuesMessage());
+        },
+    );
 });

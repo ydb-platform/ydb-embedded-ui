@@ -1,6 +1,8 @@
+import {DataIssuesIndicator} from '../../../components/DataIssuesAlert/DataIssuesIndicator';
 import {PaginatedTableWithLayout} from '../../../components/PaginatedTable/PaginatedTableWithLayout';
 import {TableColumnSetup} from '../../../components/TableColumnSetup/TableColumnSetup';
 import {useStorageGroupsHandlerHasGrouping} from '../../../store/reducers/capabilities/hooks';
+import {useTableDataIssues} from '../../../utils/dataIssues/useTableDataIssues';
 import {renderPaginatedTableErrorMessage} from '../../../utils/renderPaginatedTableErrorMessage';
 import type {PaginatedStorageProps} from '../PaginatedStorage';
 import {PaginatedStorageGroupsTable} from '../PaginatedStorageGroupsTable';
@@ -27,6 +29,10 @@ export function StorageGroupsComponent({
         viewContext,
     });
 
+    const {issues, problems, rowsMayBeMissing, handleChunkDataChange} = useTableDataIssues({
+        type: 'storageGroups',
+    });
+
     return (
         <PaginatedTableWithLayout
             controls={
@@ -34,6 +40,9 @@ export function StorageGroupsComponent({
                     withTypeSelector
                     withGroupBySelect={storageGroupsHandlerHasGrouping}
                     columns={columnsToShow}
+                    dataIssuesIndicator={
+                        <DataIssuesIndicator compact issues={issues} problems={problems} />
+                    }
                 />
             }
             extraControls={
@@ -57,6 +66,8 @@ export function StorageGroupsComponent({
                     renderErrorMessage={renderPaginatedTableErrorMessage}
                     columns={columnsToShow}
                     initialEntitiesCount={initialEntitiesCount}
+                    onChunkDataChange={handleChunkDataChange}
+                    rowsMayBeMissing={rowsMayBeMissing}
                 />
             }
             tableWrapperProps={{

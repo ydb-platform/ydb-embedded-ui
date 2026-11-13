@@ -9,6 +9,22 @@
         @include mixins.search();
     }
 
+    // The data issues label is the last item of the controls row, but takes no width in it:
+    // the expert mode panel below is as wide as the row, and its width must not change
+    // when the label comes and goes. The label itself overflows the item to the right.
+    &__data-issues {
+        display: flex;
+        flex-shrink: 0;
+
+        width: 0;
+        // the gap of the row before a zero-width item would still widen the row
+        margin-inline-start: calc(-1 * var(--g-spacing-2));
+
+        > * {
+            margin-inline-start: var(--g-spacing-2);
+        }
+    }
+
     &__table {
         .g-tooltip {
             // stylelint-disable-next-line declaration-no-important

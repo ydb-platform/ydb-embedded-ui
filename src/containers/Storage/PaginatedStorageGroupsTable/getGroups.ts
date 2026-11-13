@@ -6,12 +6,18 @@ import type {
     PreparedStorageGroup,
     PreparedStorageGroupFilters,
 } from '../../../store/reducers/storage/types';
+import type {DataQualityMeta} from '../../../utils/dataIssues/types';
 import {prepareSortValue} from '../../../utils/filters';
 import {getRequiredDataFields} from '../../../utils/tableUtils/getRequiredDataFields';
 
 import {GROUPS_COLUMNS_TO_DATA_FIELDS, getStorageGroupsColumnSortField} from './columns/constants';
 
-type GetStorageGroups = FetchData<PreparedStorageGroup, PreparedStorageGroupFilters>;
+type GetStorageGroups = FetchData<
+    PreparedStorageGroup,
+    PreparedStorageGroupFilters,
+    {},
+    DataQualityMeta
+>;
 
 export function useGroupsGetter() {
     const fetchData: GetStorageGroups = React.useCallback(async (params) => {
@@ -32,7 +38,7 @@ export function useGroupsGetter() {
         const sort = sortField ? prepareSortValue(sortField, sortOrder) : undefined;
         const dataFieldsRequired = getRequiredDataFields(columnsIds, GROUPS_COLUMNS_TO_DATA_FIELDS);
 
-        const {groups, found, total} = await requestStorageData({
+        const response = await requestStorageData({
             limit,
             offset,
             sort,
@@ -48,9 +54,10 @@ export function useGroupsGetter() {
         });
 
         return {
-            data: groups || [],
-            found: found || 0,
-            total: total || 0,
+            data: response.groups || [],
+            found: response.found || 0,
+            total: response.total || 0,
+            meta: {dataQuality: response.dataQuality},
         };
     }, []);
 

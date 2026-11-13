@@ -129,6 +129,12 @@ export const useNodesHandlerHasWorkingClusterNetworkStats = () => {
     return useGetFeatureVersion('/viewer/nodes') >= 16;
 };
 
+// From this version the handler adds `filter-not-applied` to Problems when it drops a filter.
+// Before it a dropped storage filter can only be guessed from the `bsc-storage-*` problems
+export const useViewerNodesHandlerReportsDroppedFilters = () => {
+    return useGetFeatureVersion('/viewer/nodes') >= 23;
+};
+
 export const useViewerPeersHandlerAvailable = () => {
     return useGetFeatureVersion('/viewer/peers') > 0;
 };

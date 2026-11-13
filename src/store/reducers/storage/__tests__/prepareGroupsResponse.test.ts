@@ -211,4 +211,19 @@ describe('prepareGroupsResponse', () => {
             }),
         );
     });
+
+    test('Should keep what the handler reported about the response', () => {
+        const response: StorageGroupsResponse = {
+            StorageGroups: [{GroupId: '1'}],
+            Problems: ['bsc-timeout', 'wb-incomplete-groups'],
+            NeedSort: true,
+        };
+
+        expect(prepareGroupsResponse(response).dataQuality).toEqual({
+            problems: ['bsc-timeout', 'wb-incomplete-groups'],
+            needFilter: false,
+            needSort: true,
+            needGroup: false,
+        });
+    });
 });

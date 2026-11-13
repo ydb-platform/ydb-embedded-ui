@@ -73,7 +73,7 @@ export const getStorageNodesColumns = ({
 }: GetStorageNodesColumnsParams): NodesColumn[] => {
     const columns: NodesColumn[] = [
         getNodeIdColumn(),
-        getHostColumn({database}),
+        getHostColumn({database, storageNodes: true}),
         getNodeNameColumn(),
         getDataCenterColumn(),
         getPileNameColumn(),

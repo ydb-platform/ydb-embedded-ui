@@ -2,8 +2,9 @@ import React from 'react';
 
 import {useHistory} from 'react-router-dom';
 
+import {getEmptyDataWithIssuesMessage} from '../../components/DataIssuesAlert/DataIssuesAlert';
 import {getNodeHostLabel, getNodeHostPath} from '../../components/NodeHostWrapper/NodeHostWrapper';
-import type {PaginatedTableData} from '../../components/PaginatedTable';
+import type {OnChunkDataChange, PaginatedTableData} from '../../components/PaginatedTable';
 import {PAGINATED_TABLE_IDS, ResizeablePaginatedTable} from '../../components/PaginatedTable';
 import {
     NODES_COLUMNS_IDS,
@@ -14,6 +15,7 @@ import {useClusterWithProxy} from '../../store/reducers/cluster/cluster';
 import type {NodesFilters} from '../../store/reducers/nodes/types';
 import type {PreparedStorageNode} from '../../store/reducers/storage/types';
 import type {NodesGroupByField, NodesPeerRole} from '../../types/api/nodes';
+import type {DataQualityMeta} from '../../utils/dataIssues/types';
 import {useDatacenterNodesFetcher} from '../../utils/hooks/useDatacenterNodesFetcher';
 import {useHideUnavailableNodes} from '../../utils/hooks/useHideUnavailableNodes';
 import {getIllustration} from '../../utils/illustrations';
@@ -45,6 +47,9 @@ interface NodesTableProps {
     initialEntitiesCount?: number;
 
     onDataFetched?: (data: PaginatedTableData<PreparedStorageNode>) => void;
+    onChunkDataChange?: OnChunkDataChange<PreparedStorageNode, DataQualityMeta>;
+    /** Rows may be missing: an empty table does not prove there are no such nodes */
+    rowsMayBeMissing?: boolean;
 }
 
 export function NodesTable({
@@ -61,6 +66,8 @@ export function NodesTable({
     scrollContainerRef,
     initialEntitiesCount,
     onDataFetched,
+    onChunkDataChange,
+    rowsMayBeMissing,
 }: NodesTableProps) {
     const history = useHistory();
     const fetchNodes = useDatacenterNodesFetcher(getNodes);
@@ -97,6 +104,10 @@ export function NodesTable({
     ]);
 
     const renderEmptyDataMessage = () => {
+        if (rowsMayBeMissing) {
+            return getEmptyDataWithIssuesMessage();
+        }
+
         if (withProblems || uptimeFilter !== NodesUptimeFilterValues.All) {
             return <SuccessImage width={200} height={200} />;
         }
@@ -130,6 +141,7 @@ export function NodesTable({
             filters={tableFilters}
             tableName={PAGINATED_TABLE_IDS.NODES}
             onDataFetched={onDataFetched}
+            onChunkDataChange={onChunkDataChange}
         />
     );
 }

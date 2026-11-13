@@ -158,6 +158,8 @@ class RequestBatcher {
                 data: chunkData,
                 total: batchResponse.total,
                 found: batchResponse.found,
+                // The metadata is about the whole response, so every chunk made of it gets the same
+                meta: batchResponse.meta,
             };
 
             request.resolve({data: chunkResponse});

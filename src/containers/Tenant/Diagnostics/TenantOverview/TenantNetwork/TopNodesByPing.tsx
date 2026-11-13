@@ -7,6 +7,7 @@ import {
 } from '../../../../../utils/constants';
 import {useAutoRefreshInterval} from '../../../../../utils/hooks';
 import {TenantOverviewTableLayout} from '../TenantOverviewTableLayout';
+import {TopNodesDataIssues} from '../TopTablesDataIssues';
 import i18n from '../i18n';
 
 import {getTopNodesByPingColumns} from './columns';
@@ -35,7 +36,17 @@ export function TopNodesByPing({database}: TopNodesByPingProps) {
     const topNodes = currentData?.nodes || [];
 
     return (
-        <TenantOverviewTableLayout loading={loading} error={error} withData={Boolean(currentData)}>
+        <TenantOverviewTableLayout
+            loading={loading}
+            error={error}
+            withData={Boolean(currentData)}
+            notice={
+                <TopNodesDataIssues
+                    dataQuality={currentData?.dataQuality}
+                    tableTitle={i18n('title_nodes-by-ping')}
+                />
+            }
+        >
             <ResizeableDataTable
                 columnsWidthLSKey={NODES_COLUMNS_WIDTH_LS_KEY}
                 data={topNodes}

@@ -21,6 +21,7 @@ import {
 import {useAutoRefreshInterval} from '../../../../../utils/hooks';
 import {getRequiredDataFields} from '../../../../../utils/tableUtils/getRequiredDataFields';
 import {TenantOverviewTableLayout} from '../TenantOverviewTableLayout';
+import {TopNodesDataIssues} from '../TopTablesDataIssues';
 import i18n from '../i18n';
 
 function getTopNodesByCpuColumns(
@@ -64,7 +65,17 @@ export function TopNodesByCpu({database}: TopNodesByCpuProps) {
     const topNodes = currentData?.nodes || [];
 
     return (
-        <TenantOverviewTableLayout loading={loading} error={error} withData={Boolean(currentData)}>
+        <TenantOverviewTableLayout
+            loading={loading}
+            error={error}
+            withData={Boolean(currentData)}
+            notice={
+                <TopNodesDataIssues
+                    dataQuality={currentData?.dataQuality}
+                    tableTitle={i18n('title_top-nodes-pool')}
+                />
+            }
+        >
             <ResizeableDataTable
                 columnsWidthLSKey={NODES_COLUMNS_WIDTH_LS_KEY}
                 data={topNodes}

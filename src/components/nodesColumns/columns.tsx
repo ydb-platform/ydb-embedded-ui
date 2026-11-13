@@ -49,12 +49,13 @@ export function getNodeIdColumn<T extends {NodeId?: string | number}>(): Column<
 }
 export function getHostColumn<T extends PreparedStorageNode>({
     database,
+    storageNodes,
 }: GetNodesColumnsParams): Column<T> {
     return {
         name: NODES_COLUMNS_IDS.Host,
         header: NODES_COLUMNS_TITLES.Host,
         render: ({row}) => {
-            return <NodeHostWrapper node={row} database={database} />;
+            return <NodeHostWrapper node={row} database={database} storageNodes={storageNodes} />;
         },
         width: 350,
         align: DataTable.LEFT,

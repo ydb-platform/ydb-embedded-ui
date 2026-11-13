@@ -21,6 +21,7 @@ import type {
     FetchData,
     GetRowClassName,
     HandleTableColumnsResize,
+    OnChunkDataChange,
     OnRowClick,
     PaginatedTableData,
     RenderEmptyDataMessage,
@@ -30,10 +31,10 @@ import {isSortColumnAvailable} from './utils';
 
 import './PaginatedTable.scss';
 
-export interface PaginatedTableProps<T, F> {
+export interface PaginatedTableProps<T, F, M = unknown> {
     limit?: number;
     initialEntitiesCount?: number;
-    fetchData: FetchData<T, F>;
+    fetchData: FetchData<T, F, {}, M>;
     filters?: F;
     tableName: PaginatedTableId;
     columns: Column<T>[];
@@ -46,6 +47,8 @@ export interface PaginatedTableProps<T, F> {
     renderErrorMessage?: RenderErrorMessage;
     containerClassName?: string;
     onDataFetched?: (data: PaginatedTableData<T>) => void;
+    /** Reports the data of every chunk whose rows are rendered, e.g. to describe the rows in the table */
+    onChunkDataChange?: OnChunkDataChange<T, M>;
     keepCache?: boolean;
     fetchOverscan?: number;
     onKeyboardActivate?: (row: T) => void;
@@ -55,7 +58,7 @@ export interface PaginatedTableProps<T, F> {
 
 const DEFAULT_PAGINATION_LIMIT = 20;
 
-export const PaginatedTable = <T, F>({
+export const PaginatedTable = <T, F, M = unknown>({
     limit: chunkSize = DEFAULT_PAGINATION_LIMIT,
     initialEntitiesCount,
     fetchData,
@@ -71,12 +74,13 @@ export const PaginatedTable = <T, F>({
     renderEmptyDataMessage,
     containerClassName,
     onDataFetched,
+    onChunkDataChange,
     keepCache = true,
     fetchOverscan,
     onKeyboardActivate,
     getKeyboardRowKey,
     getKeyboardRowLabel,
-}: PaginatedTableProps<T, F>) => {
+}: PaginatedTableProps<T, F, M>) => {
     const store = useStore<RootState>();
     // Get state and setters from context
     const {tableState, noBatching, setSortParams, dispatchCounts} = usePaginatedTableState();
@@ -248,6 +252,7 @@ export const PaginatedTable = <T, F>({
                     renderErrorMessage={renderErrorMessage}
                     renderEmptyDataMessage={renderEmptyDataMessage}
                     onDataFetched={handleDataFetched}
+                    onChunkDataChange={onChunkDataChange}
                     onActiveChunkOffsetsChange={handleActiveChunkOffsetsChange}
                     keepCache={keepCache}
                     fetchOverscan={fetchOverscan}

@@ -1,12 +1,17 @@
+import {DataIssuesIndicator} from '../../../components/DataIssuesAlert/DataIssuesIndicator';
 import {PaginatedTableWithLayout} from '../../../components/PaginatedTable/PaginatedTableWithLayout';
 import {TableColumnSetup} from '../../../components/TableColumnSetup/TableColumnSetup';
-import {useViewerNodesHandlerHasGrouping} from '../../../store/reducers/capabilities/hooks';
+import {
+    useViewerNodesHandlerHasGrouping,
+    useViewerNodesHandlerReportsDroppedFilters,
+} from '../../../store/reducers/capabilities/hooks';
+import {useTableDataIssues} from '../../../utils/dataIssues/useTableDataIssues';
 import {useHideUnavailableNodes} from '../../../utils/hooks/useHideUnavailableNodes';
 import {renderPaginatedTableErrorMessage} from '../../../utils/renderPaginatedTableErrorMessage';
 import type {PaginatedStorageProps} from '../PaginatedStorage';
 import {PaginatedStorageNodesTable} from '../PaginatedStorageNodesTable/PaginatedStorageNodesTable';
 import {useIsStorageExpertMode, useStorageQueryParams} from '../useStorageQueryParams';
-import {useStorageColumnsSettings} from '../utils';
+import {getStorageNodesDataIssuesSubject, useStorageColumnsSettings} from '../utils';
 
 import {StorageNodesControlsWithTableState} from './StorageNodesControls';
 import {useStorageNodesColumnsToSelect} from './useStorageNodesColumnsToSelect';
@@ -23,12 +28,17 @@ export function StorageNodesComponent({
         useStorageQueryParams();
 
     const viewerNodesHandlerHasGrouping = useViewerNodesHandlerHasGrouping();
+    const reportsDroppedFilters = useViewerNodesHandlerReportsDroppedFilters();
     const {hideUnavailable} = useHideUnavailableNodes();
 
     const expertMode = useIsStorageExpertMode();
     const {handleDataFetched, columnsSettings, rowHeight} = useStorageColumnsSettings({
         expertMode,
     });
+
+    const {issues, problems, rowsMayBeMissing, handleChunkDataChange} = useTableDataIssues(
+        getStorageNodesDataIssuesSubject({database, groupId, reportsDroppedFilters}),
+    );
 
     const {columnsToShow, columnsToSelect, setColumns} = useStorageNodesColumnsToSelect({
         database,
@@ -42,6 +52,9 @@ export function StorageNodesComponent({
                 <StorageNodesControlsWithTableState
                     withTypeSelector
                     withGroupBySelect={viewerNodesHandlerHasGrouping}
+                    dataIssuesIndicator={
+                        <DataIssuesIndicator compact issues={issues} problems={problems} />
+                    }
                 />
             }
             extraControls={
@@ -67,6 +80,8 @@ export function StorageNodesComponent({
                     initialEntitiesCount={initialEntitiesCount}
                     rowHeight={rowHeight}
                     onDataFetched={handleDataFetched}
+                    onChunkDataChange={handleChunkDataChange}
+                    rowsMayBeMissing={rowsMayBeMissing}
                 />
             }
             tableWrapperProps={{

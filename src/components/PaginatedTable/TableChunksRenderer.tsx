@@ -7,6 +7,7 @@ import type {
     Column,
     FetchData,
     GetRowClassName,
+    OnChunkDataChange,
     OnRowClick,
     PaginatedTableData,
     RenderEmptyDataMessage,
@@ -15,14 +16,14 @@ import type {
 } from './types';
 import {useScrollBasedChunks} from './useScrollBasedChunks';
 
-export interface TableChunksRendererProps<T, F> {
+export interface TableChunksRendererProps<T, F, M = unknown> {
     scrollContainerRef: React.RefObject<HTMLElement>;
     tableRef: React.RefObject<HTMLElement>;
     foundEntities: number;
     chunkSize: number;
     rowHeight: number;
     columns: Column<T>[];
-    fetchData: FetchData<T, F>;
+    fetchData: FetchData<T, F, {}, M>;
     filters?: F;
     tableName: PaginatedTableId;
     sortParams?: SortParams;
@@ -31,12 +32,13 @@ export interface TableChunksRendererProps<T, F> {
     renderErrorMessage?: RenderErrorMessage;
     renderEmptyDataMessage?: RenderEmptyDataMessage;
     onDataFetched: (data: PaginatedTableData<T>) => void;
+    onChunkDataChange?: OnChunkDataChange<T, M>;
     onActiveChunkOffsetsChange: (offsets: number[]) => void;
     keepCache: boolean;
     fetchOverscan?: number;
 }
 
-export const TableChunksRenderer = <T, F>({
+export const TableChunksRenderer = <T, F, M = unknown>({
     scrollContainerRef,
     tableRef,
     foundEntities,
@@ -52,10 +54,11 @@ export const TableChunksRenderer = <T, F>({
     renderErrorMessage,
     renderEmptyDataMessage,
     onDataFetched,
+    onChunkDataChange,
     onActiveChunkOffsetsChange,
     keepCache,
     fetchOverscan,
-}: TableChunksRendererProps<T, F>) => {
+}: TableChunksRendererProps<T, F, M>) => {
     const chunkStates = useScrollBasedChunks({
         scrollContainerRef,
         tableRef,
@@ -124,7 +127,7 @@ export const TableChunksRenderer = <T, F>({
         (chunkIndex: number) => {
             const chunkState = chunkStates[chunkIndex];
             return (
-                <TableChunk<T, F>
+                <TableChunk<T, F, M>
                     key={chunkIndex}
                     id={chunkIndex}
                     calculatedCount={
@@ -142,6 +145,7 @@ export const TableChunksRenderer = <T, F>({
                     renderErrorMessage={renderErrorMessage}
                     renderEmptyDataMessage={renderEmptyDataMessage}
                     onDataFetched={onDataFetched}
+                    onChunkDataChange={onChunkDataChange}
                     shouldFetch={chunkState.shouldFetch}
                     shouldRender={chunkState.shouldRender}
                     keepCache={keepCache}
@@ -157,6 +161,7 @@ export const TableChunksRenderer = <T, F>({
             getRowClassName,
             keepCache,
             lastChunkSize,
+            onChunkDataChange,
             onDataFetched,
             onRowClick,
             renderEmptyDataMessage,

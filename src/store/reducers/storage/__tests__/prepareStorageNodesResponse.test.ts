@@ -61,4 +61,22 @@ describe('prepareStorageNodesResponse', () => {
             }),
         );
     });
+
+    test('Should keep what the handler reported about the response', () => {
+        const response = {
+            TotalNodes: '1',
+            FoundNodes: '1',
+            Nodes: [{NodeId: 1, SystemState: {}}],
+            Problems: ['bsc-timeout', 'bsc-storage-slots-no-data'],
+            NeedFilter: true,
+            NeedGroup: true,
+        } satisfies TNodesInfo;
+
+        expect(prepareStorageNodesResponse(response).dataQuality).toEqual({
+            problems: ['bsc-timeout', 'bsc-storage-slots-no-data'],
+            needFilter: true,
+            needSort: false,
+            needGroup: true,
+        });
+    });
 });

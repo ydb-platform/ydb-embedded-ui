@@ -1,11 +1,16 @@
 import React from 'react';
 
+import {DataIssuesIndicator} from '../../../components/DataIssuesAlert/DataIssuesIndicator';
+import {EmptyTableGroups} from '../../../components/DataIssuesAlert/EmptyTableGroups';
 import {ResponseError} from '../../../components/Errors/ResponseError';
 import {PaginatedTableWithLayout} from '../../../components/PaginatedTable/PaginatedTableWithLayout';
 import {TableColumnSetup} from '../../../components/TableColumnSetup/TableColumnSetup';
 import {NODES_COLUMNS_TO_DATA_FIELDS} from '../../../components/nodesColumns/constants';
+import {useViewerNodesHandlerReportsDroppedFilters} from '../../../store/reducers/capabilities/hooks';
 import {storageApi} from '../../../store/reducers/storage/storage';
 import type {NodesGroupByField, NodesRequiredField} from '../../../types/api/nodes';
+import {useGroupedTableDataIssues} from '../../../utils/dataIssues/useTableDataIssues';
+import type {ChunkDataChangeHandler} from '../../../utils/dataIssues/useTableDataQuality';
 import {useAutoRefreshInterval} from '../../../utils/hooks';
 import {useHideUnavailableNodes} from '../../../utils/hooks/useHideUnavailableNodes';
 import {NodesUptimeFilterValues} from '../../../utils/nodes';
@@ -17,8 +22,9 @@ import {TableGroup} from '../TableGroup/TableGroup';
 import {useExpandedGroups} from '../TableGroup/useExpandedTableGroups';
 import i18n from '../i18n';
 import {b} from '../shared';
+import type {StorageNodesPaginatedTableData} from '../types';
 import {useIsStorageExpertMode, useStorageQueryParams} from '../useStorageQueryParams';
-import {useStorageColumnsSettings} from '../utils';
+import {getStorageNodesDataIssuesSubject, useStorageColumnsSettings} from '../utils';
 
 import {StorageNodesControls} from './StorageNodesControls';
 import {useStorageNodesColumnsToSelect} from './useStorageNodesColumnsToSelect';
@@ -39,8 +45,10 @@ interface StorageNodeGroupProps {
     scrollContainerRef: React.RefObject<HTMLElement>;
     onIsExpandedChange: (name: string, isExpanded: boolean) => void;
     handleShowAllNodes: VoidFunction;
-    onDataFetched: (data: any) => void;
+    onDataFetched: (data: StorageNodesPaginatedTableData) => void;
+    onChunkDataChange: ChunkDataChangeHandler;
     rowHeight: number;
+    rowsMayBeMissing: boolean;
 }
 
 export const StorageNodeGroup = React.memo(function StorageNodeGroup({
@@ -57,7 +65,9 @@ export const StorageNodeGroup = React.memo(function StorageNodeGroup({
     onIsExpandedChange,
     handleShowAllNodes,
     onDataFetched,
+    onChunkDataChange,
     rowHeight,
+    rowsMayBeMissing,
 }: StorageNodeGroupProps) {
     return (
         <TableGroup
@@ -88,6 +98,8 @@ export const StorageNodeGroup = React.memo(function StorageNodeGroup({
                         initialEntitiesCount={count}
                         rowHeight={rowHeight}
                         onDataFetched={onDataFetched}
+                        onChunkDataChange={onChunkDataChange}
+                        rowsMayBeMissing={rowsMayBeMissing}
                     />
                 }
                 tableWrapperProps={{
@@ -107,6 +119,7 @@ export function GroupedStorageNodesComponent({
 }: PaginatedStorageProps) {
     const [autoRefreshInterval] = useAutoRefreshInterval();
     const {hideUnavailable} = useHideUnavailableNodes();
+    const reportsDroppedFilters = useViewerNodesHandlerReportsDroppedFilters();
 
     const {nodesSearchValue, storageNodesGroupByParam, handleShowAllNodes} =
         useStorageQueryParams();
@@ -151,6 +164,12 @@ export function GroupedStorageNodesComponent({
 
     const {expandedGroups, setIsGroupExpanded} = useExpandedGroups(tableGroups);
 
+    const {issues, problems, rowsMayBeMissing, getGroupChunkDataChangeHandler} =
+        useGroupedTableDataIssues(
+            getStorageNodesDataIssuesSubject({database, groupId, reportsDroppedFilters}),
+            currentData,
+        );
+
     // Initialize the table state with the API data
     const initialState = React.useMemo(
         () => ({
@@ -185,12 +204,21 @@ export function GroupedStorageNodesComponent({
                         columns={columnsToShow}
                         rowHeight={rowHeight}
                         onDataFetched={handleDataFetched}
+                        onChunkDataChange={getGroupChunkDataChangeHandler(name)}
+                        rowsMayBeMissing={rowsMayBeMissing}
                     />
                 );
             });
         }
 
-        return i18n('no-nodes');
+        return (
+            <EmptyTableGroups
+                issues={issues}
+                problems={problems}
+                rowsMayBeMissing={rowsMayBeMissing}
+                emptyMessage={i18n('no-nodes')}
+            />
+        );
     };
 
     return (
@@ -202,6 +230,9 @@ export function GroupedStorageNodesComponent({
                     entitiesCountCurrent={found}
                     entitiesCountTotal={total}
                     entitiesLoading={isLoading}
+                    dataIssuesIndicator={
+                        <DataIssuesIndicator compact issues={issues} problems={problems} />
+                    }
                 />
             }
             extraControls={
