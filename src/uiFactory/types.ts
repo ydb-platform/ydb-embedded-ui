@@ -15,6 +15,7 @@ import type {ClusterInfo} from '../store/reducers/cluster/cluster';
 import type {PreparedStorageNode} from '../store/reducers/storage/types';
 import type {PreparedTenant} from '../store/reducers/tenants/types';
 import type {ClusterLink, DatabaseLink} from '../types/additionalProps';
+import type {CapabilitiesResponse} from '../types/api/capabilities';
 import type {MetaBaseClusterInfo} from '../types/api/meta';
 import type {ETenantType} from '../types/api/tenant';
 import type {TUserToken} from '../types/api/whoami';
@@ -31,6 +32,20 @@ export type IllustrationName =
     | 'Unauthenticated'
     | 'NoSearchResults'
     | 'SuccessOperation';
+
+export interface AccessPageContext {
+    database: string;
+    databaseFullPath: string;
+    path: string;
+    capabilities?: CapabilitiesResponse;
+}
+
+export interface AccessUIConfig {
+    /** Return undefined to keep the default tab title. */
+    getTabTitle?: (context: Pick<AccessPageContext, 'capabilities'>) => string | undefined;
+    /** Return null or undefined to render the default access page. */
+    renderPage?: (context: AccessPageContext) => React.ReactNode;
+}
 
 export interface UIFactory<H extends string = CommonIssueCategory, T extends string = string> {
     onCreateDB?: HandleCreateDB;
@@ -64,6 +79,7 @@ export interface UIFactory<H extends string = CommonIssueCategory, T extends str
     renderMonitoring?: RenderMonitoring;
     renderNodeTooltipActions?: RenderNodeTooltipActions;
     renderChatPanel?: RenderChatPanel;
+    access?: AccessUIConfig;
     clusterOrDatabaseAccessError?: Partial<EmptyStateProps>;
 
     /** Defaults to true. Undefined preserves the current value when configuring the UI. */
