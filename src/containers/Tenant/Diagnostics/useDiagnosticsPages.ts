@@ -24,6 +24,7 @@ export interface UseDiagnosticsPagesParams {
     type?: EPathType;
     subType?: EPathSubType;
     databasePagesDisplay?: DatabasePagesDisplay;
+    accessTitle?: string;
 }
 
 export function useDiagnosticsPages({
@@ -33,6 +34,7 @@ export function useDiagnosticsPages({
     type,
     subType,
     databasePagesDisplay,
+    accessTitle,
 }: UseDiagnosticsPagesParams): Page[] {
     const isDatabase = isDatabaseEntityType(type) || path === databaseFullPath;
 
@@ -61,6 +63,7 @@ export function useDiagnosticsPages({
             hasMonitoring: canShowTenantMonitoringTab(controlPlane, clusterMonitoring),
             databaseType,
             databasePagesDisplay,
+            accessTitle,
         });
     }, [
         type,
@@ -75,6 +78,7 @@ export function useDiagnosticsPages({
         clusterMonitoring,
         databaseType,
         databasePagesDisplay,
+        accessTitle,
         userPermissions,
     ]);
 }

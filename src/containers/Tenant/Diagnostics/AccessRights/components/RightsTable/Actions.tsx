@@ -42,7 +42,12 @@ function GrantRightsToSubject({subject}: ActionProps) {
     };
     return (
         <ActionTooltip title={i18n('description_grant-explicit-rights')}>
-            <Button view="outlined" onClick={handleClick} size="s">
+            <Button
+                view="outlined"
+                onClick={handleClick}
+                size="s"
+                aria-label={`${i18n('description_grant-explicit-rights')}: ${subject}`}
+            >
                 <Icon data={Pencil} />
             </Button>
         </ActionTooltip>
@@ -80,7 +85,13 @@ function RevokeAllRights({subject}: ActionProps) {
         >
             {/* this wrapper is needed to show tooltip if button is disabled */}
             <div className={block('button-wrapper')}>
-                <Button onClick={handleClick} disabled={noRightsToRevoke} view="outlined" size="s">
+                <Button
+                    onClick={handleClick}
+                    disabled={noRightsToRevoke}
+                    view="outlined"
+                    size="s"
+                    aria-label={`${i18n('label_revoke-all-rights')}: ${subject}`}
+                >
                     <Icon data={CircleXmark} />
                 </Button>
             </div>

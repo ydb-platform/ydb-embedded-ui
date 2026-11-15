@@ -43,6 +43,7 @@ interface GetPagesOptions {
     hasMonitoring?: boolean;
     databaseType?: ETenantType;
     databasePagesDisplay?: DatabasePagesDisplay;
+    accessTitle?: string;
 }
 
 const database = {
@@ -342,7 +343,13 @@ function applyFilters(pages: Page[], options: GetPagesOptions = {}) {
         removals.push(TENANT_DIAGNOSTICS_TABS_IDS.monitoring);
     }
 
-    return result.filter((p) => !removals.includes(p.id));
+    return result
+        .filter((p) => !removals.includes(p.id))
+        .map((page) =>
+            page.id === TENANT_DIAGNOSTICS_TABS_IDS.access && options.accessTitle?.trim()
+                ? {...page, title: options.accessTitle}
+                : page,
+        );
 }
 
 export const getPagesByType = (

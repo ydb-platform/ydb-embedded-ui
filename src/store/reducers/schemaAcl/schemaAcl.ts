@@ -1,6 +1,7 @@
 import {createSelector} from '@reduxjs/toolkit';
 
 import type {AccessRightsUpdateRequest} from '../../../types/api/acl';
+import {prepareAccessRights} from '../../../utils/prepareAccessRights';
 import type {RootState} from '../../index';
 import {api} from '../api';
 
@@ -175,59 +176,6 @@ export const selectSubjectExplicitAllowAces = createSelector(
     (subject, data) => getSubjectExplicitAllowAces(data?.acl, subject),
 );
 
-const selectRightsMap = createSelector(
-    (
-        state: RootState,
-        path: string,
-        database: string,
-        databaseFullPath: string,
-        dialect: string,
-        useMetaProxy?: boolean,
-    ) => selectAccessRights(state, path, database, databaseFullPath, dialect, useMetaProxy),
-    (data) => {
-        if (!data) {
-            return null;
-        }
-        const {acl, effectiveAcl} = data;
-
-        const result: Record<string, {explicit: Set<string>; effective: Set<string>}> = {};
-
-        if (acl?.length) {
-            acl.forEach((aclItem) => {
-                if (aclItem.Subject) {
-                    if (!result[aclItem.Subject]) {
-                        result[aclItem.Subject] = {explicit: new Set(), effective: new Set()};
-                    }
-                    aclItem.AccessRules?.forEach((rule) => {
-                        result[aclItem.Subject].explicit.add(rule);
-                    });
-                    aclItem.AccessRights?.forEach((rule) => {
-                        result[aclItem.Subject].explicit.add(rule);
-                    });
-                }
-            });
-        }
-
-        if (effectiveAcl?.length) {
-            effectiveAcl.forEach((aclItem) => {
-                if (aclItem.Subject) {
-                    if (!result[aclItem.Subject]) {
-                        result[aclItem.Subject] = {explicit: new Set(), effective: new Set()};
-                    }
-                    aclItem.AccessRules?.forEach((rule) => {
-                        result[aclItem.Subject].effective.add(rule);
-                    });
-                    aclItem.AccessRights?.forEach((rule) => {
-                        result[aclItem.Subject].effective.add(rule);
-                    });
-                }
-            });
-        }
-
-        return result;
-    },
-);
-
 export const selectPreparedRights = createSelector(
     (
         state: RootState,
@@ -236,17 +184,8 @@ export const selectPreparedRights = createSelector(
         databaseFullPath: string,
         dialect: string,
         useMetaProxy?: boolean,
-    ) => selectRightsMap(state, path, database, databaseFullPath, dialect, useMetaProxy),
-    (data) => {
-        if (!data) {
-            return null;
-        }
-        return Object.entries(data).map(([subject, value]) => ({
-            subject,
-            explicit: Array.from(value.explicit),
-            effective: Array.from(value.effective),
-        }));
-    },
+    ) => selectAccessRights(state, path, database, databaseFullPath, dialect, useMetaProxy),
+    (data) => (data ? prepareAccessRights(data.acl, data.effectiveAcl) : null),
 );
 
 export const selectSubjectExplicitRights = createSelector(
@@ -283,16 +222,16 @@ export const selectSubjectInheritedRights = createSelector(
             databaseFullPath: string,
             dialect: string,
             useMetaProxy?: boolean,
-        ) => selectRightsMap(state, path, database, databaseFullPath, dialect, useMetaProxy),
+        ) => selectPreparedRights(state, path, database, databaseFullPath, dialect, useMetaProxy),
     ],
-    (subject, rightsMap) => {
-        if (!subject || !rightsMap) {
+    (subject, rights) => {
+        const subjectRights = rights?.find((row) => row.subject === subject);
+        if (!subjectRights) {
             return new Set<string>();
         }
 
-        const explicitRights = rightsMap[subject]?.explicit || new Set();
-        const effectiveRights = rightsMap[subject]?.effective || new Set();
-        const inheritedRights = Array.from(effectiveRights).filter(
+        const explicitRights = new Set(subjectRights.explicit);
+        const inheritedRights = subjectRights.effective.filter(
             (right) => !explicitRights.has(right),
         );
 
