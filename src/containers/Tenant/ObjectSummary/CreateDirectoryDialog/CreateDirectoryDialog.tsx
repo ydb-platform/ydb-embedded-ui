@@ -1,14 +1,16 @@
 import React from 'react';
 
 import {DatabaseFill, FolderFill} from '@gravity-ui/icons';
-import {Breadcrumbs, Dialog, TextInput} from '@gravity-ui/uikit';
+import {Breadcrumbs, Dialog} from '@gravity-ui/uikit';
 
 import {ResponseError} from '../../../../components/Errors/ResponseError';
+import {SuggestInput} from '../../../../components/SuggestInput/SuggestInput';
 import {useClusterWithProxy} from '../../../../store/reducers/cluster/cluster';
 import {schemaApi} from '../../../../store/reducers/schema/schema';
 import {cn} from '../../../../utils/cn';
 import {BRAND_BUTTON_CLASS} from '../../../../utils/constants';
 import i18n from '../../i18n';
+import {useSchemaPathSuggestions} from '../../utils/useSchemaPathSuggestions';
 import {transformPath} from '../transformPath';
 
 import './CreateDirectoryDialog.scss';
@@ -49,6 +51,13 @@ export function CreateDirectoryDialog({
     const [relativePath, setRelativePath] = React.useState('');
     const [create, response] = schemaApi.useCreateDirectoryMutation();
     const inputRef = React.useRef<HTMLInputElement>(null);
+    const suggestions = useSchemaPathSuggestions({
+        value: relativePath,
+        basePath: parentPath,
+        database,
+        databaseFullPath,
+        skip: !open,
+    });
 
     const normalizedDatabasePath = databaseFullPath.replace(/^\/+|\/+$/g, '');
     const normalizedParentPath = parentPath.replace(/^\/+|\/+$/g, '');
@@ -124,7 +133,8 @@ export function CreateDirectoryDialog({
                             )}
                         </Breadcrumbs>
                     </div>
-                    <TextInput
+                    <SuggestInput
+                        suggestions={suggestions}
                         controlRef={inputRef}
                         placeholder={i18n('field_directory-name')}
                         aria-label={i18n('field_directory-name')}
@@ -132,7 +142,6 @@ export function CreateDirectoryDialog({
                         onUpdate={handleUpdate}
                         autoFocus
                         hasClear
-                        autoComplete={false}
                         disabled={response.isLoading}
                         validationState={validationError ? 'invalid' : undefined}
                         id={relativePathInputId}
