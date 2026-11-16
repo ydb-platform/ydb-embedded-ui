@@ -165,17 +165,17 @@ test.describe('Query editor regressions @query-editor-redesign', () => {
         await expect(editor.waitForStatus('Completed')).resolves.toBe(true);
         await selectView(page, 'Execution Plan');
         const image = page.getByRole('img', {name: 'Execution Plan'});
-        const open = page.getByRole('button', {name: 'Open in new tab', exact: true});
+        const open = page.getByRole('link', {name: 'Open in new tab', exact: true});
         await expect(image).toBeVisible();
         const lightSource = await image.getAttribute('src');
-        expect((await urls.jsonValue()).created).toHaveLength(1);
+        expect((await urls.jsonValue()).created).toHaveLength(2);
         const sidebar = new Sidebar(page);
         await sidebar.clickSettings();
         await page.getByRole('radio', {name: 'Dark', exact: true}).check();
         await sidebar.closeDrawer();
         await expect(image).not.toHaveAttribute('src', lightSource || '');
         await expect.poll(async () => (await urls.jsonValue()).revoked).toContain(lightSource);
-        expect((await urls.jsonValue()).created).toHaveLength(2);
+        expect((await urls.jsonValue()).created).toHaveLength(4);
         const displayed = await image.evaluate((element: HTMLImageElement) =>
             fetch(element.src).then((r) => r.text()),
         );
@@ -189,7 +189,7 @@ test.describe('Query editor regressions @query-editor-redesign', () => {
             externalRequests++;
             return route.abort();
         });
-        const popupPromise = page.waitForEvent('popup');
+        const popupPromise = page.context().waitForEvent('page');
         await open.click();
         const popup = await popupPromise;
         const darkViewer = popup.url();
@@ -218,14 +218,30 @@ test.describe('Query editor regressions @query-editor-redesign', () => {
             await popup.close();
             await page.bringToFront();
         }
-        const reopenedPromise = page.waitForEvent('popup');
-        await open.press('Enter');
-        const reopened = await reopenedPromise;
-        await expect(reopened.frameLocator('iframe').locator('svg')).toBeVisible();
-        expect(reopened.url()).toBe(darkViewer);
-        expect((await urls.jsonValue()).created).toHaveLength(3);
-        await reopened.close();
-        await page.bringToFront();
+        await expect(open).toHaveAttribute('href', darkViewer);
+        await expect(open).toHaveAttribute('target', '_blank');
+        await expect(open).toHaveAttribute('rel', 'noopener noreferrer');
+        for (const method of ['keyboard', 'middle-click']) {
+            const reopenedPromise = page.context().waitForEvent('page');
+            if (method === 'keyboard') {
+                await open.press('Enter');
+            } else {
+                await open.click({button: 'middle'});
+            }
+            const reopened = await reopenedPromise;
+            try {
+                const nativeSvg = reopened.frameLocator('iframe').locator('svg');
+                await expect(nativeSvg).toHaveAttribute('data-controls-ready', 'true');
+                await expect(nativeSvg).toHaveAttribute('data-network-blocked', 'true');
+                expect(await reopened.evaluate(() => window.opener === null)).toBe(true);
+                expect(reopened.url()).toBe(darkViewer);
+            } finally {
+                await reopened.close();
+                await page.bringToFront();
+            }
+        }
+        expect(externalRequests).toBe(0);
+        expect((await urls.jsonValue()).created).toHaveLength(4);
         const pixel = await image.evaluate(async (element: HTMLImageElement) => {
             await element.decode();
             const canvas = document.createElement('canvas');

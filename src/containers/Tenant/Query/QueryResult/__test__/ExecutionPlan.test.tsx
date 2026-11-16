@@ -1,5 +1,5 @@
 import {ThemeProvider} from '@gravity-ui/uikit';
-import {fireEvent, render, screen} from '@testing-library/react';
+import {render, screen} from '@testing-library/react';
 
 import {ExecutionPlan} from '../components/ExecutionPlan/ExecutionPlan';
 
@@ -13,13 +13,12 @@ jest.mock('../../../../../store/reducers/planToSvg', () => ({
     },
 }));
 
-test('creates the viewer only on demand and releases URLs when the image changes', () => {
+test('prepares a native viewer link and releases both URLs when the image changes', () => {
     const originalCreate = URL.createObjectURL;
     const originalRevoke = URL.revokeObjectURL;
     let created = 0;
     const create = jest.fn((blob: Blob) => `blob:${blob.type}/${++created}`);
     const revoke = jest.fn();
-    const open = jest.spyOn(window, 'open').mockReturnValue(null);
     URL.createObjectURL = create;
     URL.revokeObjectURL = revoke;
     const plan = {meta: {type: 'query' as const, version: '0.2'}};
@@ -29,28 +28,41 @@ test('creates the viewer only on demand and releases URLs when the image changes
         </ThemeProvider>,
     );
     try {
-        expect(create.mock.calls.map(([blob]) => blob.type)).toEqual(['image/svg+xml']);
-        fireEvent.click(screen.getByRole('button', {name: 'Open in new tab'}));
         expect(create.mock.calls.map(([blob]) => blob.type)).toEqual([
             'image/svg+xml',
             'text/html',
         ]);
-        fireEvent.click(screen.getByRole('button', {name: 'Open in new tab'}));
+        const link = screen.getByRole('link', {name: 'Open in new tab'});
+        expect(link).toHaveAttribute('href', 'blob:text/html/2');
+        expect(link).toHaveAttribute('target', '_blank');
+        expect(link).toHaveAttribute('rel', 'noopener noreferrer');
+        view.rerender(
+            <ThemeProvider theme="light">
+                <ExecutionPlan database="/local" plan={plan} />
+            </ThemeProvider>,
+        );
         expect(create).toHaveBeenCalledTimes(2);
-        expect(open).toHaveBeenLastCalledWith('blob:text/html/2', '_blank', 'noopener,noreferrer');
         view.rerender(
             <ThemeProvider theme="dark">
                 <ExecutionPlan database="/local" plan={plan} />
             </ThemeProvider>,
         );
         expect(revoke.mock.calls.flat()).toEqual(['blob:image/svg+xml/1', 'blob:text/html/2']);
-        expect(create).toHaveBeenCalledTimes(3);
+        expect(create).toHaveBeenCalledTimes(4);
+        expect(screen.getByRole('link', {name: 'Open in new tab'})).toHaveAttribute(
+            'href',
+            'blob:text/html/4',
+        );
         view.unmount();
-        expect(revoke).toHaveBeenLastCalledWith('blob:image/svg+xml/3');
+        expect(revoke.mock.calls.flat()).toEqual([
+            'blob:image/svg+xml/1',
+            'blob:text/html/2',
+            'blob:image/svg+xml/3',
+            'blob:text/html/4',
+        ]);
     } finally {
         view.unmount();
         URL.createObjectURL = originalCreate;
         URL.revokeObjectURL = originalRevoke;
-        open.mockRestore();
     }
 });

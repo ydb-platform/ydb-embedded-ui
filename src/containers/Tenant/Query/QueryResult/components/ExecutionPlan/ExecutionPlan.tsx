@@ -39,7 +39,7 @@ export function ExecutionPlan({database, plan}: ExecutionPlanProps) {
         svg: string;
         theme: string;
         url?: string;
-        openViewer?: VoidFunction;
+        viewerUrl?: string;
     }>();
     const [failedUrl, setFailedUrl] = React.useState<string>();
     const [attempt, setAttempt] = React.useState(0);
@@ -48,32 +48,21 @@ export function ExecutionPlan({database, plan}: ExecutionPlanProps) {
         if (!svg || !containerRef.current) {
             return undefined;
         }
+        const urls: string[] = [];
+        const revokeUrls = () => urls.forEach((url) => URL.revokeObjectURL(url));
         try {
             const styledSvg = themeSvg(svg, getSvgPalette(containerRef.current));
-            const url = URL.createObjectURL(new Blob([styledSvg], {type: 'image/svg+xml'}));
-            let viewerUrl: string | undefined;
-            const openViewer = () => {
-                try {
-                    if (!viewerUrl) {
-                        const viewer = getSvgViewerDocument(
-                            styledSvg,
-                            i18n('title_execution-plan'),
-                        );
-                        viewerUrl = URL.createObjectURL(new Blob([viewer], {type: 'text/html'}));
-                    }
-                    window.open(viewerUrl, '_blank', 'noopener,noreferrer');
-                } catch {
-                    setFailedUrl(url);
-                }
-            };
-            setImage({source: args, svg, theme, url, openViewer});
-            return () => {
-                URL.revokeObjectURL(url);
-                if (viewerUrl) {
-                    URL.revokeObjectURL(viewerUrl);
-                }
-            };
+            const viewer = getSvgViewerDocument(styledSvg, i18n('title_execution-plan'));
+            for (const blob of [
+                new Blob([styledSvg], {type: 'image/svg+xml'}),
+                new Blob([viewer], {type: 'text/html'}),
+            ]) {
+                urls.push(URL.createObjectURL(blob));
+            }
+            setImage({source: args, svg, theme, url: urls[0], viewerUrl: urls[1]});
+            return revokeUrls;
         } catch {
+            revokeUrls();
             setImage({source: args, svg, theme});
             return undefined;
         }
@@ -123,7 +112,9 @@ export function ExecutionPlan({database, plan}: ExecutionPlanProps) {
                     <ActionTooltip title={i18n('action_open-svg')}>
                         <Button
                             view="raised"
-                            onClick={currentImage?.openViewer}
+                            href={currentImage?.viewerUrl}
+                            target="_blank"
+                            rel="noopener noreferrer"
                             disabled={!url}
                             aria-label={i18n('action_open-svg')}
                         >
