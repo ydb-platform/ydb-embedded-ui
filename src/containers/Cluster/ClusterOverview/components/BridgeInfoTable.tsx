@@ -36,11 +36,12 @@ import {EMPTY_DATA_PLACEHOLDER} from '../../../../utils/constants';
 import {formatNumber} from '../../../../utils/dataFormatters/dataFormatters';
 import {useAutoRefreshInterval, useTypedSelector} from '../../../../utils/hooks';
 import {useIsUserAllowedToMakeChanges} from '../../../../utils/hooks/useIsUserAllowedToMakeChanges';
+import {parseOptionalNonNegativeNumber} from '../../../../utils/utils';
 import {useClusterHealthcheckQueryParams} from '../../ClusterDrawerHealthcheck';
 import i18n from '../../i18n';
 
 import {BridgeDatabasesSummary} from './BridgeDatabasesSummary';
-import {getBridgeNodesProgress, parseBridgeCount} from './bridgeInfo';
+import {getBridgeNodesProgress} from './bridgeInfo';
 import type {BridgePileHealthcheckTarget} from './bridgePileHealthcheck';
 import {getBridgePileHealthcheck} from './bridgePileHealthcheck';
 
@@ -199,7 +200,7 @@ const BridgePileCard = React.memo(function BridgePileCard({
         pile.AliveComputeNodes,
     ].some((value) => value !== undefined);
     const formatCount = (value?: number) => {
-        const count = parseBridgeCount(value);
+        const count = parseOptionalNonNegativeNumber(value);
         return count === undefined ? EMPTY_DATA_PLACEHOLDER : formatNumber(count);
     };
     const nodeCounters = [

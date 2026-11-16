@@ -7,9 +7,10 @@ import {BridgeSyncStatus} from '../../../../types/api/cluster';
 import {cn} from '../../../../utils/cn';
 import {EMPTY_DATA_PLACEHOLDER} from '../../../../utils/constants';
 import {formatNumber} from '../../../../utils/dataFormatters/dataFormatters';
+import {parseOptionalNonNegativeNumber} from '../../../../utils/utils';
 import i18n from '../../i18n';
 
-import {getBridgeDatabaseCounts, parseBridgeCount} from './bridgeInfo';
+import {getBridgeDatabaseCounts} from './bridgeInfo';
 
 const b = cn('ydb-bridge-info-table');
 
@@ -41,7 +42,7 @@ const statusPresentation: Record<
 
 export function BridgeDatabasesSummary({bridgeInfo}: {bridgeInfo: TBridgeInfo}) {
     const counts = getBridgeDatabaseCounts(bridgeInfo);
-    const total = parseBridgeCount(bridgeInfo.BridgeDatabases);
+    const total = parseOptionalNonNegativeNumber(bridgeInfo.BridgeDatabases);
     if (!counts?.length && total === undefined) {
         return null;
     }

@@ -1,16 +1,7 @@
 import type {TBridgeInfo} from '../../../../types/api/cluster';
 import {BridgeSyncStatus} from '../../../../types/api/cluster';
-
-export function parseBridgeCount(value?: string | number): number | undefined {
-    if (typeof value !== 'number' && typeof value !== 'string') {
-        return undefined;
-    }
-    if (typeof value === 'string' && !/^\d+$/.test(value)) {
-        return undefined;
-    }
-    const count = Number(value);
-    return Number.isSafeInteger(count) && count >= 0 ? count : undefined;
-}
+import {getUsage} from '../../../../utils/storage';
+import {parseOptionalNonNegativeNumber} from '../../../../utils/utils';
 
 export function getBridgeDatabaseCounts(bridgeInfo?: TBridgeInfo) {
     const counts = bridgeInfo?.DatabaseCountsBySyncStatus;
@@ -21,16 +12,16 @@ export function getBridgeDatabaseCounts(bridgeInfo?: TBridgeInfo) {
     return Object.values(BridgeSyncStatus)
         .filter((status) => status !== BridgeSyncStatus.NOT_REQUIRED)
         .flatMap((status) => {
-            const count = parseBridgeCount(counts[status]);
+            const count = parseOptionalNonNegativeNumber(counts[status]);
             return count === undefined ? [] : [{status, count}];
         });
 }
 
 export function getBridgeNodesProgress(total?: number, alive?: number) {
-    const totalCount = parseBridgeCount(total);
-    const aliveCount = parseBridgeCount(alive);
-    if (totalCount === undefined || aliveCount === undefined || aliveCount > totalCount) {
+    const totalCount = parseOptionalNonNegativeNumber(total);
+    const aliveCount = parseOptionalNonNegativeNumber(alive);
+    if (totalCount === undefined || aliveCount === undefined) {
         return undefined;
     }
-    return totalCount === 0 ? 0 : (aliveCount / totalCount) * 100;
+    return getUsage({Used: aliveCount, Limit: totalCount});
 }

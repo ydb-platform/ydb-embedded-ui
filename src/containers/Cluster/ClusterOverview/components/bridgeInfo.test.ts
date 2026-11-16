@@ -1,6 +1,6 @@
 import {BridgeSyncStatus} from '../../../../types/api/cluster';
 
-import {getBridgeDatabaseCounts, getBridgeNodesProgress, parseBridgeCount} from './bridgeInfo';
+import {getBridgeDatabaseCounts, getBridgeNodesProgress} from './bridgeInfo';
 
 describe('Bridge cards data', () => {
     test('reads the cluster-wide synchronization counts', () => {
@@ -47,17 +47,12 @@ describe('Bridge cards data', () => {
         ).toEqual([]);
     });
 
-    test.each([undefined, '', ' ', '-1', -1, '1.2', NaN, Infinity])(
-        'does not display invalid count %s as zero',
-        (value) => expect(parseBridgeCount(value)).toBeUndefined(),
-    );
-
     test('distinguishes no alive nodes, no nodes and unavailable alive counts', () => {
         expect(getBridgeNodesProgress(8, 6)).toBe(75);
         expect(getBridgeNodesProgress(8, 0)).toBe(0);
         expect(getBridgeNodesProgress(0, 0)).toBe(0);
         expect(getBridgeNodesProgress(8, undefined)).toBeUndefined();
         expect(getBridgeNodesProgress(undefined, 0)).toBeUndefined();
-        expect(getBridgeNodesProgress(0, 1)).toBeUndefined();
+        expect(getBridgeNodesProgress(0, 1)).toBe(0);
     });
 });
