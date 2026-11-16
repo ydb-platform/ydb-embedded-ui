@@ -1,5 +1,6 @@
+import type {TTenant} from '../../../../types/api/tenant';
 import {EType} from '../../../../types/api/tenant';
-import {calculateTenantMetrics} from '../utils';
+import {calculateTenantMetrics, prepareTenants} from '../utils';
 
 describe('calculateTenantMetrics', () => {
     test('keeps legacy storage metric card values for prod payload without tablet quota', () => {
@@ -157,5 +158,104 @@ describe('calculateTenantMetrics', () => {
         expect(result.tabletStorageStats).toEqual([
             {name: EType.None, used: 0, limit: 1000, usage: undefined},
         ]);
+    });
+});
+
+describe('prepareTenants', () => {
+    const shared: TTenant = {Id: 'shared', Name: '/Root/shared', NodeIds: [1, 2]};
+    const serverless: TTenant = {
+        Id: 'serverless',
+        Name: '/Root/serverless',
+        ResourceId: 'shared',
+    };
+
+    test('returns an empty list for empty input', () => {
+        expect(prepareTenants([])).toEqual([]);
+    });
+
+    test('leaves shared fields undefined when no Id matches the ResourceId', () => {
+        const tenants: TTenant[] = [
+            shared,
+            {Id: 'missing', ResourceId: 'absent'},
+            {Id: 'unset'},
+            {Id: 'empty', ResourceId: ''},
+        ];
+
+        prepareTenants(tenants)
+            .slice(1)
+            .forEach((row) => {
+                expect(row.sharedTenantName).toBeUndefined();
+                expect(row.sharedNodeIds).toBeUndefined();
+            });
+    });
+
+    test('keeps the first missing and empty Id without conflating them', () => {
+        const tenants: TTenant[] = [
+            {Id: '', Name: '/Root/empty', NodeIds: [5]},
+            {Name: '/Root/omitted', NodeIds: [6]},
+            {Id: '', Name: '/Root/duplicate-empty', NodeIds: [7]},
+            {Name: '/Root/duplicate-omitted', NodeIds: [8]},
+            {Id: 'omitted-resource'},
+            {Id: 'empty-resource', ResourceId: ''},
+        ];
+        const result = prepareTenants(tenants);
+
+        expect(result[4].sharedTenantName).toBe('/Root/omitted');
+        expect(result[4].sharedNodeIds).toBe(tenants[1].NodeIds);
+        expect(result[5].sharedTenantName).toBe('/Root/empty');
+        expect(result[5].sharedNodeIds).toBe(tenants[0].NodeIds);
+    });
+
+    test('keeps the first duplicate Id even when a later match is in the consumer cluster', () => {
+        const tenants: TTenant[] = [
+            {...shared, Cluster: 'cluster-a'},
+            {...shared, Cluster: 'cluster-b', Name: '/Root/duplicate', NodeIds: [9]},
+            {...serverless, Cluster: 'cluster-b'},
+        ];
+        const row = prepareTenants(tenants)[2];
+
+        expect(row.sharedTenantName).toBe('/Root/shared');
+        expect(row.sharedNodeIds).toBe(tenants[0].NodeIds);
+    });
+
+    test('prepares consumers on both sides of a shared row without changing input or order', () => {
+        const first: TTenant = {
+            ...serverless,
+            ControlPlane: {name: 'control-plane'},
+            CoresUsed: 1.5,
+            MemoryUsed: '100',
+            StorageAllocatedSize: '200',
+            StorageGroups: '3',
+            NodeIds: [7],
+            Owner: 'owner',
+        };
+        const second: TTenant = {...serverless, Id: 'second', Name: '/Root/second'};
+        const tenants = [first, shared, second];
+        const snapshot = JSON.stringify(tenants);
+        tenants.forEach((tenant) => Object.freeze(tenant));
+        Object.freeze(tenants);
+
+        const result = prepareTenants(tenants);
+
+        expect(result.map((row) => row.Id)).toEqual(['serverless', 'shared', 'second']);
+        expect(result[0]).toEqual({
+            ...first,
+            sharedTenantName: '/Root/shared',
+            sharedNodeIds: [1, 2],
+            controlPlaneName: 'control-plane',
+            cpu: 1_500_000,
+            memory: 100,
+            storage: 200,
+            nodesCount: 1,
+            groupsCount: 3,
+        });
+        expect(result[2]).toMatchObject({
+            sharedTenantName: '/Root/shared',
+            controlPlaneName: 'second',
+        });
+        expect(result[0].sharedNodeIds).toBe(shared.NodeIds);
+        expect(result[2].sharedNodeIds).toBe(shared.NodeIds);
+        expect(JSON.stringify(tenants)).toBe(snapshot);
+        result.forEach((row, index) => expect(row).not.toBe(tenants[index]));
     });
 });
