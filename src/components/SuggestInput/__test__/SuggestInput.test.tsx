@@ -23,6 +23,7 @@ function TestInput({
 
     return (
         <ThemeProvider theme="light">
+            <button type="button">before</button>
             <form
                 onSubmit={(event) => {
                     event.preventDefault();
@@ -36,6 +37,7 @@ function TestInput({
                     openOnFocus={openOnFocus}
                 />
             </form>
+            <button type="button">after</button>
         </ThemeProvider>
     );
 }
@@ -140,6 +142,34 @@ describe('SuggestInput', () => {
 
         expect(input).toHaveValue('beta');
         expect(input).toHaveFocus();
+    });
+
+    it('moves focus backward with Shift+Tab instead of selecting a suggestion', async () => {
+        const user = userEvent.setup();
+        render(<TestInput />);
+        const input = screen.getByRole('combobox');
+
+        await user.type(input, 'b');
+        expect(screen.getByRole('option', {name: 'beta'})).toHaveAttribute('aria-selected', 'true');
+
+        await user.tab({shift: true});
+
+        expect(input).toHaveValue('b');
+        expect(screen.getByRole('button', {name: 'before'})).toHaveFocus();
+    });
+
+    it('does not select a suggestion while text is being composed', async () => {
+        const user = userEvent.setup();
+        const onSubmit = jest.fn();
+        render(<TestInput onSubmit={onSubmit} />);
+        const input = screen.getByRole('combobox');
+
+        await user.type(input, 'b');
+        // Enter that confirms the text in an input method editor
+        fireEvent.keyDown(input, {key: 'Enter', isComposing: true});
+
+        expect(input).toHaveValue('b');
+        expect(onSubmit).not.toHaveBeenCalled();
     });
 
     it('submits the typed value after the list is closed with Escape', async () => {

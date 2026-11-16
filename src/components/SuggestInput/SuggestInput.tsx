@@ -94,7 +94,8 @@ export function SuggestInput({
 
     const handleKeyDown = (event: React.KeyboardEvent<HTMLInputElement>) => {
         onKeyDown?.(event);
-        if (event.defaultPrevented) {
+        // While text is being composed (IME), keys belong to the input method
+        if (event.defaultPrevented || event.nativeEvent.isComposing) {
             return;
         }
 
@@ -111,6 +112,11 @@ export function SuggestInput({
             }
         } else if (
             (event.key === 'Enter' || event.key === 'Tab') &&
+            // Modified keys keep their meaning, e.g. Shift+Tab moves focus backward
+            !event.shiftKey &&
+            !event.altKey &&
+            !event.ctrlKey &&
+            !event.metaKey &&
             activeItem &&
             // Nothing to pick if the value is already there: let Enter submit and Tab move focus
             activeItem.value !== value
