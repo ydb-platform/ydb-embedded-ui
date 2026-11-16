@@ -12,7 +12,6 @@ import {valueIsDefined} from '../../../utils';
 import {QUERY_ACTIONS, STATISTICS_MODES} from '../../../utils/query';
 
 import type {
-    PreparedQueryData,
     QueryExecutionStatusType,
     QueryInHistory,
     QueryTabState,
@@ -36,20 +35,6 @@ export function getEffectiveQuerySettingsForAction(
     return {
         ...querySettings,
         statisticsMode: STATISTICS_MODES.full,
-    };
-}
-
-export function getEffectiveQueryDataForAction(
-    actionType: QueryAction,
-    data: PreparedQueryData,
-): PreparedQueryData {
-    if (actionType !== QUERY_ACTIONS.explainAnalyze) {
-        return data;
-    }
-
-    return {
-        ...data,
-        resultSets: undefined,
     };
 }
 

@@ -2,7 +2,7 @@ import {expect, test} from '@playwright/test';
 import type {Page} from '@playwright/test';
 
 import type {StatisticsMode} from '../../../../src/types/store/query';
-import {STATISTICS_MODES} from '../../../../src/utils/query';
+import {QUERY_MODES, STATISTICS_MODES} from '../../../../src/utils/query';
 import {database} from '../../../utils/constants';
 import {TenantPage} from '../TenantPage';
 
@@ -27,13 +27,44 @@ async function runQuery(queryEditor: QueryEditor) {
 
 async function openResultActions(page: Page) {
     const controls = page.locator('.ydb-query-result__controls-right');
-    const dropdownButton = controls.locator('.g-dropdown-menu__switcher-wrapper button');
-    await expect(dropdownButton).toBeVisible();
-    await dropdownButton.click();
-    return dropdownButton;
+    const executionPlan = page.getByRole('radio', {name: 'Execution Plan', exact: true});
+    await executionPlan.click();
+    return controls;
 }
 
-test.describe('Plan to SVG functionality', () => {
+async function downloadExecutionPlan(page: Page) {
+    const statuses: number[] = [];
+    page.on('response', (response) => {
+        if (
+            response.request().method() === 'POST' &&
+            new URL(response.url()).pathname.endsWith('/plan2svg')
+        ) {
+            statuses.push(response.status());
+        }
+    });
+    await openResultActions(page);
+    const image = page.getByRole('img', {name: 'Execution Plan', exact: true});
+    await expect(image).toBeVisible();
+    await expect
+        .poll(() =>
+            image.evaluate(
+                (element) =>
+                    element instanceof HTMLImageElement &&
+                    element.complete &&
+                    element.naturalWidth > 0 &&
+                    element.naturalHeight > 0,
+            ),
+        )
+        .toBe(true);
+    expect(statuses).toEqual([200]);
+
+    const downloadPromise = page.waitForEvent('download');
+    await page.getByRole('button', {name: 'Download .SVG', exact: true}).click();
+    const download = await downloadPromise;
+    expect(download.suggestedFilename()).toBe('query-plan.svg');
+}
+
+test.describe('Plan to SVG functionality @query-editor-redesign', () => {
     test.beforeEach(async ({page}) => {
         const tenantPage = new TenantPage(page);
         await tenantPage.goto({
@@ -51,62 +82,44 @@ test.describe('Plan to SVG functionality', () => {
         await setStatisticsMode(queryEditor, STATISTICS_MODES.none);
         await openResultActions(page);
 
-        const openInNewTabOption = page.getByRole('menuitem', {name: /Open Execution Plan/i});
-        await expect(openInNewTabOption).toBeVisible();
-        await expect(page.getByRole('menuitem', {name: /Download Execution Plan/i})).toBeVisible();
-
-        const popupPromise = page.waitForEvent('popup');
-        await openInNewTabOption.click();
-        const popup = await popupPromise;
-        await popup.waitForLoadState('domcontentloaded');
-        await expect(popup.locator('svg').first()).toBeVisible();
+        const downloadButton = page.getByRole('button', {name: 'Download .SVG', exact: true});
+        await expect(downloadButton).toBeVisible();
+        await expect(page.getByRole('img', {name: 'Execution Plan'})).toBeVisible();
     });
 
     test('downloads a Profile execution plan as SVG', async ({page}) => {
         const queryEditor = new QueryEditor(page);
         await setStatisticsMode(queryEditor, STATISTICS_MODES.profile);
         await runQuery(queryEditor);
-        await openResultActions(page);
-
-        const downloadPromise = page.waitForEvent('download');
-        const downloadPlanOption = page.getByRole('menuitem', {
-            name: /Download Execution Plan/i,
-        });
-        await expect(downloadPlanOption).toBeVisible();
-        await downloadPlanOption.click();
-
-        const download = await downloadPromise;
-        expect(download.suggestedFilename()).toBe('query-plan.svg');
+        await downloadExecutionPlan(page);
     });
 
-    test('handles plan conversion errors', async ({page}) => {
-        const queryEditor = new QueryEditor(page);
-        await setStatisticsMode(queryEditor, STATISTICS_MODES.full);
-        await runQuery(queryEditor);
+    for (const mode of [QUERY_MODES.query, QUERY_MODES.script]) {
+        test(`downloads an Explain ${mode} plan without statistics`, async ({page}) => {
+            const queryEditor = new QueryEditor(page);
+            await queryEditor.clickGearButton();
+            await queryEditor.settingsDialog.changeQueryMode(mode);
+            await queryEditor.settingsDialog.changeStatsLevel(STATISTICS_MODES.none);
+            await queryEditor.settingsDialog.clickButton(ButtonNames.Save);
+            const query = `SELECT NodeId FROM \`${database}/.sys/nodes\` LIMIT 1;`;
+            await queryEditor.setQuery(query);
 
-        await page.route('**/plan2svg**', (route) => {
-            route.fulfill({
-                status: 500,
-                contentType: 'application/json',
-                body: 'Failed to generate SVG',
+            const requests: {action: string; stats: StatisticsMode}[] = [];
+            page.on('request', (request) => {
+                if (request.method() === 'POST' && request.url().includes('/query?')) {
+                    const payload = request.postDataJSON();
+                    if (payload.query?.includes(query)) {
+                        requests.push({action: payload.action, stats: payload.stats});
+                    }
+                }
             });
+            await queryEditor.clickExplainButton();
+            await expect(queryEditor.waitForStatus('Completed')).resolves.toBe(true);
+            expect(requests).toEqual([{action: `explain-${mode}`, stats: STATISTICS_MODES.none}]);
+            await downloadExecutionPlan(page);
+            expect(requests).toEqual([{action: `explain-${mode}`, stats: STATISTICS_MODES.none}]);
         });
-
-        const dropdownButton = await openResultActions(page);
-        const openExecutionPlanOption = page.getByRole('menuitem', {
-            name: /Open Execution Plan/i,
-        });
-        await expect(openExecutionPlanOption).toBeVisible();
-        await openExecutionPlanOption.click();
-
-        const errorToast = page.locator('.g-toast.g-toast_theme_danger');
-        await expect(errorToast).toBeVisible();
-        await expect(errorToast.locator('.g-toast__title')).toContainText('Error');
-
-        await dropdownButton.click();
-        await expect(openExecutionPlanOption).toBeVisible();
-        await expect(page.getByRole('menuitem', {name: /Download Execution Plan/i})).toBeVisible();
-    });
+    }
 
     test('does not show plan actions for a None statistics result', async ({page}) => {
         const queryEditor = new QueryEditor(page);
@@ -114,7 +127,8 @@ test.describe('Plan to SVG functionality', () => {
         await runQuery(queryEditor);
         await openResultActions(page);
 
-        await expect(page.getByRole('menuitem', {name: /Open Execution Plan/i})).toHaveCount(0);
-        await expect(page.getByRole('menuitem', {name: /Download Execution Plan/i})).toHaveCount(0);
+        await expect(page.getByText('Query plan not enabled', {exact: true})).toBeVisible();
+        await expect(page.getByRole('button', {name: 'Open query settings'})).toBeVisible();
+        await expect(page.getByRole('button', {name: 'Download .SVG', exact: true})).toHaveCount(0);
     });
 });

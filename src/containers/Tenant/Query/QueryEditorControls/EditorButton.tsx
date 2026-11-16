@@ -64,15 +64,15 @@ interface SettingsButtonProps {
 const Settings = ({onClick, isLoading}: SettingsButtonProps) => {
     const {changedCurrentSettings, changedCurrentSettingsDescriptions} = useChangedQuerySettings();
 
-    const extraGearProps =
-        changedCurrentSettings.length > 0
-            ? ({view: 'outlined-info', selected: true} as const)
-            : null;
+    const hasChangedSettings = changedCurrentSettings.length > 0;
 
     return (
         <ActionTooltip
-            disabled={changedCurrentSettings.length === 0}
-            title={i18n('alert_query-settings-modified')}
+            title={
+                hasChangedSettings
+                    ? i18n('alert_query-settings-modified')
+                    : i18n('action_query-settings')
+            }
             description={
                 <QuerySettingsDescription
                     prefix=""
@@ -84,12 +84,14 @@ const Settings = ({onClick, isLoading}: SettingsButtonProps) => {
         >
             <Button
                 onClick={onClick}
+                view="flat"
+                aria-label={i18n('action_query-settings')}
                 loading={isLoading}
                 className={b('gear-button')}
-                {...extraGearProps}
+                selected={hasChangedSettings || undefined}
             >
                 <Icon data={Gear} size={16} />
-                {extraGearProps ? (
+                {hasChangedSettings ? (
                     <div className={b('changed-settings')}>({changedCurrentSettings.length})</div>
                 ) : null}
             </Button>
