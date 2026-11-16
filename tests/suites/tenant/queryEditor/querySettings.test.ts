@@ -70,7 +70,7 @@ test.describe('Test Query Settings', async () => {
         await queryEditor.clickGearButton();
 
         await queryEditor.settingsDialog.changeQueryMode(QUERY_MODES.scan);
-        await queryEditor.settingsDialog.clickButton(ButtonNames.Save);
+        await queryEditor.settingsDialog.clickButton(ButtonNames.Apply);
 
         await expect(async () => {
             const text = await queryEditor.gearButtonText();
@@ -83,7 +83,7 @@ test.describe('Test Query Settings', async () => {
         await queryEditor.clickGearButton();
 
         await queryEditor.settingsDialog.changeQueryMode(QUERY_MODES.scan);
-        await queryEditor.settingsDialog.clickButton(ButtonNames.Save);
+        await queryEditor.settingsDialog.clickButton(ButtonNames.Apply);
         await queryEditor.hoverGearButton();
 
         const settingsActionTooltip = page
@@ -102,7 +102,7 @@ test.describe('Test Query Settings', async () => {
         // Change a setting
         await queryEditor.clickGearButton();
         await queryEditor.settingsDialog.changeQueryMode(QUERY_MODES.scan);
-        await queryEditor.settingsDialog.clickButton(ButtonNames.Save);
+        await queryEditor.settingsDialog.clickButton(ButtonNames.Apply);
 
         // Execute a script
         await queryEditor.setQuery(testQuery);
@@ -118,7 +118,7 @@ test.describe('Test Query Settings', async () => {
         // Change a setting
         await queryEditor.clickGearButton();
         await queryEditor.settingsDialog.changeQueryMode(QUERY_MODES.scan);
-        await queryEditor.settingsDialog.clickButton(ButtonNames.Save);
+        await queryEditor.settingsDialog.clickButton(ButtonNames.Apply);
 
         // Execute a script
         await queryEditor.setQuery(longRunningQuery);
@@ -135,7 +135,7 @@ test.describe('Test Query Settings', async () => {
 
         await queryEditor.settingsDialog.changeQueryMode(QUERY_MODES.scan);
         await queryEditor.settingsDialog.changeTransactionMode(TRANSACTION_MODES.snapshot);
-        await queryEditor.settingsDialog.clickButton(ButtonNames.Save);
+        await queryEditor.settingsDialog.clickButton(ButtonNames.Apply);
 
         await expect(async () => {
             const text = await queryEditor.gearButtonText();
@@ -157,7 +157,7 @@ test.describe('Test Query Settings', async () => {
         await queryEditor.clickGearButton();
 
         await queryEditor.settingsDialog.changeLimitRows(100001);
-        await queryEditor.settingsDialog.clickButton(ButtonNames.Save);
+        await queryEditor.settingsDialog.clickButton(ButtonNames.Apply);
 
         await expect(queryEditor.settingsDialog.isLimitRowsError()).resolves.toBe(true);
         await expect(queryEditor.settingsDialog.getLimitRowsErrorMessage()).resolves.toBe(
@@ -170,7 +170,7 @@ test.describe('Test Query Settings', async () => {
         await queryEditor.clickGearButton();
 
         await queryEditor.settingsDialog.changeLimitRows(-1);
-        await queryEditor.settingsDialog.clickButton(ButtonNames.Save);
+        await queryEditor.settingsDialog.clickButton(ButtonNames.Apply);
 
         await expect(queryEditor.settingsDialog.isLimitRowsError()).resolves.toBe(true);
         await expect(queryEditor.settingsDialog.getLimitRowsErrorMessage()).resolves.toBe(
@@ -185,7 +185,7 @@ test.describe('Test Query Settings', async () => {
         // Set value and save
         await queryEditor.clickGearButton();
         await queryEditor.settingsDialog.changeLimitRows(validValue);
-        await queryEditor.settingsDialog.clickButton(ButtonNames.Save);
+        await queryEditor.settingsDialog.clickButton(ButtonNames.Apply);
         await expect(queryEditor.settingsDialog.isHidden()).resolves.toBe(true);
 
         // Reopen and check value
@@ -200,7 +200,7 @@ test.describe('Test Query Settings', async () => {
 
         await queryEditor.clickGearButton();
         await queryEditor.settingsDialog.clearLimitRows();
-        await queryEditor.settingsDialog.clickButton(ButtonNames.Save);
+        await queryEditor.settingsDialog.clickButton(ButtonNames.Apply);
 
         await expect(queryEditor.settingsDialog.isHidden()).resolves.toBe(true);
     });
@@ -290,7 +290,7 @@ test.describe('Test Query Settings', async () => {
 
         // Enter a value exceeding MAX_QUERY_TIMEOUT_SECONDS
         await queryEditor.settingsDialog.changeTimeout(MAX_QUERY_TIMEOUT_SECONDS + 1);
-        await queryEditor.settingsDialog.clickButton(ButtonNames.Save);
+        await queryEditor.settingsDialog.clickButton(ButtonNames.Apply);
 
         // Dialog should stay open with validation error
         await expect(queryEditor.settingsDialog.isTimeoutError()).resolves.toBe(true);
@@ -310,7 +310,7 @@ test.describe('Test Query Settings', async () => {
 
         // Enter a negative value
         await queryEditor.settingsDialog.changeTimeout(-10);
-        await queryEditor.settingsDialog.clickButton(ButtonNames.Save);
+        await queryEditor.settingsDialog.clickButton(ButtonNames.Apply);
 
         // Dialog should stay open with validation error
         await expect(queryEditor.settingsDialog.isTimeoutError()).resolves.toBe(true);
@@ -330,7 +330,7 @@ test.describe('Test Query Settings', async () => {
 
         // Enter exactly the max value
         await queryEditor.settingsDialog.changeTimeout(MAX_QUERY_TIMEOUT_SECONDS);
-        await queryEditor.settingsDialog.clickButton(ButtonNames.Save);
+        await queryEditor.settingsDialog.clickButton(ButtonNames.Apply);
 
         // Dialog should close (no error)
         await expect(queryEditor.settingsDialog.isHidden()).resolves.toBe(true);
@@ -354,7 +354,7 @@ test.describe('Test Query Settings', async () => {
         // Enable timeout and set value
         await queryEditor.settingsDialog.clickTimeoutSwitch();
         await queryEditor.settingsDialog.changeTimeout(validTimeout);
-        await queryEditor.settingsDialog.clickButton(ButtonNames.Save);
+        await queryEditor.settingsDialog.clickButton(ButtonNames.Apply);
         await expect(queryEditor.settingsDialog.isHidden()).resolves.toBe(true);
 
         // Reopen and verify
@@ -410,7 +410,7 @@ test.describe('Test Query Settings', async () => {
         await queryEditor.clickGearButton();
         await queryEditor.settingsDialog.changeQueryMode(QUERY_MODES.scan);
         await queryEditor.settingsDialog.changeTimeout(timeoutSeconds);
-        await queryEditor.settingsDialog.clickButton(ButtonNames.Save);
+        await queryEditor.settingsDialog.clickButton(ButtonNames.Apply);
 
         // Run a query
         await queryEditor.setQuery('SELECT 1;');
@@ -432,7 +432,7 @@ test.describe('Test Query Settings', async () => {
         // Clear timeout and run another query
         await queryEditor.clickGearButton();
         await queryEditor.settingsDialog.clearTimeout();
-        await queryEditor.settingsDialog.clickButton(ButtonNames.Save);
+        await queryEditor.settingsDialog.clickButton(ButtonNames.Apply);
 
         await queryEditor.setQuery('SELECT 2;');
         await queryEditor.clickRunButton();
@@ -491,7 +491,7 @@ test.describe('Test Query Settings', async () => {
         await queryEditor.clickGearButton();
 
         await queryEditor.settingsDialog.changeResourcePool('olap');
-        await queryEditor.settingsDialog.clickButton(ButtonNames.Save);
+        await queryEditor.settingsDialog.clickButton(ButtonNames.Apply);
         await expect(queryEditor.settingsDialog.isHidden()).resolves.toBe(true);
 
         await queryEditor.clickGearButton();
@@ -569,7 +569,7 @@ test.describe('Test Query Settings', async () => {
         // Select a concrete resource pool and run a query
         await queryEditor.clickGearButton();
         await queryEditor.settingsDialog.changeResourcePool('olap');
-        await queryEditor.settingsDialog.clickButton(ButtonNames.Save);
+        await queryEditor.settingsDialog.clickButton(ButtonNames.Apply);
         await queryEditor.setQuery('SELECT 1;');
         await queryEditor.clickRunButton();
 
@@ -588,7 +588,7 @@ test.describe('Test Query Settings', async () => {
         // Now switch to "No pool override" and ensure resource_pool is omitted
         await queryEditor.clickGearButton();
         await queryEditor.settingsDialog.changeResourcePool('No pool override');
-        await queryEditor.settingsDialog.clickButton(ButtonNames.Save);
+        await queryEditor.settingsDialog.clickButton(ButtonNames.Apply);
         await queryEditor.setQuery('SELECT 2;');
         await queryEditor.clickRunButton();
 

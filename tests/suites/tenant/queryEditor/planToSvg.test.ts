@@ -13,7 +13,7 @@ const testQuery = 'SELECT 1;';
 async function setStatisticsMode(queryEditor: QueryEditor, statisticsMode: StatisticsMode) {
     await queryEditor.clickGearButton();
     await queryEditor.settingsDialog.changeStatsLevel(statisticsMode);
-    await queryEditor.settingsDialog.clickButton(ButtonNames.Save);
+    await queryEditor.settingsDialog.clickButton(ButtonNames.Apply);
 }
 
 async function runQuery(queryEditor: QueryEditor) {

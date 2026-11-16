@@ -242,6 +242,8 @@ export interface UiMetricaGoals {
     /** Failed creation. Params: objectType, errorType (ydb, http, network, timeout, cancelled, unknown), httpStatus (HTTP errors only). */
     createObjectError?: string;
     runQuery?: string;
+    /** Validated, changed query settings confirmed with Apply; excludes query text and pool names. */
+    applyQuerySettings?: string;
     explainAnalyzeQuery?: string;
     stopQuery?: string;
     openManagePartitioning?: string;

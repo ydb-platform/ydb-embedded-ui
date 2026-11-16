@@ -6,6 +6,7 @@ import type {
     STATISTICS_MODES,
     TRANSACTION_MODES,
 } from '../../../../../src/utils/query';
+import {STATISTICS_MODES_TITLES} from '../../../../../src/utils/query';
 import {VISIBILITY_TIMEOUT} from '../../TenantPage';
 
 import type {ButtonNames} from './QueryEditor';
@@ -48,7 +49,7 @@ export class SettingsDialog {
         this.limitRowsErrorPopover = this.page.locator('.g-popover-legacy__tooltip-content');
         this.selectPopup = page.locator('.ydb-query-settings-select__popup');
         this.timeoutInput = this.dialog.locator('.ydb-query-settings-timeout__input');
-        this.timeoutSwitch = this.dialog.locator('.ydb-timeout-label__switch');
+        this.timeoutSwitch = this.dialog.locator('.ydb-query-settings-timeout__switch');
         this.timeoutSwitchHint = this.dialog.locator('.ydb-timeout-label__question-icon');
         this.timeoutHintPopover = this.page.locator('.g-help-mark__popover');
         this.timeoutLabel = this.dialog.locator('.ydb-timeout-label__label-title');
@@ -73,6 +74,7 @@ export class SettingsDialog {
     }
 
     async changeQueryMode(mode: (typeof QUERY_MODES)[keyof typeof QUERY_MODES]) {
+        await this.expandAdvanced();
         await this.openSelect(this.queryModeSelect);
         await this.page.locator(`.ydb-query-settings-select__item_type_${mode}`).click();
         await this.selectPopup.waitFor({state: 'hidden', timeout: VISIBILITY_TIMEOUT});
@@ -127,17 +129,18 @@ export class SettingsDialog {
     }
 
     async changeStatsLevel(mode: (typeof STATISTICS_MODES)[keyof typeof STATISTICS_MODES]) {
-        await this.openSelect(this.statisticsModeSelect);
-        await this.page.locator(`.ydb-query-settings-select__item_type_${mode}`).click();
-        await this.selectPopup.waitFor({state: 'hidden', timeout: VISIBILITY_TIMEOUT});
+        await this.statisticsModeSelect
+            .getByText(STATISTICS_MODES_TITLES[mode], {exact: true})
+            .click();
     }
 
     async getStatsLevel() {
-        await this.statisticsModeSelect.waitFor({state: 'visible', timeout: VISIBILITY_TIMEOUT});
-        const selectedText = await this.statisticsModeSelect
-            .locator('.g-select-control__option-text')
-            .textContent();
-        return selectedText;
+        for (const [value, title] of Object.entries(STATISTICS_MODES_TITLES)) {
+            if (await this.statisticsModeSelect.locator(`input[value="${value}"]`).isChecked()) {
+                return title;
+            }
+        }
+        throw new Error('No statistics mode selected');
     }
 
     async changeLimitRows(limitRows: number) {
@@ -155,11 +158,13 @@ export class SettingsDialog {
     }
 
     async changeOutputChunkMaxSize(size: number) {
+        await this.expandAdvanced();
         await this.outputChunkMaxSizeInput.fill(size.toString());
         await expect(this.outputChunkMaxSizeInput).toHaveValue(size.toString());
     }
 
     async changePragmas(pragmas: string) {
+        await this.expandAdvanced();
         await this.pragmasInput.fill(pragmas);
     }
 
@@ -190,10 +195,12 @@ export class SettingsDialog {
     }
 
     async isTimeoutInputVisible() {
+        await this.expandAdvanced();
         return await this.timeoutInput.isVisible();
     }
 
     async clickTimeoutSwitch() {
+        await this.expandAdvanced();
         const clickTarget = this.getTimeoutSwitchClickTarget();
         const input = this.timeoutSwitch.locator('input[type="checkbox"]');
         const wasChecked = await input.isChecked();
@@ -203,49 +210,59 @@ export class SettingsDialog {
     }
 
     async isTimeoutSwitchChecked() {
+        await this.expandAdvanced();
         return await this.timeoutSwitch.locator('input[type="checkbox"]').isChecked();
     }
 
     async isTimeoutSwitchDisabled() {
+        await this.expandAdvanced();
         return await this.timeoutSwitch.locator('input[type="checkbox"][disabled]').isVisible();
     }
 
     async isTimeoutHintVisible() {
+        await this.expandAdvanced();
         return await this.timeoutSwitchHint.isVisible();
     }
 
     async getTimeoutHintText() {
+        await this.expandAdvanced();
         await this.timeoutSwitchHint.hover();
         await this.timeoutHintPopover.waitFor({state: 'visible', timeout: VISIBILITY_TIMEOUT});
         return await this.timeoutHintPopover.textContent();
     }
 
     async isTimeoutLabelVisible() {
+        await this.expandAdvanced();
         return await this.timeoutLabel.isVisible();
     }
 
     async changeTimeout(value: number) {
+        await this.expandAdvanced();
         const input = this.timeoutInput.locator('input');
         await input.fill(value.toString());
         await expect(input).toHaveValue(value.toString());
     }
 
     async clearTimeout() {
+        await this.expandAdvanced();
         const input = this.timeoutInput.locator('input');
         await input.clear();
         await expect(input).toHaveValue('');
     }
 
     async getTimeoutValue() {
+        await this.expandAdvanced();
         const input = this.timeoutInput.locator('input');
         return await input.inputValue();
     }
 
     async isTimeoutError() {
+        await this.expandAdvanced();
         return await this.timeoutErrorIcon.isVisible();
     }
 
     async getTimeoutErrorMessage() {
+        await this.expandAdvanced();
         await this.timeoutErrorIcon.hover();
         await this.timeoutErrorPopover.waitFor({state: 'visible', timeout: VISIBILITY_TIMEOUT});
         return await this.timeoutErrorPopover.textContent();
@@ -254,6 +271,13 @@ export class SettingsDialog {
     async hoverStatisticsSelect() {
         await this.statisticsModeSelect.waitFor({state: 'visible', timeout: VISIBILITY_TIMEOUT});
         await this.statisticsModeSelect.hover();
+    }
+
+    async expandAdvanced() {
+        const toggle = this.dialog.getByRole('button', {name: 'Advanced settings', exact: true});
+        if ((await toggle.getAttribute('aria-expanded')) !== 'true') {
+            await toggle.click();
+        }
     }
 
     private async openSelect(selectWrapper: Locator) {
@@ -265,6 +289,6 @@ export class SettingsDialog {
     }
 
     private getTimeoutSwitchClickTarget() {
-        return this.timeoutSwitch.locator('.g-control-label__text').first();
+        return this.timeoutSwitch;
     }
 }

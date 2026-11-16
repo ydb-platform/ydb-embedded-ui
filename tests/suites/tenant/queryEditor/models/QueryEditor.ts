@@ -22,6 +22,7 @@ export enum ButtonNames {
     ExplainAnalyze = 'Explain Analyze',
     Cancel = 'Cancel',
     Save = 'Save',
+    Apply = 'Apply',
     Edit = 'Edit query',
     Stop = 'Stop',
 }
@@ -776,7 +777,7 @@ export class QueryEditor {
     private async setQueryModeAndText(query: string, mode: keyof typeof QUERY_MODES) {
         await this.clickGearButton();
         await this.settingsDialog.changeQueryMode(mode);
-        await this.settingsDialog.clickButton(ButtonNames.Save);
+        await this.settingsDialog.clickButton(ButtonNames.Apply);
         await this.setQuery(query);
     }
 }
