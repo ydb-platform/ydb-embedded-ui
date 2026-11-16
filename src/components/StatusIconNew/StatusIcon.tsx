@@ -1,5 +1,6 @@
 import {
     ArrowsRotateRight,
+    Check,
     CircleCheck,
     CircleExclamation,
     Flame,
@@ -22,12 +23,15 @@ const EFlagToIcon: Record<EFlag, IconData> = {
 
 interface StatusIconProps extends Omit<IconProps, 'data'> {
     status?: EFlag;
+    /** Icon used for the Green status. */
+    checkIcon?: 'check' | 'circle-check';
 }
 
-export function StatusIcon({status, ...props}: StatusIconProps) {
+export function StatusIcon({status, checkIcon = 'circle-check', ...props}: StatusIconProps) {
     if (!status) {
         return null;
     }
 
-    return <Icon {...props} data={EFlagToIcon[status]} />;
+    const icon = status === EFlag.Green && checkIcon === 'check' ? Check : EFlagToIcon[status];
+    return <Icon {...props} data={icon} />;
 }

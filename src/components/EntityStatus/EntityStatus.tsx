@@ -23,7 +23,7 @@ export const EFlagToLabelTheme: Record<EFlag, LabelProps['theme']> = {
     [EFlag.Yellow]: 'warning',
 };
 
-const EFlagToStatusName: Record<EFlag, string> = {
+export const EFlagToStatusName: Record<EFlag, string> = {
     get [EFlag.Red]() {
         return i18n('title_red');
     },
@@ -49,6 +49,8 @@ interface EntityStatusLabelBaseProps {
     className?: string;
     size?: LabelProps['size'];
     iconSize?: number;
+    checkIcon?: React.ComponentProps<typeof StatusIcon>['checkIcon'];
+    tooltipTitle?: string;
     qa?: string;
 }
 
@@ -59,6 +61,8 @@ interface DefaultEntityStatusLabelProps {
     endContent?: React.ReactNode;
     withStatusName?: boolean;
     onClick?: (event: React.MouseEvent<HTMLElement>) => void;
+    'aria-label'?: never;
+    tabIndex?: never;
 }
 
 interface CompactEntityStatusLabelProps {
@@ -67,7 +71,10 @@ interface CompactEntityStatusLabelProps {
     children?: never;
     endContent?: never;
     withStatusName?: never;
-    onClick?: never;
+    onClick?: (event: React.MouseEvent<HTMLElement>) => void;
+    'aria-label'?: string;
+    /** Tab index for a noninteractive tooltip anchor. Clickable labels use their button. */
+    tabIndex?: number;
 }
 
 type EntityStatusLabelProps = EntityStatusLabelBaseProps &
@@ -83,21 +90,46 @@ function EntityStatusLabel({
     note,
     size = 'm',
     iconSize = 14,
+    checkIcon,
+    tooltipTitle,
     onClick,
     qa,
+    'aria-label': ariaLabel,
+    tabIndex,
 }: EntityStatusLabelProps) {
     if (view === 'compact') {
         const statusName = EFlagToStatusName[status];
+        const accessibleName = ariaLabel ?? statusName;
+        const label = (
+            <Label
+                theme={status === EFlag.Blue ? 'info' : EFlagToLabelTheme[status]}
+                icon={<StatusIcon size={iconSize} status={status} checkIcon={checkIcon} />}
+                size={size}
+                className={b(null, className)}
+                interactive={Boolean(onClick)}
+            />
+        );
         return (
-            <ActionTooltip title={statusName}>
-                <span className={b('compact')} role="img" aria-label={statusName}>
-                    <Label
-                        theme={status === EFlag.Blue ? 'info' : EFlagToLabelTheme[status]}
-                        icon={<StatusIcon size={iconSize} status={status} />}
-                        size={size}
-                        className={b(null, className)}
-                        qa={qa}
-                    />
+            <ActionTooltip title={tooltipTitle ?? statusName}>
+                <span
+                    className={b('compact')}
+                    role={onClick ? undefined : 'img'}
+                    aria-label={onClick ? undefined : accessibleName}
+                    tabIndex={onClick ? undefined : tabIndex}
+                    data-qa={qa}
+                >
+                    {onClick ? (
+                        <button
+                            type="button"
+                            className={b('compact-button')}
+                            onClick={onClick}
+                            aria-label={accessibleName}
+                        >
+                            {label}
+                        </button>
+                    ) : (
+                        label
+                    )}
                 </span>
             </ActionTooltip>
         );
@@ -105,10 +137,10 @@ function EntityStatusLabel({
     const theme = EFlagToLabelTheme[status];
     const isClickable = Boolean(onClick);
     return (
-        <ActionTooltip title={EFlagToDescription[status]} disabled={Boolean(note)}>
+        <ActionTooltip title={tooltipTitle ?? EFlagToDescription[status]} disabled={Boolean(note)}>
             <Label
                 theme={theme}
-                icon={<StatusIcon size={iconSize} status={status} />}
+                icon={<StatusIcon size={iconSize} status={status} checkIcon={checkIcon} />}
                 size={size}
                 className={b({critical: status === EFlag.Red, clickable: isClickable}, className)}
                 onClick={onClick}

@@ -1,28 +1,35 @@
 .ydb-bridge-info-table {
-    gap: 10px;
+    max-width: var(--cluster-overview-section, 652px);
 
-    height: 100%;
-
-    &__pile {
-        box-sizing: border-box;
-        width: 321px;
-        min-height: 98px;
-        padding: var(--g-spacing-3);
-
-        border-radius: var(--g-border-radius-s);
-        background-color: var(--g-color-base-generic);
+    &__piles {
+        gap: 12px 10px;
     }
 
+    &__pile {
+        --g-card-border-radius: var(--g-border-radius-l);
+        display: flex;
+        flex-direction: column;
+        gap: var(--g-spacing-3);
+
+        box-sizing: border-box;
+        width: 321px;
+        max-width: 100%;
+        padding: calc(var(--g-spacing-3) - 1px);
+    }
+
+    &__pile-heading,
     &__pile-name {
         min-width: 0;
     }
 
     &__current-pile {
+        display: flex;
         flex-shrink: 0;
     }
 
     &__state-label,
     &__healthcheck-status {
+        display: flex;
         flex-shrink: 0;
     }
 
@@ -35,24 +42,45 @@
     }
 
     &__healthcheck-skeleton {
-        width: 72px;
-        height: 20px;
+        width: 18px;
+        height: 18px;
     }
 
-    &__healthcheck-accessible-prefix {
-        position: absolute;
+    &__details {
+        --g-definition-list-item-gap: var(--g-spacing-2);
 
-        overflow: hidden;
-        clip: rect(0 0 0 0);
+        font-size: var(--g-text-body-1-font-size);
+        line-height: var(--g-text-body-1-line-height);
 
-        width: 1px;
-        height: 1px;
+        .g-definition-list__item {
+            align-items: center;
+        }
 
+        .g-definition-list__definition {
+            min-width: 0;
+        }
+    }
+
+    &__nodes-count {
         white-space: nowrap;
-        clip-path: inset(50%);
     }
 
-    &__nodes {
-        color: var(--g-color-text-secondary);
+    &__nodes-progress {
+        --g-progress-filled-background-color: var(--g-color-base-info-heavy);
+        flex-shrink: 0;
+
+        width: 80px;
+    }
+
+    &__healthcheck-status,
+    &__summary-status {
+        display: flex;
+    }
+
+    &__current-pile:focus-visible,
+    &__state-label:focus-visible,
+    &__summary-status:focus-visible {
+        outline: 2px solid var(--g-color-line-focus);
+        outline-offset: 2px;
     }
 }

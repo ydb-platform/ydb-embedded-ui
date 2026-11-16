@@ -6,6 +6,24 @@
         flex-shrink: 0;
     }
 
+    &__compact-button {
+        display: flex;
+
+        padding: 0;
+
+        cursor: pointer;
+
+        border: 0;
+        border-radius: var(--g-border-radius-xs);
+        background: none;
+    }
+
+    &__compact:focus-visible,
+    &__compact-button:focus-visible {
+        outline: 2px solid var(--g-color-line-focus);
+        outline-offset: 2px;
+    }
+
     &__note {
         color: inherit;
     }
