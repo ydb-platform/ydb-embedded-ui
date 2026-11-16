@@ -47,8 +47,6 @@ export function BridgeDatabasesSummary({bridgeInfo}: {bridgeInfo: TBridgeInfo}) 
         return null;
     }
 
-    const incomplete = bridgeInfo.BridgeDatabasesComplete === false;
-
     return (
         <Flex gap={1} alignItems="center" wrap qa="bridge-databases-summary">
             <Text color="secondary">{i18n('field_bridge-databases')}:</Text>
@@ -56,10 +54,7 @@ export function BridgeDatabasesSummary({bridgeInfo}: {bridgeInfo: TBridgeInfo}) 
                 {counts?.length ? (
                     counts.map(({status, count}) => {
                         const {icon, theme, label} = statusPresentation[status];
-                        const statusTitle = i18n('context_bridge-sync-status', {status: label()});
-                        const title = incomplete
-                            ? `${statusTitle}. ${i18n('context_bridge-databases-incomplete')}`
-                            : statusTitle;
+                        const title = i18n('context_bridge-sync-status', {status: label()});
                         const formattedCount = formatNumber(count);
                         return (
                             <Tooltip key={status} content={title} openDelay={500}>
