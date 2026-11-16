@@ -17,7 +17,7 @@ const TRANSACTION_MODE_SELECT_OPTIONS = [
         value: TRANSACTION_MODES.implicit,
         content: TRANSACTION_MODES_TITLES[TRANSACTION_MODES.implicit],
         text: i18n('context_implicit-transaction-mode'),
-        isDefault: true,
+        badge: 'recommended' as const,
     },
     {
         value: TRANSACTION_MODES.serializable,
@@ -43,6 +43,7 @@ const TRANSACTION_MODE_SELECT_OPTIONS = [
         value: TRANSACTION_MODES.onlinero,
         content: TRANSACTION_MODES_TITLES[TRANSACTION_MODES.onlinero],
         text: i18n('context_online-read-only-transaction-mode'),
+        badge: 'deprecated' as const,
     },
 ];
 
@@ -50,23 +51,23 @@ const QUERY_MODE_SELECT_OPTIONS = [
     {
         value: QUERY_MODES.query,
         content: QUERY_MODES_TITLES[QUERY_MODES.query],
-        text: i18n('context_query-execution-method'),
-        isDefault: true,
+        text: formI18n('context_query-service'),
+        badge: 'recommended' as const,
     },
     {
         value: QUERY_MODES.script,
         content: QUERY_MODES_TITLES[QUERY_MODES.script],
-        text: i18n('context_script-execution-method'),
+        badge: 'legacy' as const,
     },
     {
         value: QUERY_MODES.scan,
         content: QUERY_MODES_TITLES[QUERY_MODES.scan],
-        text: i18n('context_scan-execution-method'),
+        badge: 'legacy' as const,
     },
     {
         value: QUERY_MODES.data,
         content: QUERY_MODES_TITLES[QUERY_MODES.data],
-        text: i18n('context_data-execution-method'),
+        badge: 'legacy' as const,
     },
 ];
 
@@ -75,7 +76,6 @@ const STATISTICS_MODE_SELECT_OPTIONS = [
         value: STATISTICS_MODES.none,
         content: STATISTICS_MODES_TITLES[STATISTICS_MODES.none],
         text: i18n('context_disabled-statistics'),
-        isDefault: true,
     },
     {
         value: STATISTICS_MODES.basic,
@@ -99,7 +99,6 @@ const TRACING_LEVEL_SELECT_OPTIONS = [
         value: TRACING_LEVELS.off,
         content: TRACING_LEVELS_TITLES[TRACING_LEVELS.off],
         text: i18n('context_disabled-tracing'),
-        isDefault: true,
     },
     {
         value: TRACING_LEVELS.toplevel,
@@ -142,7 +141,7 @@ export const QUERY_SETTINGS_FIELD_SETTINGS = {
         options: STATISTICS_MODE_SELECT_OPTIONS,
     },
     tracingLevel: {
-        title: formI18n('form.tracing-level'),
+        title: formI18n('field_tracing'),
         options: TRACING_LEVEL_SELECT_OPTIONS,
     },
     timeout: {

@@ -1,8 +1,9 @@
 import React from 'react';
 
-import {TextInput} from '@gravity-ui/uikit';
+import {Switch, TextInput} from '@gravity-ui/uikit';
 
 import {cn} from '../../../../utils/cn';
+import {useQueryStreamingSetting} from '../../../../utils/hooks';
 
 import {TimeoutLabel} from './TimeoutLabel';
 import i18n from './i18n';
@@ -38,12 +39,27 @@ export function QuerySettingsTimeout({
     );
 
     const isChecked = value !== null;
+    const [isQueryStreamingEnabled] = useQueryStreamingSetting();
+    const switchId = id ? `${id}-switch` : undefined;
 
     return (
         <React.Fragment>
-            <TimeoutLabel isDisabled={isDisabled} isChecked={isChecked} onToggle={onToggle} />
-            {isChecked && (
-                <div className={b('control-wrapper')}>
+            <TimeoutLabel
+                htmlFor={isQueryStreamingEnabled ? switchId : id}
+                isDisabled={isQueryStreamingEnabled && isDisabled}
+            />
+            <div className={b('control-wrapper')}>
+                {isQueryStreamingEnabled && (
+                    <Switch
+                        className={b('switch')}
+                        disabled={isDisabled}
+                        checked={isChecked}
+                        onUpdate={onToggle}
+                        id={switchId}
+                        controlProps={{'aria-label': i18n('form.timeout')}}
+                    />
+                )}
+                {isChecked && (
                     <TextInput
                         id={id}
                         type="number"
@@ -58,8 +74,8 @@ export function QuerySettingsTimeout({
                             <span className={b('postfix')}>{i18n('form.timeout.seconds')}</span>
                         }
                     />
-                </div>
-            )}
+                )}
+            </div>
         </React.Fragment>
     );
 }

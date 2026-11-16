@@ -1,5 +1,5 @@
 import type {SelectOption} from '@gravity-ui/uikit';
-import {Select} from '@gravity-ui/uikit';
+import {Label, Select} from '@gravity-ui/uikit';
 
 import type {
     QueryMode,
@@ -21,10 +21,13 @@ export const getOptionHeight = () => -1;
 const b = cn('ydb-query-settings-select');
 
 type SelectType = QueryMode | TransactionMode | StatisticsMode | TracingLevel | ResourcePoolValue;
-type QuerySettingSelectOption<T> = SelectOption<T> & {isDefault?: boolean};
+type QuerySettingSelectOption<T> = SelectOption<T> & {
+    badge?: 'recommended' | 'legacy' | 'deprecated';
+};
 
 interface QuerySettingsSelectProps<T extends SelectType> {
     id?: string;
+    ariaLabel: string;
     setting: T;
     settingOptions: QuerySettingSelectOption<T>[];
     disabled?: boolean;
@@ -36,6 +39,7 @@ export function QuerySettingsSelect<T extends SelectType>(props: QuerySettingsSe
         <div className={b('selector')}>
             <Select<T>
                 id={props.id}
+                aria-label={props.ariaLabel}
                 disabled={props.disabled}
                 options={props.settingOptions}
                 value={[props.setting]}
@@ -48,7 +52,14 @@ export function QuerySettingsSelect<T extends SelectType>(props: QuerySettingsSe
                     <div className={b('item', {type: option.value, disabled: option.disabled})}>
                         <div className={b('item-title')}>
                             {option.content}
-                            {option.isDefault ? i18n('description.default') : ''}
+                            {option.badge && (
+                                <Label
+                                    theme={option.badge === 'recommended' ? 'info' : 'normal'}
+                                    size="xs"
+                                >
+                                    {i18n(`value_${option.badge}`)}
+                                </Label>
+                            )}
                         </div>
                         {option.text && (
                             <span className={b('item-description')}>{option.text}</span>
