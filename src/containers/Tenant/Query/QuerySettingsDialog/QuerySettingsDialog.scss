@@ -1,5 +1,15 @@
 .ydb-query-settings-dialog {
     max-width: calc(100vw - var(--g-spacing-5) * 2);
+
+    &__header {
+        padding-block: calc(var(--g-spacing-4) + var(--g-spacing-half))
+            calc(var(--g-spacing-3) + var(--g-spacing-half));
+    }
+
+    &__advanced-toggle {
+        min-height: var(--g-spacing-7);
+    }
+
     &__dialog-body,
     &__advanced-fields {
         display: flex;
@@ -10,7 +20,7 @@
     &__dialog-row {
         display: grid;
         align-items: start;
-        grid-template-columns: minmax(0, 0.62fr) minmax(0, 1fr);
+        grid-template-columns: calc(var(--g-spacing-10) * 4 - var(--g-spacing-2)) minmax(0, 1fr);
         gap: var(--g-spacing-3);
     }
 
@@ -20,6 +30,8 @@
         gap: var(--g-spacing-1);
 
         min-height: var(--g-spacing-7);
+        // Let long labels use part of the column gap without moving the controls.
+        margin-inline-end: calc(-1 * var(--g-spacing-2));
     }
 
     &__control-wrapper {
@@ -28,6 +40,10 @@
         gap: var(--g-spacing-2);
 
         min-width: 0;
+
+        &_statisticsMode {
+            align-items: flex-start;
+        }
     }
 
     &__description {
@@ -86,6 +102,7 @@
 
         &__field-title {
             min-height: auto;
+            margin-inline-end: 0;
         }
     }
 }

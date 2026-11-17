@@ -32,5 +32,9 @@
   "context_query-type": "Selects the YDB API used to execute the query. Available features depend on the selected type.",
   "context_tracing": "Collects query execution traces for troubleshooting. The selected level controls how much detail is recorded.",
   "context_output-chunk-max-size": "Maximum size of a streamed result chunk, in bytes. Does not limit the total result size.",
-  "context_query-prefix": "YQL statements added before each query, such as PRAGMA settings. The editor text stays unchanged."
+  "context_query-prefix": "YQL statements added before each query, such as PRAGMA settings. The editor text stays unchanged.",
+  "context_implicit-transaction-mode": "Default isolation level",
+  "context_serializable-transaction-mode": "Strictest isolation for custom transactions",
+  "context_stale-read-only-transaction-mode": "Read operations within a transaction may return slightly outdated results",
+  "context_snapshot-read-only-transaction-mode": "All the read operations within a transaction access the database snapshot"
 }

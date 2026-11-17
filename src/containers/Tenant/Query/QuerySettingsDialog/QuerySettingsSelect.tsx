@@ -1,4 +1,4 @@
-import type {SelectOption} from '@gravity-ui/uikit';
+import type {SelectOption, SelectOptionGroup} from '@gravity-ui/uikit';
 import {Label, Select} from '@gravity-ui/uikit';
 
 import type {
@@ -19,6 +19,7 @@ import './QuerySettingsSelect.scss';
 export const getOptionHeight = () => -1;
 
 const b = cn('ydb-query-settings-select');
+const badgeThemes = {recommended: 'info', legacy: 'unknown', deprecated: 'normal'} as const;
 
 type SelectType = QueryMode | TransactionMode | StatisticsMode | TracingLevel | ResourcePoolValue;
 type QuerySettingSelectOption<T> = SelectOption<T> & {
@@ -29,7 +30,7 @@ interface QuerySettingsSelectProps<T extends SelectType> {
     id?: string;
     ariaLabel: string;
     setting: T;
-    settingOptions: QuerySettingSelectOption<T>[];
+    settingOptions: (QuerySettingSelectOption<T> | SelectOptionGroup<T>)[];
     disabled?: boolean;
     onUpdateSetting: (mode: T) => void;
 }
@@ -51,10 +52,11 @@ export function QuerySettingsSelect<T extends SelectType>(props: QuerySettingsSe
                 renderOption={(option: QuerySettingSelectOption<T>) => (
                     <div className={b('item', {type: option.value, disabled: option.disabled})}>
                         <div className={b('item-title')}>
-                            {option.content}
+                            <span className={b('item-label')}>{option.content}</span>
                             {option.badge && (
                                 <Label
-                                    theme={option.badge === 'recommended' ? 'info' : 'normal'}
+                                    theme={badgeThemes[option.badge]}
+                                    className={b('badge')}
                                     size="xs"
                                 >
                                     {i18n(`value_${option.badge}`)}

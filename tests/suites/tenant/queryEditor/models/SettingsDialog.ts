@@ -129,9 +129,12 @@ export class SettingsDialog {
     }
 
     async changeStatsLevel(mode: (typeof STATISTICS_MODES)[keyof typeof STATISTICS_MODES]) {
-        await this.statisticsModeSelect
-            .getByText(STATISTICS_MODES_TITLES[mode], {exact: true})
-            .click();
+        const radio = this.statisticsModeSelect.getByRole('radio', {
+            name: STATISTICS_MODES_TITLES[mode],
+            exact: true,
+        });
+        await radio.check();
+        await expect(radio).toBeChecked();
     }
 
     async getStatsLevel() {
