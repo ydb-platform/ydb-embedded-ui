@@ -32,6 +32,7 @@ interface DiagnosticsTabContentOptions {
     type?: EPathType;
     subType?: EPathSubType;
     database: string;
+    bridgeModeEnabled: boolean;
     path: string;
     databaseFullPath: string;
     additionalTenantProps?: AdditionalTenantsProps;
@@ -112,8 +113,12 @@ const diagnosticsTabRenderers: Record<TenantDiagnosticsTab, DiagnosticsTabRender
     [TENANT_DIAGNOSTICS_TABS_IDS.storageUsage]: ({path, database, databaseFullPath}) => (
         <StorageUsage path={path} database={database} databaseFullPath={databaseFullPath} />
     ),
-    [TENANT_DIAGNOSTICS_TABS_IDS.storage]: ({database, scrollContainerRef}) => (
-        <PaginatedStorage database={database} scrollContainerRef={scrollContainerRef} />
+    [TENANT_DIAGNOSTICS_TABS_IDS.storage]: ({database, bridgeModeEnabled, scrollContainerRef}) => (
+        <PaginatedStorage
+            database={database}
+            bridgeModeEnabled={bridgeModeEnabled}
+            scrollContainerRef={scrollContainerRef}
+        />
     ),
     [TENANT_DIAGNOSTICS_TABS_IDS.network]: ({
         path,

@@ -1,9 +1,6 @@
 import React from 'react';
 
-import {
-    useBlobStorageCapacityMetricsEnabled,
-    useBridgeModeEnabled,
-} from '../../../../store/reducers/capabilities/hooks';
+import {useBlobStorageCapacityMetricsEnabled} from '../../../../store/reducers/capabilities/hooks';
 import {VISIBLE_ENTITIES} from '../../../../store/reducers/storage/constants';
 import {VDisksGroupBy} from '../../../../utils/disks/groupBy';
 import {
@@ -33,24 +30,16 @@ import {
     STORAGE_GROUPS_LEGACY_CAPACITY_COLUMN_IDS,
     STORAGE_GROUPS_SELECTED_COLUMNS_LS_KEY,
     VIEWER_USER_COLUMNS_IDS,
-    isBridgeModeEnabledForStorage,
 } from './constants';
 import type {GetStorageGroupsColumnsParams} from './types';
 
 export function useStorageGroupsSelectedColumns({
-    database,
-    databaseBridgeMode,
+    bridgeModeEnabled = false,
     visibleEntities,
     viewContext,
 }: GetStorageGroupsColumnsParams) {
     const isUserAllowedToMakeChanges = useIsUserAllowedToMakeChanges();
     const isViewerUser = useIsViewerUser();
-    const clusterBridgeModeEnabled = useBridgeModeEnabled();
-    const bridgeModeEnabled = isBridgeModeEnabledForStorage(
-        database,
-        databaseBridgeMode,
-        clusterBridgeModeEnabled,
-    );
     const blobMetricsEnabled = useBlobStorageCapacityMetricsEnabled();
     const isStorageExpertMode = useIsStorageExpertMode();
     const vdisksGroupBy = useVDisksGroupByParam();
@@ -188,13 +177,11 @@ export function useStorageGroupsSelectedColumns({
 
         return {
             ...selectedColumns,
-            bridgeModeEnabled,
             columnsToShow,
             columnsToSelect,
             setColumns,
         };
     }, [
-        bridgeModeEnabled,
         hiddenCapacityColumnIds,
         selectedColumns,
         setColumns,

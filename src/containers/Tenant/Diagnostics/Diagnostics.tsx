@@ -5,6 +5,7 @@ import {Helmet} from 'react-helmet-async';
 
 import {CopyableValue} from '../../../components/CopyableValue/CopyableValue';
 import {DrawerContextProvider} from '../../../components/Drawer/DrawerContext';
+import {Loader} from '../../../components/Loader/Loader';
 import {TENANT_DIAGNOSTICS_TABS_IDS} from '../../../store/reducers/tenant/constants';
 import {setDiagnosticsTab, useTenantBaseInfo} from '../../../store/reducers/tenant/tenant';
 import type {AdditionalTenantsProps} from '../../../types/additionalProps';
@@ -49,7 +50,7 @@ function Diagnostics({
 
     const isV2NavigationEnabled = useNavigationV2Enabled();
 
-    const {name, id, controlPlane, metaErrors} = useTenantBaseInfo(database);
+    const {name, id, controlPlane, metaErrors, databaseData, isError} = useTenantBaseInfo(database);
     const showDatabaseId = Boolean(id && (controlPlane || metaErrors?.control_plane));
 
     const pages = useDiagnosticsPages({
@@ -77,10 +78,19 @@ function Diagnostics({
     }, [activeTab, diagnosticsTab, dispatch]);
 
     const renderTabContent = () => {
+        if (
+            activeTab.id === TENANT_DIAGNOSTICS_TABS_IDS.storage &&
+            databaseData === undefined &&
+            !isError
+        ) {
+            return <Loader />;
+        }
+
         return renderDiagnosticsTabContent({
             activeTabId: activeTab.id,
             type,
             database,
+            bridgeModeEnabled: databaseData?.BridgeMode === true,
             path,
             databaseFullPath,
             additionalTenantProps,

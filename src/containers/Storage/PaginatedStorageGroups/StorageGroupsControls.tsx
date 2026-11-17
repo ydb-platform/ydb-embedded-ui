@@ -9,7 +9,6 @@ import {Search} from '../../../components/Search/Search';
 import {
     useBlobStorageCapacityMetricsAvailable,
     useBlobStorageCapacityMetricsEnabled,
-    useBridgeModeEnabled,
 } from '../../../store/reducers/capabilities/hooks';
 import {SETTING_KEYS} from '../../../store/reducers/settings/constants';
 import {useSetting} from '../../../utils/hooks';
@@ -45,7 +44,7 @@ interface StorageControlsProps {
 export function StorageGroupsControls({
     withTypeSelector,
     withGroupBySelect,
-    bridgeModeEnabled: scopedBridgeModeEnabled,
+    bridgeModeEnabled = false,
     bridgeSyncGroupingAvailable = true,
 
     columns = [],
@@ -74,8 +73,6 @@ export function StorageGroupsControls({
     );
     const isStorageExpertMode = useIsStorageExpertMode();
     const storageExpertModeAvailable = useBlobStorageCapacityMetricsAvailable();
-    const clusterBridgeModeEnabled = useBridgeModeEnabled();
-    const bridgeModeEnabled = scopedBridgeModeEnabled ?? clusterBridgeModeEnabled;
     const blobMetricsEnabled = useBlobStorageCapacityMetricsEnabled();
 
     const isVDisksPDisksColumnVisible = React.useMemo(() => {
