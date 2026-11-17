@@ -311,3 +311,91 @@ test('supports a small viewport and keyboard help', async ({page}) => {
         animations: 'disabled',
     });
 });
+
+for (const theme of ['light', 'dark']) {
+    test(`approved layout and grouped options (${theme})`, async ({page}) => {
+        await mockBackend(page, DEFAULT_QUERY_SETTINGS, 11, true);
+        await page.addInitScript((value) => localStorage.setItem('theme', value), theme);
+        const dialog = await open(page);
+        const editor = new QueryEditor(page);
+        for (const mode of ['none', 'basic', 'full', 'profile'] as const) {
+            await editor.settingsDialog.changeStatsLevel(mode);
+            await expect(dialog.locator(`input[value="${mode}"]`)).toBeChecked();
+        }
+        await editor.settingsDialog.changeStatsLevel('full');
+        await page.evaluate(async () => {
+            await document.fonts.ready;
+            await Promise.all(
+                document
+                    .getAnimations()
+                    .filter((animation) => animation.effect?.getTiming().iterations !== Infinity)
+                    .map((animation) => animation.finished.catch(() => {})),
+            );
+        });
+        const layout = await dialog.evaluate((element) => {
+            const rect = element.getBoundingClientRect();
+            const stats = element.querySelector('.g-segmented-radio-group');
+            const control = element.querySelector(
+                '.ydb-query-settings-dialog__control-wrapper_limitRows',
+            );
+            const advanced = element.querySelector('.g-disclosure__trigger');
+            if (!stats || !control || !advanced) {
+                throw new Error('Missing query settings controls');
+            }
+            const statsRect = stats.getBoundingClientRect();
+            const controlRect = control.getBoundingClientRect();
+            const advancedRect = advanced.getBoundingClientRect();
+            return {
+                width: rect.width,
+                height: rect.height,
+                statsWidth: statsRect.width,
+                controlsX: controlRect.x - rect.x,
+                advancedHeight: advancedRect.height,
+            };
+        });
+        expect(layout.width).toBe(480);
+        expect(layout.controlsX).toBeCloseTo(196, 0);
+        expect(layout.advancedHeight).toBe(28);
+        expect(layout.statsWidth).toBeLessThan(240);
+        expect(layout.height).toBe(382);
+        await dialog.screenshot({
+            path: `playwright-artifacts/query-settings-${theme}-collapsed.png`,
+            animations: 'disabled',
+            scale: 'css',
+        });
+        await dialog.getByRole('button', {name: 'Advanced settings'}).click();
+        await expect
+            .poll(async () => {
+                const height = await dialog.evaluate(
+                    (element) => element.getBoundingClientRect().height,
+                );
+                return height >= 613 && height <= 614;
+            })
+            .toBe(true);
+        await dialog.getByRole('combobox', {name: 'Query type', exact: true}).click();
+        const popup = page.locator('.ydb-query-settings-select__popup');
+        const badges = popup.locator('.g-label');
+        await expect(badges).toHaveCount(4);
+        const rightEdges = await badges.evaluateAll((elements) =>
+            elements.map((element) => element.getBoundingClientRect().right),
+        );
+        expect(Math.max(...rightEdges) - Math.min(...rightEdges)).toBeLessThan(1);
+        await expect(popup.locator('.g-select-list__group-label_empty')).toHaveCount(2);
+        const legacyStyle = await badges.nth(1).evaluate((element) => {
+            const style = getComputedStyle(element);
+            return {theme: element.classList.contains('g-label_theme_unknown'), color: style.color};
+        });
+        expect(legacyStyle.theme).toBe(true);
+        await popup.screenshot({
+            path: `playwright-artifacts/query-settings-${theme}-groups.png`,
+            animations: 'disabled',
+            scale: 'css',
+        });
+        await page.keyboard.press('Escape');
+        await dialog.screenshot({
+            path: `playwright-artifacts/query-settings-${theme}-expanded.png`,
+            animations: 'disabled',
+            scale: 'css',
+        });
+    });
+}

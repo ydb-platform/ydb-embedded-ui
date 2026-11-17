@@ -16,23 +16,23 @@ const TRANSACTION_MODE_SELECT_OPTIONS = [
     {
         value: TRANSACTION_MODES.implicit,
         content: TRANSACTION_MODES_TITLES[TRANSACTION_MODES.implicit],
-        text: i18n('context_implicit-transaction-mode'),
+        text: formI18n('context_implicit-transaction-mode'),
         badge: 'recommended' as const,
     },
     {
         value: TRANSACTION_MODES.serializable,
         content: TRANSACTION_MODES_TITLES[TRANSACTION_MODES.serializable],
-        text: i18n('context_serializable-transaction-mode'),
+        text: formI18n('context_serializable-transaction-mode'),
     },
     {
         value: TRANSACTION_MODES.stalero,
         content: TRANSACTION_MODES_TITLES[TRANSACTION_MODES.stalero],
-        text: i18n('context_stale-read-only-transaction-mode'),
+        text: formI18n('context_stale-read-only-transaction-mode'),
     },
     {
         value: TRANSACTION_MODES.snapshot,
         content: TRANSACTION_MODES_TITLES[TRANSACTION_MODES.snapshot],
-        text: i18n('context_snapshot-read-only-transaction-mode'),
+        text: formI18n('context_snapshot-read-only-transaction-mode'),
     },
     {
         value: TRANSACTION_MODES.snapshotrw,
@@ -69,6 +69,11 @@ const QUERY_MODE_SELECT_OPTIONS = [
         content: QUERY_MODES_TITLES[QUERY_MODES.data],
         badge: 'legacy' as const,
     },
+];
+
+const QUERY_MODE_SELECT_GROUPS = [
+    {label: '', options: QUERY_MODE_SELECT_OPTIONS.slice(0, 1)},
+    {label: '', options: QUERY_MODE_SELECT_OPTIONS.slice(1)},
 ];
 
 const STATISTICS_MODE_SELECT_OPTIONS = [
@@ -135,6 +140,7 @@ export const QUERY_SETTINGS_FIELD_SETTINGS = {
     queryMode: {
         title: formI18n('form.query-mode'),
         options: QUERY_MODE_SELECT_OPTIONS,
+        groups: QUERY_MODE_SELECT_GROUPS,
     },
     statisticsMode: {
         title: formI18n('form.statistics-mode'),

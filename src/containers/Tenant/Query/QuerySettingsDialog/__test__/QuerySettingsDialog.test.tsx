@@ -238,3 +238,17 @@ test('hides unsupported tracing and keeps the snapshot capability fallback', asy
         expect.objectContaining({transactionMode: TRANSACTION_MODES.implicit}),
     );
 });
+
+test('uses the approved transaction descriptions', async () => {
+    const {user} = setup();
+    await user.click(screen.getByRole('combobox', {name: 'Transaction mode'}));
+    for (const description of [
+        'Default isolation level',
+        'Strictest isolation for custom transactions',
+        'Read operations within a transaction may return slightly outdated results',
+        'All the read operations within a transaction access the database snapshot',
+    ]) {
+        expect(screen.getByText(description, {exact: true})).toBeVisible();
+    }
+    expect(screen.queryByText('No transaction', {exact: true})).not.toBeInTheDocument();
+});

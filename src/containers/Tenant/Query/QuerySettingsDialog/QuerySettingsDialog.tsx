@@ -75,7 +75,7 @@ export function QuerySettingsDialog() {
             className={b()}
             aria-label={i18n('action.settings')}
         >
-            <Dialog.Header caption={i18n('action.settings')} />
+            <Dialog.Header className={b('header')} caption={i18n('action.settings')} />
             <QuerySettingsForm
                 initialValues={querySettings}
                 onSubmit={onSubmit}
@@ -304,6 +304,11 @@ function QuerySettingsForm({initialValues, onSubmit, onClose}: QuerySettingsForm
                     arrowPosition="end"
                     keepMounted
                 >
+                    <Disclosure.Summary>
+                        {(_props, summary) =>
+                            React.cloneElement(summary, {className: b('advanced-toggle')})
+                        }
+                    </Disclosure.Summary>
                     <div className={b('advanced-fields')} hidden={!advancedExpanded}>
                         <SettingRow name="queryMode" help={i18n('context_query-type')}>
                             <Controller
@@ -323,7 +328,7 @@ function QuerySettingsForm({initialValues, onSubmit, onClose}: QuerySettingsForm
                                             }
                                         }}
                                         settingOptions={
-                                            QUERY_SETTINGS_FIELD_SETTINGS.queryMode.options
+                                            QUERY_SETTINGS_FIELD_SETTINGS.queryMode.groups
                                         }
                                     />
                                 )}
