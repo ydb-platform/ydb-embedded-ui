@@ -216,15 +216,7 @@ const BridgePileCard = React.memo(function BridgePileCard({
     const healthcheckAccessibleName = `${i18n('label_bridge-pile-health-status-prefix', {pileName})} ${EFlagToStatusName[pileHealthcheck.status]}`;
 
     return (
-        <Flex
-            as={Card}
-            view="outlined"
-            direction="column"
-            gap={3}
-            width={321}
-            maxWidth="100%"
-            className={b('pile')}
-        >
+        <Flex as={Card} view="outlined" direction="column" gap={3} className={b('pile')}>
             <Flex justifyContent="space-between" alignItems="center" gap={2} width="100%">
                 <Flex alignItems="center" gap={1} minWidth={0}>
                     <Text variant="subheader-1" ellipsis className={b('pile-name')}>

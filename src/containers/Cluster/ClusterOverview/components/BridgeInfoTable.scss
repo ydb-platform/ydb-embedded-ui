@@ -7,6 +7,8 @@
 
     &__pile {
         --g-card-border-radius: var(--g-border-radius-l);
+        width: 320px;
+        max-width: 100%;
         padding: calc(var(--g-spacing-3) - 1px);
     }
 
