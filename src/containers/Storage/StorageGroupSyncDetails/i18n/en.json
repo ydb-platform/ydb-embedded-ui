@@ -1,0 +1,20 @@
+{
+  "field_remaining": "Data remaining",
+  "context_remaining": "Data still to be synchronised. This amount may increase as scanning discovers more data.",
+  "field_rate": "Sync rate",
+  "value_rate": "{{size}}/s",
+  "value_bytes": "{{value}} B",
+  "value_lower-bound": "≥ {{value}}",
+  "field_last-progress": "Last progress",
+  "title_partners": "Sync partners",
+  "field_group-id": "Group ID",
+  "field_pile": "Bridge pile",
+  "title_message": "Last sync message",
+  "field_reported": "Reported",
+  "field_stage": "Stage",
+  "value_stage-blocks": "Blocks",
+  "value_stage-keep-flags": "Keep flags",
+  "value_stage-barriers": "Barriers",
+  "value_stage-data": "Data",
+  "value_stage-synced": "Synchronised"
+}

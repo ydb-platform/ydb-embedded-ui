@@ -33,6 +33,14 @@
         min-width: 0;
     }
 
+    &__sync {
+        margin-top: var(--g-spacing-4);
+    }
+
+    &__sync-title {
+        margin: 0;
+    }
+
     &__storage-title {
         z-index: 3;
 
