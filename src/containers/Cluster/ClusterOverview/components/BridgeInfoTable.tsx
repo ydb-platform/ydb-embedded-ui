@@ -18,6 +18,7 @@ import {
     Label,
     Progress,
     Text,
+    text,
 } from '@gravity-ui/uikit';
 import type {LabelProps} from '@gravity-ui/uikit';
 
@@ -215,9 +216,17 @@ const BridgePileCard = React.memo(function BridgePileCard({
     const healthcheckAccessibleName = `${i18n('label_bridge-pile-health-status-prefix', {pileName})} ${EFlagToStatusName[pileHealthcheck.status]}`;
 
     return (
-        <Card view="outlined" className={b('pile')}>
+        <Flex
+            as={Card}
+            view="outlined"
+            direction="column"
+            gap={3}
+            width={321}
+            maxWidth="100%"
+            className={b('pile')}
+        >
             <Flex justifyContent="space-between" alignItems="center" gap={2} width="100%">
-                <Flex alignItems="center" gap={1} className={b('pile-heading')}>
+                <Flex alignItems="center" gap={1} minWidth={0}>
                     <Text variant="subheader-1" ellipsis className={b('pile-name')}>
                         {pileName}
                     </Text>
@@ -241,7 +250,7 @@ const BridgePileCard = React.memo(function BridgePileCard({
                 </Flex>
                 {stateStatus}
             </Flex>
-            <DefinitionList nameMaxWidth={130} className={b('details')}>
+            <DefinitionList nameMaxWidth={130} className={text({variant: 'body-1'}, b('details'))}>
                 {hasRoleCounters ? (
                     nodeCounters.map(({kind, total, alive}) => {
                         const title = i18n(
@@ -254,7 +263,6 @@ const BridgePileCard = React.memo(function BridgePileCard({
                                     alignItems="center"
                                     gap={2}
                                     wrap
-                                    className={b('nodes-count')}
                                     qa={'bridge-pile-' + kind + '-nodes'}
                                 >
                                     {progress !== undefined ? (
@@ -262,7 +270,7 @@ const BridgePileCard = React.memo(function BridgePileCard({
                                             <Progress value={progress} size="xs" theme="info" />
                                         </span>
                                     ) : null}
-                                    <Text>
+                                    <Text whiteSpace="nowrap">
                                         {i18n('value_nodes-alive', {
                                             alive: formatCount(alive),
                                             total: formatCount(total),
@@ -280,7 +288,7 @@ const BridgePileCard = React.memo(function BridgePileCard({
                         {healthcheckLoading ? (
                             <Skeleton className={b('healthcheck-skeleton')} />
                         ) : (
-                            <Flex className={b('healthcheck-status')}>
+                            <Flex shrink={0}>
                                 <EntityStatus.Label
                                     view="compact"
                                     status={pileHealthcheck.status}
@@ -304,7 +312,7 @@ const BridgePileCard = React.memo(function BridgePileCard({
                     </DefinitionList.Item>
                 )}
             </DefinitionList>
-        </Card>
+        </Flex>
     );
 });
 

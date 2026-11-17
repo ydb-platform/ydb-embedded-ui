@@ -7,17 +7,9 @@
 
     &__pile {
         --g-card-border-radius: var(--g-border-radius-l);
-        display: flex;
-        flex-direction: column;
-        gap: var(--g-spacing-3);
-
-        box-sizing: border-box;
-        width: 321px;
-        max-width: 100%;
         padding: calc(var(--g-spacing-3) - 1px);
     }
 
-    &__pile-heading,
     &__pile-name {
         min-width: 0;
     }
@@ -27,8 +19,7 @@
         flex-shrink: 0;
     }
 
-    &__state-label,
-    &__healthcheck-status {
+    &__state-label {
         display: flex;
         flex-shrink: 0;
     }
@@ -49,9 +40,6 @@
     &__details {
         --g-definition-list-item-gap: var(--g-spacing-2);
 
-        font-size: var(--g-text-body-1-font-size);
-        line-height: var(--g-text-body-1-line-height);
-
         .g-definition-list__item {
             align-items: center;
         }
@@ -61,10 +49,6 @@
         }
     }
 
-    &__nodes-count {
-        white-space: nowrap;
-    }
-
     &__nodes-progress {
         --g-progress-filled-background-color: var(--g-color-base-info-heavy);
         flex-shrink: 0;
@@ -72,7 +56,6 @@
         width: 80px;
     }
 
-    &__healthcheck-status,
     &__summary-status {
         display: flex;
     }
