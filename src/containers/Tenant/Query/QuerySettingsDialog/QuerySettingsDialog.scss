@@ -1,5 +1,5 @@
 .ydb-query-settings-dialog {
-    max-width: calc(100vw - var(--g-spacing-5) * 2);
+    max-width: 100%;
 
     &__header {
         padding-block: calc(var(--g-spacing-4) + var(--g-spacing-half))

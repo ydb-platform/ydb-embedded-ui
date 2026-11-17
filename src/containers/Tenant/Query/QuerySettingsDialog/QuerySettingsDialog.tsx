@@ -328,7 +328,7 @@ function QuerySettingsForm({initialValues, onSubmit, onClose}: QuerySettingsForm
                                             }
                                         }}
                                         settingOptions={
-                                            QUERY_SETTINGS_FIELD_SETTINGS.queryMode.groups
+                                            QUERY_SETTINGS_FIELD_SETTINGS.queryMode.options
                                         }
                                     />
                                 )}
