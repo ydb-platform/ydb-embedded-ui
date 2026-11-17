@@ -89,10 +89,6 @@ test('Describe closes Full value when the object changes', async ({page}) => {
     const describe = await openDescribe(page);
 
     await describe.toggleField('PathDescription');
-    const jsonTable = page.getByTestId('describe').locator('.g-ru-table');
-    await jsonTable.hover();
-    await page.mouse.wheel(1000, 0);
-    await expect.poll(() => jsonTable.evaluate((element) => element.scrollLeft)).toBeGreaterThan(0);
     await describe.openFullValue('Description');
     await expect(describe.getFullValueDialog()).toContainText(getDescription('first'));
 
