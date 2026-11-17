@@ -1,5 +1,26 @@
 # Changelog
 
+## [22.10.0](https://github.com/ydb-platform/ydb-embedded-ui/compare/v22.9.0...v22.10.0) (2026-11-17)
+
+
+### Features
+
+* **CreateDirectoryDialog:** suggest existing directories ([#4599](https://github.com/ydb-platform/ydb-embedded-ui/issues/4599)) ([4de2059](https://github.com/ydb-platform/ydb-embedded-ui/commit/4de2059dab61f4425a8e1fe5781882056771425d))
+* **operations:** add control plane operations ([#4586](https://github.com/ydb-platform/ydb-embedded-ui/issues/4586)) ([a6e3683](https://github.com/ydb-platform/ydb-embedded-ui/commit/a6e3683c3eef5fceaf34d430a5219d8acf08ddd2))
+* **query:** redesign editor toolbar and result views ([#4506](https://github.com/ydb-platform/ydb-embedded-ui/issues/4506)) ([a684753](https://github.com/ydb-platform/ydb-embedded-ui/commit/a684753fc5e11d197f2dc1356cbc78c79a5fa31a))
+
+
+### Bug Fixes
+
+* **clusters:** build filter options from clusters matching availability ([#4583](https://github.com/ydb-platform/ydb-embedded-ui/issues/4583)) ([7a8fa9f](https://github.com/ydb-platform/ydb-embedded-ui/commit/7a8fa9f4e05114e91f88165a734985a8c0009aca))
+* **dc:** clip datacenter labels without ellipsis ([#4575](https://github.com/ydb-platform/ydb-embedded-ui/issues/4575)) ([ba991a1](https://github.com/ydb-platform/ydb-embedded-ui/commit/ba991a1d898345554e658ea2aadf0537054112b5))
+* **Storage:** warn about incomplete data of groups and nodes ([#4579](https://github.com/ydb-platform/ydb-embedded-ui/issues/4579)) ([294f8e9](https://github.com/ydb-platform/ydb-embedded-ui/commit/294f8e9cea68d90450dfdd9334fdd27469ad54d2))
+
+
+### Performance Improvements
+
+* avoid repeated shared database lookups ([#4587](https://github.com/ydb-platform/ydb-embedded-ui/issues/4587)) ([500cf47](https://github.com/ydb-platform/ydb-embedded-ui/commit/500cf4795673b3766843126f71d56ba0d64a9ad7))
+
 ## [22.9.0](https://github.com/ydb-platform/ydb-embedded-ui/compare/v22.8.0...v22.9.0) (2026-11-11)
 
 
