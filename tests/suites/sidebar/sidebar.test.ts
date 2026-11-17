@@ -143,6 +143,7 @@ test.describe('Test Sidebar', async () => {
 
         const tenantPage = new TenantPage(page);
         await tenantPage.goto(pageQueryParams);
+        await tenantPage.queryEditor.waitForEditorReady();
 
         // Create sidebar instance to check for hotkeys panel
         const sidebar = new Sidebar(page);

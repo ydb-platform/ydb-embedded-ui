@@ -232,6 +232,7 @@ export class SettingsDialog {
 
     async clearTimeout() {
         const input = this.timeoutInput.locator('input');
+        await input.click();
         await input.clear();
         await expect(input).toHaveValue('');
     }
