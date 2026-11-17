@@ -1,0 +1,28 @@
+.ydb-suggest-input {
+    display: inline-block;
+
+    width: 100%;
+
+    &__list {
+        overflow-y: auto;
+
+        box-sizing: border-box;
+        min-width: 120px;
+        max-height: 224px;
+        padding: 4px 0;
+    }
+
+    &__item {
+        overflow: hidden;
+
+        padding: 6px 12px;
+
+        cursor: pointer;
+        white-space: nowrap;
+        text-overflow: ellipsis;
+
+        &_active {
+            background: var(--g-color-base-simple-hover);
+        }
+    }
+}
