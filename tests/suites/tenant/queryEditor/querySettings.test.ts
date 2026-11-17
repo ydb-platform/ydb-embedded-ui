@@ -2,6 +2,7 @@ import {expect, test} from '@playwright/test';
 import type {Page, Route} from '@playwright/test';
 
 import {
+    DEFAULT_QUERY_SETTINGS,
     MAX_QUERY_TIMEOUT_SECONDS,
     QUERY_MODES,
     TRANSACTION_MODES,
@@ -85,7 +86,14 @@ test.describe('Test Query Settings', async () => {
         const queryEditor = new QueryEditor(page);
         await queryEditor.clickGearButton();
 
-        await queryEditor.settingsDialog.changeQueryMode(QUERY_MODES.scan);
+        await queryEditor.settingsDialog.expandAdvanced();
+        await page.getByRole('combobox', {name: 'Query type', exact: true}).click();
+        const options = page.getByRole('option');
+        await expect(options).toHaveCount(4);
+        for (const option of await options.all()) {
+            await expect(option).toHaveAccessibleName(/\S/);
+        }
+        await page.getByRole('option', {name: 'Scan Legacy', exact: true}).click();
         await queryEditor.settingsDialog.clickButton(ButtonNames.Apply);
 
         await expect(async () => {
@@ -194,21 +202,38 @@ test.describe('Test Query Settings', async () => {
         );
     });
 
-    test('Persists valid limit rows value', async ({page}) => {
+    test('Persists limit rows without replacing a saved snapshot transaction mode', async ({
+        page,
+    }) => {
+        await page.evaluate(
+            (settings) => localStorage.setItem('queryExecutionSettings', JSON.stringify(settings)),
+            {...DEFAULT_QUERY_SETTINGS, transactionMode: TRANSACTION_MODES.snapshotrw},
+        );
+        await Promise.all([
+            page.waitForResponse((response) => response.url().includes('/viewer/capabilities')),
+            page.reload(),
+        ]);
         const queryEditor = new QueryEditor(page);
         const validValue = 50000;
+        const transactionMode = page.getByRole('combobox', {name: 'Transaction mode', exact: true});
 
-        // Set value and save
         await queryEditor.clickGearButton();
+        await expect(transactionMode).toContainText('Snapshot Read-Write');
         await queryEditor.settingsDialog.changeLimitRows(validValue);
         await queryEditor.settingsDialog.clickButton(ButtonNames.Apply);
         await expect(queryEditor.settingsDialog.isHidden()).resolves.toBe(true);
 
-        // Reopen and check value
         await queryEditor.clickGearButton();
         await expect(queryEditor.settingsDialog.getLimitRowsValue()).resolves.toBe(
             validValue.toString(),
         );
+        await expect(transactionMode).toContainText('Snapshot Read-Write');
+        await queryEditor.settingsDialog.changeTransactionMode(TRANSACTION_MODES.serializable);
+        await queryEditor.settingsDialog.clickButton(ButtonNames.Apply);
+        await expect(queryEditor.settingsDialog.isHidden()).resolves.toBe(true);
+        await queryEditor.clickGearButton();
+        await transactionMode.click();
+        await expect(page.getByRole('option', {name: /Snapshot Read-Write/})).toHaveCount(0);
     });
 
     test('Allows empty limit rows value', async ({page}) => {
