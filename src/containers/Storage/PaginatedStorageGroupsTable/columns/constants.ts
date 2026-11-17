@@ -247,14 +247,6 @@ export const STORAGE_GROUPS_GROUP_BY_OPTIONS: SelectOption[] = STORAGE_GROUPS_GR
 
 export const BRIDGE_STORAGE_GROUP_BY_FIELDS = ['PileName', 'BridgeSyncStatus'] as const;
 
-export function isBridgeModeEnabledForStorage(
-    database: string | undefined,
-    databaseBridgeMode: boolean | undefined,
-    clusterBridgeMode: boolean,
-) {
-    return database ? databaseBridgeMode === true : clusterBridgeMode;
-}
-
 export function getStorageGroupsGroupByOptions(
     blobMetricsEnabled: boolean,
     bridgeModeEnabled: boolean,

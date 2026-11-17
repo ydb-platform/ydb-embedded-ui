@@ -4,7 +4,6 @@ import {
     STORAGE_GROUPS_COLUMNS_IDS,
     getStorageGroupsColumnSortField,
     getStorageGroupsGroupByOptions,
-    isBridgeModeEnabledForStorage,
     storageGroupsGroupByParamSchema,
 } from '../constants';
 
@@ -41,13 +40,6 @@ describe('storage groups capacity column contracts', () => {
         const legacy = getStorageGroupsGroupByOptions(false, true, false).map(({value}) => value);
         expect(legacy).toContain('PileName');
         expect(legacy).not.toContain('BridgeSyncStatus');
-    });
-
-    test('uses database mode independently of cluster mode when database is selected', () => {
-        expect(isBridgeModeEnabledForStorage('/local', false, true)).toBe(false);
-        expect(isBridgeModeEnabledForStorage('/local', undefined, true)).toBe(false);
-        expect(isBridgeModeEnabledForStorage('/local', true, false)).toBe(true);
-        expect(isBridgeModeEnabledForStorage(undefined, undefined, true)).toBe(true);
     });
 
     test.each([

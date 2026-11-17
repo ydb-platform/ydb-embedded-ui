@@ -17,7 +17,6 @@ import {
 import {InfoViewerSkeleton} from '../../components/InfoViewerSkeleton/InfoViewerSkeleton';
 import {InternalLink} from '../../components/InternalLink/InternalLink';
 import {LinkWithIcon} from '../../components/LinkWithIcon/LinkWithIcon';
-import {LoaderWrapper} from '../../components/LoaderWrapper/LoaderWrapper';
 import {VDiskInfo} from '../../components/VDiskInfo/VDiskInfo';
 import {vDiskInfoKeyset} from '../../components/VDiskInfo/i18n';
 import {
@@ -27,6 +26,7 @@ import {
 } from '../../components/VDiskStatus';
 import {useVDiskPagePath} from '../../routes';
 import {api} from '../../store/reducers/api';
+import {useBridgeModeEnabled} from '../../store/reducers/capabilities/hooks';
 import {setHeaderBreadcrumbs} from '../../store/reducers/header/header';
 import {vDiskApi} from '../../store/reducers/vdisk/vdisk';
 import {cn} from '../../utils/cn';
@@ -36,7 +36,6 @@ import {createVDiskDeveloperUILink, useHasDeveloperUi} from '../../utils/develop
 import {useAutoRefreshInterval, useTypedDispatch} from '../../utils/hooks';
 import {useAppTitle} from '../App/AppTitleContext';
 import {PaginatedStorage} from '../Storage/PaginatedStorage';
-import {useStorageBridgeMode} from '../Storage/useStorageBridgeMode';
 
 import {VDiskStorageDetails} from './VDiskStorageDetails';
 import {VDiskTablets} from './VDiskTablets';
@@ -91,9 +90,7 @@ export function VDiskPage() {
     const resolvedVDiskId = VDiskId || (!loading && parseVdiskId(vDiskIdParam)) || undefined;
     const {GroupID} = resolvedVDiskId || {};
 
-    const {bridgeModeEnabled, isLoading: bridgeModeLoading} = useStorageBridgeMode(database, {
-        skip: vDiskTab !== 'storage' || isNil(GroupID),
-    });
+    const bridgeModeEnabled = useBridgeModeEnabled();
 
     const vDiskId = vDiskData?.StringifiedId || (loading ? undefined : vDiskIdParam);
     const {appTitle} = useAppTitle();
@@ -253,22 +250,20 @@ export function VDiskPage() {
     const renderStorageInfo = () => {
         if (!isNil(GroupID)) {
             return (
-                <LoaderWrapper loading={bridgeModeLoading}>
-                    <PaginatedStorage
-                        database={database}
-                        bridgeModeEnabled={bridgeModeEnabled}
-                        groupId={GroupID}
-                        nodeId={nodeId ?? undefined}
-                        pDiskId={PDiskId}
-                        scrollContainerRef={containerRef}
-                        viewContext={{
-                            groupId: GroupID?.toString(),
-                            nodeId: nodeId?.toString(),
-                            pDiskId: PDiskId?.toString(),
-                            vDiskSlotId: vDiskSlotId?.toString(),
-                        }}
-                    />
-                </LoaderWrapper>
+                <PaginatedStorage
+                    database={database}
+                    bridgeModeEnabled={bridgeModeEnabled}
+                    groupId={GroupID}
+                    nodeId={nodeId ?? undefined}
+                    pDiskId={PDiskId}
+                    scrollContainerRef={containerRef}
+                    viewContext={{
+                        groupId: GroupID?.toString(),
+                        nodeId: nodeId?.toString(),
+                        pDiskId: PDiskId?.toString(),
+                        vDiskSlotId: vDiskSlotId?.toString(),
+                    }}
+                />
             );
         }
 

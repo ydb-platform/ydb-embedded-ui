@@ -12,10 +12,10 @@ import {ResponseError} from '../../components/Errors/ResponseError';
 import {FullNodeViewer} from '../../components/FullNodeViewer/FullNodeViewer';
 import {InfoViewerSkeleton} from '../../components/InfoViewerSkeleton/InfoViewerSkeleton';
 import {InternalLink} from '../../components/InternalLink';
-import {LoaderWrapper} from '../../components/LoaderWrapper/LoaderWrapper';
 import {PageMeta} from '../../components/PageMeta/PageMeta';
 import routes, {getDefaultNodePath} from '../../routes';
 import {
+    useBridgeModeEnabled,
     useCapabilitiesLoaded,
     useConfigAvailable,
     useViewerPeersHandlerAvailable,
@@ -31,7 +31,6 @@ import {useAppTitle} from '../App/AppTitleContext';
 import {Configs} from '../Configs/Configs';
 import {NodeNetwork} from '../Node/NodeNetwork/NodeNetwork';
 import {PaginatedStorage} from '../Storage/PaginatedStorage';
-import {useStorageBridgeMode} from '../Storage/useStorageBridgeMode';
 import {Tablets} from '../Tablets/Tablets';
 
 import type {NodeTab} from './NodePages';
@@ -267,9 +266,7 @@ function NodePageContent({
     tabs,
     parentContainer,
 }: NodePageContentProps) {
-    const {bridgeModeEnabled, isLoading: bridgeModeLoading} = useStorageBridgeMode(database, {
-        skip: activeTabId !== 'storage',
-    });
+    const bridgeModeEnabled = useBridgeModeEnabled();
 
     const renderTabs = () => {
         return (
@@ -299,17 +296,15 @@ function NodePageContent({
         switch (activeTabId) {
             case 'storage': {
                 return (
-                    <LoaderWrapper loading={bridgeModeLoading}>
-                        <PaginatedStorage
-                            database={database}
-                            bridgeModeEnabled={bridgeModeEnabled}
-                            nodeId={nodeId}
-                            scrollContainerRef={parentContainer}
-                            viewContext={{
-                                nodeId: nodeId,
-                            }}
-                        />
-                    </LoaderWrapper>
+                    <PaginatedStorage
+                        database={database}
+                        bridgeModeEnabled={bridgeModeEnabled}
+                        nodeId={nodeId}
+                        scrollContainerRef={parentContainer}
+                        viewContext={{
+                            nodeId: nodeId,
+                        }}
+                    />
                 );
             }
             case 'tablets': {

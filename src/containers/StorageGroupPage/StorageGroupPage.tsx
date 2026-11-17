@@ -9,9 +9,8 @@ import {StickyAutoRefreshControl} from '../../components/AutoRefreshControl/Stic
 import {CopyableValue} from '../../components/CopyableValue/CopyableValue';
 import {ResponseError} from '../../components/Errors/ResponseError';
 import {InfoViewerSkeleton} from '../../components/InfoViewerSkeleton/InfoViewerSkeleton';
-import {LoaderWrapper} from '../../components/LoaderWrapper/LoaderWrapper';
 import {StorageGroupInfo} from '../../components/StorageGroupInfo/StorageGroupInfo';
-import {useCapabilitiesLoaded} from '../../store/reducers/capabilities/hooks';
+import {useBridgeModeEnabled, useCapabilitiesLoaded} from '../../store/reducers/capabilities/hooks';
 import {setHeaderBreadcrumbs} from '../../store/reducers/header/header';
 import {storageApi} from '../../store/reducers/storage/storage';
 import {valueIsDefined} from '../../utils';
@@ -22,7 +21,6 @@ import {useDatabaseFromQuery} from '../../utils/hooks/useDatabaseFromQuery';
 import {useAppTitle} from '../App/AppTitleContext';
 import {PaginatedStorage} from '../Storage/PaginatedStorage';
 import {StorageGroupStateLabel} from '../Storage/StorageGroupStateLabel';
-import {useStorageBridgeMode} from '../Storage/useStorageBridgeMode';
 
 import {storageGroupPageKeyset} from './i18n';
 
@@ -39,9 +37,7 @@ export function StorageGroupPage() {
 
     const [autoRefreshInterval] = useAutoRefreshInterval();
     const capabilitiesLoaded = useCapabilitiesLoaded();
-    const {bridgeModeEnabled, isLoading: bridgeModeLoading} = useStorageBridgeMode(database, {
-        skip: !groupId,
-    });
+    const bridgeModeEnabled = useBridgeModeEnabled();
     const groupQuery = storageApi.useGetStorageGroupsInfoQuery(
         valueIsDefined(groupId)
             ? {groupId, with: 'all', fieldsRequired: 'all', database}
@@ -123,17 +119,15 @@ export function StorageGroupPage() {
                 <Text as="h2" variant="subheader-3" className={storageGroupPageCn('storage-title')}>
                     {storageGroupPageKeyset('storage')}
                 </Text>
-                <LoaderWrapper loading={bridgeModeLoading}>
-                    <PaginatedStorage
-                        database={database}
-                        bridgeModeEnabled={bridgeModeEnabled}
-                        groupId={groupId}
-                        scrollContainerRef={containerRef}
-                        viewContext={{
-                            groupId: groupId?.toString(),
-                        }}
-                    />
-                </LoaderWrapper>
+                <PaginatedStorage
+                    database={database}
+                    bridgeModeEnabled={bridgeModeEnabled}
+                    groupId={groupId}
+                    scrollContainerRef={containerRef}
+                    viewContext={{
+                        groupId: groupId?.toString(),
+                    }}
+                />
             </React.Fragment>
         );
     };
