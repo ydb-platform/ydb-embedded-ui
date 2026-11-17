@@ -55,14 +55,30 @@ test.describe('Test Query Settings', async () => {
         });
     });
 
-    test('Settings dialog opens on Gear click and closes on Cancel', async ({page}) => {
+    test('Settings dialog discards cancelled drafts and persists applied statistics', async ({
+        page,
+    }) => {
         const queryEditor = new QueryEditor(page);
         await queryEditor.clickGearButton();
 
         await expect(queryEditor.settingsDialog.isVisible()).resolves.toBe(true);
-
+        await expect(queryEditor.settingsDialog.getStatsLevel()).resolves.toBe('Full');
+        const advanced = page.getByRole('button', {name: 'Advanced settings', exact: true});
+        await expect(advanced).toHaveAttribute('aria-expanded', 'false');
+        await queryEditor.settingsDialog.expandAdvanced();
+        await queryEditor.settingsDialog.changeStatsLevel('none');
         await queryEditor.settingsDialog.clickButton(ButtonNames.Cancel);
         await expect(queryEditor.settingsDialog.isHidden()).resolves.toBe(true);
+
+        await queryEditor.clickGearButton();
+        await expect(advanced).toHaveAttribute('aria-expanded', 'false');
+        await expect(queryEditor.settingsDialog.getStatsLevel()).resolves.toBe('Full');
+        await queryEditor.settingsDialog.changeStatsLevel('none');
+        await queryEditor.settingsDialog.clickButton(ButtonNames.Apply);
+        await expect(queryEditor.settingsDialog.isHidden()).resolves.toBe(true);
+        await page.reload();
+        await queryEditor.clickGearButton();
+        await expect(queryEditor.settingsDialog.getStatsLevel()).resolves.toBe('None');
     });
 
     test('Settings dialog saves changes and updates Gear button', async ({page}) => {

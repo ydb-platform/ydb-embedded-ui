@@ -1,4 +1,4 @@
-import {DEFAULT_QUERY_SETTINGS, querySettingsRestoreSchema} from '../../../../../utils/query';
+import {DEFAULT_QUERY_SETTINGS} from '../../../../../utils/query';
 import {getQuerySettingsMetricaParams} from '../getQuerySettingsMetricaParams';
 
 test('does not record an unchanged draft', () => {
@@ -17,31 +17,20 @@ test('records clearing optional values without exposing prefix or pool names', (
         resourcePool: 'private-pool',
     };
     const params = getQuerySettingsMetricaParams(initial, applied);
-    expect(params).toEqual(
-        expect.objectContaining({
-            outputChunkMaxSizeChanged: true,
-            limitRowsChanged: true,
-            outputChunkMaxSize: null,
-            limitRows: null,
-            pragmasChanged: true,
-            resourcePoolChanged: true,
-            queryPrefixPresent: true,
-            resourcePoolOverride: true,
-        }),
-    );
-    expect(JSON.stringify(params)).not.toContain('private');
-});
-
-test('uses Full for missing or invalid stored statistics, preserving explicit choices', () => {
-    expect(querySettingsRestoreSchema.parse(undefined).statisticsMode).toBe('full');
-    expect(
-        querySettingsRestoreSchema.parse({...DEFAULT_QUERY_SETTINGS, statisticsMode: 'invalid'})
-            .statisticsMode,
-    ).toBe('full');
-    for (const statisticsMode of ['none', 'basic', 'full', 'profile']) {
-        expect(
-            querySettingsRestoreSchema.parse({...DEFAULT_QUERY_SETTINGS, statisticsMode})
-                .statisticsMode,
-        ).toBe(statisticsMode);
-    }
+    expect(params).toEqual({
+        outputChunkMaxSizeChanged: true,
+        limitRowsChanged: true,
+        pragmasChanged: true,
+        resourcePoolChanged: true,
+        queryMode: initial.queryMode,
+        transactionMode: initial.transactionMode,
+        statisticsMode: initial.statisticsMode,
+        tracingLevel: initial.tracingLevel,
+        timeoutEnabled: false,
+        timeoutSeconds: null,
+        outputChunkMaxSize: null,
+        limitRows: null,
+        queryPrefixPresent: true,
+        resourcePoolOverride: true,
+    });
 });

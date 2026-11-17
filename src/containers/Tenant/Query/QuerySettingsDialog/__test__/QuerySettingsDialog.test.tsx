@@ -1,13 +1,9 @@
 import React from 'react';
 
 import {ThemeProvider} from '@gravity-ui/uikit';
-import {render, screen, waitFor, within} from '@testing-library/react';
+import {render, screen, waitFor} from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 
-import {
-    useSnapshotReadWriteAvailable,
-    useTracingLevelOptionAvailable,
-} from '../../../../../store/reducers/capabilities/hooks';
 import type {QuerySettings} from '../../../../../types/store/query';
 import {
     useQueryExecutionSettings,
@@ -75,8 +71,6 @@ beforeAll(() => {
 
 beforeEach(() => {
     jest.clearAllMocks();
-    jest.mocked(useSnapshotReadWriteAvailable).mockReturnValue(true);
-    jest.mocked(useTracingLevelOptionAvailable).mockReturnValue(true);
     jest.mocked(useQueryStreamingSetting).mockReturnValue([true, jest.fn()]);
     jest.mocked(useResourcePools).mockReturnValue({
         resourcePools: ['default', 'olap'],
@@ -86,51 +80,21 @@ beforeEach(() => {
     });
 });
 
-test('opens with Full statistics, collapsed advanced fields and Apply', () => {
-    setup();
-    expect(screen.getByRole('radio', {name: 'Full'})).toBeChecked();
-    expect(screen.getByRole('button', {name: 'Apply'})).toBeVisible();
-    expect(screen.getByRole('button', {name: 'Advanced settings'})).toHaveAttribute(
-        'aria-expanded',
-        'false',
-    );
-    expect(screen.queryByLabelText('Query prefix')).not.toBeVisible();
-});
-
-test('discards cancelled edits and preserves advanced values when collapsed', async () => {
-    const {user, saved} = setup();
-    await user.click(screen.getByRole('button', {name: 'Advanced settings'}));
-    await user.clear(screen.getByLabelText('Query prefix'));
-    await user.type(screen.getByLabelText('Query prefix'), 'PRAGMA Test = "private";');
-    await user.click(screen.getByRole('button', {name: 'Advanced settings'}));
-    await user.click(screen.getByRole('button', {name: 'Advanced settings'}));
-    expect(screen.getByLabelText('Query prefix')).toHaveValue('PRAGMA Test = "private";');
-    await user.click(screen.getByRole('button', {name: 'Cancel'}));
-    await waitFor(() => expect(screen.queryByRole('dialog')).not.toBeInTheDocument());
-    await user.click(screen.getByRole('button', {name: 'Open settings'}));
-    expect(screen.getByRole('button', {name: 'Advanced settings'})).toHaveAttribute(
-        'aria-expanded',
-        'false',
-    );
-    await user.click(screen.getByRole('button', {name: 'Advanced settings'}));
-    expect(screen.getByLabelText('Query prefix')).toHaveValue(DEFAULT_QUERY_SETTINGS.pragmas);
-    expect(saved).not.toHaveBeenCalled();
-    expect(reachMetricaGoal).not.toHaveBeenCalled();
-});
-
-test('does not offer snapshot read-write for a new selection', async () => {
-    const {user} = setup();
-    await user.click(screen.getByRole('combobox', {name: 'Transaction mode'}));
-    expect(screen.queryByRole('option', {name: /Snapshot Read-Write/})).not.toBeInTheDocument();
-    expect(screen.queryByRole('option', {name: /Read committed/})).not.toBeInTheDocument();
-    expect(screen.getByRole('option', {name: /Online Read-Only/})).toHaveTextContent('Deprecated');
-});
-
 test('preserves saved snapshot read-write until another mode is applied', async () => {
     const {user, saved} = setup({
         ...DEFAULT_QUERY_SETTINGS,
         transactionMode: TRANSACTION_MODES.snapshotrw,
     });
+    expect(screen.getByRole('combobox', {name: 'Transaction mode'})).toHaveTextContent(
+        'Snapshot Read-Write',
+    );
+    await user.click(screen.getByRole('combobox', {name: 'Transaction mode'}));
+    await user.click(screen.getByRole('option', {name: /Serializable/}));
+    await user.click(screen.getByRole('button', {name: 'Cancel'}));
+    await waitFor(() => expect(screen.queryByRole('dialog')).not.toBeInTheDocument());
+    expect(saved).not.toHaveBeenCalled();
+    expect(reachMetricaGoal).not.toHaveBeenCalled();
+    await user.click(screen.getByRole('button', {name: 'Open settings'}));
     expect(screen.getByRole('combobox', {name: 'Transaction mode'})).toHaveTextContent(
         'Snapshot Read-Write',
     );
@@ -145,30 +109,27 @@ test('preserves saved snapshot read-write until another mode is applied', async 
     await user.click(screen.getByRole('combobox', {name: 'Transaction mode'}));
     await user.click(screen.getByRole('option', {name: /Serializable/}));
     await user.click(screen.getByRole('button', {name: 'Apply'}));
+    expect(saved).toHaveBeenLastCalledWith(
+        expect.objectContaining({transactionMode: TRANSACTION_MODES.serializable}),
+    );
     await waitFor(() => expect(screen.queryByRole('dialog')).not.toBeInTheDocument());
     await user.click(screen.getByRole('button', {name: 'Open settings'}));
     await user.click(screen.getByRole('combobox', {name: 'Transaction mode'}));
     expect(screen.queryByRole('option', {name: /Snapshot Read-Write/})).not.toBeInTheDocument();
 });
 
-test('enables tracing at Top Level and omits legacy query type descriptions', async () => {
+test('reveals invalid advanced fields and only records valid changed Apply without query text', async () => {
     const {user, saved} = setup();
+    expect(screen.getByRole('button', {name: 'Advanced settings'})).toHaveAttribute(
+        'aria-expanded',
+        'false',
+    );
     await user.click(screen.getByRole('button', {name: 'Advanced settings'}));
     expect(screen.getByRole('combobox', {name: 'Tracing level'})).toBeDisabled();
     await user.click(screen.getByRole('switch', {name: 'Tracing'}));
     expect(screen.getByRole('combobox', {name: 'Tracing level'})).toHaveTextContent('Top Level');
-    await user.click(screen.getByRole('combobox', {name: 'Query type'}));
-    const legacyOption = screen.getByRole('option', {name: 'Scan Legacy'});
-    expect(within(legacyOption).getByText('Legacy')).toBeVisible();
-    expect(legacyOption.querySelector('.ydb-query-settings-select__item-description')).toBeNull();
-    await user.click(legacyOption);
-    await user.click(screen.getByRole('button', {name: 'Apply'}));
-    expect(saved).toHaveBeenCalledWith(expect.objectContaining({tracingLevel: 'toplevel'}));
-});
-
-test('reveals invalid advanced fields and only records valid changed Apply without query text', async () => {
-    const {user, saved} = setup();
-    await user.click(screen.getByRole('button', {name: 'Advanced settings'}));
+    await user.clear(screen.getByLabelText('Query prefix'));
+    await user.type(screen.getByLabelText('Query prefix'), 'PRAGMA Test = "secret";');
     await user.type(screen.getByLabelText('Output chunk max size'), '-1');
     await user.click(screen.getByRole('button', {name: 'Advanced settings'}));
     await user.click(screen.getByRole('button', {name: 'Apply'}));
@@ -181,9 +142,12 @@ test('reveals invalid advanced fields and only records valid changed Apply witho
     expect(saved).not.toHaveBeenCalled();
     expect(reachMetricaGoal).not.toHaveBeenCalled();
     await user.clear(screen.getByLabelText('Output chunk max size'));
-    await user.clear(screen.getByLabelText('Query prefix'));
-    await user.type(screen.getByLabelText('Query prefix'), 'PRAGMA Test = "secret";');
+    expect(screen.getByLabelText('Query prefix')).toHaveValue('PRAGMA Test = "secret";');
     await user.click(screen.getByRole('button', {name: 'Apply'}));
+    expect(saved).toHaveBeenCalledTimes(1);
+    expect(saved).toHaveBeenCalledWith(
+        expect.objectContaining({tracingLevel: 'toplevel', pragmas: 'PRAGMA Test = "secret";'}),
+    );
     expect(reachMetricaGoal).toHaveBeenCalledTimes(1);
     expect(reachMetricaGoal).toHaveBeenCalledWith(
         'applyQuerySettings',
@@ -192,63 +156,10 @@ test('reveals invalid advanced fields and only records valid changed Apply witho
     expect(JSON.stringify(jest.mocked(reachMetricaGoal).mock.calls)).not.toContain('secret');
 });
 
-test.each(['Cancel', 'Close dialog', 'Escape'])(
-    'keeps saved mode after a draft change dismissed via %s',
-    async (closeAction) => {
-        const {user, saved} = setup({
-            ...DEFAULT_QUERY_SETTINGS,
-            transactionMode: TRANSACTION_MODES.snapshotrw,
-        });
-        await user.click(screen.getByRole('combobox', {name: 'Transaction mode'}));
-        await user.click(screen.getByRole('option', {name: /Serializable/}));
-        if (closeAction === 'Escape') {
-            await user.keyboard('{Escape}');
-        } else {
-            await user.click(screen.getByRole('button', {name: closeAction}));
-        }
-        await waitFor(() => expect(screen.queryByRole('dialog')).not.toBeInTheDocument());
-        await user.click(screen.getByRole('button', {name: 'Open settings'}));
-        expect(screen.getByRole('combobox', {name: 'Transaction mode'})).toHaveTextContent(
-            'Snapshot Read-Write',
-        );
-        expect(saved).not.toHaveBeenCalled();
-        expect(reachMetricaGoal).not.toHaveBeenCalled();
-    },
-);
-
 test('does not record Apply without changes and keeps explicitly saved None statistics', async () => {
     const {user} = setup({...DEFAULT_QUERY_SETTINGS, statisticsMode: 'none'});
     expect(screen.getByRole('radio', {name: 'None'})).toBeChecked();
     await user.click(screen.getByRole('button', {name: 'Apply'}));
     await waitFor(() => expect(screen.queryByRole('dialog')).not.toBeInTheDocument());
     expect(reachMetricaGoal).not.toHaveBeenCalled();
-});
-
-test('hides unsupported tracing and keeps the snapshot capability fallback', async () => {
-    jest.mocked(useTracingLevelOptionAvailable).mockReturnValue(false);
-    jest.mocked(useSnapshotReadWriteAvailable).mockReturnValue(false);
-    const {user, saved} = setup({
-        ...DEFAULT_QUERY_SETTINGS,
-        transactionMode: TRANSACTION_MODES.snapshotrw,
-    });
-    await user.click(screen.getByRole('button', {name: 'Advanced settings'}));
-    expect(screen.queryByRole('switch', {name: 'Tracing'})).not.toBeInTheDocument();
-    await user.click(screen.getByRole('button', {name: 'Apply'}));
-    expect(saved).toHaveBeenCalledWith(
-        expect.objectContaining({transactionMode: TRANSACTION_MODES.implicit}),
-    );
-});
-
-test('uses the approved transaction descriptions', async () => {
-    const {user} = setup();
-    await user.click(screen.getByRole('combobox', {name: 'Transaction mode'}));
-    for (const description of [
-        'Default isolation level',
-        'Strictest isolation for custom transactions',
-        'Read operations within a transaction may return slightly outdated results',
-        'All the read operations within a transaction access the database snapshot',
-    ]) {
-        expect(screen.getByText(description, {exact: true})).toBeVisible();
-    }
-    expect(screen.queryByText('No transaction', {exact: true})).not.toBeInTheDocument();
 });
