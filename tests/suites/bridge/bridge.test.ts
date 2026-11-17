@@ -51,7 +51,7 @@ test.describe('Bridge mode - Storage nodes', () => {
         await mockCapabilities(page, true);
         await mockNodesWithPile(page);
         const storage = new StoragePage(page);
-        await storage.goto({visible: 'all'}, {waitUntil: 'domcontentloaded'});
+        await storage.goto({visible: 'all', type: 'nodes'}, {waitUntil: 'domcontentloaded'});
         const table = new ClusterStorageTable(page);
         await table.getControls().openColumnSetup();
         await table.getControls().setColumnChecked('PileName');
@@ -63,7 +63,7 @@ test.describe('Bridge mode - Storage nodes', () => {
     test('off: hides Pile Name', async ({page}) => {
         await mockCapabilities(page, false);
         const storage = new StoragePage(page);
-        await storage.goto({visible: 'all'}, {waitUntil: 'domcontentloaded'});
+        await storage.goto({visible: 'all', type: 'nodes'}, {waitUntil: 'domcontentloaded'});
         const table = new ClusterStorageTable(page);
         await table.waitForTableToLoad();
         const headers = await table.getHeaders();
@@ -72,7 +72,7 @@ test.describe('Bridge mode - Storage nodes', () => {
 });
 
 test.describe('Bridge mode - Storage groups', () => {
-    test('on: shows Bridge pile and group-by option', async ({page}) => {
+    test('on: shows Bridge pile column', async ({page}) => {
         await mockCapabilities(page, true);
         await mockStorageGroupsWithPile(page);
         const storage = new StoragePage(page);
@@ -85,7 +85,7 @@ test.describe('Bridge mode - Storage groups', () => {
         expect(headers.join(' ')).toContain('Bridge pile');
     });
 
-    test('off: hides Bridge pile and group-by option', async ({page}) => {
+    test('off: hides Bridge pile column', async ({page}) => {
         await mockCapabilities(page, false);
         const storage = new StoragePage(page);
         await storage.goto({visible: 'all', type: 'groups'}, {waitUntil: 'domcontentloaded'});
