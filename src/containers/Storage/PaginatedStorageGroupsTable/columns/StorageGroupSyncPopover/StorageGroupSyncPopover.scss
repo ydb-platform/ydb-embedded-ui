@@ -29,22 +29,14 @@
         box-shadow: inset 0 0 0 1px var(--g-color-line-generic);
 
         .g-table__table {
-            width: 100%;
-
             table-layout: fixed;
         }
+    }
 
-        .g-table__cell {
-            box-sizing: border-box;
-            height: 32px;
-            padding: 5px 8px;
-        }
-
-        .g-table__head .g-table__cell {
-            font-weight: 400;
-
-            color: var(--g-color-text-secondary);
-        }
+    & &__partner-cell {
+        box-sizing: border-box;
+        height: 32px;
+        padding: var(--g-spacing-1) var(--g-spacing-2);
     }
 
     &__partner-pile {
@@ -52,7 +44,7 @@
     }
 
     &__message.g-alert {
-        padding: 11px 12px;
+        padding: var(--g-spacing-3);
 
         border-radius: var(--g-border-radius-m);
 

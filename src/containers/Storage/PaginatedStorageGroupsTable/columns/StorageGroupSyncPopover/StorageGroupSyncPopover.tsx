@@ -64,7 +64,12 @@ function SyncDetails({group, onClose}: {group: PreparedStorageGroup; onClose: Vo
     const columns: TableColumnConfig<TBridgeGroupLink>[] = [
         {
             id: 'GroupId',
-            name: i18n('field_group-id'),
+            name: () => (
+                <Text variant="body-1" color="secondary">
+                    {i18n('field_group-id')}
+                </Text>
+            ),
+            className: b('partner-cell'),
             width: 100,
             template: ({GroupId}) =>
                 GroupId ? (
@@ -75,7 +80,12 @@ function SyncDetails({group, onClose}: {group: PreparedStorageGroup; onClose: Vo
         },
         {
             id: 'PileName',
-            name: i18n('field_pile'),
+            name: () => (
+                <Text variant="body-1" color="secondary">
+                    {i18n('field_pile')}
+                </Text>
+            ),
+            className: b('partner-cell'),
             width: 90,
             template: ({PileName}) => (
                 <Text ellipsis className={b('partner-pile')} title={PileName}>
@@ -123,6 +133,7 @@ function SyncDetails({group, onClose}: {group: PreparedStorageGroup; onClose: Vo
                         </Text>
                         <Table
                             className={b('partners')}
+                            width="max"
                             data={partners}
                             columns={columns}
                             getRowDescriptor={({GroupId}) => ({id: GroupId})}
