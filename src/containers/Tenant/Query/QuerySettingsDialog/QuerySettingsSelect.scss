@@ -32,6 +32,17 @@
         width: 100%;
         min-width: 0;
         padding: var(--g-spacing-1) 0;
+
+        &_separator::before {
+            display: block;
+
+            margin: 0 calc(-1 * var(--g-spacing-2)) var(--g-spacing-1);
+
+            content: '';
+
+            border-top: 1px solid var(--g-color-line-generic);
+        }
+
         &_disabled {
             color: var(--g-color-text-secondary);
         }

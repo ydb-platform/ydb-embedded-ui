@@ -163,3 +163,19 @@ test('does not record Apply without changes and keeps explicitly saved None stat
     await waitFor(() => expect(screen.queryByRole('dialog')).not.toBeInTheDocument());
     expect(reachMetricaGoal).not.toHaveBeenCalled();
 });
+
+test('exposes four named query types and applies a keyboard selection', async () => {
+    const {user, saved} = setup();
+    await user.click(screen.getByRole('button', {name: 'Advanced settings'}));
+    await user.click(screen.getByRole('combobox', {name: 'Query type'}));
+
+    const options = screen.getAllByRole('option');
+    expect(options).toHaveLength(4);
+    for (const option of options) {
+        expect(option).toHaveAccessibleName();
+    }
+    await user.keyboard('{ArrowDown}{ArrowDown}{Enter}');
+    expect(screen.getByRole('combobox', {name: 'Query type'})).toHaveTextContent('Scan');
+    await user.click(screen.getByRole('button', {name: 'Apply'}));
+    expect(saved).toHaveBeenCalledWith(expect.objectContaining({queryMode: 'scan'}));
+});
