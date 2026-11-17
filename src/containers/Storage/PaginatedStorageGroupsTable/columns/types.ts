@@ -11,6 +11,8 @@ export interface GetStorageColumnsData {
 }
 
 export interface GetStorageGroupsColumnsParams {
+    database?: string;
+    databaseBridgeMode?: boolean;
     visibleEntities?: VisibleEntities;
     viewContext?: StorageViewContext;
 }

@@ -106,6 +106,10 @@ export const useStorageGroupsHandlerHasGrouping = () => {
     return useGetFeatureVersion('/storage/groups') > 4;
 };
 
+export const useStorageGroupsHandlerHasBridgeSyncGrouping = () => {
+    return useGetFeatureVersion('/storage/groups') >= 17;
+};
+
 export const useViewerNodesAliveFilterAvailable = () => {
     return useGetFeatureVersion('/viewer/nodes/alive') >= 1;
 };

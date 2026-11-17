@@ -33,16 +33,24 @@ import {
     STORAGE_GROUPS_LEGACY_CAPACITY_COLUMN_IDS,
     STORAGE_GROUPS_SELECTED_COLUMNS_LS_KEY,
     VIEWER_USER_COLUMNS_IDS,
+    isBridgeModeEnabledForStorage,
 } from './constants';
 import type {GetStorageGroupsColumnsParams} from './types';
 
 export function useStorageGroupsSelectedColumns({
+    database,
+    databaseBridgeMode,
     visibleEntities,
     viewContext,
 }: GetStorageGroupsColumnsParams) {
     const isUserAllowedToMakeChanges = useIsUserAllowedToMakeChanges();
     const isViewerUser = useIsViewerUser();
-    const bridgeModeEnabled = useBridgeModeEnabled();
+    const clusterBridgeModeEnabled = useBridgeModeEnabled();
+    const bridgeModeEnabled = isBridgeModeEnabledForStorage(
+        database,
+        databaseBridgeMode,
+        clusterBridgeModeEnabled,
+    );
     const blobMetricsEnabled = useBlobStorageCapacityMetricsEnabled();
     const isStorageExpertMode = useIsStorageExpertMode();
     const vdisksGroupBy = useVDisksGroupByParam();
@@ -55,7 +63,11 @@ export function useStorageGroupsSelectedColumns({
         const skipped: StorageGroupsColumnId[] = [];
 
         if (!bridgeModeEnabled) {
-            skipped.push(STORAGE_GROUPS_COLUMNS_IDS.PileName);
+            skipped.push(
+                STORAGE_GROUPS_COLUMNS_IDS.BridgeMode,
+                STORAGE_GROUPS_COLUMNS_IDS.PileName,
+                STORAGE_GROUPS_COLUMNS_IDS.BridgeSyncStatus,
+            );
         }
 
         if (!isUserAllowedToMakeChanges) {
@@ -107,9 +119,16 @@ export function useStorageGroupsSelectedColumns({
         if (!bridgeModeEnabled) {
             return defaultStorageGroupsColumns;
         }
-        return defaultStorageGroupsColumns.includes(STORAGE_GROUPS_COLUMNS_IDS.PileName)
-            ? defaultStorageGroupsColumns
-            : [...defaultStorageGroupsColumns, STORAGE_GROUPS_COLUMNS_IDS.PileName];
+        const usedColumnIndex = defaultStorageGroupsColumns.indexOf(
+            STORAGE_GROUPS_COLUMNS_IDS.Used,
+        );
+        return [
+            ...defaultStorageGroupsColumns.slice(0, usedColumnIndex),
+            STORAGE_GROUPS_COLUMNS_IDS.BridgeMode,
+            STORAGE_GROUPS_COLUMNS_IDS.PileName,
+            STORAGE_GROUPS_COLUMNS_IDS.BridgeSyncStatus,
+            ...defaultStorageGroupsColumns.slice(usedColumnIndex),
+        ];
     }, [bridgeModeEnabled, isStorageExpertMode]);
 
     const selectedColumns = useSelectedColumns(
@@ -169,11 +188,13 @@ export function useStorageGroupsSelectedColumns({
 
         return {
             ...selectedColumns,
+            bridgeModeEnabled,
             columnsToShow,
             columnsToSelect,
             setColumns,
         };
     }, [
+        bridgeModeEnabled,
         hiddenCapacityColumnIds,
         selectedColumns,
         setColumns,

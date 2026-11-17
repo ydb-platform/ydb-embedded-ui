@@ -6,6 +6,7 @@ import {ResponseError} from '../../../components/Errors/ResponseError/ResponseEr
 import {PaginatedTableWithLayout} from '../../../components/PaginatedTable/PaginatedTableWithLayout';
 import {TableColumnSetup} from '../../../components/TableColumnSetup/TableColumnSetup';
 import {storageApi} from '../../../store/reducers/storage/storage';
+import {useTenantBaseInfo} from '../../../store/reducers/tenant/tenant';
 import type {GroupsGroupByField} from '../../../types/api/storage';
 import {useGroupedTableDataIssues} from '../../../utils/dataIssues/useTableDataIssues';
 import type {ChunkDataChangeHandler} from '../../../utils/dataIssues/useTableDataQuality';
@@ -105,15 +106,20 @@ export function GroupedStorageGroupsComponent({
     pDiskId,
     scrollContainerRef,
     viewContext,
-}: PaginatedStorageProps) {
+    bridgeSyncGroupingAvailable = true,
+}: PaginatedStorageProps & {bridgeSyncGroupingAvailable?: boolean}) {
     const [autoRefreshInterval] = useAutoRefreshInterval();
     const {groupsSearchValue, storageGroupsGroupByParam, visibleEntities, handleShowAllGroups} =
         useStorageQueryParams();
+    const {databaseData} = useTenantBaseInfo(database ?? '');
 
-    const {columnsToShow, columnsToSelect, setColumns} = useStorageGroupsSelectedColumns({
-        visibleEntities,
-        viewContext,
-    });
+    const {columnsToShow, columnsToSelect, setColumns, bridgeModeEnabled} =
+        useStorageGroupsSelectedColumns({
+            database,
+            databaseBridgeMode: databaseData?.BridgeMode,
+            visibleEntities,
+            viewContext,
+        });
 
     const {currentData, isFetching, error} = storageApi.useGetStorageGroupsInfoQuery(
         {
@@ -194,6 +200,8 @@ export function GroupedStorageGroupsComponent({
                 <StorageGroupsControls
                     withTypeSelector
                     withGroupBySelect
+                    bridgeModeEnabled={bridgeModeEnabled}
+                    bridgeSyncGroupingAvailable={bridgeSyncGroupingAvailable}
                     columns={columnsToShow}
                     entitiesCountCurrent={found}
                     entitiesCountTotal={total}

@@ -17,7 +17,7 @@ import {TableColumnSetup} from '../../components/TableColumnSetup/TableColumnSet
 import {TableWithControlsLayout} from '../../components/TableWithControlsLayout/TableWithControlsLayout';
 import {TenantNameWrapper} from '../../components/TenantNameWrapper/TenantNameWrapper';
 import {getTenantLink} from '../../components/TenantNameWrapper/utils';
-import {useEmMetaAvailable} from '../../store/reducers/capabilities/hooks';
+import {useBridgeModeEnabled, useEmMetaAvailable} from '../../store/reducers/capabilities/hooks';
 import {useClusterBaseInfo} from '../../store/reducers/cluster/cluster';
 import {
     filterTenantsByDomain,
@@ -48,6 +48,7 @@ import {isNumeric} from '../../utils/utils';
 
 import type {DatabaseStatusClickHandler} from './DatabaseDrawerHealthcheck';
 import {DatabaseDrawerHealthcheck} from './DatabaseDrawerHealthcheck';
+import {getDatabaseBridgeColumns} from './bridgeColumns';
 import {
     DATABASES_COLUMNS_IDS,
     DATABASES_COLUMNS_TITLES,
@@ -145,6 +146,7 @@ const TenantsTableContent = ({
     const [sortParams, setSortParams] = React.useState<SortOrder | SortOrder[] | undefined>();
 
     const isCreateDBAvailable = useEmMetaAvailable() && uiFactory.onCreateDB !== undefined;
+    const bridgeModeEnabled = useBridgeModeEnabled();
 
     const {domain: domainRoot, settings, isResolved: isClusterInfoResolved} = useClusterBaseInfo();
     const loading = (isFetching && currentData === undefined) || !isClusterInfoResolved;
@@ -313,6 +315,7 @@ const TenantsTableContent = ({
                     </Label>
                 ),
             },
+            ...(bridgeModeEnabled ? getDatabaseBridgeColumns() : []),
             {
                 name: DATABASES_COLUMNS_IDS.CPU,
                 header: DATABASES_COLUMNS_TITLES[DATABASES_COLUMNS_IDS.CPU],
@@ -407,6 +410,7 @@ const TenantsTableContent = ({
 
         return columns;
     }, [
+        bridgeModeEnabled,
         clusterName,
         additionalTenantsProps,
         environmentName,
