@@ -1087,7 +1087,6 @@ test.describe('Datacenter info screenshots', () => {
                     databasePage: 'diagnostics',
                     diagnosticsTab: 'overview',
                 });
-                await page.getByTestId('schema-object-info').waitFor({state: 'visible'});
                 const labels = page
                     .getByTestId('database-datacenters')
                     .locator('.ydb-datacenter-label');

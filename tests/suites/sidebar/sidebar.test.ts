@@ -107,7 +107,6 @@ test.describe('Test Sidebar', async () => {
     test('Clicking hotkeys button in information popup opens hotkeys panel with title', async ({
         page,
     }) => {
-        await page.getByRole('textbox', {name: 'Database name'}).waitFor({state: 'visible'});
         const sidebar = new Sidebar(page);
         await sidebar.waitForSidebarToLoad();
 
@@ -144,7 +143,6 @@ test.describe('Test Sidebar', async () => {
 
         const tenantPage = new TenantPage(page);
         await tenantPage.goto(pageQueryParams);
-        await tenantPage.queryEditor.waitForEditorReady();
 
         // Create sidebar instance to check for hotkeys panel
         const sidebar = new Sidebar(page);

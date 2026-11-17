@@ -3,8 +3,6 @@ import type {Page} from '@playwright/test';
 export interface MockStreamingOptions {
     /** Interval between data chunks in ms (default: 200) */
     chunkIntervalMs?: number;
-    /** Hold data chunks after SessionCreated until resumeMockStreamingData is called. */
-    pauseDataChunks?: boolean;
     /**
      * When set, the stream will send this many data chunks followed by a
      * QueryResponse chunk and then close.  When omitted the stream runs
@@ -48,7 +46,6 @@ export async function setupMockStreamingFetch(
     const totalChunks = options.totalChunks ?? null;
     const errorAfterChunks = options.errorAfterChunks ?? null;
     const splitSessionPart = options.splitSessionPart ?? false;
-    const pauseDataChunks = options.pauseDataChunks ?? false;
 
     await page.evaluate(
         ({
@@ -56,11 +53,9 @@ export async function setupMockStreamingFetch(
             totalChunks: total,
             errorAfterChunks: errorAfter,
             splitSessionPart: splitSession,
-            pauseDataChunks: paused,
         }) => {
             const originalFetch = window.fetch;
             (window as unknown as Record<string, unknown>).__originalFetch = originalFetch;
-            (window as unknown as Record<string, unknown>).__mockStreamingDataPaused = paused;
 
             window.fetch = function (
                 input: RequestInfo | URL,
@@ -161,12 +156,6 @@ export async function setupMockStreamingFetch(
 
                         const startDataChunks = () => {
                             intervalId = window.setInterval(() => {
-                                if (
-                                    (window as unknown as Record<string, unknown>)
-                                        .__mockStreamingDataPaused
-                                ) {
-                                    return;
-                                }
                                 try {
                                     // Check if we should terminate
                                     if (chunkLimit !== null && chunkIndex >= chunkLimit) {
@@ -251,14 +240,8 @@ export async function setupMockStreamingFetch(
                 });
             }
         },
-        {chunkIntervalMs, totalChunks, errorAfterChunks, splitSessionPart, pauseDataChunks},
+        {chunkIntervalMs, totalChunks, errorAfterChunks, splitSessionPart},
     );
-}
-
-export async function resumeMockStreamingData(page: Page): Promise<void> {
-    await page.evaluate(() => {
-        (window as unknown as Record<string, unknown>).__mockStreamingDataPaused = false;
-    });
 }
 
 export interface MockStreamingHttpErrorOptions {
@@ -439,7 +422,6 @@ export async function setupMockStreamingNonJsonChunk(
 export async function cleanupMockStreamingFetch(page: Page): Promise<void> {
     await page.evaluate(() => {
         const w = window as unknown as Record<string, unknown>;
-        delete w.__mockStreamingDataPaused;
         if (typeof w.__originalFetch === 'function') {
             window.fetch = w.__originalFetch as typeof window.fetch;
             delete w.__originalFetch;

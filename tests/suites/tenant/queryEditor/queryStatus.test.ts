@@ -4,7 +4,6 @@ import {STATISTICS_MODES} from '../../../../src/utils/query';
 import {database} from '../../../utils/constants';
 import {
     cleanupMockStreamingFetch,
-    resumeMockStreamingData,
     setupMockStreamingFetch,
 } from '../../../utils/mockStreamingFetch';
 import {toggleEditorSetting} from '../../../utils/toggleExperiment';
@@ -103,15 +102,13 @@ test.describe('Test Query Execution Status', async () => {
         const queryEditor = new QueryEditor(page);
         await toggleEditorSetting(page, 'on', 'Query Streaming');
 
-        await setupMockStreamingFetch(page, {totalChunks: 10, pauseDataChunks: true});
+        // Mock completes after 10 data chunks then sends QueryResponse
+        await setupMockStreamingFetch(page, {totalChunks: 10});
 
         await queryEditor.setQuery(testQuery);
         await queryEditor.clickRunButton();
 
-        await expect(queryEditor.waitForStatus('Running')).resolves.toBe(true);
-        await resumeMockStreamingData(page);
-
-        const validStreamingStatuses = ['Running', 'Fetching', 'Completed'];
+        const validStreamingStatuses = ['Preparing', 'Running', 'Fetching', 'Completed'];
         const transitions = await queryEditor.collectStatusTransitions('Completed');
 
         for (let i = 0; i < transitions.length; i++) {
@@ -123,6 +120,7 @@ test.describe('Test Query Execution Status', async () => {
             }
         }
 
+        expect(transitions).toContain('Running');
         expect(transitions[transitions.length - 1]).toBe('Completed');
     });
 

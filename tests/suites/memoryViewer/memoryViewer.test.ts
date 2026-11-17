@@ -7,37 +7,6 @@ import {MemoryViewer} from './MemoryViewer';
 
 test.describe('Memory Viewer Widget', () => {
     test.beforeEach(async ({page}) => {
-        await page.route('**/viewer/json/nodes?*', (route) =>
-            route.fulfill({
-                json: {
-                    TotalNodes: '1',
-                    FoundNodes: '1',
-                    Nodes: [
-                        {
-                            NodeId: 1,
-                            SystemState: {
-                                Host: 'memory-test-node',
-                                SystemState: 'Green',
-                                MemoryUsed: '2000000000',
-                                MemoryLimit: '8000000000',
-                                MemoryStats: {
-                                    AnonRss: '2000000000',
-                                    AllocatorCachesMemory: '200000000',
-                                    SharedCacheConsumption: '0',
-                                    SharedCacheLimit: '1000000000',
-                                    QueryExecutionConsumption: '100000000',
-                                    QueryExecutionLimit: '2000000000',
-                                    MemTableConsumption: '0',
-                                    MemTableLimit: '100000000',
-                                    SoftLimit: '6000000000',
-                                    HardLimit: '8000000000',
-                                },
-                            },
-                        },
-                    ],
-                },
-            }),
-        );
         const nodesPage = new NodesPage(page);
         const memoryViewer = new MemoryViewer(page);
         await nodesPage.goto();
