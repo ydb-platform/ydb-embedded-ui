@@ -12,5 +12,10 @@
         flex: 0 0 auto;
 
         padding: 0 20px 20px 0;
+
+        // Horizontal scrolling must not rerender the virtualized rows and reset scrollLeft.
+        .g-ru-table {
+            overflow-x: auto;
+        }
     }
 }
