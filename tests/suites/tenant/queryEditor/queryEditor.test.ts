@@ -281,6 +281,9 @@ test.describe('Test Query Editor', async () => {
         await page.mouse.down();
         await page.mouse.move(x, y, {steps: 8});
         await page.mouse.up();
+        await expect
+            .poll(() => editorPane.evaluate((element) => element.getBoundingClientRect().height))
+            .toBe(160);
         await page.getByRole('button', {name: 'Run', exact: true}).click({trial: true});
 
         const collapsedHeight = await editorPane.evaluate((element) => element.clientHeight);
