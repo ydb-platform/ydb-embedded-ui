@@ -1,4 +1,4 @@
-import {ArrowsRotateLeft, Check, CircleQuestion, Clock} from '@gravity-ui/icons';
+import {ArrowsRotateLeft, Check, CirclePause, CircleQuestion} from '@gravity-ui/icons';
 import {Icon, Label} from '@gravity-ui/uikit';
 import type {IconData, LabelProps} from '@gravity-ui/uikit';
 
@@ -22,7 +22,7 @@ const statusPresentation: Record<
         label: () => i18n('value_sync-syncing'),
     },
     [BridgeSyncStatus.PENDING]: {
-        icon: Clock,
+        icon: CirclePause,
         theme: 'warning',
         label: () => i18n('value_sync-pending'),
     },
@@ -46,12 +46,10 @@ export function BridgeSyncStatusLabel({
     status,
     withInfo = false,
     interactive = false,
-    pendingIcon = Clock,
 }: {
     status?: BridgeSyncStatus;
     withInfo?: boolean;
     interactive?: boolean;
-    pendingIcon?: IconData;
 }) {
     const presentation = getBridgeSyncStatusPresentation(status);
     if (!presentation) {
@@ -67,12 +65,7 @@ export function BridgeSyncStatusLabel({
             interactive={interactive}
             size="xs"
             theme={presentation.theme}
-            icon={
-                <Icon
-                    data={status === BridgeSyncStatus.PENDING ? pendingIcon : presentation.icon}
-                    size={12}
-                />
-            }
+            icon={<Icon data={presentation.icon} size={12} />}
         >
             {presentation.label()}
         </Label>

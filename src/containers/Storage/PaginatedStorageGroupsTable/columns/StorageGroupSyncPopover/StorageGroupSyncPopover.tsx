@@ -1,5 +1,5 @@
 import {dateTimeParse} from '@gravity-ui/date-utils';
-import {CirclePause, Xmark} from '@gravity-ui/icons';
+import {Xmark} from '@gravity-ui/icons';
 import {Alert, Button, DefinitionList, Flex, Icon, Table, Text, Tooltip} from '@gravity-ui/uikit';
 import type {TableColumnConfig} from '@gravity-ui/uikit';
 
@@ -174,7 +174,7 @@ function SyncDetails({group, onClose}: {group: PreparedStorageGroup; onClose: Vo
 
 export function StorageGroupSyncPopover({group}: {group: PreparedStorageGroup}) {
     if (!hasSyncDetails(group)) {
-        return <BridgeSyncStatusLabel status={group.BridgeSyncStatus} pendingIcon={CirclePause} />;
+        return <BridgeSyncStatusLabel status={group.BridgeSyncStatus} />;
     }
     return (
         <HoverPopup
@@ -184,7 +184,6 @@ export function StorageGroupSyncPopover({group}: {group: PreparedStorageGroup}) 
             <Flex as="span" inline onClick={(event) => event.stopPropagation()}>
                 <BridgeSyncStatusLabel
                     status={group.BridgeSyncStatus}
-                    pendingIcon={CirclePause}
                     withInfo={Boolean(group.BridgeSyncLastError?.trim())}
                     interactive
                 />
