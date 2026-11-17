@@ -78,6 +78,8 @@
   "alert_invalid-path": "Invalid path",
   "alert_whitespace-not-allowed": "Whitespace is not allowed",
   "alert_empty-path": "Path is empty",
+  "alert_directory-name-required": "Add the name of the new directory",
+  "alert_directory-exists": "Directory already exists",
   "title_create-directory": "Create directory",
   "field_parent-directory": "Inside",
   "action_cancel": "Cancel",

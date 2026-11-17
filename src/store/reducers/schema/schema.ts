@@ -3,7 +3,7 @@ import React from 'react';
 import {createSelector, createSlice} from '@reduxjs/toolkit';
 import type {PayloadAction} from '@reduxjs/toolkit';
 
-import type {TEvDescribeSchemeResult} from '../../../types/api/schema';
+import type {TDirEntry, TEvDescribeSchemeResult} from '../../../types/api/schema';
 import type {RootState} from '../../defaultStore';
 import {api} from '../api';
 
@@ -81,6 +81,22 @@ export const schemaApi = api.injectEndpoints({
                     };
                 }
                 return existing;
+            },
+        }),
+        getSchemaPathChildren: builder.query<
+            TDirEntry[],
+            {path: string; database: string; databaseFullPath: string; useMetaProxy?: boolean}
+        >({
+            queryFn: async ({path, database, databaseFullPath, useMetaProxy}, {signal}) => {
+                try {
+                    const data = await window.api.viewer.getSchema(
+                        {path: {path, databaseFullPath, useMetaProxy}, database},
+                        {signal},
+                    );
+                    return {data: data?.PathDescription?.Children ?? []};
+                } catch (error) {
+                    return {error};
+                }
             },
         }),
     }),
