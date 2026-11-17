@@ -16,10 +16,5 @@
   "column-pools": "Pools",
 
   "value_bridge": "Bridge",
-  "value_non-bridge": "Non-bridge",
-  "value_not-required": "Not required",
-  "value_sync-synced": "Synchronised",
-  "value_sync-syncing": "Syncing",
-  "value_sync-pending": "Pending",
-  "value_sync-unknown": "Unknown"
+  "value_non-bridge": "Non-bridge"
 }

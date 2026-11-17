@@ -15,10 +15,7 @@ import {StorageGroupsComponent} from './StorageGroupsComponent';
 
 import '../Storage.scss';
 
-export function PaginatedStorageGroups({
-    bridgeModeEnabled = false,
-    ...props
-}: PaginatedStorageProps) {
+export function PaginatedStorageGroups({bridgeModeEnabled, ...props}: PaginatedStorageProps) {
     const {storageGroupsGroupByParam, visibleEntities, handleShowAllGroups} =
         useStorageQueryParams();
 

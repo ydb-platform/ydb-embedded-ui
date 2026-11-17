@@ -19,7 +19,7 @@ export function StorageGroupsComponent({
     viewContext,
     scrollContainerRef,
     initialEntitiesCount,
-    bridgeModeEnabled = false,
+    bridgeModeEnabled,
     bridgeSyncGroupingAvailable = true,
 }: PaginatedStorageProps & {bridgeSyncGroupingAvailable?: boolean}) {
     const {groupsSearchValue, visibleEntities, handleShowAllGroups} = useStorageQueryParams();

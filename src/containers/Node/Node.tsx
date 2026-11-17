@@ -12,6 +12,7 @@ import {ResponseError} from '../../components/Errors/ResponseError';
 import {FullNodeViewer} from '../../components/FullNodeViewer/FullNodeViewer';
 import {InfoViewerSkeleton} from '../../components/InfoViewerSkeleton/InfoViewerSkeleton';
 import {InternalLink} from '../../components/InternalLink';
+import {LoaderWrapper} from '../../components/LoaderWrapper/LoaderWrapper';
 import {PageMeta} from '../../components/PageMeta/PageMeta';
 import routes, {getDefaultNodePath} from '../../routes';
 import {
@@ -30,6 +31,7 @@ import {useAppTitle} from '../App/AppTitleContext';
 import {Configs} from '../Configs/Configs';
 import {NodeNetwork} from '../Node/NodeNetwork/NodeNetwork';
 import {PaginatedStorage} from '../Storage/PaginatedStorage';
+import {useStorageBridgeMode} from '../Storage/useStorageBridgeMode';
 import {Tablets} from '../Tablets/Tablets';
 
 import type {NodeTab} from './NodePages';
@@ -265,6 +267,10 @@ function NodePageContent({
     tabs,
     parentContainer,
 }: NodePageContentProps) {
+    const {bridgeModeEnabled, isLoading: bridgeModeLoading} = useStorageBridgeMode(database, {
+        skip: activeTabId !== 'storage',
+    });
+
     const renderTabs = () => {
         return (
             <div className={b('tabs')}>
@@ -293,14 +299,17 @@ function NodePageContent({
         switch (activeTabId) {
             case 'storage': {
                 return (
-                    <PaginatedStorage
-                        database={database}
-                        nodeId={nodeId}
-                        scrollContainerRef={parentContainer}
-                        viewContext={{
-                            nodeId: nodeId,
-                        }}
-                    />
+                    <LoaderWrapper loading={bridgeModeLoading}>
+                        <PaginatedStorage
+                            database={database}
+                            bridgeModeEnabled={bridgeModeEnabled}
+                            nodeId={nodeId}
+                            scrollContainerRef={parentContainer}
+                            viewContext={{
+                                nodeId: nodeId,
+                            }}
+                        />
+                    </LoaderWrapper>
                 );
             }
             case 'tablets': {

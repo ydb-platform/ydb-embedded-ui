@@ -1,16 +1,15 @@
-import {ArrowsRotateLeft, Check, CirclePause, CircleQuestion} from '@gravity-ui/icons';
+import {ArrowsRotateLeft, Check, CircleQuestion, Clock} from '@gravity-ui/icons';
 import {Icon, Label} from '@gravity-ui/uikit';
 import type {IconData, LabelProps} from '@gravity-ui/uikit';
 
-import type {PreparedStorageGroup} from '../../../../store/reducers/storage/types';
-import {BridgeSyncStatus} from '../../../../types/api/cluster';
-import {EMPTY_DATA_PLACEHOLDER} from '../../../../utils/constants';
+import {BridgeSyncStatus} from '../../types/api/cluster';
+import {EMPTY_DATA_PLACEHOLDER} from '../../utils/constants';
 
 import i18n from './i18n';
 
 const statusPresentation: Record<
-    Exclude<BridgeSyncStatus, BridgeSyncStatus.NOT_REQUIRED>,
-    {icon: IconData; theme: LabelProps['theme']; label: () => string}
+    BridgeSyncStatus,
+    {icon?: IconData; theme?: LabelProps['theme']; label: () => string}
 > = {
     [BridgeSyncStatus.SYNCED]: {
         icon: Check,
@@ -23,7 +22,7 @@ const statusPresentation: Record<
         label: () => i18n('value_sync-syncing'),
     },
     [BridgeSyncStatus.PENDING]: {
-        icon: CirclePause,
+        icon: Clock,
         theme: 'warning',
         label: () => i18n('value_sync-pending'),
     },
@@ -32,26 +31,34 @@ const statusPresentation: Record<
         theme: 'unknown',
         label: () => i18n('value_sync-unknown'),
     },
+    [BridgeSyncStatus.NOT_REQUIRED]: {
+        label: () => i18n('value_not-required'),
+    },
 };
 
-export function StorageGroupSyncStatus({
-    BridgeSyncStatus: status,
+export function getBridgeSyncStatusPresentation(status?: BridgeSyncStatus) {
+    return status !== undefined && Object.hasOwn(statusPresentation, status)
+        ? statusPresentation[status]
+        : undefined;
+}
+
+export function BridgeSyncStatusLabel({
+    status,
     withInfo = false,
     interactive = false,
-}: Pick<PreparedStorageGroup, 'BridgeSyncStatus'> & {
+    pendingIcon = Clock,
+}: {
+    status?: BridgeSyncStatus;
     withInfo?: boolean;
     interactive?: boolean;
+    pendingIcon?: IconData;
 }) {
-    if (status === BridgeSyncStatus.NOT_REQUIRED) {
-        return i18n('value_not-required');
-    }
-
-    const presentation =
-        status !== undefined && Object.hasOwn(statusPresentation, status)
-            ? statusPresentation[status]
-            : undefined;
+    const presentation = getBridgeSyncStatusPresentation(status);
     if (!presentation) {
         return EMPTY_DATA_PLACEHOLDER;
+    }
+    if (!presentation.icon) {
+        return presentation.label();
     }
 
     return (
@@ -60,7 +67,12 @@ export function StorageGroupSyncStatus({
             interactive={interactive}
             size="xs"
             theme={presentation.theme}
-            icon={<Icon data={presentation.icon} size={12} />}
+            icon={
+                <Icon
+                    data={status === BridgeSyncStatus.PENDING ? pendingIcon : presentation.icon}
+                    size={12}
+                />
+            }
         >
             {presentation.label()}
         </Label>

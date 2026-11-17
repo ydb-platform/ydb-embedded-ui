@@ -108,15 +108,11 @@ export function useStorageGroupsSelectedColumns({
         if (!bridgeModeEnabled) {
             return defaultStorageGroupsColumns;
         }
-        const usedColumnIndex = defaultStorageGroupsColumns.indexOf(
-            STORAGE_GROUPS_COLUMNS_IDS.Used,
-        );
         return [
-            ...defaultStorageGroupsColumns.slice(0, usedColumnIndex),
+            ...defaultStorageGroupsColumns,
             STORAGE_GROUPS_COLUMNS_IDS.BridgeMode,
             STORAGE_GROUPS_COLUMNS_IDS.PileName,
             STORAGE_GROUPS_COLUMNS_IDS.BridgeSyncStatus,
-            ...defaultStorageGroupsColumns.slice(usedColumnIndex),
         ];
     }, [bridgeModeEnabled, isStorageExpertMode]);
 

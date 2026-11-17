@@ -1,21 +1,25 @@
 import {dateTimeParse} from '@gravity-ui/date-utils';
-import {Xmark} from '@gravity-ui/icons';
+import {CirclePause, Xmark} from '@gravity-ui/icons';
 import {Alert, Button, DefinitionList, Flex, Icon, Table, Text, Tooltip} from '@gravity-ui/uikit';
 import type {TableColumnConfig} from '@gravity-ui/uikit';
 
+import {
+    BridgeSyncStatusLabel,
+    getBridgeSyncStatusPresentation,
+} from '../../../../../components/BridgeSyncStatusLabel';
 import {HoverPopup} from '../../../../../components/HoverPopup/HoverPopup';
 import {InternalLink} from '../../../../../components/InternalLink';
 import {useStorageGroupPath} from '../../../../../routes';
 import type {PreparedStorageGroup} from '../../../../../store/reducers/storage/types';
+import {BridgeSyncStatus} from '../../../../../types/api/cluster';
 import type {TBridgeGroupLink} from '../../../../../types/api/storage';
 import {cn} from '../../../../../utils/cn';
 import {EMPTY_DATA_PLACEHOLDER} from '../../../../../utils/constants';
 import {formatDateTime} from '../../../../../utils/dataFormatters/dataFormatters';
-import {bytesToSize} from '../../../../../utils/utils';
-import {StorageGroupSyncStatus} from '../StorageGroupSyncStatus';
+import {parseUsToMs} from '../../../../../utils/timeParsers';
+import {bytesToSize, parseOptionalNonNegativeNumber} from '../../../../../utils/utils';
 
 import i18n from './i18n';
-import {hasSyncDetails, parseSyncNumber, parseSyncTimestamp} from './utils';
 
 import './StorageGroupSyncPopover.scss';
 
@@ -25,16 +29,30 @@ function formatBytes(value: number) {
     return value < 1000 ? i18n('value_bytes', {value}) : bytesToSize(value);
 }
 
+function hasSyncDetails(group: PreparedStorageGroup) {
+    return (
+        group.BridgeSyncStatus !== BridgeSyncStatus.NOT_REQUIRED &&
+        Boolean(getBridgeSyncStatusPresentation(group.BridgeSyncStatus))
+    );
+}
+
 function SyncDetails({group, onClose}: {group: PreparedStorageGroup; onClose: VoidFunction}) {
     const getGroupPath = useStorageGroupPath();
     const partners = (group.BridgeGroups ?? []).filter(
         (partner) => partner.GroupId && partner.GroupId !== String(group.GroupId),
     );
-    const remaining = parseSyncNumber(group.BridgeSyncRemainingBytes);
-    const rate = parseSyncNumber(group.BridgeSyncCopyBytesPerSecond);
-    const lastProgress = parseSyncTimestamp(group.BridgeSyncLastProgressTimestamp);
+    const remaining = parseOptionalNonNegativeNumber(group.BridgeSyncRemainingBytes);
+    const rate = parseOptionalNonNegativeNumber(group.BridgeSyncCopyBytesPerSecond);
+    const lastProgress = parseUsToMs(
+        parseOptionalNonNegativeNumber(group.BridgeSyncLastProgressTimestamp),
+        3,
+    );
+    const formattedLastProgress = formatDateTime(lastProgress);
     const lastError = group.BridgeSyncLastError?.trim();
-    const reported = parseSyncTimestamp(group.BridgeSyncLastErrorTimestamp);
+    const reported = parseUsToMs(
+        parseOptionalNonNegativeNumber(group.BridgeSyncLastErrorTimestamp),
+        3,
+    );
     let remainingText = EMPTY_DATA_PLACEHOLDER;
     if (remaining !== undefined) {
         const value = formatBytes(remaining);
@@ -89,12 +107,12 @@ function SyncDetails({group, onClose}: {group: PreparedStorageGroup; onClose: Vo
                             : i18n('value_rate', {size: formatBytes(rate)})}
                     </DefinitionList.Item>
                     <DefinitionList.Item name={i18n('field_last-progress')}>
-                        {lastProgress === undefined ? (
-                            EMPTY_DATA_PLACEHOLDER
-                        ) : (
-                            <Tooltip content={formatDateTime(lastProgress)}>
+                        {formattedLastProgress ? (
+                            <Tooltip content={formattedLastProgress}>
                                 <span tabIndex={0}>{dateTimeParse(lastProgress)?.fromNow()}</span>
                             </Tooltip>
+                        ) : (
+                            EMPTY_DATA_PLACEHOLDER
                         )}
                     </DefinitionList.Item>
                 </DefinitionList>
@@ -118,9 +136,7 @@ function SyncDetails({group, onClose}: {group: PreparedStorageGroup; onClose: Vo
                         </Text>
                         <DefinitionList nameMaxWidth={200} className={b('metrics')}>
                             <DefinitionList.Item name={i18n('field_reported')}>
-                                {reported === undefined
-                                    ? EMPTY_DATA_PLACEHOLDER
-                                    : formatDateTime(reported)}
+                                {formatDateTime(reported, {defaultValue: EMPTY_DATA_PLACEHOLDER})}
                             </DefinitionList.Item>
                         </DefinitionList>
                         <Alert
@@ -147,7 +163,7 @@ function SyncDetails({group, onClose}: {group: PreparedStorageGroup; onClose: Vo
 
 export function StorageGroupSyncPopover({group}: {group: PreparedStorageGroup}) {
     if (!hasSyncDetails(group)) {
-        return <StorageGroupSyncStatus {...group} />;
+        return <BridgeSyncStatusLabel status={group.BridgeSyncStatus} pendingIcon={CirclePause} />;
     }
     return (
         <HoverPopup
@@ -155,8 +171,9 @@ export function StorageGroupSyncPopover({group}: {group: PreparedStorageGroup}) 
             renderPopupContent={({onClose}) => <SyncDetails group={group} onClose={onClose} />}
         >
             <Flex as="span" inline onClick={(event) => event.stopPropagation()}>
-                <StorageGroupSyncStatus
-                    {...group}
+                <BridgeSyncStatusLabel
+                    status={group.BridgeSyncStatus}
+                    pendingIcon={CirclePause}
                     withInfo={Boolean(group.BridgeSyncLastError?.trim())}
                     interactive
                 />

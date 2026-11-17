@@ -24,7 +24,7 @@ import {
 } from '../../components/PDiskInfo/statuses';
 import {getPDiskPagePath} from '../../routes';
 import {api} from '../../store/reducers/api';
-import {useDiskPagesAvailable} from '../../store/reducers/capabilities/hooks';
+import {useBridgeModeEnabled, useDiskPagesAvailable} from '../../store/reducers/capabilities/hooks';
 import {setHeaderBreadcrumbs} from '../../store/reducers/header/header';
 import {pDiskApi} from '../../store/reducers/pdisk/pdisk';
 import {valueIsDefined} from '../../utils';
@@ -73,6 +73,7 @@ export function PDiskPage() {
 
     const isUserAllowedToMakeChanges = useIsUserAllowedToMakeChanges();
     const newDiskApiAvailable = useDiskPagesAvailable();
+    const bridgeModeEnabled = useBridgeModeEnabled();
     const containerRef = React.useRef<HTMLDivElement>(null);
 
     const [{nodeId, pDiskId, activeTab}] = useQueryParams({
@@ -259,6 +260,7 @@ export function PDiskPage() {
             case 'storage': {
                 return pDiskParamsDefined ? (
                     <PaginatedStorage
+                        bridgeModeEnabled={bridgeModeEnabled}
                         nodeId={nodeId}
                         pDiskId={pDiskId}
                         scrollContainerRef={containerRef}

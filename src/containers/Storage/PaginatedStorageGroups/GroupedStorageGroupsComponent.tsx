@@ -105,7 +105,7 @@ export function GroupedStorageGroupsComponent({
     pDiskId,
     scrollContainerRef,
     viewContext,
-    bridgeModeEnabled = false,
+    bridgeModeEnabled,
     bridgeSyncGroupingAvailable = true,
 }: PaginatedStorageProps & {bridgeSyncGroupingAvailable?: boolean}) {
     const [autoRefreshInterval] = useAutoRefreshInterval();

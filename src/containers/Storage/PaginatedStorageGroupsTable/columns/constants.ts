@@ -193,7 +193,7 @@ const STORAGE_GROUPS_COLUMNS_GROUP_BY_TITLES = {
         return i18n('pool-name');
     },
     get PileName() {
-        return i18n('pile-name');
+        return i18n('field_bridge-pile');
     },
     get BridgeSyncStatus() {
         return i18n('field_bridge-sync-status');
