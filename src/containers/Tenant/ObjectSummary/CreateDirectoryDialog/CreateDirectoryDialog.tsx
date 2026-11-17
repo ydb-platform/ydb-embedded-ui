@@ -13,6 +13,8 @@ import i18n from '../../i18n';
 import {useSchemaPathSuggestions} from '../../utils/useSchemaPathSuggestions';
 import {transformPath} from '../transformPath';
 
+import {validateRelativePath} from './validateRelativePath';
+
 import './CreateDirectoryDialog.scss';
 
 const b = cn('ydb-schema-create-directory-dialog');
@@ -26,16 +28,6 @@ interface CreateDirectoryDialogProps {
     databaseFullPath: string;
     parentPath: string;
     onSuccess: (value: string) => void;
-}
-
-function validateRelativePath(value: string) {
-    if (!value) {
-        return i18n('alert_empty-path');
-    }
-    if (/\s/.test(value)) {
-        return i18n('alert_whitespace-not-allowed');
-    }
-    return '';
 }
 
 export function CreateDirectoryDialog({
@@ -105,7 +97,10 @@ export function CreateDirectoryDialog({
             <form
                 onSubmit={(e) => {
                     e.preventDefault();
-                    const nextValidationError = validateRelativePath(relativePath);
+                    const nextValidationError = validateRelativePath(
+                        relativePath,
+                        suggestions.map((item) => item.value),
+                    );
                     setValidationError(nextValidationError);
                     if (!nextValidationError) {
                         handleSubmit();

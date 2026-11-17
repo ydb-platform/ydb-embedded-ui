@@ -1,7 +1,7 @@
 import React from 'react';
 
-import {ThemeProvider} from '@gravity-ui/uikit';
-import {fireEvent, render, screen} from '@testing-library/react';
+import {Dialog, ThemeProvider} from '@gravity-ui/uikit';
+import {fireEvent, render, screen, waitFor} from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 
 import type {SuggestInputItem} from '../SuggestInput';
@@ -43,6 +43,23 @@ function TestInput({
 }
 
 describe('SuggestInput', () => {
+    beforeAll(() => {
+        // Dialog needs matchMedia, which jsdom doesn't implement
+        Object.defineProperty(window, 'matchMedia', {
+            writable: true,
+            value: jest.fn().mockImplementation((query: string) => ({
+                matches: false,
+                media: query,
+                onchange: null,
+                addListener: jest.fn(),
+                removeListener: jest.fn(),
+                addEventListener: jest.fn(),
+                removeEventListener: jest.fn(),
+                dispatchEvent: jest.fn(),
+            })),
+        });
+    });
+
     it('shows suggestions for the typed value', async () => {
         const user = userEvent.setup();
         render(<TestInput />);
@@ -185,6 +202,51 @@ describe('SuggestInput', () => {
         await user.keyboard('{Enter}');
         expect(input).toHaveValue('al');
         expect(onSubmit).toHaveBeenCalledWith('al');
+    });
+
+    it('closes only the list with Escape inside Dialog', async () => {
+        const user = userEvent.setup();
+        const onClose = jest.fn();
+
+        function DialogWithInput() {
+            const [value, setValue] = React.useState('');
+            const inputRef = React.useRef<HTMLInputElement>(null);
+            const suggestions = ITEMS.filter((item) => item.startsWith(value)).map((item) => ({
+                value: item,
+            }));
+            return (
+                <ThemeProvider theme="light">
+                    <Dialog open onClose={onClose} initialFocus={inputRef}>
+                        <Dialog.Body>
+                            <SuggestInput
+                                controlRef={inputRef}
+                                value={value}
+                                onUpdate={setValue}
+                                suggestions={suggestions}
+                            />
+                        </Dialog.Body>
+                    </Dialog>
+                </ThemeProvider>
+            );
+        }
+
+        render(<DialogWithInput />);
+        const input = await screen.findByRole('combobox');
+        // Dialog moves focus to the input when it opens
+        await waitFor(() => expect(input).toHaveFocus());
+
+        await user.keyboard('al');
+        expect(input).toHaveValue('al');
+        expect(screen.getAllByRole('option')).toHaveLength(2);
+
+        await user.keyboard('{Escape}');
+        expect(input).toHaveAttribute('aria-expanded', 'false');
+        expect(input).toHaveValue('al');
+        expect(onClose).not.toHaveBeenCalled();
+
+        // The list is closed, so the next Escape goes to the dialog
+        await user.keyboard('{Escape}');
+        expect(onClose).toHaveBeenCalled();
     });
 
     it('keeps a custom value and submits it', async () => {

@@ -99,7 +99,16 @@ export function SuggestInput({
             return;
         }
 
-        if (event.key === 'ArrowDown' || event.key === 'ArrowUp') {
+        if (event.key === 'Escape') {
+            if (open) {
+                // Close only the list. The event is stopped here, because a parent layer
+                // (e.g. Dialog) handles Escape on the document and would swallow or act on it
+                event.preventDefault();
+                event.stopPropagation();
+                setRequested(false);
+                setActiveIndex(0);
+            }
+        } else if (event.key === 'ArrowDown' || event.key === 'ArrowUp') {
             if (suggestions.length === 0) {
                 return;
             }
