@@ -10,6 +10,7 @@
   "field_group-id": "Group ID",
   "field_pile": "Bridge pile",
   "title_message": "Last sync message",
+  "action_copy-error": "Copy last sync message",
   "field_reported": "Reported",
   "field_stage": "Stage",
   "value_stage-blocks": "Blocks",

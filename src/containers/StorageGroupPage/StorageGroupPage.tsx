@@ -1,6 +1,6 @@
 import React from 'react';
 
-import {Flex, Label, Text} from '@gravity-ui/uikit';
+import {Disclosure, Flex, Label, Text} from '@gravity-ui/uikit';
 import {skipToken} from '@reduxjs/toolkit/query';
 import {Helmet} from 'react-helmet-async';
 import {StringParam, useQueryParams} from 'use-query-params';
@@ -153,19 +153,23 @@ export function StorageGroupPage() {
                 {renderError()}
                 {renderInfo()}
                 {storageGroupData?.BridgeMode === true && (
-                    <Flex className={storageGroupPageCn('sync')} direction="column" gap={4}>
-                        <Flex alignItems="center" gap={2}>
-                            <Text
-                                as="h2"
-                                variant="subheader-3"
-                                className={storageGroupPageCn('sync-title')}
-                            >
-                                {storageGroupPageKeyset('title_sync')}
-                            </Text>
-                            <BridgeSyncStatusLabel status={storageGroupData.BridgeSyncStatus} />
-                        </Flex>
-                        <StorageGroupSyncDetails group={storageGroupData} layout="page" />
-                    </Flex>
+                    <Disclosure
+                        key={groupId}
+                        arrowPosition="end"
+                        className={storageGroupPageCn('sync')}
+                        summary={
+                            <Flex alignItems="center" gap={2} wrap="wrap">
+                                <Text variant="subheader-2">
+                                    {storageGroupPageKeyset('title_sync')}
+                                </Text>
+                                <BridgeSyncStatusLabel status={storageGroupData.BridgeSyncStatus} />
+                            </Flex>
+                        }
+                    >
+                        <div className={storageGroupPageCn('sync-content')}>
+                            <StorageGroupSyncDetails group={storageGroupData} layout="page" />
+                        </div>
+                    </Disclosure>
                 )}
             </div>
             {renderStorage()}
