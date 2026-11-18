@@ -10,10 +10,5 @@
   "title_message": "Last sync message",
   "action_copy-error": "Copy last sync message",
   "field_reported": "Reported",
-  "field_stage": "Stage",
-  "value_stage-blocks": "Blocks",
-  "value_stage-keep-flags": "Keep flags",
-  "value_stage-barriers": "Barriers",
-  "value_stage-data": "Data",
-  "value_stage-synced": "Synchronised"
+  "field_stage": "Stage"
 }

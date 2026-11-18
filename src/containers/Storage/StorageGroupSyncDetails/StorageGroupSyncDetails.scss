@@ -3,6 +3,10 @@
 
     &__metrics {
         --g-definition-list-item-gap: var(--g-spacing-2);
+
+        [data-qa='storage-group-sync-stage'] > .g-definition-list__definition {
+            min-width: 0;
+        }
     }
 
     &__section-title {
@@ -32,7 +36,7 @@
 
     & &__partner-id {
         width: max-content;
-        min-width: calc(80px - 2 * var(--g-spacing-2));
+        min-width: calc(100px - 2 * var(--g-spacing-2));
         max-width: calc(120px - 2 * var(--g-spacing-2));
     }
 

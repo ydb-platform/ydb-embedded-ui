@@ -28,14 +28,6 @@ import './StorageGroupSyncDetails.scss';
 
 const b = cn('ydb-storage-group-sync-details');
 
-const stageLabels = [
-    ['BLOCKS', 'value_stage-blocks'],
-    ['WRITE_KEEP', 'value_stage-keep-flags'],
-    ['WRITE_KEEP_BARRIER_DONOTKEEP', 'value_stage-barriers'],
-    ['WRITE_KEEP_BARRIER_DONOTKEEP_DATA', 'value_stage-data'],
-    ['SYNCED', 'value_stage-synced'],
-] as const;
-
 export function StorageGroupSyncDetails({
     group,
     layout = 'popover',
@@ -44,7 +36,7 @@ export function StorageGroupSyncDetails({
     layout?: 'popover' | 'page';
 }) {
     const isPage = layout === 'page';
-    const stage = stageLabels.find(([value]) => value === group.BridgeSyncStage)?.[1];
+    const stage = group.BridgeSyncStage?.trim();
     const getGroupPath = useStorageGroupPath();
     const partners = (group.BridgeGroups ?? []).filter(
         (partner) => partner.GroupId && partner.GroupId !== String(group.GroupId),
@@ -121,8 +113,18 @@ export function StorageGroupSyncDetails({
                     </DefinitionList.Item>
                 )}
                 {isPage && (
-                    <DefinitionList.Item name={i18n('field_stage')}>
-                        {stage ? i18n(stage) : EMPTY_DATA_PLACEHOLDER}
+                    <DefinitionList.Item name={i18n('field_stage')} qa="storage-group-sync-stage">
+                        {stage ? (
+                            <CellWithPopover
+                                content={<Text wordBreak="break-all">{stage}</Text>}
+                                placement={['top', 'bottom']}
+                                fullWidth
+                            >
+                                <span tabIndex={0}>{stage}</span>
+                            </CellWithPopover>
+                        ) : (
+                            EMPTY_DATA_PLACEHOLDER
+                        )}
                     </DefinitionList.Item>
                 )}
                 <DefinitionList.Item
