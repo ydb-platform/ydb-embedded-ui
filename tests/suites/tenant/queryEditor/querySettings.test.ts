@@ -63,7 +63,7 @@ test.describe('Test Query Settings', async () => {
         await queryEditor.clickGearButton();
 
         await expect(queryEditor.settingsDialog.isVisible()).resolves.toBe(true);
-        await expect(queryEditor.settingsDialog.getStatsLevel()).resolves.toBe('Full');
+        await expect(queryEditor.settingsDialog.selectedStatsLevel).toHaveAccessibleName('Full');
         const advanced = page.getByRole('button', {name: 'Advanced settings', exact: true});
         await expect(advanced).toHaveAttribute('aria-expanded', 'false');
         await queryEditor.settingsDialog.expandAdvanced();
@@ -79,13 +79,13 @@ test.describe('Test Query Settings', async () => {
 
         await queryEditor.clickGearButton();
         await expect(advanced).toHaveAttribute('aria-expanded', 'false');
-        await expect(queryEditor.settingsDialog.getStatsLevel()).resolves.toBe('Full');
+        await expect(queryEditor.settingsDialog.selectedStatsLevel).toHaveAccessibleName('Full');
         await queryEditor.settingsDialog.changeStatsLevel('none');
         await queryEditor.settingsDialog.clickButton(ButtonNames.Apply);
         await expect(queryEditor.settingsDialog.isHidden()).resolves.toBe(true);
         await page.reload();
         await queryEditor.clickGearButton();
-        await expect(queryEditor.settingsDialog.getStatsLevel()).resolves.toBe('None');
+        await expect(queryEditor.settingsDialog.selectedStatsLevel).toHaveAccessibleName('None');
     });
 
     test('Settings dialog saves changes and updates Gear button', async ({page}) => {

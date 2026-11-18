@@ -23,7 +23,7 @@ const badgeThemes = {recommended: 'info', legacy: 'unknown', deprecated: 'normal
 
 type SelectType = QueryMode | TransactionMode | StatisticsMode | TracingLevel | ResourcePoolValue;
 type QuerySettingSelectOption<T> = SelectOption<T> & {
-    badge?: 'recommended' | 'legacy' | 'deprecated';
+    badge?: keyof typeof badgeThemes;
     separatorBefore?: boolean;
 };
 
