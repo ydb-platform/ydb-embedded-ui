@@ -10,6 +10,8 @@ type MockState = {
     compositeMessage?: string;
     /** The composite response describes another database */
     unrelated?: boolean;
+    /** The composite response names the database only in the control plane data */
+    unnamed?: boolean;
     /** Hold composite and cluster settings responses until the flag is reset */
     holdCluster?: boolean;
     useMetaProxy?: boolean;
@@ -28,13 +30,14 @@ function getCompositeResponse(url: URL, state: MockState) {
             databases: [
                 {
                     Id: state.unrelated ? 'unrelated' : 'cp-id',
-                    Name: state.unrelated ? '/other' : database,
+                    ...(state.unnamed ? {} : {Name: state.unrelated ? '/other' : database}),
                     Type: 'Dedicated',
                     ...(state.healthy ? {NodeIds: [1], Overall: 'Green'} : {}),
                     ControlPlane: {
                         id: 'cp-id',
                         name: `${clusterName}-display`,
                         folder_id: 'folder',
+                        ...(state.unnamed ? {labels: {database_path: database}} : {}),
                         endpoint: 'grpcs://example.invalid:2135',
                         status: 'RUNNING',
                     },
@@ -161,6 +164,19 @@ test('cold runtime outage shows control plane data in the regular page without r
     expect(await page.evaluate(() => localStorage.getItem('saved_tenant_initial_tab'))).toBe(
         '"query"',
     );
+});
+
+test('a cold start without a runtime name takes the database name from the control plane', async ({
+    page,
+}) => {
+    const state: MockState = {unnamed: true, calls: []};
+    await mockApi(page, state);
+    await page.goto('/database?database=/db&clusterName=scope-a');
+
+    await expect(cpInfo(page)).toBeVisible();
+    await expect(page.getByTestId('database-header')).toContainText('/db');
+    await expect(page.locator('.g-breadcrumbs')).toContainText('db');
+    expect(countCalls(state, RUNTIME_REQUESTS)).toBe(0);
 });
 
 test('a hidden tab from the link falls back to the overview, a control plane tab is kept', async ({

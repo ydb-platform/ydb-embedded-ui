@@ -21,11 +21,21 @@ export function isRuntimeTenant(tenant?: TenantInfoData): tenant is RuntimeTenan
     return tenant?.availability === 'runtime';
 }
 
+/**
+ * Database name to show. A response without runtime data may lack `Name`,
+ * the control plane then names the database itself.
+ */
+export function getTenantName(tenant?: TTenant) {
+    const controlPlane = tenant?.ControlPlane;
+    return tenant?.Name || controlPlane?.labels?.database_path || controlPlane?.name || undefined;
+}
+
 export function matchesDatabase(tenant: TTenant, database: string) {
     return Boolean(
         database &&
             (tenant.Id === database ||
                 tenant.Name === database ||
+                tenant.ControlPlane?.labels?.database_path === database ||
                 tenant.ControlPlane?.id === database),
     );
 }

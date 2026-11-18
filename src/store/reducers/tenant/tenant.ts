@@ -9,7 +9,7 @@ import {api} from '../api';
 import {getDatabaseDataTag} from '../entityDataTags';
 import {prepareTenants} from '../tenants/utils';
 
-import {hasMetaError, matchesDatabase} from './availability';
+import {getTenantName, hasMetaError, matchesDatabase} from './availability';
 import type {TenantInfoData} from './availability';
 import {TENANT_DIAGNOSTICS_TABS_IDS, TENANT_METRICS_TABS_IDS} from './constants';
 import type {
@@ -183,14 +183,14 @@ export function useTenantBaseInfo(
         {skip: skip || !database},
     );
 
-    const {ControlPlane, Name, Id, Type} = currentData || {};
+    const {ControlPlane, Id, Type} = currentData || {};
 
     return {
         databaseData: currentData,
         refetch,
         controlPlane: ControlPlane,
         metaErrors: currentData?.metaErrors,
-        name: Name,
+        name: getTenantName(currentData),
         id: Id,
         databaseType: Type,
         isLoading,

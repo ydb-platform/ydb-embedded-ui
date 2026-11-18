@@ -1,6 +1,11 @@
 import type {TUserToken} from '../../../../types/api/whoami';
 import {prepareTenants} from '../../tenants/utils';
-import {getDatabaseAvailability, isTenantRequestReady, matchesDatabase} from '../availability';
+import {
+    getDatabaseAvailability,
+    getTenantName,
+    isTenantRequestReady,
+    matchesDatabase,
+} from '../availability';
 import type {ControlPlaneTenant, RuntimeTenant} from '../availability';
 
 const raw = {Id: 'id', Name: '/db', ControlPlane: {id: 'id'}};
@@ -15,6 +20,21 @@ const ready = {
     whoamiData,
     clusterInfoResolved: true,
 };
+
+test('the database name falls back to the control plane path, then to its name', () => {
+    const ControlPlane = {id: 'id', name: 'root/db', labels: {database_path: '/Root/db'}};
+    expect(getTenantName({Name: '/db', ControlPlane})).toBe('/db');
+    expect(getTenantName({Name: '', ControlPlane})).toBe('/Root/db');
+    expect(getTenantName({ControlPlane: {id: 'id', name: 'root/db'}})).toBe('root/db');
+    expect(getTenantName({ControlPlane: {id: 'id'}})).toBeUndefined();
+    expect(getTenantName(undefined)).toBeUndefined();
+});
+
+test('a database without a runtime name is matched by the control plane path only', () => {
+    const tenant = {ControlPlane: {id: 'id', name: 'root/db', labels: {database_path: '/Root/db'}}};
+    expect(matchesDatabase(tenant, '/Root/db')).toBe(true);
+    expect(matchesDatabase(tenant, 'root/db')).toBe(false);
+});
 
 describe('getDatabaseAvailability', () => {
     test.each(['id', '/db'])('selects CP by its ID or canonical path: %s', (database) => {

@@ -1,6 +1,7 @@
 import React from 'react';
 
-import {Button, Flex, Label, Popover, Text} from '@gravity-ui/uikit';
+import {CircleExclamation} from '@gravity-ui/icons';
+import {Button, Flex, Icon, Label, Popover, Text} from '@gravity-ui/uikit';
 
 import {cn} from '../../../utils/cn';
 
@@ -47,7 +48,13 @@ export function RuntimeUnavailableLabel() {
                 </Flex>
             }
         >
-            <Label theme="warning" interactive qa="runtime-unavailable-label">
+            <Label
+                theme="danger"
+                size="s"
+                icon={<Icon size={14} data={CircleExclamation} />}
+                interactive
+                qa="runtime-unavailable-label"
+            >
                 {i18n('label_runtime-unavailable')}
             </Label>
         </Popover>

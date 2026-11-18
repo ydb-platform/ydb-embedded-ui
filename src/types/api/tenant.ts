@@ -145,6 +145,10 @@ export interface ControlPlane {
     folder_id?: string;
     location_id?: string;
     resource_preset_id?: string;
+    labels?: {
+        database_path?: string;
+        [key: string]: string | undefined;
+    };
 
     scale_policy?: {
         fixed_scale: {
