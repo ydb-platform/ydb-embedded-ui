@@ -331,7 +331,7 @@ const STORAGE_GROUPS_COLUMNS_TO_SORT_FIELDS: Record<
     GroupId: 'GroupId',
     PoolName: 'PoolName',
     PileName: 'PileName',
-    BridgeMode: 'BridgeMode',
+    BridgeMode: undefined,
     BridgeSyncStatus: 'BridgeSyncStatus',
     MediaType: 'MediaType',
     Erasure: 'Erasure',

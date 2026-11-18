@@ -1,13 +1,13 @@
 import {
     useBridgeModeEnabled,
-    useStorageGroupsHandlerHasBridgeSyncGrouping,
+    useStorageGroupsHandlerHasBridgeSyncStatus,
 } from '../../../store/reducers/capabilities/hooks';
 
 export function useStorageGroupsBridgeGrouping() {
     const bridgeModeEnabled = useBridgeModeEnabled();
-    const handlerHasBridgeSyncGrouping = useStorageGroupsHandlerHasBridgeSyncGrouping();
+    const handlerHasBridgeSyncStatus = useStorageGroupsHandlerHasBridgeSyncStatus();
     return {
         bridgeModeEnabled,
-        bridgeSyncGroupingAvailable: bridgeModeEnabled && handlerHasBridgeSyncGrouping,
+        bridgeSyncGroupingAvailable: bridgeModeEnabled && handlerHasBridgeSyncStatus,
     };
 }
