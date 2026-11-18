@@ -67,6 +67,12 @@ test.describe('Test Query Settings', async () => {
         const advanced = page.getByRole('button', {name: 'Advanced settings', exact: true});
         await expect(advanced).toHaveAttribute('aria-expanded', 'false');
         await queryEditor.settingsDialog.expandAdvanced();
+        const tracingLabel = page.getByText('Tracing', {exact: true});
+        const tracing = page.getByRole('switch', {name: 'Tracing', exact: true});
+        await tracingLabel.click();
+        await expect(tracing).toBeChecked();
+        await tracingLabel.click();
+        await expect(tracing).not.toBeChecked();
         await queryEditor.settingsDialog.changeStatsLevel('none');
         await queryEditor.settingsDialog.clickButton(ButtonNames.Cancel);
         await expect(queryEditor.settingsDialog.isHidden()).resolves.toBe(true);
@@ -337,6 +343,23 @@ test.describe('Test Query Settings', async () => {
         await expect(queryEditor.settingsDialog.isTimeoutError()).resolves.toBe(true);
 
         await queryEditor.settingsDialog.clickButton(ButtonNames.Cancel);
+    });
+
+    test('Apply reveals and focuses an invalid field in collapsed advanced settings', async ({
+        page,
+    }) => {
+        const queryEditor = new QueryEditor(page);
+        await queryEditor.clickGearButton();
+        await queryEditor.settingsDialog.expandAdvanced();
+        const chunkSize = page.getByRole('spinbutton', {name: 'Output chunk max size'});
+        await chunkSize.pressSequentially('1e');
+        await page.getByRole('button', {name: 'Advanced settings'}).click();
+        await expect(chunkSize).toBeHidden();
+        await queryEditor.settingsDialog.clickButton(ButtonNames.Apply);
+        await expect(chunkSize).toBeFocused();
+        await chunkSize.fill('1024');
+        await queryEditor.settingsDialog.clickButton(ButtonNames.Apply);
+        await expect(queryEditor.settingsDialog.isHidden()).resolves.toBe(true);
     });
 
     test('Shows error for negative timeout', async ({page}) => {

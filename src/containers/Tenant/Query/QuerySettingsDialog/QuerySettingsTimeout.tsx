@@ -14,6 +14,7 @@ const b = cn('ydb-query-settings-timeout');
 
 interface QuerySettingsTimeoutProps {
     id?: string;
+    controlRef?: React.Ref<HTMLInputElement>;
     value: string | number | null | undefined;
     onChange: (value: string) => void;
     onToggle: (enabled: boolean) => void;
@@ -24,6 +25,7 @@ interface QuerySettingsTimeoutProps {
 
 export function QuerySettingsTimeout({
     id,
+    controlRef,
     value,
     onChange,
     onToggle,
@@ -62,6 +64,7 @@ export function QuerySettingsTimeout({
                 {isChecked && (
                     <TextInput
                         id={id}
+                        controlRef={controlRef}
                         type="number"
                         value={value?.toString() || ''}
                         onChange={handleValueChange}
