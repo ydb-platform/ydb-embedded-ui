@@ -130,31 +130,25 @@ const prepareStorageNodeData = (
     };
 };
 
-/**
- * Calculates the maximum number of VDisk slots per PDisk across all nodes
- * A slot represents a VDisk that can be allocated to a PDisk
- */
+/** Calculates the maximum occupied slots on a PDisk, including DDisk and Persistent Buffer pairs. */
 export const calculateMaximumSlotsPerDisk = (
     nodes: TNodeInfo[] | undefined,
     providedMaximumSlotsPerDisk?: string,
 ): number => {
-    if (providedMaximumSlotsPerDisk && !isNaN(Number(providedMaximumSlotsPerDisk))) {
-        return Number(providedMaximumSlotsPerDisk);
+    const providedMaximum = Number(providedMaximumSlotsPerDisk);
+    let maximum = Math.max(1, Number.isSafeInteger(providedMaximum) ? providedMaximum : 0);
+
+    for (const node of nodes ?? []) {
+        const slotsPerDisk = new Map<number | undefined, number>();
+        for (const {PDiskId} of [...(node.VDisks ?? []), ...(node.DDisks ?? [])]) {
+            slotsPerDisk.set(PDiskId, (slotsPerDisk.get(PDiskId) ?? 0) + 1);
+        }
+        for (const {PDiskId} of node.PDisks ?? []) {
+            maximum = Math.max(maximum, slotsPerDisk.get(PDiskId) ?? 0);
+        }
     }
 
-    const safeNodes = nodes || [];
-    const slotsPerDiskCounts = safeNodes.flatMap((node) => {
-        const safePDisks = node.PDisks || [];
-        const safeVDisks = node.VDisks || [];
-
-        return safePDisks.map((pDisk) => {
-            const vDisksOnPDisk = safeVDisks.filter((vDisk) => vDisk.PDiskId === pDisk.PDiskId);
-            return vDisksOnPDisk.length || 0;
-        });
-    });
-
-    const maxSlots = Math.max(1, ...slotsPerDiskCounts);
-    return maxSlots;
+    return maximum;
 };
 
 /**
