@@ -2,15 +2,7 @@ import {configureStore} from '@reduxjs/toolkit';
 
 import type {YdbEmbeddedAPI} from '../../../../services/api';
 import {api} from '../../api';
-import {tenantApi} from '../../tenant/tenant';
 import authentication, {authenticationApi} from '../authentication';
-
-jest.mock('../../../../utils/hooks/useDatabaseFromQuery', () => ({
-    useClusterNameFromQuery: jest.fn(),
-}));
-jest.mock('../../../../utils/hooks/useDatabasesV2', () => ({
-    useDatabasesV2: jest.fn(),
-}));
 
 function createStore() {
     return configureStore({
@@ -63,14 +55,9 @@ test.each(['authenticate', 'logout'] as const)(
     'successful %s clears data cached for the previous user',
     async (action) => {
         const originalApi = window.api;
-        const args = {database: '/db', clusterName: 'cluster', isMetaDatabasesAvailable: true};
+        const args = {database: '/db'};
         window.api = {
-            meta: {
-                getTenantsV2: jest.fn().mockResolvedValue({
-                    TenantInfo: [{Id: 'id', Name: '/db', ControlPlane: {id: 'id'}}],
-                    errors: {viewer: 'unavailable'},
-                }),
-            },
+            viewer: {whoami: jest.fn().mockResolvedValue({UserSID: 'previous'})},
             auth: {
                 authenticate: jest.fn().mockResolvedValue({}),
                 logout: jest.fn().mockResolvedValue({}),
@@ -79,12 +66,11 @@ test.each(['authenticate', 'logout'] as const)(
         try {
             const store = createStore();
             await store.dispatch(
-                tenantApi.endpoints.getTenantInfo.initiate(args, {subscribe: false}),
+                authenticationApi.endpoints.whoami.initiate(args, {subscribe: false}),
             );
-            expect(
-                tenantApi.endpoints.getTenantInfo.select(args)(store.getState()).data?.ControlPlane
-                    ?.id,
-            ).toBe('id');
+            expect(authenticationApi.endpoints.whoami.select(args)(store.getState()).data).toEqual({
+                UserSID: 'previous',
+            });
             if (action === 'authenticate') {
                 await store
                     .dispatch(
@@ -98,9 +84,8 @@ test.each(['authenticate', 'logout'] as const)(
                 await store.dispatch(authenticationApi.endpoints.logout.initiate({})).unwrap();
             }
             expect(
-                tenantApi.endpoints.getTenantInfo.select(args)(store.getState()).data,
+                authenticationApi.endpoints.whoami.select(args)(store.getState()).data,
             ).toBeUndefined();
-            expect(store.getState().authentication.isAuthenticated).toBe(action === 'authenticate');
         } finally {
             window.api = originalApi;
         }

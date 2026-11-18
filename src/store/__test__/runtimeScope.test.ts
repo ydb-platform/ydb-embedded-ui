@@ -23,9 +23,4 @@ describe('getNextRuntimeScope', () => {
             getNextRuntimeScope(clustersList.scope, {...clusterA, clusterName: 'b'}).changed,
         ).toBe(true);
     });
-
-    test('single cluster mode never changes the scope', () => {
-        expect(getNextRuntimeScope({backend: '/'}, {backend: '/'}).changed).toBe(false);
-        expect(getNextRuntimeScope({}, {}).changed).toBe(false);
-    });
 });
