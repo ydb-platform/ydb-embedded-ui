@@ -17,6 +17,7 @@ import {useTypedSelector} from '../../../utils/hooks';
 import {
     useClusterNameFromQuery,
     useDatabaseFromQuery,
+    useDatabaseIdFromQuery,
 } from '../../../utils/hooks/useDatabaseFromQuery';
 import {useDatabasesV2} from '../../../utils/hooks/useDatabasesV2';
 
@@ -35,6 +36,7 @@ export function useIsMetaDatabaseCandidate() {
  */
 export function useDatabaseAvailability({skip = false}: {skip?: boolean} = {}) {
     const database = useDatabaseFromQuery() ?? '';
+    const databaseId = useDatabaseIdFromQuery(database);
     const clusterName = useClusterNameFromQuery();
     const candidate = useIsMetaDatabaseCandidate();
     const active = candidate && !skip;
@@ -58,6 +60,7 @@ export function useDatabaseAvailability({skip = false}: {skip?: boolean} = {}) {
     const availability = active
         ? getDatabaseAvailability({
               database,
+              databaseId,
               composite,
               whoamiData: whoami.currentData,
               whoamiError: whoami.error,

@@ -30,13 +30,18 @@ export function getTenantName(tenant?: TTenant) {
     return tenant?.Name || controlPlane?.labels?.database_path || controlPlane?.name || undefined;
 }
 
-export function matchesDatabase(tenant: TTenant, database: string) {
+/**
+ * Whether the record describes the requested database. The path can be compared with the
+ * runtime name or the control plane path, the id with the runtime or the control plane id.
+ * The control plane display name is never an identity.
+ */
+export function matchesDatabase(tenant: TTenant, database: string, databaseId?: string) {
+    const controlPlane = tenant.ControlPlane;
+    const ids = [tenant.Id, controlPlane?.id];
+    const paths = [tenant.Name, controlPlane?.labels?.database_path];
     return Boolean(
-        database &&
-            (tenant.Id === database ||
-                tenant.Name === database ||
-                tenant.ControlPlane?.labels?.database_path === database ||
-                tenant.ControlPlane?.id === database),
+        (databaseId && ids.includes(databaseId)) ||
+            (database && (ids.includes(database) || paths.includes(database))),
     );
 }
 
@@ -77,6 +82,8 @@ export function isTenantRequestReady({
 
 interface DatabaseAvailabilityParams {
     database: string;
+    /** Control plane id of the database when the link provides it */
+    databaseId?: string;
     /** Whether the composite (runtime + control plane) tenant API is used */
     composite: boolean;
     whoamiData?: TUserToken;
@@ -89,6 +96,7 @@ interface DatabaseAvailabilityParams {
 
 export function getDatabaseAvailability({
     database,
+    databaseId,
     composite,
     whoamiData,
     whoamiError,
@@ -127,7 +135,7 @@ export function getDatabaseAvailability({
     }
 
     const controlPlaneUsable =
-        matchesDatabase(tenantData, database) && hasUsableControlPlane(tenantData);
+        matchesDatabase(tenantData, database, databaseId) && hasUsableControlPlane(tenantData);
 
     if (!isRuntimeTenant(tenantData)) {
         return controlPlaneUsable

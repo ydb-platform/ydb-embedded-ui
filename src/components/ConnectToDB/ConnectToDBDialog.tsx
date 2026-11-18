@@ -8,7 +8,10 @@ import {tenantApi} from '../../store/reducers/tenant/tenant';
 import {backend, environment} from '../../store/runtimeParams';
 import {cn} from '../../utils/cn';
 import {useTypedSelector} from '../../utils/hooks';
-import {useClusterNameFromQuery} from '../../utils/hooks/useDatabaseFromQuery';
+import {
+    useClusterNameFromQuery,
+    useDatabaseIdFromQuery,
+} from '../../utils/hooks/useDatabaseFromQuery';
 import {useDatabasesV2} from '../../utils/hooks/useDatabasesV2';
 import {LinkWithIcon} from '../LinkWithIcon/LinkWithIcon';
 import {LoaderWrapper} from '../LoaderWrapper/LoaderWrapper';
@@ -51,13 +54,14 @@ function ConnectToDBDialog({
     const singleClusterMode = useTypedSelector((state) => state.singleClusterMode);
 
     const isMetaDatabasesAvailable = useDatabasesV2();
+    const databaseId = useDatabaseIdFromQuery(database);
 
     // If there is endpoint from props, we don't need to request tenant data
     // Also we should not request tenant data if we are in single cluster mode
     // Since there is no ControlPlane data in this case
     const shouldRequestTenantData = database && !endpointFromProps && !singleClusterMode;
     const params = shouldRequestTenantData
-        ? {database, clusterName, isMetaDatabasesAvailable, environment, backend}
+        ? {database, databaseId, clusterName, isMetaDatabasesAvailable, environment, backend}
         : skipToken;
     const {currentData: tenantData, isLoading: isTenantDataLoading} =
         tenantApi.useGetTenantInfoQuery(params);

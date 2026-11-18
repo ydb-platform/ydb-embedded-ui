@@ -36,6 +36,25 @@ test('a database without a runtime name is matched by the control plane path onl
     expect(matchesDatabase(tenant, 'root/db')).toBe(false);
 });
 
+test('the database id from the link identifies the record when the path does not', () => {
+    const tenant = {Id: 'viewer-id', Name: '/Root/db', ControlPlane: {id: 'cp-id', name: 'db'}};
+    expect(matchesDatabase(tenant, '/alias', 'cp-id')).toBe(true);
+    expect(matchesDatabase(tenant, '/alias', 'viewer-id')).toBe(true);
+    expect(matchesDatabase(tenant, '/alias', 'other-id')).toBe(false);
+    expect(matchesDatabase(tenant, '/alias', 'db')).toBe(false);
+    // A wrong id does not hide the record found by its path
+    expect(matchesDatabase(tenant, '/Root/db', 'other-id')).toBe(true);
+
+    const tenantData = {...cp, Name: '/Root/db'};
+    expect(getDatabaseAvailability({...ready, database: '/alias', tenantData}).status).toBe(
+        'unavailable',
+    );
+    expect(
+        getDatabaseAvailability({...ready, database: '/alias', databaseId: 'id', tenantData})
+            .status,
+    ).toBe('control-plane');
+});
+
 describe('getDatabaseAvailability', () => {
     test.each(['id', '/db'])('selects CP by its ID or canonical path: %s', (database) => {
         expect(getDatabaseAvailability({...ready, database, tenantData: cp})).toEqual({

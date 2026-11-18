@@ -284,6 +284,39 @@ describe('tenantApi.getTenantInfo', () => {
         expect(getTenantsV2).toHaveBeenCalledTimes(1);
     });
 
+    test('sends the database id to the composite API and caches it separately', async () => {
+        const getTenantsV2 = jest.fn().mockResolvedValue({TenantInfo: [cpTenant]});
+        window.api = {meta: {getTenantsV2}} as unknown as YdbEmbeddedAPI;
+        const store = createTestStore();
+        const endpoint = tenantApi.endpoints.getTenantInfo;
+
+        await store.dispatch(endpoint.initiate({...compositeArgs, databaseId: 'cp-id'}));
+        expect(getTenantsV2).toHaveBeenLastCalledWith(
+            expect.objectContaining({database: compositeArgs.database, databaseId: 'cp-id'}),
+            expect.anything(),
+        );
+
+        await store.dispatch(endpoint.initiate(compositeArgs));
+        expect(getTenantsV2).toHaveBeenCalledTimes(2);
+        expect(getTenantsV2.mock.calls[1][0].databaseId).toBeUndefined();
+    });
+
+    test('selects a CP-only record by the database id when its path differs', async () => {
+        const response = {TenantInfo: [cpTenant], errors: {viewer: 'Unavailable'}};
+        window.api = {
+            meta: {getTenantsV2: jest.fn().mockResolvedValue(response)},
+        } as unknown as YdbEmbeddedAPI;
+        const store = createTestStore();
+        const endpoint = tenantApi.endpoints.getTenantInfo;
+        const args = {...compositeArgs, database: '/alias'};
+
+        expect((await store.dispatch(endpoint.initiate(args))).error).toMatchObject({
+            code: 'EMPTY_TENANT_INFO',
+        });
+        const result = await store.dispatch(endpoint.initiate({...args, databaseId: 'cp-id'}));
+        expect(result.data).toMatchObject({Name: cpTenant.Name, availability: 'control-plane'});
+    });
+
     test('rejects unrelated CP-only records instead of selecting the first item', async () => {
         window.api = {
             meta: {

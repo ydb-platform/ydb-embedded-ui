@@ -2,7 +2,10 @@ import {createSlice} from '@reduxjs/toolkit';
 import type {PayloadAction} from '@reduxjs/toolkit';
 
 import type {TTenantInfo} from '../../../types/api/tenant';
-import {useClusterNameFromQuery} from '../../../utils/hooks/useDatabaseFromQuery';
+import {
+    useClusterNameFromQuery,
+    useDatabaseIdFromQuery,
+} from '../../../utils/hooks/useDatabaseFromQuery';
 import {useDatabasesV2} from '../../../utils/hooks/useDatabasesV2';
 import {backend, environment} from '../../runtimeParams';
 import {api} from '../api';
@@ -54,30 +57,21 @@ export default slice.reducer;
 export const {setQueryTab, setDiagnosticsTab, setSummaryTab, setMetricsTab, setRuntimeSeenScope} =
     slice.actions;
 
+interface TenantInfoQueryArgs {
+    database: string;
+    /** Control plane id of the database, sent to the composite meta API only */
+    databaseId?: string;
+    clusterName?: string;
+    isMetaDatabasesAvailable: boolean;
+    environment?: string;
+    backend?: string;
+}
+
 export const tenantApi = api.injectEndpoints({
     endpoints: (builder) => ({
-        getTenantInfo: builder.query<
-            TenantInfoData,
-            {
-                database: string;
-                clusterName?: string;
-                isMetaDatabasesAvailable: boolean;
-                environment?: string;
-                backend?: string;
-            }
-        >({
+        getTenantInfo: builder.query<TenantInfoData, TenantInfoQueryArgs>({
             queryFn: async (
-                {
-                    database,
-                    clusterName,
-                    isMetaDatabasesAvailable,
-                }: {
-                    database: string;
-                    clusterName?: string;
-                    isMetaDatabasesAvailable: boolean;
-                    environment?: string;
-                    backend?: string;
-                },
+                {database, databaseId, clusterName, isMetaDatabasesAvailable}: TenantInfoQueryArgs,
                 {signal},
             ) => {
                 try {
@@ -87,7 +81,7 @@ export const tenantApi = api.injectEndpoints({
                     );
                     if (window.api.meta && clusterName && isMetaDatabasesAvailable) {
                         tenantData = await window.api.meta.getTenantsV2(
-                            {database, clusterName},
+                            {database, databaseId, clusterName},
                             {signal},
                         );
                     } else if (window.api.meta && clusterName) {
@@ -105,7 +99,7 @@ export const tenantApi = api.injectEndpoints({
                     // Previous meta versions do not support filtering databases by name, so the first
                     // item is a fallback. Control plane data of another database is never selected.
                     const tenant =
-                        tenants.find((item) => matchesDatabase(item, database)) ??
+                        tenants.find((item) => matchesDatabase(item, database, databaseId)) ??
                         (runtimeUnavailable ? undefined : tenants[0]);
                     if (!tenant) {
                         return {
@@ -152,6 +146,7 @@ export const tenantApi = api.injectEndpoints({
                 return {
                     clusterName: queryArgs.clusterName,
                     database: queryArgs.database,
+                    databaseId: queryArgs.databaseId,
                     environment: queryArgs.environment,
                     backend: queryArgs.backend,
                     // V1 and V2 meta APIs return different data for the same database
@@ -171,10 +166,12 @@ export function useTenantBaseInfo(
     const clusterNameFromQuery = useClusterNameFromQuery();
     const clusterName = clusterNameOverride ?? clusterNameFromQuery;
     const isMetaDatabasesAvailable = useDatabasesV2();
+    const databaseId = useDatabaseIdFromQuery(database);
 
     const {currentData, isLoading, isError, error, refetch} = tenantApi.useGetTenantInfoQuery(
         {
             database,
+            databaseId,
             clusterName,
             isMetaDatabasesAvailable,
             environment,

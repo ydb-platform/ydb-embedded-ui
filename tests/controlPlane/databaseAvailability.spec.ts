@@ -179,6 +179,34 @@ test('a cold start without a runtime name takes the database name from the contr
     expect(countCalls(state, RUNTIME_REQUESTS)).toBe(0);
 });
 
+test('the database id from the link is sent to the composite API and survives navigation', async ({
+    page,
+}) => {
+    const state: MockState = {calls: []};
+    await mockApi(page, state);
+    await page.goto('/database?database=/db&clusterName=scope-a&databaseId=cp-id');
+
+    await expect(cpInfo(page)).toBeVisible();
+    const compositeCalls = state.calls.filter((call) => call.includes('/meta/databases'));
+    expect(compositeCalls).toHaveLength(1);
+    expect(new URLSearchParams(compositeCalls[0].split('?')[1]).get('database_id')).toBe('cp-id');
+
+    await page.getByRole('tab', {name: 'Backups'}).click();
+    await expect(page.getByTestId('cp-extension-backups')).toBeVisible();
+    expect(new URL(page.url()).searchParams.get('databaseId')).toBe('cp-id');
+});
+
+test('a record under another path is shown when the database id from the link matches', async ({
+    page,
+}) => {
+    const state: MockState = {unrelated: true, calls: []};
+    await mockApi(page, state);
+    await page.goto('/database?database=/db&clusterName=scope-a&databaseId=cp-id');
+
+    await expect(cpInfo(page)).toBeVisible();
+    await expect(page.getByTestId('database-header')).toContainText('/other');
+});
+
 test('a hidden tab from the link falls back to the overview, a control plane tab is kept', async ({
     page,
 }) => {
