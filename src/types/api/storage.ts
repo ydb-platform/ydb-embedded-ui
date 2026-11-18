@@ -1,3 +1,4 @@
+import type {BridgeSyncStatus} from './cluster';
 import type {BackendSortParam, SchemaPathParam} from './common';
 import type {ECapacityAlert, EFlag} from './enums';
 import type {EDecommitStatus, EDriveStatus, TPDiskStateInfo} from './pdisk';
@@ -133,7 +134,40 @@ export interface StorageGroupGroups {
     GroupCount?: string;
 }
 
-export interface TGroupsStorageGroupInfo {
+export type TStorageGroupStateCount =
+    | {Disks: {Value?: number}; FailRealms?: never}
+    | {Disks?: never; FailRealms: {Value?: number}};
+
+export interface TStorageGroupStateInfo {
+    Status?: string;
+    /** Disks for none/block-4-2; affected fail realms for mirror-3-dc. Omitted for ok. */
+    Count?: TStorageGroupStateCount;
+    /** Non-zero failed-domain counts per affected realm, in descending order. */
+    FailedDomainsPerRealm?: number[];
+}
+
+export interface TBridgeGroupLink {
+    GroupId?: string;
+    PileName?: string;
+}
+
+export interface TBridgeGroupSyncInfo {
+    BridgeMode?: boolean;
+    BridgeSyncStatus?: BridgeSyncStatus;
+    BridgeGroups?: TBridgeGroupLink[];
+    BridgeSyncLastError?: string;
+    /** Unix microseconds. */
+    BridgeSyncLastErrorTimestamp?: string;
+    /** Unix microseconds. */
+    BridgeSyncLastProgressTimestamp?: string;
+    /** uint64, blob bytes per second. */
+    BridgeSyncCopyBytesPerSecond?: string;
+    /** uint64, a lower bound until the estimate is complete. */
+    BridgeSyncRemainingBytes?: string;
+    BridgeSyncRemainingBytesComplete?: boolean;
+}
+
+export interface TGroupsStorageGroupInfo extends TBridgeGroupSyncInfo {
     GroupId?: string;
     /** uint64 */
     GroupGeneration?: string;
@@ -259,6 +293,9 @@ export type EVersion = 'v1' | 'v2'; // only v2 versions works with sorting
  */
 export type StorageV2SortValue =
     | 'PoolName'
+    | 'PileName'
+    | 'BridgeMode'
+    | 'BridgeSyncStatus'
     | 'Kind'
     | 'MediaType'
     | 'Erasure'
@@ -301,6 +338,7 @@ export type GroupsGroupByField =
     | 'DiskSpaceUsage'
     | 'PoolName'
     | 'PileName'
+    | 'BridgeSyncStatus'
     | 'Kind'
     | 'Encryption'
     | 'MediaType'
@@ -313,6 +351,15 @@ export type GroupsRequiredField =
     | 'GroupId' // always required
     | 'PoolName'
     | 'PileName'
+    | 'BridgeMode'
+    | 'BridgeSyncStatus'
+    | 'BridgeGroups'
+    | 'BridgeSyncLastError'
+    | 'BridgeSyncLastErrorTimestamp'
+    | 'BridgeSyncLastProgressTimestamp'
+    | 'BridgeSyncCopyBytesPerSecond'
+    | 'BridgeSyncRemainingBytes'
+    | 'BridgeSyncRemainingBytesComplete'
     | 'Kind'
     | 'MediaType'
     | 'Erasure'

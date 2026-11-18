@@ -8,6 +8,8 @@ export const DATABASES_COLUMNS_IDS = {
     Name: 'Name',
     Type: 'Type',
     State: 'State',
+    BridgeMode: 'BridgeMode',
+    BridgeSyncStatus: 'BridgeSyncStatus',
     CPU: 'cpu',
     Memory: 'memory',
     Storage: 'storage',
@@ -23,6 +25,8 @@ export const DATABASES_DEFAULT_COLUMNS: DatabasesColumnId[] = [
     DATABASES_COLUMNS_IDS.Name,
     DATABASES_COLUMNS_IDS.Type,
     DATABASES_COLUMNS_IDS.State,
+    DATABASES_COLUMNS_IDS.BridgeMode,
+    DATABASES_COLUMNS_IDS.BridgeSyncStatus,
     DATABASES_COLUMNS_IDS.CPU,
     DATABASES_COLUMNS_IDS.Memory,
     DATABASES_COLUMNS_IDS.Storage,
@@ -42,6 +46,12 @@ export const DATABASES_COLUMNS_TITLES = {
     },
     get [DATABASES_COLUMNS_IDS.State]() {
         return i18n('column-state');
+    },
+    get [DATABASES_COLUMNS_IDS.BridgeMode]() {
+        return i18n('column-mode');
+    },
+    get [DATABASES_COLUMNS_IDS.BridgeSyncStatus]() {
+        return i18n('column-sync-status');
     },
     get [DATABASES_COLUMNS_IDS.CPU]() {
         return i18n('column-cpu');

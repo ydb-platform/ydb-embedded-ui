@@ -15,7 +15,8 @@ import {Search} from '../../components/Search';
 import {TableColumnSetup} from '../../components/TableColumnSetup/TableColumnSetup';
 import {TableWithControlsLayout} from '../../components/TableWithControlsLayout/TableWithControlsLayout';
 import {TenantNameWrapper} from '../../components/TenantNameWrapper/TenantNameWrapper';
-import {useEmMetaAvailable} from '../../store/reducers/capabilities/hooks';
+import {getTenantLink} from '../../components/TenantNameWrapper/utils';
+import {useBridgeModeEnabled, useEmMetaAvailable} from '../../store/reducers/capabilities/hooks';
 import {useClusterBaseInfo} from '../../store/reducers/cluster/cluster';
 import {SETTING_KEYS} from '../../store/reducers/settings/constants';
 import {
@@ -41,6 +42,9 @@ import {useSelectedColumns} from '../../utils/hooks/useSelectedColumns';
 import {getIllustration} from '../../utils/illustrations';
 import {isNumeric} from '../../utils/utils';
 
+import type {DatabaseStatusClickHandler} from './DatabaseDrawerHealthcheck';
+import {DatabaseDrawerHealthcheck} from './DatabaseDrawerHealthcheck';
+import {getDatabaseBridgeColumns} from './bridgeColumns';
 import {
     DATABASES_COLUMNS_IDS,
     DATABASES_COLUMNS_TITLES,
@@ -133,6 +137,7 @@ export const TenantsTable = ({
     const [sortParams, setSortParams] = React.useState<SortOrder | SortOrder[] | undefined>();
 
     const isCreateDBAvailable = useEmMetaAvailable() && uiFactory.onCreateDB !== undefined;
+    const bridgeModeEnabled = useBridgeModeEnabled();
 
     const {domain: domainRoot} = useClusterBaseInfo();
 
@@ -252,6 +257,7 @@ export const TenantsTable = ({
                     </Label>
                 ),
             },
+            ...(bridgeModeEnabled ? getDatabaseBridgeColumns() : []),
             {
                 name: DATABASES_COLUMNS_IDS.CPU,
                 header: DATABASES_COLUMNS_TITLES[DATABASES_COLUMNS_IDS.CPU],
@@ -348,6 +354,7 @@ export const TenantsTable = ({
 
         return columns;
     }, [
+        bridgeModeEnabled,
         clusterName,
         additionalTenantsProps,
         environmentName,

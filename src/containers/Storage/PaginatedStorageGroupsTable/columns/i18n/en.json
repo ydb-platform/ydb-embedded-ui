@@ -1,6 +1,10 @@
 {
   "pool-name": "Pool Name",
-  "pile-name": "Pile Name",
+  "field_bridge-pile": "Bridge pile",
+  "field_bridge-mode": "Mode",
+  "field_bridge-sync-status": "Sync status",
+  "value_bridge": "Bridge",
+  "value_non-bridge": "Non-bridge",
   "type": "Type",
   "encryption": "Encryption",
   "erasure": "Erasure",

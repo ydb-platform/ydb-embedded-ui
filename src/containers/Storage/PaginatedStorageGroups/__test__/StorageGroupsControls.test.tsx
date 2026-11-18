@@ -25,7 +25,8 @@ jest.mock('../../../../components/Search/Search', () => ({
 
 jest.mock('../../../../store/reducers/capabilities/hooks', () => ({
     useBlobStorageCapacityMetricsEnabled: jest.fn(),
-    useBridgeModeEnabled: jest.fn(),
+    useBridgeModeEnabled: () => false,
+    useStorageGroupsHandlerHasBridgeSyncStatus: () => true,
 }));
 
 jest.mock('../../../../utils/hooks', () => ({
@@ -55,9 +56,8 @@ jest.mock('../../useStorageQueryParams', () => ({
     useStorageQueryParams: jest.fn(),
 }));
 
-const {useBlobStorageCapacityMetricsEnabled, useBridgeModeEnabled} = jest.requireMock(
-    '../../../../store/reducers/capabilities/hooks',
-);
+const {useBlobStorageCapacityMetricsAvailable, useBlobStorageCapacityMetricsEnabled} =
+    jest.requireMock('../../../../store/reducers/capabilities/hooks');
 const {useSetting} = jest.requireMock('../../../../utils/hooks');
 const {useIsUserAllowedToMakeChanges} = jest.requireMock(
     '../../../../utils/hooks/useIsUserAllowedToMakeChanges',
@@ -72,7 +72,6 @@ describe('StorageGroupsControls', () => {
     beforeEach(() => {
         jest.clearAllMocks();
 
-        useBridgeModeEnabled.mockReturnValue(false);
         useBlobStorageCapacityMetricsEnabled.mockReturnValue(false);
         useSetting.mockImplementation((key: string) => [
             key === SETTING_KEYS.ENABLE_STORAGE_EXPERT_MODE,

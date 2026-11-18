@@ -5,11 +5,16 @@
   "column-name": "Database",
   "column-type": "Type",
   "column-state": "State",
+  "column-mode": "Mode",
+  "column-sync-status": "Sync status",
   "column-cpu": "CPU",
   "column-memory": "Memory",
   "column-storage": "Storage",
   "column-network": "Network",
   "column-nodes": "Nodes",
   "column-groups": "Groups",
-  "column-pools": "Pools"
+  "column-pools": "Pools",
+
+  "value_bridge": "Bridge",
+  "value_non-bridge": "Non-bridge"
 }
