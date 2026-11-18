@@ -18,28 +18,15 @@ import type {TBridgeGroupLink} from '../../../types/api/storage';
 import {cn} from '../../../utils/cn';
 import {EMPTY_DATA_PLACEHOLDER} from '../../../utils/constants';
 import {formatDateTime} from '../../../utils/dataFormatters/dataFormatters';
+import {formatMetricBytes} from '../../../utils/storageMetrics';
 import {parseUsToMs} from '../../../utils/timeParsers';
-import {bytesToSize, parseOptionalNonNegativeNumber} from '../../../utils/utils';
+import {parseOptionalNonNegativeNumber} from '../../../utils/utils';
 
 import i18n from './i18n';
 
 import './StorageGroupSyncDetails.scss';
 
 const b = cn('ydb-storage-group-sync-details');
-
-function formatBytes(value: number) {
-    return value < 1000 ? i18n('value_bytes', {value}) : bytesToSize(value);
-}
-
-function formatRemainingBytes(bytes?: string, complete?: boolean) {
-    const remaining = parseOptionalNonNegativeNumber(bytes);
-    if (remaining === undefined) {
-        return EMPTY_DATA_PLACEHOLDER;
-    }
-
-    const value = formatBytes(remaining);
-    return complete === true ? value : i18n('value_lower-bound', {value});
-}
 
 const stageLabels = [
     ['BLOCKS', 'value_stage-blocks'],
@@ -62,10 +49,7 @@ export function StorageGroupSyncDetails({
     const partners = (group.BridgeGroups ?? []).filter(
         (partner) => partner.GroupId && partner.GroupId !== String(group.GroupId),
     );
-    const remainingText = formatRemainingBytes(
-        group.BridgeSyncRemainingBytes,
-        group.BridgeSyncRemainingBytesComplete,
-    );
+    const remaining = parseOptionalNonNegativeNumber(group.BridgeSyncRemainingBytes);
     const rate = parseOptionalNonNegativeNumber(group.BridgeSyncCopyBytesPerSecond);
     const lastProgress = parseUsToMs(
         parseOptionalNonNegativeNumber(group.BridgeSyncLastProgressTimestamp),
@@ -145,12 +129,12 @@ export function StorageGroupSyncDetails({
                     name={i18n('field_remaining')}
                     note={i18n('context_remaining')}
                 >
-                    {remainingText}
+                    {formatMetricBytes(remaining)}
                 </DefinitionList.Item>
                 <DefinitionList.Item name={i18n('field_rate')}>
                     {rate === undefined
                         ? EMPTY_DATA_PLACEHOLDER
-                        : i18n('value_rate', {size: formatBytes(rate)})}
+                        : i18n('value_rate', {size: formatMetricBytes(rate)})}
                 </DefinitionList.Item>
                 <DefinitionList.Item name={i18n('field_last-progress')}>
                     {formattedLastProgress ? (
@@ -191,17 +175,18 @@ export function StorageGroupSyncDetails({
                     <Alert
                         theme="normal"
                         icon={null}
-                        layout="horizontal"
-                        message={lastError}
-                        actions={
-                            isPage && (
+                        message={
+                            <Flex alignItems="flex-start" gap={2}>
+                                <Flex grow minWidth={0}>
+                                    {lastError}
+                                </Flex>
                                 <ClipboardButton
                                     text={lastError}
                                     aria-label={i18n('action_copy-error')}
                                     view="flat-secondary"
                                     size="s"
                                 />
-                            )
+                            </Flex>
                         }
                         className={b('message')}
                     />

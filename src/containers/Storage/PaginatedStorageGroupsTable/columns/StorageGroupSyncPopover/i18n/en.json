@@ -1,5 +1,4 @@
 {
   "title_sync": "Storage group synchronisation",
-  "action_open": "Synchronization details for group {{groupId}}",
-  "action_close": "Close synchronization details"
+  "action_open": "Synchronization details for group {{groupId}}"
 }

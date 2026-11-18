@@ -1,5 +1,4 @@
-import {Xmark} from '@gravity-ui/icons';
-import {Button, Flex, Icon, Text} from '@gravity-ui/uikit';
+import {Flex, Text} from '@gravity-ui/uikit';
 
 import {BridgeSyncStatusLabel} from '../../../../../components/BridgeSyncStatusLabel';
 import {HoverPopup} from '../../../../../components/HoverPopup/HoverPopup';
@@ -21,7 +20,7 @@ function hasSyncDetails(group: PreparedStorageGroup) {
     );
 }
 
-function SyncDetails({group, onClose}: {group: PreparedStorageGroup; onClose: VoidFunction}) {
+function SyncDetails({group}: {group: PreparedStorageGroup}) {
     return (
         <div
             className={b()}
