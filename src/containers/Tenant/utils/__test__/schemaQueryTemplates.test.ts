@@ -1,15 +1,54 @@
 import {
     addMinMaxIndex,
     alterSecretTemplate,
+    alterStreamingQuerySettingsTemplate,
+    alterStreamingQueryText,
     createSecretTemplate,
+    createStreamingQueryTemplate,
     disableTTLTemplate,
     dropSecretTemplate,
+    dropStreamingQueryTemplate,
     enableTTLTemplate,
     selectQueryTemplate,
     selectTopicQueryTemplate,
 } from '../schemaQueryTemplates';
 
 describe('schemaQueryTemplates', () => {
+    describe('streaming query templates', () => {
+        test.each([
+            [String.raw`a\\Qb\\Ec`, String.raw`a\\\\Qb\\\\Ec`],
+            [String.raw`\$name`, String.raw`\\\$name`],
+            [String.raw`\}`, String.raw`\\\}`],
+            ['${1:user_text}', String.raw`\${1:user_text\}`],
+            ['$name', String.raw`\$name`],
+        ])('escapes query text %s for Monaco', (text, escapedText) => {
+            const template = alterStreamingQueryText({
+                path: '/local/q1',
+                relativePath: 'q1',
+                streamingQueryData: {resultSets: [{result: [{Text: text}]}]},
+            });
+
+            expect(template).toContain(`DO BEGIN\n\n${escapedText}\n\nEND DO;`);
+        });
+
+        test.each([
+            ['create', createStreamingQueryTemplate],
+            ['alter settings', alterStreamingQuerySettingsTemplate],
+            ['alter text', alterStreamingQueryText],
+            ['drop', dropStreamingQueryTemplate],
+        ])('escapes the %s query identifier for YQL and Monaco', (_name, template) => {
+            const relativePath = 'q1\\xtz`$name}';
+            const snippet = template({path: `/local/${relativePath}`, relativePath});
+
+            expect(snippet).toContain(String.raw`q1\\\\xtz` + '\\\\`' + String.raw`\$name\}`);
+        });
+
+        test('retains editable placeholders when the name and text are unavailable', () => {
+            expect(alterStreamingQueryText()).toContain('${1:<my_streaming_query>}');
+            expect(alterStreamingQueryText()).toContain('${2:<streaming_query_text>}');
+        });
+    });
+
     describe('enableTTLTemplate', () => {
         test('does not suggest disabling TTL with a zero interval', () => {
             const template = enableTTLTemplate({path: '/local/table', relativePath: 'table'});
