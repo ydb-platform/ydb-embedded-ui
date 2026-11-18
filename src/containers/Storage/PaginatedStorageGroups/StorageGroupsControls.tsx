@@ -86,6 +86,12 @@ export function StorageGroupsControls({
         );
     }, [bridgeModeEnabled, blobMetricsEnabled, bridgeSyncGroupingAvailable]);
 
+    const groupByValue =
+        storageGroupsGroupByParam &&
+        groupByOptions.some(({value}) => value === storageGroupsGroupByParam)
+            ? [storageGroupsGroupByParam]
+            : [];
+
     const handleGroupBySelectUpdate = (value: string[]) => {
         handleStorageGroupsGroupByParamChange(value[0]);
     };
@@ -123,9 +129,7 @@ export function StorageGroupsControls({
                             qa="storage-groups-group-by"
                             placeholder={'-'}
                             width={150}
-                            defaultValue={
-                                storageGroupsGroupByParam ? [storageGroupsGroupByParam] : undefined
-                            }
+                            value={groupByValue}
                             onUpdate={handleGroupBySelectUpdate}
                             options={groupByOptions}
                         />
