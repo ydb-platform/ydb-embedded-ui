@@ -58,8 +58,13 @@ export function QuerySettingsSelect<T extends SelectType>(props: QuerySettingsSe
                             separator: option.separatorBefore,
                         })}
                     >
-                        <div className={b('item-title')}>
-                            <span className={b('item-label')}>{option.content}</span>
+                        <div className={b('item-content')}>
+                            <div className={b('item-label')}>
+                                <div className={b('item-title')}>{option.content}</div>
+                                {option.text && (
+                                    <span className={b('item-description')}>{option.text}</span>
+                                )}
+                            </div>
                             {option.badge && (
                                 <Label
                                     theme={badgeThemes[option.badge]}
@@ -70,9 +75,6 @@ export function QuerySettingsSelect<T extends SelectType>(props: QuerySettingsSe
                                 </Label>
                             )}
                         </div>
-                        {option.text && (
-                            <span className={b('item-description')}>{option.text}</span>
-                        )}
                     </div>
                 )}
                 width="max"
