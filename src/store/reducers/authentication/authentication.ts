@@ -65,8 +65,6 @@ export const authenticationApi = api.injectEndpoints({
                     } else {
                         data = await window.api.auth.authenticate(rest);
                     }
-                    // Data cached for the previous user must not be shown to the new one
-                    dispatch(api.util.resetApiState());
                     dispatch(setIsAuthenticated(true));
                     return {data};
                 } catch (error) {
@@ -84,7 +82,6 @@ export const authenticationApi = api.injectEndpoints({
                     } else {
                         data = await window.api.auth.logout();
                     }
-                    dispatch(api.util.resetApiState());
                     dispatch(setIsAuthenticated(false));
                     return {data};
                 } catch (error) {

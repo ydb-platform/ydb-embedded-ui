@@ -30,10 +30,9 @@ export function GetUser({
 
     useHandleVisibilityChange(refetch);
 
-    // Only the first request for the current database blocks the page. A background
-    // revalidation (e.g. when the tab becomes visible again) keeps the page mounted,
-    // so its state is not lost; a failed revalidation still replaces it with the error.
-    const loading = isFetching && currentData === undefined && !error;
+    // Only the first request for the current database blocks the page: a background
+    // revalidation (e.g. when the tab becomes visible again) must not unmount it.
+    const loading = isFetching && currentData === undefined;
 
     const {appTitle} = useAppTitle();
 
