@@ -363,6 +363,8 @@ export function QueryResultViewer({
                 {renderDiagnosticsButton()}
                 <EnableFullscreenButton />
                 <PaneVisibilityToggleButtons
+                    collapseLabel={i18n('action_collapse-results')}
+                    expandLabel={i18n('action_expand-results')}
                     onCollapse={onCollapseResults}
                     onExpand={onExpandResults}
                     isCollapsed={isResultsCollapsed}

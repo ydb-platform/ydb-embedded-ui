@@ -31,7 +31,7 @@ const makeResponse = () => ({
     plan,
     ast: '(return (Int32 1))',
     result: [{columns: [{name: 'value', type: 'Int32'}], rows: [[1]], truncated: false}],
-    stats: {DurationUs: '500000', Executions: [{ResultRows: '1', DurationUs: '500000'}]},
+    stats: {DurationUs: '500000', Executions: [{DurationUs: '500000'}]},
 });
 const svg =
     '<svg xmlns="http://www.w3.org/2000/svg" width="500" height="100"><text x="10" y="50">Current plan</text></svg>';
@@ -85,6 +85,18 @@ async function analyze(editor: QueryEditor) {
 }
 
 test.describe('Query editor regressions @query-editor-redesign', () => {
+    test('keeps New query inside a narrow editor pane', async ({page}) => {
+        await openEditor(page);
+        await page.setViewportSize({width: 1440, height: 900});
+        const toolbar = page.locator('.ydb-query-editor-controls');
+        await expect(toolbar).toHaveCSS('height', '60px');
+        await page.setViewportSize({width: 560, height: 800});
+        const newQuery = page.getByTestId('new-sql-dropdown-switcher');
+        await expect(newQuery).toBeInViewport({ratio: 1});
+        await newQuery.click();
+        await expect(page.getByRole('menuitem', {name: 'Tables', exact: true})).toBeVisible();
+    });
+
     test('resizes columns locally and resets widths for another view or result', async ({page}) => {
         const editor = await openEditor(page);
         await page.route(queryUrl, (route) => route.fulfill({json: makeResponse()}));

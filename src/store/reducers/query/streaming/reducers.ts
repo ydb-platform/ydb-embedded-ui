@@ -127,6 +127,6 @@ export const addStreamingChunks = (
         formattedRows.forEach((row) => {
             resultSet.result?.push(row);
         });
-        resultSet.truncated = chunk.result.truncated;
+        resultSet.truncated ||= chunk.result.truncated;
     }
 };

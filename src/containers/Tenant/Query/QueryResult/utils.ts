@@ -3,6 +3,7 @@ import type {
     QueryPlanView,
     QueryResult,
 } from '../../../../store/reducers/query/types';
+import {MAX_QUERY_LIMIT_ROWS} from '../../../../utils/query';
 import {safeParseNumber} from '../../../../utils/utils';
 
 export function getInitialQueryPlanView(data: PreparedQueryData): QueryPlanView {
@@ -19,7 +20,7 @@ export function getInitialQueryPlanView(data: PreparedQueryData): QueryPlanView 
 }
 
 export function getResultRowsPerSecond(result: QueryResult): number | undefined {
-    const {data, error, isLoading, streamingStatus} = result;
+    const {data, error, isLoading, limitRows, streamingStatus} = result;
     if (
         error ||
         isLoading ||
@@ -35,12 +36,19 @@ export function getResultRowsPerSecond(result: QueryResult): number | undefined 
     if (!resultSet?.result || resultSet.truncated) {
         return undefined;
     }
-    const rows = safeParseNumber(ResultRows, NaN);
+    const rows = resultSet.result.length;
+    // Viewer can stop exactly at limit_rows without marking the final chunk truncated.
+    if (
+        !limitRows ||
+        !Number.isSafeInteger(limitRows) ||
+        limitRows > MAX_QUERY_LIMIT_ROWS ||
+        rows >= limitRows
+    ) {
+        return undefined;
+    }
     const duration = safeParseNumber(DurationUs, NaN);
     if (
-        !Number.isSafeInteger(rows) ||
-        rows < 0 ||
-        rows !== resultSet.result.length ||
+        (ResultRows !== undefined && safeParseNumber(ResultRows, NaN) !== rows) ||
         !Number.isFinite(duration) ||
         duration <= 0
     ) {
