@@ -73,6 +73,7 @@ export function QuerySettingsDialog() {
             contentOverflow="auto"
             onClose={onClose}
             className={b()}
+            modalClassName={b('modal')}
             aria-label={i18n('action.settings')}
         >
             <Dialog.Header className={b('header')} caption={i18n('action.settings')} />

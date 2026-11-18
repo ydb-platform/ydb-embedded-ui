@@ -100,7 +100,7 @@ export const QUERY_MODES_TITLES: Record<QueryMode, string> = {
     scan: 'Scan',
     script: 'YQL Script',
     data: 'Data',
-    query: 'YQL - QueryService',
+    query: 'YQL — QueryService',
 } as const;
 
 export const QUERY_SYNTAX = {
