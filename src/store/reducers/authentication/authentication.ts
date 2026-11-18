@@ -3,6 +3,7 @@ import type {PayloadAction} from '@reduxjs/toolkit';
 
 import type {TUserToken} from '../../../types/api/whoami';
 import {isAxiosResponse} from '../../../utils/response';
+import type {RootState} from '../../defaultStore';
 import {api} from '../api';
 
 import type {AuthenticationState} from './types';
@@ -31,10 +32,7 @@ export const {selectIsAuthenticated} = slice.selectors;
 export const authenticationApi = api.injectEndpoints({
     endpoints: (build) => ({
         whoami: build.query({
-            queryFn: async (
-                {database, useMeta}: {database?: string; useMeta?: boolean},
-                {dispatch},
-            ) => {
+            queryFn: async ({database, useMeta}: {database?: string; useMeta?: boolean}) => {
                 try {
                     let data: TUserToken;
                     if (useMeta && window.api.meta) {
@@ -44,10 +42,21 @@ export const authenticationApi = api.injectEndpoints({
                     }
                     return {data};
                 } catch (error) {
-                    if (isAxiosResponse(error) && error.status === 401 && !error.data?.authUrl) {
-                        dispatch(setIsAuthenticated(false));
-                    }
                     return {error};
+                }
+            },
+            async onQueryStarted(args, {dispatch, getState, queryFulfilled, requestId}) {
+                const error = await queryFulfilled.then(
+                    () => undefined,
+                    (rejection: {error: unknown}) => rejection.error,
+                );
+                if (
+                    isAxiosResponse(error) &&
+                    error.status === 401 &&
+                    !error.data?.authUrl &&
+                    isCurrentWhoamiRequest(args, requestId, getState())
+                ) {
+                    dispatch(setIsAuthenticated(false));
                 }
             },
             providesTags: ['UserData'],
@@ -95,3 +104,24 @@ export const authenticationApi = api.injectEndpoints({
     }),
     overrideExisting: 'throw',
 });
+
+/**
+ * A late 401 may only log the user out if it answers the request the UI currently relies on:
+ * the cache entry was not reset or refetched since (e.g. after a cluster switch or login),
+ * and the user has not navigated to another database meanwhile.
+ */
+function isCurrentWhoamiRequest(
+    args: {database?: string; useMeta?: boolean},
+    requestId: string,
+    state: unknown,
+) {
+    const entry = authenticationApi.endpoints.whoami.select(args)(state as RootState);
+    if (entry.requestId !== requestId) {
+        return false;
+    }
+    if (args.useMeta || !args.database) {
+        return true;
+    }
+    const selectedDatabase = new URLSearchParams(window.location.search).get('database');
+    return !selectedDatabase || selectedDatabase === args.database;
+}

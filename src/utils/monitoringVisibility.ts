@@ -28,3 +28,16 @@ export function canShowTenantMonitoringTab(
         canShowTenantMonitoring(controlPlane, clusterMonitoring)
     );
 }
+
+/**
+ * Visibility check for the Backups tab: backups are managed by the control plane.
+ * The tab stays visible when the control plane fails, so the extension can show the error.
+ */
+export function canShowTenantBackupsTab(
+    controlPlane?: ControlPlane,
+    controlPlaneError?: string,
+): boolean {
+    return (
+        typeof uiFactory.renderBackups === 'function' && Boolean(controlPlane || controlPlaneError)
+    );
+}

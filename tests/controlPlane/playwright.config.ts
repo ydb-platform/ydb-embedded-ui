@@ -3,7 +3,7 @@ import {defineConfig, devices} from '@playwright/test';
 // Multi-cluster UI with every API call mocked: no YDB backend or meta service is needed.
 export default defineConfig({
     testDir: '.',
-    testMatch: 'controlPlane.spec.ts',
+    testMatch: '*.spec.ts',
     workers: 1,
     retries: 0,
     timeout: 30000,

@@ -1,0 +1,18 @@
+.ydb-control-plane-unavailable {
+    height: 100%;
+    min-height: 0;
+    padding: var(--g-spacing-4);
+
+    &__content {
+        overflow: auto;
+        flex: 1;
+
+        min-height: 0;
+    }
+}
+
+.ydb-runtime-lost-alert {
+    flex: 0 0 auto;
+
+    margin: var(--g-spacing-2) var(--g-spacing-4) 0;
+}
