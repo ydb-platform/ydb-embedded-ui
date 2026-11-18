@@ -4,6 +4,7 @@ import {Alert, Button, DefinitionList, Flex, Icon, Table, Text, Tooltip} from '@
 import type {TableColumnConfig} from '@gravity-ui/uikit';
 
 import {BridgeSyncStatusLabel} from '../../../../../components/BridgeSyncStatusLabel';
+import {CellWithPopover} from '../../../../../components/CellWithPopover/CellWithPopover';
 import {HoverPopup} from '../../../../../components/HoverPopup/HoverPopup';
 import {InternalLink} from '../../../../../components/InternalLink';
 import {useStorageGroupPath} from '../../../../../routes';
@@ -15,7 +16,6 @@ import {EMPTY_DATA_PLACEHOLDER} from '../../../../../utils/constants';
 import {formatDateTime} from '../../../../../utils/dataFormatters/dataFormatters';
 import {parseUsToMs} from '../../../../../utils/timeParsers';
 import {bytesToSize, parseOptionalNonNegativeNumber} from '../../../../../utils/utils';
-import {SyncPartnerPileName} from '../../../SyncPartnerPileName';
 
 import i18n from './i18n';
 
@@ -70,7 +70,14 @@ function SyncDetails({group, onClose}: {group: PreparedStorageGroup; onClose: Vo
             className: b('partner-cell', {id: true}),
             template: ({GroupId}) =>
                 GroupId ? (
-                    <InternalLink to={getGroupPath(GroupId)}>{GroupId}</InternalLink>
+                    <CellWithPopover
+                        content={GroupId}
+                        placement={['top', 'bottom']}
+                        wrapperClassName={b('partner-id')}
+                        fullWidth
+                    >
+                        <InternalLink to={getGroupPath(GroupId)}>{GroupId}</InternalLink>
+                    </CellWithPopover>
                 ) : (
                     EMPTY_DATA_PLACEHOLDER
                 ),
@@ -83,7 +90,18 @@ function SyncDetails({group, onClose}: {group: PreparedStorageGroup; onClose: Vo
                 </Text>
             ),
             className: b('partner-cell', {pile: true}),
-            template: ({PileName}) => <SyncPartnerPileName name={PileName} />,
+            template: ({PileName}) => (
+                <CellWithPopover
+                    content={PileName}
+                    disabled={!PileName}
+                    placement={['top', 'bottom']}
+                    fullWidth
+                >
+                    <span tabIndex={PileName ? 0 : undefined}>
+                        {PileName || EMPTY_DATA_PLACEHOLDER}
+                    </span>
+                </CellWithPopover>
+            ),
         },
     ];
 

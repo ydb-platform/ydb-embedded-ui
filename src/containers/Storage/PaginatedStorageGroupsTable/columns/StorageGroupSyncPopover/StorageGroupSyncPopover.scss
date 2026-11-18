@@ -47,6 +47,12 @@
         }
     }
 
+    & &__partner-id {
+        width: max-content;
+        min-width: calc(80px - 2 * var(--g-spacing-2));
+        max-width: calc(120px - 2 * var(--g-spacing-2));
+    }
+
     &__message.g-alert {
         padding: var(--g-spacing-3);
 
