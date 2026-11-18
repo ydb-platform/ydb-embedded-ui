@@ -18,6 +18,7 @@ import {
     Label,
     Progress,
     Text,
+    Tooltip,
     text,
 } from '@gravity-ui/uikit';
 import type {LabelProps} from '@gravity-ui/uikit';
@@ -223,7 +224,7 @@ const BridgePileCard = React.memo(function BridgePileCard({
                         {pileName}
                     </Text>
                     {current ? (
-                        <ActionTooltip title={i18n('label_you-are-here')}>
+                        <Tooltip content={i18n('context_bridge-pile-current')}>
                             <span
                                 role="img"
                                 aria-label={i18n('label_you-are-here')}
@@ -237,7 +238,7 @@ const BridgePileCard = React.memo(function BridgePileCard({
                                     qa="bridge-current-pile"
                                 />
                             </span>
-                        </ActionTooltip>
+                        </Tooltip>
                     ) : null}
                 </Flex>
                 {stateStatus}
