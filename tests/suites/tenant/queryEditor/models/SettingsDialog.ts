@@ -137,13 +137,8 @@ export class SettingsDialog {
         await expect(radio).toBeChecked();
     }
 
-    async getStatsLevel() {
-        for (const [value, title] of Object.entries(STATISTICS_MODES_TITLES)) {
-            if (await this.statisticsModeSelect.locator(`input[value="${value}"]`).isChecked()) {
-                return title;
-            }
-        }
-        throw new Error('No statistics mode selected');
+    get selectedStatsLevel() {
+        return this.statisticsModeSelect.getByRole('radio', {checked: true});
     }
 
     async changeLimitRows(limitRows: number) {
@@ -204,11 +199,9 @@ export class SettingsDialog {
 
     async clickTimeoutSwitch() {
         await this.expandAdvanced();
-        const clickTarget = this.getTimeoutSwitchClickTarget();
         const input = this.timeoutSwitch.locator('input[type="checkbox"]');
         const wasChecked = await input.isChecked();
-        await clickTarget.waitFor({state: 'visible', timeout: VISIBILITY_TIMEOUT});
-        await clickTarget.click();
+        await this.timeoutSwitch.click({timeout: VISIBILITY_TIMEOUT});
         await expect(input).toBeChecked({checked: !wasChecked});
     }
 
@@ -289,9 +282,5 @@ export class SettingsDialog {
         await selectControl.waitFor({state: 'visible', timeout: VISIBILITY_TIMEOUT});
         await selectControl.click();
         await this.selectPopup.waitFor({state: 'visible', timeout: VISIBILITY_TIMEOUT});
-    }
-
-    private getTimeoutSwitchClickTarget() {
-        return this.timeoutSwitch;
     }
 }
