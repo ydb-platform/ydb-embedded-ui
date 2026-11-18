@@ -15,7 +15,6 @@ import {InternalLink} from '../../components/InternalLink';
 import {PageMeta} from '../../components/PageMeta/PageMeta';
 import routes, {getDefaultNodePath} from '../../routes';
 import {
-    useBridgeModeEnabled,
     useCapabilitiesLoaded,
     useConfigAvailable,
     useViewerPeersHandlerAvailable,
@@ -266,8 +265,6 @@ function NodePageContent({
     tabs,
     parentContainer,
 }: NodePageContentProps) {
-    const bridgeModeEnabled = useBridgeModeEnabled();
-
     const renderTabs = () => {
         return (
             <div className={b('tabs')}>
@@ -298,7 +295,6 @@ function NodePageContent({
                 return (
                     <PaginatedStorage
                         database={database}
-                        bridgeModeEnabled={bridgeModeEnabled}
                         nodeId={nodeId}
                         scrollContainerRef={parentContainer}
                         viewContext={{

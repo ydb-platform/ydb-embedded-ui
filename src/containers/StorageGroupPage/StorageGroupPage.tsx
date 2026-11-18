@@ -10,7 +10,7 @@ import {CopyableValue} from '../../components/CopyableValue/CopyableValue';
 import {ResponseError} from '../../components/Errors/ResponseError';
 import {InfoViewerSkeleton} from '../../components/InfoViewerSkeleton/InfoViewerSkeleton';
 import {StorageGroupInfo} from '../../components/StorageGroupInfo/StorageGroupInfo';
-import {useBridgeModeEnabled, useCapabilitiesLoaded} from '../../store/reducers/capabilities/hooks';
+import {useCapabilitiesLoaded} from '../../store/reducers/capabilities/hooks';
 import {setHeaderBreadcrumbs} from '../../store/reducers/header/header';
 import {storageApi} from '../../store/reducers/storage/storage';
 import {valueIsDefined} from '../../utils';
@@ -37,7 +37,6 @@ export function StorageGroupPage() {
 
     const [autoRefreshInterval] = useAutoRefreshInterval();
     const capabilitiesLoaded = useCapabilitiesLoaded();
-    const bridgeModeEnabled = useBridgeModeEnabled();
     const groupQuery = storageApi.useGetStorageGroupsInfoQuery(
         valueIsDefined(groupId)
             ? {groupId, with: 'all', fieldsRequired: 'all', database}
@@ -121,7 +120,6 @@ export function StorageGroupPage() {
                 </Text>
                 <PaginatedStorage
                     database={database}
-                    bridgeModeEnabled={bridgeModeEnabled}
                     groupId={groupId}
                     scrollContainerRef={containerRef}
                     viewContext={{

@@ -19,14 +19,11 @@ export function StorageGroupsComponent({
     viewContext,
     scrollContainerRef,
     initialEntitiesCount,
-    bridgeModeEnabled,
-    bridgeSyncGroupingAvailable = true,
-}: PaginatedStorageProps & {bridgeSyncGroupingAvailable?: boolean}) {
+}: PaginatedStorageProps) {
     const {groupsSearchValue, visibleEntities, handleShowAllGroups} = useStorageQueryParams();
 
     const storageGroupsHandlerHasGrouping = useStorageGroupsHandlerHasGrouping();
     const {columnsToShow, columnsToSelect, setColumns} = useStorageGroupsSelectedColumns({
-        bridgeModeEnabled,
         visibleEntities,
         viewContext,
     });
@@ -41,8 +38,6 @@ export function StorageGroupsComponent({
                 <StorageGroupsControlsWithTableState
                     withTypeSelector
                     withGroupBySelect={storageGroupsHandlerHasGrouping}
-                    bridgeModeEnabled={bridgeModeEnabled}
-                    bridgeSyncGroupingAvailable={bridgeSyncGroupingAvailable}
                     columns={columnsToShow}
                     dataIssuesIndicator={
                         <DataIssuesIndicator compact issues={issues} problems={problems} />

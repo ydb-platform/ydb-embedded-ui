@@ -26,7 +26,6 @@ import {
 } from '../../components/VDiskStatus';
 import {useVDiskPagePath} from '../../routes';
 import {api} from '../../store/reducers/api';
-import {useBridgeModeEnabled} from '../../store/reducers/capabilities/hooks';
 import {setHeaderBreadcrumbs} from '../../store/reducers/header/header';
 import {vDiskApi} from '../../store/reducers/vdisk/vdisk';
 import {cn} from '../../utils/cn';
@@ -89,8 +88,6 @@ export function VDiskPage() {
 
     const resolvedVDiskId = VDiskId || (!loading && parseVdiskId(vDiskIdParam)) || undefined;
     const {GroupID} = resolvedVDiskId || {};
-
-    const bridgeModeEnabled = useBridgeModeEnabled();
 
     const vDiskId = vDiskData?.StringifiedId || (loading ? undefined : vDiskIdParam);
     const {appTitle} = useAppTitle();
@@ -252,7 +249,6 @@ export function VDiskPage() {
             return (
                 <PaginatedStorage
                     database={database}
-                    bridgeModeEnabled={bridgeModeEnabled}
                     groupId={GroupID}
                     nodeId={nodeId ?? undefined}
                     pDiskId={PDiskId}

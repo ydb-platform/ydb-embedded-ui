@@ -12,7 +12,6 @@ import {InternalLink} from '../../components/InternalLink';
 import {NetworkTable} from '../../components/NetworkTable/NetworkTable';
 import routes, {getClusterPath, getLocationObjectFromHref} from '../../routes';
 import {
-    useBridgeModeEnabled,
     useClusterDashboardAvailable,
     useConfigAvailable,
     useNodesHandlerHasWorkingClusterNetworkStats,
@@ -66,7 +65,6 @@ interface ClusterProps {
 export function Cluster({additionalClusterProps, additionalTenantsProps}: ClusterProps) {
     const container = React.useRef<HTMLDivElement>(null);
     const isClusterDashboardAvailable = useClusterDashboardAvailable();
-    const bridgeModeEnabled = useBridgeModeEnabled();
 
     const shouldShowNetworkTable = useNodesHandlerHasWorkingClusterNetworkStats();
     const shouldShowEventsTab = useShouldShowEventsTab();
@@ -257,10 +255,7 @@ export function Cluster({additionalClusterProps, additionalTenantsProps}: Cluste
                                     ).pathname
                                 }
                             >
-                                <PaginatedStorage
-                                    bridgeModeEnabled={bridgeModeEnabled}
-                                    scrollContainerRef={container}
-                                />
+                                <PaginatedStorage scrollContainerRef={container} />
                             </Route>
                             {shouldShowNetworkTable && (
                                 <Route

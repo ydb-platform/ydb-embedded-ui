@@ -105,14 +105,11 @@ export function GroupedStorageGroupsComponent({
     pDiskId,
     scrollContainerRef,
     viewContext,
-    bridgeModeEnabled,
-    bridgeSyncGroupingAvailable = true,
-}: PaginatedStorageProps & {bridgeSyncGroupingAvailable?: boolean}) {
+}: PaginatedStorageProps) {
     const [autoRefreshInterval] = useAutoRefreshInterval();
     const {groupsSearchValue, storageGroupsGroupByParam, visibleEntities, handleShowAllGroups} =
         useStorageQueryParams();
     const {columnsToShow, columnsToSelect, setColumns} = useStorageGroupsSelectedColumns({
-        bridgeModeEnabled,
         visibleEntities,
         viewContext,
     });
@@ -196,8 +193,6 @@ export function GroupedStorageGroupsComponent({
                 <StorageGroupsControls
                     withTypeSelector
                     withGroupBySelect
-                    bridgeModeEnabled={bridgeModeEnabled}
-                    bridgeSyncGroupingAvailable={bridgeSyncGroupingAvailable}
                     columns={columnsToShow}
                     entitiesCountCurrent={found}
                     entitiesCountTotal={total}

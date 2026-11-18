@@ -16,7 +16,6 @@ import {getStorageGroupsInitialEntitiesCount, getStorageNodesInitialEntitiesCoun
 
 export interface PaginatedStorageProps {
     database?: string;
-    bridgeModeEnabled: boolean;
     nodeId?: string | number;
     groupId?: string | number;
     pDiskId?: string | number;

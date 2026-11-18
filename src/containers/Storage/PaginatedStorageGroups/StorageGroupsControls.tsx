@@ -25,11 +25,11 @@ import i18n from '../i18n';
 import {b} from '../shared';
 import {useIsStorageExpertMode, useStorageQueryParams} from '../useStorageQueryParams';
 
+import {useStorageGroupsBridgeGrouping} from './useStorageGroupsBridgeGrouping';
+
 interface StorageControlsProps {
     withTypeSelector?: boolean;
     withGroupBySelect?: boolean;
-    bridgeModeEnabled?: boolean;
-    bridgeSyncGroupingAvailable?: boolean;
 
     columns?: StorageGroupsColumn[];
 
@@ -44,8 +44,6 @@ interface StorageControlsProps {
 export function StorageGroupsControls({
     withTypeSelector,
     withGroupBySelect,
-    bridgeModeEnabled = false,
-    bridgeSyncGroupingAvailable = true,
 
     columns = [],
 
@@ -74,6 +72,7 @@ export function StorageGroupsControls({
     const isStorageExpertMode = useIsStorageExpertMode();
     const storageExpertModeAvailable = useBlobStorageCapacityMetricsAvailable();
     const blobMetricsEnabled = useBlobStorageCapacityMetricsEnabled();
+    const {bridgeModeEnabled, bridgeSyncGroupingAvailable} = useStorageGroupsBridgeGrouping();
 
     const isVDisksPDisksColumnVisible = React.useMemo(() => {
         return columns.some((column) => column.name === STORAGE_GROUPS_COLUMNS_IDS.VDisksPDisks);
@@ -124,7 +123,9 @@ export function StorageGroupsControls({
                             qa="storage-groups-group-by"
                             placeholder={'-'}
                             width={150}
-                            value={storageGroupsGroupByParam ? [storageGroupsGroupByParam] : []}
+                            defaultValue={
+                                storageGroupsGroupByParam ? [storageGroupsGroupByParam] : undefined
+                            }
                             onUpdate={handleGroupBySelectUpdate}
                             options={groupByOptions}
                         />
@@ -159,15 +160,11 @@ export function StorageGroupsControls({
 export function StorageGroupsControlsWithTableState({
     withTypeSelector,
     withGroupBySelect,
-    bridgeModeEnabled,
-    bridgeSyncGroupingAvailable,
     columns,
     dataIssuesIndicator,
 }: {
     withTypeSelector?: boolean;
     withGroupBySelect?: boolean;
-    bridgeModeEnabled?: boolean;
-    bridgeSyncGroupingAvailable?: boolean;
     columns?: StorageGroupsColumn[];
     dataIssuesIndicator?: React.ReactNode;
 }) {
@@ -177,8 +174,6 @@ export function StorageGroupsControlsWithTableState({
         <StorageGroupsControls
             withTypeSelector={withTypeSelector}
             withGroupBySelect={withGroupBySelect}
-            bridgeModeEnabled={bridgeModeEnabled}
-            bridgeSyncGroupingAvailable={bridgeSyncGroupingAvailable}
             columns={columns}
             entitiesCountCurrent={tableState.foundEntities}
             entitiesCountTotal={tableState.totalEntities}

@@ -1,6 +1,9 @@
 import React from 'react';
 
-import {useBlobStorageCapacityMetricsEnabled} from '../../../../store/reducers/capabilities/hooks';
+import {
+    useBlobStorageCapacityMetricsEnabled,
+    useBridgeModeEnabled,
+} from '../../../../store/reducers/capabilities/hooks';
 import {VISIBLE_ENTITIES} from '../../../../store/reducers/storage/constants';
 import {VDisksGroupBy} from '../../../../utils/disks/groupBy';
 import {
@@ -34,13 +37,13 @@ import {
 import type {GetStorageGroupsColumnsParams} from './types';
 
 export function useStorageGroupsSelectedColumns({
-    bridgeModeEnabled = false,
     visibleEntities,
     viewContext,
 }: GetStorageGroupsColumnsParams) {
     const isUserAllowedToMakeChanges = useIsUserAllowedToMakeChanges();
     const isViewerUser = useIsViewerUser();
     const blobMetricsEnabled = useBlobStorageCapacityMetricsEnabled();
+    const bridgeModeEnabled = useBridgeModeEnabled();
     const isStorageExpertMode = useIsStorageExpertMode();
     const vdisksGroupBy = useVDisksGroupByParam();
     const pdisksGroupBy = usePDisksGroupByParam();

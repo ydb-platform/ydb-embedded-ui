@@ -5,7 +5,6 @@ import {Helmet} from 'react-helmet-async';
 
 import {CopyableValue} from '../../../components/CopyableValue/CopyableValue';
 import {DrawerContextProvider} from '../../../components/Drawer/DrawerContext';
-import {useBridgeModeEnabled} from '../../../store/reducers/capabilities/hooks';
 import {TENANT_DIAGNOSTICS_TABS_IDS} from '../../../store/reducers/tenant/constants';
 import {setDiagnosticsTab, useTenantBaseInfo} from '../../../store/reducers/tenant/tenant';
 import type {AdditionalTenantsProps} from '../../../types/additionalProps';
@@ -50,7 +49,6 @@ function Diagnostics({
 
     const isV2NavigationEnabled = useNavigationV2Enabled();
 
-    const bridgeModeEnabled = useBridgeModeEnabled();
     const {name, id, controlPlane, metaErrors} = useTenantBaseInfo(database);
     const showDatabaseId = Boolean(id && (controlPlane || metaErrors?.control_plane));
 
@@ -83,7 +81,6 @@ function Diagnostics({
             activeTabId: activeTab.id,
             type,
             database,
-            bridgeModeEnabled,
             path,
             databaseFullPath,
             additionalTenantProps,

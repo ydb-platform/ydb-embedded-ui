@@ -11,7 +11,6 @@ export interface GetStorageColumnsData {
 }
 
 export interface GetStorageGroupsColumnsParams {
-    bridgeModeEnabled?: boolean;
     visibleEntities?: VisibleEntities;
     viewContext?: StorageViewContext;
 }
