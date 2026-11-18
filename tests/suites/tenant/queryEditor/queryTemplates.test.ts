@@ -207,6 +207,68 @@ test.describe('Query Templates', () => {
         await expect.poll(readEditorText).toBe(selectQuery);
     });
 
+    test('Alter streaming query text preserves backslashes in the name and body', async ({
+        page,
+    }) => {
+        const name = String.raw`q1\xtz`;
+        const escapedName = String.raw`q1\\xtz`;
+        const path = `${database}/${name}`;
+        const query = {Name: name, PathType: 'EPathTypeStreamingQuery'};
+        const filter = String.raw`WHERE Data REGEXP 'a\\Qb\\Ec';`;
+        const body = 'INSERT INTO `out` SELECT Data FROM `in`\n' + filter;
+
+        await page.route(`${backend}/viewer/json/describe?*`, (route) => {
+            const requestedPath = new URL(route.request().url()).searchParams.get('path');
+            if (requestedPath !== database && requestedPath !== path) {
+                return route.fallback();
+            }
+
+            return route.fulfill({
+                json: {
+                    Status: 'StatusSuccess',
+                    Path: requestedPath,
+                    PathDescription:
+                        requestedPath === path
+                            ? {Self: query}
+                            : {
+                                  Self: {Name: 'local', PathType: 'EPathTypeSubDomain'},
+                                  Children: [query],
+                              },
+                },
+            });
+        });
+        await page.route(`${backend}/viewer/json/query?*`, (route) => {
+            const {query: sql} = (route.request().postDataJSON() ?? {}) as {query?: string};
+            if (!sql?.includes('.sys/streaming_queries')) {
+                return route.fallback();
+            }
+
+            return route.fulfill({
+                json: {
+                    version: 8,
+                    result: [
+                        {
+                            columns: [{name: 'Text', type: 'Utf8?'}],
+                            rows: sql.includes(`WHERE Path = '${database}/${escapedName}'`)
+                                ? [[body]]
+                                : [],
+                        },
+                    ],
+                },
+            });
+        });
+
+        const objectSummary = new ObjectSummary(page);
+        await objectSummary.clickRefreshButton();
+        await objectSummary.clickActionMenuItem(name, 'Alter query text...');
+
+        const queryEditor = new QueryEditor(page);
+        await expect
+            .poll(() => queryEditor.getEditorContent())
+            .toContain(`ALTER STREAMING QUERY \`${escapedName}\` SET`);
+        expect(await queryEditor.getEditorContent()).toContain(filter);
+    });
+
     test('Save query flow saves query and shows it in Saved tab', async ({page}) => {
         const objectSummary = new ObjectSummary(page);
         const queryEditor = new QueryEditor(page);

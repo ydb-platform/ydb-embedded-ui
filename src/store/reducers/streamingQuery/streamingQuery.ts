@@ -2,9 +2,13 @@ import {QUERY_TECHNICAL_MARK} from '../../../utils/constants';
 import {isQueryErrorResponse, parseQueryAPIResponse} from '../../../utils/query';
 import {api} from '../api';
 
+function escapePathForYqlString(path: string) {
+    return path.replace(/['\\]/g, '\\$&');
+}
+
 function getStreamingQueryInfoSQL(path: string) {
     // Select available columns so older backends without lifecycle fields remain supported.
-    const safePath = path.replace(/'/g, "''");
+    const safePath = escapePathForYqlString(path);
     return `${QUERY_TECHNICAL_MARK}
 SELECT * WITHOUT Plan, Ast
 FROM \`.sys/streaming_queries\`
@@ -13,7 +17,7 @@ LIMIT 1`;
 }
 
 function getStreamingQueryPlanSQL(path: string) {
-    const safePath = path.replace(/'/g, "''");
+    const safePath = escapePathForYqlString(path);
     return `${QUERY_TECHNICAL_MARK}
 SELECT
     Status,
