@@ -37,10 +37,10 @@ export const PaginatedStorage = (props: PaginatedStorageProps) => {
     useSaveNodesPDisksGroupBy();
     const isUserAllowedToMakeChanges = useIsUserAllowedToMakeChanges();
 
-    const showNodes = storageType === 'nodes' && isUserAllowedToMakeChanges;
+    const isNodes = storageType === 'nodes';
 
     // Hide storage node details for users with only viewer rights
-    if (showNodes) {
+    if (isNodes && isUserAllowedToMakeChanges) {
         return (
             <PaginatedStorageNodes
                 initialEntitiesCount={getStorageNodesInitialEntitiesCount(props.viewContext)}

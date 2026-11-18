@@ -23,6 +23,7 @@ export function StorageGroupsComponent({
     const {groupsSearchValue, visibleEntities, handleShowAllGroups} = useStorageQueryParams();
 
     const storageGroupsHandlerHasGrouping = useStorageGroupsHandlerHasGrouping();
+
     const {columnsToShow, columnsToSelect, setColumns} = useStorageGroupsSelectedColumns({
         visibleEntities,
         viewContext,

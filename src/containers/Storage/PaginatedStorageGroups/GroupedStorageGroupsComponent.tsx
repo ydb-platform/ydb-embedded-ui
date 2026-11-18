@@ -109,6 +109,7 @@ export function GroupedStorageGroupsComponent({
     const [autoRefreshInterval] = useAutoRefreshInterval();
     const {groupsSearchValue, storageGroupsGroupByParam, visibleEntities, handleShowAllGroups} =
         useStorageQueryParams();
+
     const {columnsToShow, columnsToSelect, setColumns} = useStorageGroupsSelectedColumns({
         visibleEntities,
         viewContext,
