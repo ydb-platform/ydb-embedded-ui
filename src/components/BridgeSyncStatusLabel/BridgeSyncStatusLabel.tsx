@@ -56,7 +56,11 @@ export function BridgeSyncStatusLabel({
         return EMPTY_DATA_PLACEHOLDER;
     }
     if (!presentation.icon) {
-        return <Text color="hint">{presentation.label()}</Text>;
+        return (
+            <Text variant="inherit" color="hint">
+                {presentation.label()}
+            </Text>
+        );
     }
 
     return (

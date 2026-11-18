@@ -1,6 +1,13 @@
 import {dateTimeParse} from '@gravity-ui/date-utils';
-import {Xmark} from '@gravity-ui/icons';
-import {Alert, Button, DefinitionList, Flex, Icon, Table, Text, Tooltip} from '@gravity-ui/uikit';
+import {
+    Alert,
+    ClipboardButton,
+    DefinitionList,
+    Flex,
+    Table,
+    Text,
+    Tooltip,
+} from '@gravity-ui/uikit';
 import type {TableColumnConfig} from '@gravity-ui/uikit';
 
 import {BridgeSyncStatusLabel} from '../../../../../components/BridgeSyncStatusLabel';
@@ -14,18 +21,15 @@ import type {TBridgeGroupLink} from '../../../../../types/api/storage';
 import {cn} from '../../../../../utils/cn';
 import {EMPTY_DATA_PLACEHOLDER} from '../../../../../utils/constants';
 import {formatDateTime} from '../../../../../utils/dataFormatters/dataFormatters';
+import {formatMetricBytes} from '../../../../../utils/storageMetrics';
 import {parseUsToMs} from '../../../../../utils/timeParsers';
-import {bytesToSize, parseOptionalNonNegativeNumber} from '../../../../../utils/utils';
+import {parseOptionalNonNegativeNumber} from '../../../../../utils/utils';
 
 import i18n from './i18n';
 
 import './StorageGroupSyncPopover.scss';
 
 const b = cn('ydb-storage-group-sync-popover');
-
-function formatBytes(value: number) {
-    return value < 1000 ? i18n('value_bytes', {value}) : bytesToSize(value);
-}
 
 function hasSyncDetails(group: PreparedStorageGroup) {
     return (
@@ -34,7 +38,7 @@ function hasSyncDetails(group: PreparedStorageGroup) {
     );
 }
 
-function SyncDetails({group, onClose}: {group: PreparedStorageGroup; onClose: VoidFunction}) {
+function SyncDetails({group}: {group: PreparedStorageGroup}) {
     const getGroupPath = useStorageGroupPath();
     const partners = (group.BridgeGroups ?? []).filter(
         (partner) => partner.GroupId && partner.GroupId !== String(group.GroupId),
@@ -51,14 +55,6 @@ function SyncDetails({group, onClose}: {group: PreparedStorageGroup; onClose: Vo
         parseOptionalNonNegativeNumber(group.BridgeSyncLastErrorTimestamp),
         3,
     );
-    let remainingText = EMPTY_DATA_PLACEHOLDER;
-    if (remaining !== undefined) {
-        const value = formatBytes(remaining);
-        remainingText =
-            group.BridgeSyncRemainingBytesComplete === true
-                ? value
-                : i18n('value_lower-bound', {value});
-    }
     const columns: TableColumnConfig<TBridgeGroupLink>[] = [
         {
             id: 'GroupId',
@@ -119,12 +115,12 @@ function SyncDetails({group, onClose}: {group: PreparedStorageGroup; onClose: Vo
                         name={i18n('field_remaining')}
                         note={i18n('context_remaining')}
                     >
-                        {remainingText}
+                        {formatMetricBytes(remaining)}
                     </DefinitionList.Item>
                     <DefinitionList.Item name={i18n('field_rate')}>
                         {rate === undefined
                             ? EMPTY_DATA_PLACEHOLDER
-                            : i18n('value_rate', {size: formatBytes(rate)})}
+                            : i18n('value_rate', {size: formatMetricBytes(rate)})}
                     </DefinitionList.Item>
                     <DefinitionList.Item name={i18n('field_last-progress')}>
                         {formattedLastProgress ? (
@@ -167,21 +163,24 @@ function SyncDetails({group, onClose}: {group: PreparedStorageGroup; onClose: Vo
                         <Alert
                             theme="normal"
                             icon={null}
-                            message={lastError}
+                            message={
+                                <Flex alignItems="flex-start" gap={2}>
+                                    <Flex grow minWidth={0}>
+                                        {lastError}
+                                    </Flex>
+                                    <ClipboardButton
+                                        text={lastError}
+                                        aria-label={i18n('action_copy-error')}
+                                        view="flat-secondary"
+                                        size="s"
+                                    />
+                                </Flex>
+                            }
                             className={b('message')}
                         />
                     </Flex>
                 )}
             </Flex>
-            <Button
-                view="flat-secondary"
-                size="s"
-                className={b('close')}
-                aria-label={i18n('action_close')}
-                onClick={onClose}
-            >
-                <Icon data={Xmark} size={12} />
-            </Button>
         </div>
     );
 }
@@ -193,7 +192,7 @@ export function StorageGroupSyncPopover({group}: {group: PreparedStorageGroup}) 
     return (
         <HoverPopup
             placement={['right-start', 'left-start', 'bottom-start']}
-            renderPopupContent={({onClose}) => <SyncDetails group={group} onClose={onClose} />}
+            renderPopupContent={() => <SyncDetails group={group} />}
         >
             <Flex as="span" inline onClick={(event) => event.stopPropagation()}>
                 <BridgeSyncStatusLabel status={group.BridgeSyncStatus} withInfo interactive />
