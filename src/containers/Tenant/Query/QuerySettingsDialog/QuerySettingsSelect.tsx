@@ -49,7 +49,7 @@ export function QuerySettingsSelect<T extends SelectType>(props: QuerySettingsSe
                     props.onUpdateSetting(value[0] as T);
                 }}
                 getOptionHeight={getOptionHeight}
-                popupClassName={b('popup')}
+                popupClassName={b('popup', {field: props.id})}
                 renderOption={(option: QuerySettingSelectOption<T>) => (
                     <div
                         className={b('item', {
