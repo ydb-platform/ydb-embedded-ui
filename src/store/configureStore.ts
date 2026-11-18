@@ -12,7 +12,9 @@ import {getUrlData} from './getUrlData';
 import rootReducer from './reducers';
 import {api as storeApi} from './reducers/api';
 import {preloadUserSettingsFromLS, syncUserSettingsFromLS} from './reducers/settings/settings';
-import {basename, setRuntimeParams} from './runtimeParams';
+import {backend, basename, clusterName, environment, setRuntimeParams} from './runtimeParams';
+import {getNextRuntimeScope} from './runtimeScope';
+import type {RuntimeScope} from './runtimeScope';
 import getLocationMiddleware from './state-url-mapping';
 
 export {backend, basename, clusterName, environment} from './runtimeParams';
@@ -95,17 +97,29 @@ export function configureStore({
     });
     const history = createBrowserHistory({basename});
 
+    const store = _configureStore(aRootReducer, history, {singleClusterMode}, [
+        storeApi.middleware,
+    ]);
+
+    let runtimeScope: RuntimeScope = {backend, clusterName, environment};
     history.listen(() => {
         getUrlDataAndSetParams({
             singleClusterMode,
             customBackend,
             allowedEnvironments: environments,
         });
+        const {scope, changed} = getNextRuntimeScope(runtimeScope, {
+            backend,
+            clusterName,
+            environment,
+        });
+        runtimeScope = scope;
+        if (changed) {
+            // Responses of another runtime must not be reused for the same cache keys
+            store.dispatch(storeApi.util.resetApiState());
+        }
     });
 
-    const store = _configureStore(aRootReducer, history, {singleClusterMode}, [
-        storeApi.middleware,
-    ]);
     listenForHistoryChange(store, history);
 
     syncUserSettingsFromLS(store);
