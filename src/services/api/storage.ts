@@ -41,6 +41,9 @@ export class StorageAPI extends BaseYdbAPI {
         if (result.Status !== 'OK') {
             throw new Error(result.ErrorReason || result.Status || 'Invalid CMS response');
         }
+        if (result.Groups?.some((group) => group.MonitoredQuorum === undefined)) {
+            throw new Error('CMS does not support NBS tablet health');
+        }
         return result;
     }
 

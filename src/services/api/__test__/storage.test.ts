@@ -81,3 +81,15 @@ test('tablet snapshot errors remain visible', async () => {
     const {api} = createApi({Status: 'NOT_FOUND', ErrorReason: 'DDisk snapshot is not available'});
     await expect(api.getNbsTablet('41')).rejects.toThrow('DDisk snapshot is not available');
 });
+
+test('a legacy tablet snapshot is distinct from unknown observed quorum', async () => {
+    const group = {DirectBlockGroupId: 1};
+    const legacy = createApi({Status: 'OK', Groups: [group]});
+    await expect(legacy.api.getNbsTablet('41')).rejects.toThrow(
+        'CMS does not support NBS tablet health',
+    );
+
+    const result = {Status: 'OK', Groups: [{...group, MonitoredQuorum: 'Unknown'}]};
+    const current = createApi(result);
+    await expect(current.api.getNbsTablet('41')).resolves.toEqual(result);
+});

@@ -337,6 +337,25 @@ test('CMS application errors are visible even with HTTP 200', async ({page}) => 
     ).toBeVisible();
 });
 
+test('old CMS tablet layouts report unavailable health during a rolling upgrade', async ({
+    page,
+}) => {
+    const tablet = TABLETS[0];
+    await page.route('**/cms/api/json/ddisk/tablets?*', (route) =>
+        route.fulfill({json: {Status: {Code: 'OK'}, TotalCount: 1, Tablets: [tablet]}}),
+    );
+    await page.route('**/cms/api/json/ddisk/tablet?*', (route) =>
+        route.fulfill({
+            json: {Status: 'OK', TabletId: tablet.TabletId, Groups: [{DirectBlockGroupId: '100'}]},
+        }),
+    );
+    await new PageModel(page, 'cluster/storage', {type: 'nbs'}).goto();
+    await page.getByRole('button', {name: 'Show groups for tablet ' + tablet.TabletId}).click();
+    await expect(
+        page.getByText('CMS does not support NBS tablet health', {exact: false}),
+    ).toBeVisible();
+});
+
 test('tablet groups load on click, filter degraded groups and restore the mode', async ({
     page,
 }, testInfo) => {
