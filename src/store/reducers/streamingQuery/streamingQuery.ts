@@ -4,7 +4,7 @@ import {api} from '../api';
 
 function getStreamingQueryInfoSQL(path: string) {
     // Select available columns so older backends without lifecycle fields remain supported.
-    const safePath = path.replace(/'/g, "''");
+    const safePath = path.replace(/[\\']/g, '\\$&');
     return `${QUERY_TECHNICAL_MARK}
 SELECT * WITHOUT Plan, Ast
 FROM \`.sys/streaming_queries\`
@@ -13,7 +13,7 @@ LIMIT 1`;
 }
 
 function getStreamingQueryPlanSQL(path: string) {
-    const safePath = path.replace(/'/g, "''");
+    const safePath = path.replace(/[\\']/g, '\\$&');
     return `${QUERY_TECHNICAL_MARK}
 SELECT
     Status,

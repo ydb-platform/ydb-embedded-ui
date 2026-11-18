@@ -17,7 +17,12 @@ export interface SchemaQueryParams {
 export type TemplateFn = (params?: SchemaQueryParams) => string;
 
 function normalizeParameter(param: string) {
-    return param.replace(/\$/g, '\\$');
+    return param.replace(/[\\$}]/g, '\\$&');
+}
+
+function normalizeIdentifierParameter(param: string) {
+    // Escape YQL identifiers before escaping the enclosing Monaco snippet.
+    return normalizeParameter(param.replace(/[\\`]/g, '\\$&'));
 }
 
 function toLF(str: string) {
@@ -416,7 +421,7 @@ SET USING \\$l;`;
 
 export const createStreamingQueryTemplate = (params?: SchemaQueryParams) => {
     const streamingQueryName = params?.relativePath
-        ? `\`${normalizeParameter(params.relativePath)}/my_streaming_query\``
+        ? `\`${normalizeIdentifierParameter(params.relativePath)}/my_streaming_query\``
         : '${1:<my_streaming_query>}';
     return `CREATE STREAMING QUERY ${streamingQueryName} WITH (
     RUN = TRUE  -- Run the query after creation
@@ -431,7 +436,7 @@ END DO;`;
 
 export const alterStreamingQuerySettingsTemplate = (params?: SchemaQueryParams) => {
     const streamingQueryName = params?.relativePath
-        ? `\`${normalizeParameter(params.relativePath)}\``
+        ? `\`${normalizeIdentifierParameter(params.relativePath)}\``
         : '${1:<my_streaming_query>}';
     return `ALTER STREAMING QUERY ${streamingQueryName} SET (
     RUN = FALSE, -- Stop query execution
@@ -441,7 +446,7 @@ export const alterStreamingQuerySettingsTemplate = (params?: SchemaQueryParams) 
 
 export const alterStreamingQueryText = (params?: SchemaQueryParams) => {
     const streamingQueryName = params?.relativePath
-        ? `\`${normalizeParameter(params.relativePath)}\``
+        ? `\`${normalizeIdentifierParameter(params.relativePath)}\``
         : '${1:<my_streaming_query>}';
 
     const sysData = params?.streamingQueryData;
@@ -464,7 +469,7 @@ END DO;`;
 
 export const dropStreamingQueryTemplate = (params?: SchemaQueryParams) => {
     const streamingQueryName = params?.relativePath
-        ? `\`${normalizeParameter(params.relativePath)}\``
+        ? `\`${normalizeIdentifierParameter(params.relativePath)}\``
         : '${1:<my_streaming_query>}';
     return `DROP STREAMING QUERY ${streamingQueryName};`;
 };
