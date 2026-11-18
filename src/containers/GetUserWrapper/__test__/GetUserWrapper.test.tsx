@@ -1,7 +1,7 @@
 import React from 'react';
 
 import {configureStore} from '@reduxjs/toolkit';
-import {act, render, screen, waitFor} from '@testing-library/react';
+import {act, render, screen} from '@testing-library/react';
 import {Provider} from 'react-redux';
 
 import type {YdbEmbeddedAPI} from '../../../services/api';
@@ -112,5 +112,6 @@ test('a failed revalidation still replaces the page with the error', async () =>
     returnToTabAfterInactivity();
     await act(async () => revalidation.reject({status: 403, statusText: 'Forbidden'}));
 
-    await waitFor(() => expect(screen.queryByText('page content')).not.toBeInTheDocument());
+    expect(await screen.findByText('Access denied')).toBeVisible();
+    expect(screen.queryByText('page content')).not.toBeInTheDocument();
 });
