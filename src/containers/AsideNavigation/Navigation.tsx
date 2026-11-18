@@ -108,6 +108,10 @@ export function Navigation({children, userSettings}: NavigationProps) {
                 _collapsed: boolean,
                 event: React.MouseEvent<HTMLElement>,
             ) => {
+                if (item.disabled) {
+                    event.preventDefault();
+                    return;
+                }
                 if (isModifiedClickEvent(event)) {
                     return;
                 }
@@ -120,9 +124,9 @@ export function Navigation({children, userSettings}: NavigationProps) {
                 title: item.title,
                 icon: item.icon,
                 current: item.current,
-                href: item.path,
+                href: item.disabled ? undefined : item.path,
                 onItemClick: handleItemClick,
-                tooltipText: item.title,
+                tooltipText: item.disabled ? i18n('description_runtime-unavailable') : item.title,
                 itemWrapper: (params, makeItem, options) => {
                     const baseCnParams = {
                         compact: options.compact,
@@ -139,6 +143,7 @@ export function Navigation({children, userSettings}: NavigationProps) {
                     const buttonCnParams = {
                         ...baseCnParams,
                         active: item.current,
+                        disabled: item.disabled,
                     };
 
                     if (item.id === 'database') {

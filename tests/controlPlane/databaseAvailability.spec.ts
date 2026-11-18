@@ -110,12 +110,22 @@ async function mockApi(page: Page, state: MockState) {
     });
 }
 
-function cpPage(page: Page) {
-    return page.getByTestId('control-plane-unavailable');
+/** The database overview built from control plane data */
+function cpInfo(page: Page) {
+    return page.getByTestId('control-plane-info');
 }
 
-function retryButton(page: Page) {
-    return page.getByRole('button', {name: 'Retry runtime connection'});
+function runtimeLabel(page: Page) {
+    return page.getByTestId('runtime-unavailable-label');
+}
+
+async function retry(page: Page) {
+    const button = page.getByRole('button', {name: 'Retry runtime connection'});
+    // The button is on the error page, or in the popover of the header label
+    if (!(await button.isVisible())) {
+        await runtimeLabel(page).click();
+    }
+    await button.click();
 }
 
 function countCalls(state: MockState, pattern: RegExp) {
@@ -124,28 +134,48 @@ function countCalls(state: MockState, pattern: RegExp) {
 
 const RUNTIME_REQUESTS = /nodes|nodelist|describe|healthcheck|selfcheck|query/;
 
-test('cold runtime outage shows control plane data and extensions without runtime requests', async ({
+test('cold runtime outage shows control plane data in the regular page without runtime requests', async ({
     page,
 }) => {
     const state: MockState = {calls: []};
     await mockApi(page, state);
     await page.goto('/database?database=/db&clusterName=scope-a&databasePage=query');
 
-    await expect(cpPage(page)).toBeVisible();
-    await expect(cpPage(page).getByRole('heading', {name: 'scope-a-display'})).toBeVisible();
-    await cpPage(page).getByRole('tab', {name: 'Backups'}).click();
+    // The database section is shown instead of the requested one, which cannot work
+    await expect(cpInfo(page)).toBeVisible();
+    await expect(cpInfo(page).getByText('scope-a-display', {exact: true})).toBeVisible();
+    await expect(runtimeLabel(page)).toBeVisible();
+    await expect(page.locator('.ydb-navigation-wrapper__button-wrapper_disabled')).toHaveCount(2);
+
+    // Only the tabs served by the control plane are offered
+    await expect(page.getByRole('tab', {name: 'Nodes'})).toHaveCount(0);
+    await page.getByRole('tab', {name: 'Backups'}).click();
     await expect(page.getByTestId('cp-extension-backups')).toHaveText('cp-id:scope-a-display');
-    await cpPage(page).getByRole('tab', {name: 'Monitoring'}).click();
+    await page.getByRole('tab', {name: 'Monitoring'}).click();
     await expect(page.getByTestId('cp-extension-monitoring')).toHaveText('cp-id:scope-a-display');
 
     expect(countCalls(state, RUNTIME_REQUESTS)).toBe(0);
     // Extensions reuse the cached composite response
     expect(countCalls(state, /\/meta\/databases/)).toBe(1);
-    // The runtime route and the saved default tab are not overwritten
-    expect(new URL(page.url()).searchParams.get('databasePage')).toBe('query');
+    // The saved default section is not overwritten
     expect(await page.evaluate(() => localStorage.getItem('saved_tenant_initial_tab'))).toBe(
         '"query"',
     );
+});
+
+test('a hidden tab from the link falls back to the overview, a control plane tab is kept', async ({
+    page,
+}) => {
+    const state: MockState = {calls: []};
+    await mockApi(page, state);
+    await page.goto('/database?database=/db&clusterName=scope-a&diagnosticsTab=nodes');
+    await expect(cpInfo(page)).toBeVisible();
+    // The requested tab stays in the URL and opens once the runtime responds
+    expect(new URL(page.url()).searchParams.get('diagnosticsTab')).toBe('nodes');
+
+    await page.goto('/database?database=/db&clusterName=scope-a&diagnosticsTab=backups');
+    await expect(page.getByTestId('cp-extension-backups')).toBeVisible();
+    await expect(cpInfo(page)).toHaveCount(0);
 });
 
 test('retry restores the runtime page with its original deep link', async ({page}) => {
@@ -154,13 +184,13 @@ test('retry restores the runtime page with its original deep link', async ({page
     await page.goto(
         '/database?database=/db&clusterName=scope-a&databasePage=diagnostics&diagnosticsTab=nodes',
     );
-    await expect(cpPage(page)).toBeVisible();
+    await expect(cpInfo(page)).toBeVisible();
     expect(countCalls(state, RUNTIME_REQUESTS)).toBe(0);
 
     state.whoamiStatus = 200;
-    await retryButton(page).click();
+    await retry(page);
 
-    await expect(cpPage(page)).toHaveCount(0);
+    await expect(cpInfo(page)).toHaveCount(0);
     await expect.poll(() => countCalls(state, /\/nodelist/)).toBeGreaterThan(0);
     expect(new URL(page.url()).searchParams.get('diagnosticsTab')).toBe('nodes');
 });
@@ -185,7 +215,7 @@ test('runtime page stays mounted when a refetch fails or returns control plane d
     state.compositeMessage = 'Transient composite failure';
     await page.evaluate(() => window.controlPlaneTest.refreshTenant());
     expect(await isEditorMounted()).toBe(true);
-    await expect(retryButton(page)).toHaveCount(0);
+    await expect(runtimeLabel(page)).toHaveCount(0);
 
     // A control plane only refetch warns instead of replacing the page
     state.compositeStatus = undefined;
@@ -193,8 +223,8 @@ test('runtime page stays mounted when a refetch fails or returns control plane d
     state.healthy = false;
     state.whoamiStatus = 200;
     await page.evaluate(() => window.controlPlaneTest.refreshTenant());
-    await expect(retryButton(page)).toBeVisible();
-    await expect(cpPage(page)).toHaveCount(0);
+    await expect(runtimeLabel(page)).toBeVisible();
+    await expect(cpInfo(page)).toHaveCount(0);
     expect(await isEditorMounted()).toBe(true);
     expect(await page.evaluate(() => window.ydbEditor?.getValue())).toBe('SELECT 42; -- unsaved');
     // Runtime actions are not offered without runtime data
@@ -203,8 +233,8 @@ test('runtime page stays mounted when a refetch fails or returns control plane d
     ).toHaveCount(0);
 
     state.healthy = true;
-    await retryButton(page).click();
-    await expect(retryButton(page)).toHaveCount(0);
+    await retry(page);
+    await expect(runtimeLabel(page)).toHaveCount(0);
     expect(await isEditorMounted()).toBe(true);
     await expect(
         page.locator('header').getByRole('button', {name: 'Copy path', exact: true}),
@@ -219,15 +249,15 @@ test('retry shows the actual composite failure until the runtime recovers', asyn
 
     state.compositeStatus = 500;
     state.compositeMessage = 'Composite database request failed';
-    await retryButton(page).click();
+    await retry(page);
     await expect(page.getByText('Composite database request failed', {exact: true})).toBeVisible();
     // Control plane data of a failed request is not shown
-    await expect(cpPage(page)).toHaveCount(0);
+    await expect(cpInfo(page)).toHaveCount(0);
     await expect(page.getByTestId('cp-extension-backups')).toHaveCount(0);
 
     state.compositeStatus = undefined;
     state.compositeMessage = undefined;
-    await retryButton(page).click();
+    await retry(page);
     await expect(page.getByTestId('cp-extension-backups')).toHaveText('cp-id:scope-a-display');
 });
 
@@ -238,12 +268,12 @@ for (const deniedSource of ['whoamiStatus', 'capabilitiesStatus', 'compositeStat
         const state: MockState = {calls: []};
         await mockApi(page, state);
         await page.goto('/database?database=/db&clusterName=scope-a');
-        await expect(cpPage(page)).toBeVisible();
+        await expect(cpInfo(page)).toBeVisible();
 
         state[deniedSource] = 403;
-        await retryButton(page).click();
+        await retry(page);
         await expect(page.getByText('Request access to the database')).toBeVisible();
-        await expect(cpPage(page)).toHaveCount(0);
+        await expect(cpInfo(page)).toHaveCount(0);
         await expect(page.getByText('scope-a-display', {exact: true})).toHaveCount(0);
         expect(countCalls(state, RUNTIME_REQUESTS)).toBe(0);
     });
@@ -255,7 +285,7 @@ test('control plane data of another database is not shown', async ({page}) => {
     await page.goto('/database?database=/db&clusterName=scope-a');
     // The regular page reports its own runtime errors
     await expect(page.getByText('400 Bad Request')).toBeVisible();
-    await expect(cpPage(page)).toHaveCount(0);
+    await expect(cpInfo(page)).toHaveCount(0);
     await expect(page.getByText('scope-a-display', {exact: true})).toHaveCount(0);
 });
 
@@ -309,5 +339,5 @@ test('a Viewer waits for cluster settings instead of a speculative composite req
     await expect.poll(() => countCalls(state, /\/meta\/cp_databases/)).toBe(1);
     await expect.poll(() => countCalls(state, /\/nodelist/)).toBeGreaterThan(0);
     expect(countCalls(state, /\/meta\/databases/)).toBe(0);
-    await expect(cpPage(page)).toHaveCount(0);
+    await expect(cpInfo(page)).toHaveCount(0);
 });

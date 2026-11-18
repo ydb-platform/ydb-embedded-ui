@@ -44,11 +44,15 @@ const slice = createSlice({
             const isValidTab = action.payload && validTabs.includes(action.payload);
             state.metricsTab = isValidTab ? action.payload : TENANT_METRICS_TABS_IDS.cpu;
         },
+        setRuntimeSeenScope: (state, action: PayloadAction<string | undefined>) => {
+            state.runtimeSeenScope = action.payload;
+        },
     },
 });
 
 export default slice.reducer;
-export const {setQueryTab, setDiagnosticsTab, setSummaryTab, setMetricsTab} = slice.actions;
+export const {setQueryTab, setDiagnosticsTab, setSummaryTab, setMetricsTab, setRuntimeSeenScope} =
+    slice.actions;
 
 export const tenantApi = api.injectEndpoints({
     endpoints: (builder) => ({

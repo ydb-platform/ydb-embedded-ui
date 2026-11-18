@@ -1,10 +1,10 @@
 import type {TTenant} from '../../../types/api/tenant';
-import {EMPTY_DATA_PLACEHOLDER} from '../../../utils/constants';
 
 function displayValue(value?: string | number | null) {
-    return value === undefined || value === null || value === '' ? EMPTY_DATA_PLACEHOLDER : value;
+    return value === undefined || value === null || value === '' ? undefined : value;
 }
 
+/** Control plane fields of a database; a missing value is `undefined`. */
 export function prepareControlPlaneInfo(tenant: TTenant) {
     const cp = tenant.ControlPlane ?? {};
     const {fixed_scale: fixedScale} = cp.scale_policy ?? {};
@@ -24,27 +24,9 @@ export function prepareControlPlaneInfo(tenant: TTenant) {
         storageLimit: displayValue(storageLimit),
         storageOptions: displayValue(
             storageOptions
-                ?.map(
-                    (option) =>
-                        `${displayValue(option.storage_type_id)}: ${displayValue(option.group_count)}`,
-                )
+                ?.filter((option) => option.storage_type_id)
+                .map((option) => `${option.storage_type_id}: ${option.group_count ?? 0}`)
                 .join(', '),
         ),
     };
-}
-
-export type ControlPlaneTab = 'overview' | 'backups' | 'monitoring';
-
-export function getControlPlaneTab(
-    requestedTab: unknown,
-    hasBackups: boolean,
-    hasMonitoring: boolean,
-): ControlPlaneTab {
-    if (requestedTab === 'backups' && hasBackups) {
-        return 'backups';
-    }
-    if (requestedTab === 'monitoring' && hasMonitoring) {
-        return 'monitoring';
-    }
-    return 'overview';
 }

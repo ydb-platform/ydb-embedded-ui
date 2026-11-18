@@ -14,7 +14,16 @@ import {EPathType} from '../../../../types/api/schema';
 import {configureUIFactory, uiFactory} from '../../../../uiFactory/uiFactory';
 import {useIsViewerUser, useUserPermissions} from '../../../../utils/hooks/useWhoami';
 import {canShowTenantMonitoringTab} from '../../../../utils/monitoringVisibility';
+import {useControlPlaneOperationsAvailable} from '../../../Operations/useOperationsSource';
+import {useDatabaseRuntimeState} from '../../DatabaseAvailability/useDatabaseAvailability';
 import {useDiagnosticsPages} from '../useDiagnosticsPages';
+
+jest.mock('../../DatabaseAvailability/useDatabaseAvailability', () => ({
+    useDatabaseRuntimeState: jest.fn(),
+}));
+jest.mock('../../../Operations/useOperationsSource', () => ({
+    useControlPlaneOperationsAvailable: jest.fn(),
+}));
 
 jest.mock('../../../../store/reducers/capabilities/hooks', () => ({
     useCapabilitiesLoaded: jest.fn(),
@@ -71,6 +80,31 @@ describe('useDiagnosticsPages', () => {
         (useIsViewerUser as jest.Mock).mockReturnValue(true);
         (canShowTenantMonitoringTab as jest.Mock).mockReturnValue(true);
         (useUserPermissions as jest.Mock).mockReturnValue(undefined);
+        (useDatabaseRuntimeState as jest.Mock).mockReturnValue({coldStart: false});
+        (useControlPlaneOperationsAvailable as jest.Mock).mockReturnValue(false);
+    });
+
+    test('a cold start keeps only the tabs served by the control plane', () => {
+        configureUIFactory({renderBackups: () => null});
+        (useDatabaseRuntimeState as jest.Mock).mockReturnValue({coldStart: true});
+        const getPages = () =>
+            renderHook(() =>
+                useDiagnosticsPages({
+                    path: '/local',
+                    database: '/local',
+                    databaseFullPath: '/local',
+                    databasePagesDisplay: 'database',
+                }),
+            ).result.current.map((page) => page.id);
+
+        expect(getPages()).toEqual([
+            TENANT_DIAGNOSTICS_TABS_IDS.database,
+            TENANT_DIAGNOSTICS_TABS_IDS.monitoring,
+            TENANT_DIAGNOSTICS_TABS_IDS.backups,
+        ]);
+
+        (useControlPlaneOperationsAvailable as jest.Mock).mockReturnValue(true);
+        expect(getPages()).toContain(TENANT_DIAGNOSTICS_TABS_IDS.operations);
     });
 
     test.each(['Dedicated', 'Serverless'] as const)(

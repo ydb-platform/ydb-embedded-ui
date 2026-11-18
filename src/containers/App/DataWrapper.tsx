@@ -15,12 +15,21 @@ import {useSetting} from '../../utils/hooks/useSetting';
 import {isForbiddenError, isRedirectToAuth, isUnauthenticatedError} from '../../utils/response';
 import {GetUser} from '../GetUserWrapper/GetUserWrapper';
 
-export function DataWrapper({children}: {children: React.ReactNode}) {
+interface DataWrapperProps {
+    children: React.ReactNode;
+    /**
+     * The database runtime does not respond and the page shows what is left without it:
+     * an operational whoami failure must not replace the page, runtime data is not requested.
+     */
+    runtimeUnavailable?: boolean;
+}
+
+export function DataWrapper({children, runtimeUnavailable}: DataWrapperProps) {
     return (
         // capabilities is going to work without authentication, but not all running systems are supporting this yet
         <GetCapabilities>
-            <GetUser>
-                <GetNodesList />
+            <GetUser displayWhoamiError={!runtimeUnavailable}>
+                {runtimeUnavailable ? null : <GetNodesList />}
                 {/* this GetCapabilities will be removed */}
                 <GetCapabilities>{children}</GetCapabilities>
             </GetUser>

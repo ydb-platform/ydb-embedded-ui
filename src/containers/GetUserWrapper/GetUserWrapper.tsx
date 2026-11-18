@@ -32,7 +32,9 @@ export function GetUser({
 
     // Only the first request for the current database blocks the page: a background
     // revalidation (e.g. when the tab becomes visible again) must not unmount it.
-    const loading = isFetching && currentData === undefined;
+    // A page shown despite a whoami error stays mounted too: its own whoami subscribers
+    // refetch the failed request on mount, and a loader here would remount them in a loop.
+    const loading = isFetching && currentData === undefined && (displayWhoamiError || !error);
 
     const {appTitle} = useAppTitle();
 

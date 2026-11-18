@@ -27,5 +27,6 @@
   "hotkeys.previous-tab": "Previous tab",
   "hotkeys.close-other-tabs": "Close other tabs",
   "hotkeys.close-all-tabs": "Close all tabs",
-  "hotkeys.save-query-as": "Save query as"
+  "hotkeys.save-query-as": "Save query as",
+  "description_runtime-unavailable": "Unavailable while the database runtime is not responding"
 }

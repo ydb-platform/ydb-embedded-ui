@@ -5,6 +5,7 @@ import {getConnectToDBDialog} from '../../components/ConnectToDB/ConnectToDBDial
 import {ServerlessDBLabel} from '../../components/ServerlessDBLabel/ServerlessDBLabel';
 import type {PreparedTenant} from '../../store/reducers/tenants/types';
 import {useDatabaseHealthcheckAvailable} from '../../utils/hooks/useDatabaseHealthcheckAvailable';
+import {RuntimeUnavailableLabel} from '../Tenant/DatabaseAvailability/RuntimeUnavailableLabel';
 import {HealthcheckPreview} from '../Tenant/Diagnostics/TenantOverview/Healthcheck/HealthcheckPreview';
 
 import {b} from './constants';
@@ -53,6 +54,7 @@ export function HeaderLeftControls({
             <Flex direction="row" alignItems={'center'} gap={2}>
                 {isServerless ? <ServerlessDBLabel /> : null}
                 {showHealthcheck ? <HealthcheckPreview database={database} compact /> : null}
+                {isRuntimeUnavailable ? <RuntimeUnavailableLabel /> : null}
             </Flex>
         </Flex>
     );

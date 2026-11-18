@@ -15,6 +15,7 @@ import {
 import {tenantPageSchema} from '../../../store/reducers/tenant/types';
 import type {TenantPage} from '../../../store/reducers/tenant/types';
 import {useSetting} from '../../../utils/hooks';
+import {useDatabaseRuntimeState} from '../DatabaseAvailability/useDatabaseAvailability';
 import i18n from '../i18n';
 import {useNavigationV2Enabled} from '../utils/useNavigationV2Enabled';
 
@@ -59,6 +60,8 @@ interface TenantNavigationItem {
     icon?: IconData;
     path: string;
     current: boolean;
+    /** The section needs the database runtime, which has not responded yet */
+    disabled: boolean;
     onForward: () => void;
 }
 
@@ -69,6 +72,7 @@ export function useTenantNavigation(): TenantNavigationItem[] {
     const isV2Enabled = useNavigationV2Enabled();
 
     const {tenantPage, handleTenantPageChange} = useTenantPage();
+    const {coldStart} = useDatabaseRuntimeState();
 
     const menuItems = React.useMemo<TenantNavigationItem[]>(() => {
         if (!match) {
@@ -92,6 +96,7 @@ export function useTenantNavigation(): TenantNavigationItem[] {
                 icon,
                 path: pagePath,
                 current: tenantPage === pageId,
+                disabled: coldStart && tenantPage !== pageId,
                 onForward: () => {
                     handleTenantPageChange(pageId);
                 },
@@ -101,7 +106,7 @@ export function useTenantNavigation(): TenantNavigationItem[] {
         });
 
         return items;
-    }, [tenantPage, handleTenantPageChange, match, queryParams, isV2Enabled]);
+    }, [tenantPage, handleTenantPageChange, match, queryParams, isV2Enabled, coldStart]);
 
     return menuItems;
 }
@@ -169,6 +174,17 @@ export function useTenantPage() {
         legacyTenantPageFromQuery,
         databasePageFromQuery,
     ]);
+
+    // Without the runtime only the database section has something to show. The URL and the
+    // saved page are left intact, so the requested section opens once the runtime responds.
+    const isV2Enabled = useNavigationV2Enabled();
+    const {coldStart} = useDatabaseRuntimeState();
+    if (coldStart) {
+        const controlPlanePage = isV2Enabled
+            ? TENANT_PAGES_IDS.database
+            : TENANT_PAGES_IDS.diagnostics;
+        return {tenantPage: controlPlanePage, handleTenantPageChange} as const;
+    }
 
     return {tenantPage, handleTenantPageChange} as const;
 }

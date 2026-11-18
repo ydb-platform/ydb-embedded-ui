@@ -1,5 +1,8 @@
 import React from 'react';
 
+import {useRouteMatch} from 'react-router-dom';
+
+import routes from '../../../routes';
 import {authenticationApi} from '../../../store/reducers/authentication/authentication';
 import {capabilitiesApi} from '../../../store/reducers/capabilities/capabilities';
 import {useEmMetaAvailable} from '../../../store/reducers/capabilities/hooks';
@@ -10,6 +13,7 @@ import {
 } from '../../../store/reducers/tenant/availability';
 import type {DatabaseAvailability} from '../../../store/reducers/tenant/availability';
 import {useTenantBaseInfo} from '../../../store/reducers/tenant/tenant';
+import {useTypedSelector} from '../../../utils/hooks';
 import {
     useClusterNameFromQuery,
     useDatabaseFromQuery,
@@ -92,4 +96,24 @@ export function useDatabaseAvailability({skip = false}: {skip?: boolean} = {}) {
     ]);
 
     return {availability, retry};
+}
+
+/**
+ * What the database page needs to know about a runtime outage.
+ * `coldStart` - the runtime has not responded since the page was opened: only control plane
+ * data can be shown. Otherwise the runtime was lost under an open page, which stays as it is.
+ */
+export function useDatabaseRuntimeState() {
+    const isDatabasePage = Boolean(useRouteMatch(routes.tenant));
+    const database = useDatabaseFromQuery() ?? '';
+    const clusterName = useClusterNameFromQuery();
+    const {availability, retry} = useDatabaseAvailability({skip: !isDatabasePage});
+    const runtimeSeenScope = useTypedSelector((state) => state.tenant.runtimeSeenScope);
+
+    const scope = `${clusterName}/${database}`;
+    const runtimeUnavailable =
+        availability.status === 'control-plane' || availability.status === 'unavailable';
+    const coldStart = runtimeUnavailable && runtimeSeenScope !== scope;
+
+    return {availability, retry, scope, runtimeUnavailable, coldStart};
 }
