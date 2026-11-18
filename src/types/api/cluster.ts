@@ -115,6 +115,17 @@ export enum BridgePileGroupStatus {
     DISINTEGRATED = 'DISINTEGRATED',
 }
 
+export enum BridgeSyncStatus {
+    SYNCED = 'SYNCED',
+    SYNCING = 'SYNCING',
+    PENDING = 'PENDING',
+    UNKNOWN = 'UNKNOWN',
+    NOT_REQUIRED = 'NOT_REQUIRED',
+}
+
+/** Counts are uint64 values, serialized as strings by Viewer. */
+export type BridgeDatabaseCounts = Record<string, string | number>;
+
 export interface TBridgePile {
     /** unique pile identifier */
     PileId?: number;
@@ -124,10 +135,22 @@ export interface TBridgePile {
     State?: BridgePileState;
     /** number of nodes in the pile */
     Nodes?: number;
+    /** Known static nodes and those that responded during collection. */
+    StorageNodes?: number;
+    AliveStorageNodes?: number;
+    /** Known dynamic nodes and those that responded during collection. */
+    ComputeNodes?: number;
+    AliveComputeNodes?: number;
     /** storage group statuses in the pile */
     GroupStatuses?: Partial<Record<BridgePileGroupStatus, number>>;
 }
 
 export interface TBridgeInfo {
     Piles?: TBridgePile[];
+    /** uint64 */
+    BridgeDatabases?: string | number;
+    /** False when ownership is incomplete or global synchronization counts are unavailable. */
+    BridgeDatabasesComplete?: boolean;
+    /** Each fully bridged storage owner is counted once across all required copies. Viewer v11+. */
+    DatabaseCountsBySyncStatus?: BridgeDatabaseCounts;
 }

@@ -20,8 +20,14 @@ const contentProps = {
 <EntityStatus.Label {...commonProps} {...contentProps} view="default" />;
 <EntityStatus.Label {...commonProps} view="compact" />;
 
-// @ts-expect-error Compact labels are noninteractive.
-<EntityStatus.Label {...commonProps} view="compact" onClick={contentProps.onClick} />;
+<EntityStatus.Label
+    {...commonProps}
+    view="compact"
+    onClick={contentProps.onClick}
+    aria-label="Open healthcheck details"
+    checkIcon="check"
+/>;
+<EntityStatus.Label {...commonProps} view="compact" tabIndex={0} checkIcon="circle-check" />;
 // @ts-expect-error Compact labels do not render children.
 <EntityStatus.Label {...commonProps} view="compact" children={contentProps.children} />;
 // @ts-expect-error Compact labels do not render trailing content.
@@ -31,7 +37,6 @@ const contentProps = {
 // @ts-expect-error Compact labels never render an inline status name.
 <EntityStatus.Label {...commonProps} view="compact" withStatusName={false} />;
 
-// @ts-expect-error Spreading props must not bypass the noninteractive contract.
 <EntityStatus.Label {...commonProps} view="compact" {...{onClick: contentProps.onClick}} />;
 // @ts-expect-error Spreading props must not introduce children.
 <EntityStatus.Label {...commonProps} view="compact" {...{children: contentProps.children}} />;

@@ -1,34 +1,49 @@
 import React from 'react';
 
 import {
-    Archive,
     ArrowChevronRight,
     Ban,
-    ChevronRight,
+    Check,
     CirclePause,
+    CrownDiamond,
     LinkSlash,
     MapPin,
 } from '@gravity-ui/icons';
-import {Flex, Icon, Label, Text} from '@gravity-ui/uikit';
+import {
+    ActionTooltip,
+    Card,
+    DefinitionList,
+    Flex,
+    Icon,
+    Label,
+    Progress,
+    Text,
+    Tooltip,
+    text,
+} from '@gravity-ui/uikit';
 import type {LabelProps} from '@gravity-ui/uikit';
 
-import {EntityStatus} from '../../../../components/EntityStatus/EntityStatus';
+import {EFlagToStatusName, EntityStatus} from '../../../../components/EntityStatus/EntityStatus';
 import {LabelWithHelpMark} from '../../../../components/LabelWithHelpMark/LabelWithHelpMark';
 import {Skeleton} from '../../../../components/Skeleton/Skeleton';
 import {
     healthcheckApi,
     selectLeavesIssues,
 } from '../../../../store/reducers/healthcheckInfo/healthcheckInfo';
-import type {TBridgePile} from '../../../../types/api/cluster';
+import type {TBridgeInfo, TBridgePile} from '../../../../types/api/cluster';
 import {BridgePileState} from '../../../../types/api/cluster';
+import {EFlag} from '../../../../types/api/enums';
 import {cn} from '../../../../utils/cn';
 import {EMPTY_DATA_PLACEHOLDER} from '../../../../utils/constants';
 import {formatNumber} from '../../../../utils/dataFormatters/dataFormatters';
 import {useAutoRefreshInterval, useTypedSelector} from '../../../../utils/hooks';
 import {useIsUserAllowedToMakeChanges} from '../../../../utils/hooks/useIsUserAllowedToMakeChanges';
+import {parseOptionalNonNegativeNumber} from '../../../../utils/utils';
 import {useClusterHealthcheckQueryParams} from '../../ClusterDrawerHealthcheck';
 import i18n from '../../i18n';
 
+import {BridgeDatabasesSummary} from './BridgeDatabasesSummary';
+import {getBridgeNodesProgress} from './bridgeInfo';
 import type {BridgePileHealthcheckTarget} from './bridgePileHealthcheck';
 import {getBridgePileHealthcheck} from './bridgePileHealthcheck';
 
@@ -48,7 +63,8 @@ function getBridgePileStateInfo(state?: BridgePileState): BridgePileStateInfo {
         case BridgePileState.PRIMARY:
             return {
                 label: i18n('value_bridge-state-primary'),
-                theme: 'normal',
+                theme: 'utility',
+                icon: <Icon data={CrownDiamond} size={12} />,
                 help: i18n('context_bridge-pile-state-primary'),
             };
         case BridgePileState.PROMOTED:
@@ -61,7 +77,8 @@ function getBridgePileStateInfo(state?: BridgePileState): BridgePileStateInfo {
         case BridgePileState.SYNCHRONIZED:
             return {
                 label: i18n('value_bridge-state-synchronised'),
-                theme: 'normal',
+                theme: 'success',
+                icon: <Icon data={Check} size={12} />,
                 help: i18n('context_bridge-pile-state-synchronised'),
             };
         case BridgePileState.NOT_SYNCHRONIZED:
@@ -100,6 +117,7 @@ function getBridgePileStateInfo(state?: BridgePileState): BridgePileStateInfo {
 
 interface BridgeInfoTableProps {
     piles: TBridgePile[];
+    bridgeInfo?: TBridgeInfo;
     database?: string;
     clusterName?: string;
 }
@@ -129,6 +147,18 @@ const BridgePileCard = React.memo(function BridgePileCard({
         const {label, theme, icon, help} = getBridgePileStateInfo(pile.State);
         if (!label) {
             return null;
+        }
+
+        if (pile.State === BridgePileState.PRIMARY && help) {
+            return (
+                <ActionTooltip title={help}>
+                    <span className={b('state-label')} tabIndex={0}>
+                        <Label theme={theme} size="xs" icon={icon}>
+                            {label}
+                        </Label>
+                    </span>
+                </ActionTooltip>
+            );
         }
 
         return (
@@ -165,67 +195,123 @@ const BridgePileCard = React.memo(function BridgePileCard({
 
     const pileName = pile.Name?.trim() || EMPTY_DATA_PLACEHOLDER;
     const nodes = pile.Nodes === undefined ? EMPTY_DATA_PLACEHOLDER : formatNumber(pile.Nodes);
+    const hasRoleCounters = [
+        pile.StorageNodes,
+        pile.AliveStorageNodes,
+        pile.ComputeNodes,
+        pile.AliveComputeNodes,
+    ].some((value) => value !== undefined);
+    const formatCount = (value?: number) => {
+        const count = parseOptionalNonNegativeNumber(value);
+        return count === undefined ? EMPTY_DATA_PLACEHOLDER : formatNumber(count);
+    };
+    const nodeCounters = [
+        {kind: 'storage', total: pile.StorageNodes, alive: pile.AliveStorageNodes},
+        {kind: 'compute', total: pile.ComputeNodes, alive: pile.AliveComputeNodes},
+    ] as const;
     const handleHealthcheckClick = () => {
         if (pileHealthcheck.target) {
             onHealthcheckClick(pileHealthcheck.target);
         }
     };
+    const healthcheckAccessibleName = `${i18n('label_bridge-pile-health-status-prefix', {pileName})} ${EFlagToStatusName[pileHealthcheck.status]}`;
 
     return (
-        <Flex direction="column" gap={2} className={b('pile')}>
-            <Flex justifyContent="space-between" alignItems="flex-start" gap={2} width="100%">
-                <Text variant="subheader-1" ellipsis className={b('pile-name')}>
-                    {pileName}
-                </Text>
-                {current ? (
-                    <Label
-                        theme="clear"
-                        size="xs"
-                        icon={<Icon data={MapPin} size={12} />}
-                        className={b('current-pile')}
-                    >
-                        {i18n('label_you-are-here')}
-                    </Label>
-                ) : null}
-            </Flex>
-            <Flex gap={2} alignItems="center" wrap>
+        <Flex as={Card} view="outlined" direction="column" gap={3} className={b('pile')}>
+            <Flex justifyContent="space-between" alignItems="center" gap={2} width="100%">
+                <Flex alignItems="center" gap={1} minWidth={0}>
+                    <Text variant="subheader-1" ellipsis className={b('pile-name')}>
+                        {pileName}
+                    </Text>
+                    {current ? (
+                        <Tooltip content={i18n('context_bridge-pile-current')}>
+                            <span
+                                role="img"
+                                aria-label={i18n('label_you-are-here')}
+                                className={b('current-pile')}
+                                tabIndex={0}
+                            >
+                                <Label
+                                    theme="info"
+                                    size="xs"
+                                    icon={<Icon data={MapPin} size={12} />}
+                                    qa="bridge-current-pile"
+                                />
+                            </span>
+                        </Tooltip>
+                    ) : null}
+                </Flex>
                 {stateStatus}
-                {healthcheckAllowed &&
-                    (healthcheckLoading ? (
-                        <Skeleton className={b('healthcheck-skeleton')} />
-                    ) : (
-                        <EntityStatus.Label
-                            status={pileHealthcheck.status}
-                            size="xs"
-                            className={b('healthcheck-status')}
-                            onClick={pileHealthcheck.target ? handleHealthcheckClick : undefined}
-                            endContent={
-                                pileHealthcheck.target ? (
-                                    <Icon data={ChevronRight} size={12} />
-                                ) : undefined
-                            }
-                            qa="bridge-pile-healthcheck"
-                        >
-                            {pileHealthcheck.target ? (
-                                <span className={b('healthcheck-accessible-prefix')}>
-                                    {i18n('label_bridge-pile-health-status-prefix', {pileName})}
-                                </span>
-                            ) : null}
-                        </EntityStatus.Label>
-                    ))}
             </Flex>
-            <Flex gap={1} alignItems="center" className={b('nodes')}>
-                <Icon data={Archive} size={14} />
-                <Text variant="body-1">
-                    {i18n('field_nodes')}: {nodes}
-                </Text>
-            </Flex>
+            <DefinitionList nameMaxWidth={130} className={text({variant: 'body-1'}, b('details'))}>
+                {hasRoleCounters ? (
+                    nodeCounters.map(({kind, total, alive}) => {
+                        const title = i18n(
+                            kind === 'storage' ? 'field_storage-nodes' : 'field_compute-nodes',
+                        );
+                        const progress = getBridgeNodesProgress(total, alive);
+                        return (
+                            <DefinitionList.Item key={kind} name={title}>
+                                <Flex
+                                    alignItems="center"
+                                    gap={2}
+                                    wrap
+                                    qa={'bridge-pile-' + kind + '-nodes'}
+                                >
+                                    {progress !== undefined ? (
+                                        <span className={b('nodes-progress')} aria-hidden="true">
+                                            <Progress value={progress} size="xs" theme="info" />
+                                        </span>
+                                    ) : null}
+                                    <Text whiteSpace="nowrap">
+                                        {i18n('value_nodes-alive', {
+                                            alive: formatCount(alive),
+                                            total: formatCount(total),
+                                        })}
+                                    </Text>
+                                </Flex>
+                            </DefinitionList.Item>
+                        );
+                    })
+                ) : (
+                    <DefinitionList.Item name={i18n('field_nodes')}>{nodes}</DefinitionList.Item>
+                )}
+                {healthcheckAllowed && (
+                    <DefinitionList.Item name={i18n('field_healthcheck')}>
+                        {healthcheckLoading ? (
+                            <Skeleton className={b('healthcheck-skeleton')} />
+                        ) : (
+                            <Flex shrink={0}>
+                                <EntityStatus.Label
+                                    view="compact"
+                                    status={pileHealthcheck.status}
+                                    checkIcon="check"
+                                    tooltipTitle={
+                                        pileHealthcheck.status === EFlag.Green
+                                            ? i18n('context_bridge-pile-no-issues')
+                                            : undefined
+                                    }
+                                    size="xxs"
+                                    iconSize={12}
+                                    onClick={
+                                        pileHealthcheck.target ? handleHealthcheckClick : undefined
+                                    }
+                                    aria-label={healthcheckAccessibleName}
+                                    tabIndex={pileHealthcheck.target ? undefined : 0}
+                                    qa="bridge-pile-healthcheck"
+                                />
+                            </Flex>
+                        )}
+                    </DefinitionList.Item>
+                )}
+            </DefinitionList>
         </Flex>
     );
 });
 
 export const BridgeInfoTable = React.memo(function BridgeInfoTable({
     piles,
+    bridgeInfo,
     database,
     clusterName,
 }: BridgeInfoTableProps) {
@@ -257,8 +343,15 @@ export const BridgeInfoTable = React.memo(function BridgeInfoTable({
 
     const sortedPiles = React.useMemo(() => {
         return piles
-            .map((pile, index) => ({pile, index}))
+            .map((pile, index) => ({
+                pile,
+                index,
+                current: Boolean(currentPileName?.trim() && pile.Name === currentPileName),
+            }))
             .sort((left, right) => {
+                if (left.current !== right.current) {
+                    return left.current ? -1 : 1;
+                }
                 const leftPrimary = left.pile.State === BridgePileState.PRIMARY;
                 const rightPrimary = right.pile.State === BridgePileState.PRIMARY;
                 if (leftPrimary !== rightPrimary) {
@@ -266,23 +359,26 @@ export const BridgeInfoTable = React.memo(function BridgeInfoTable({
                 }
                 return left.index - right.index;
             });
-    }, [piles]);
+    }, [piles, currentPileName]);
 
     return (
-        <Flex wrap className={b()}>
-            {sortedPiles.map(({pile, index}) => (
-                <BridgePileCard
-                    key={pile.PileId ?? pile.Name ?? index}
-                    pile={pile}
-                    current={Boolean(currentPileName?.trim() && pile.Name === currentPileName)}
-                    healthcheckAllowed={Boolean(isMonitoringAllowed)}
-                    healthcheckAvailable={healthcheckAvailable}
-                    healthcheckSupportsPiles={healthcheckSupportsPiles}
-                    healthcheckLoading={healthcheckLoading}
-                    leavesIssues={leavesIssues}
-                    onHealthcheckClick={handleOpenHealthcheckIssue}
-                />
-            ))}
+        <Flex direction="column" gap={3} className={b()}>
+            {bridgeInfo ? <BridgeDatabasesSummary bridgeInfo={bridgeInfo} /> : null}
+            <Flex wrap className={b('piles')}>
+                {sortedPiles.map(({pile, index, current}) => (
+                    <BridgePileCard
+                        key={pile.PileId ?? pile.Name ?? index}
+                        pile={pile}
+                        current={current}
+                        healthcheckAllowed={Boolean(isMonitoringAllowed)}
+                        healthcheckAvailable={healthcheckAvailable}
+                        healthcheckSupportsPiles={healthcheckSupportsPiles}
+                        healthcheckLoading={healthcheckLoading}
+                        leavesIssues={leavesIssues}
+                        onHealthcheckClick={handleOpenHealthcheckIssue}
+                    />
+                ))}
+            </Flex>
         </Flex>
     );
 });
