@@ -20,6 +20,18 @@ function normalizeParameter(param: string) {
     return param.replace(/\$/g, '\\$');
 }
 
+function escapeSnippetText(text: string) {
+    return text.replace(/[$}\\]/g, '\\$&');
+}
+
+function getStreamingQueryNameSnippet(relativePath?: string) {
+    if (!relativePath) {
+        return '${1:<my_streaming_query>}';
+    }
+    const escapedName = relativePath.replace(/[\\`]/g, '\\$&');
+    return escapeSnippetText(`\`${escapedName}\``);
+}
+
 function toLF(str: string) {
     return str.replace(/\r\n?/g, '\n');
 }
@@ -430,9 +442,7 @@ END DO;`;
 };
 
 export const alterStreamingQuerySettingsTemplate = (params?: SchemaQueryParams) => {
-    const streamingQueryName = params?.relativePath
-        ? `\`${normalizeParameter(params.relativePath)}\``
-        : '${1:<my_streaming_query>}';
+    const streamingQueryName = getStreamingQueryNameSnippet(params?.relativePath);
     return `ALTER STREAMING QUERY ${streamingQueryName} SET (
     RUN = FALSE, -- Stop query execution
     RESOURCE_POOL = "default" -- Workload manager pool for query
@@ -440,18 +450,15 @@ export const alterStreamingQuerySettingsTemplate = (params?: SchemaQueryParams) 
 };
 
 export const alterStreamingQueryText = (params?: SchemaQueryParams) => {
-    const streamingQueryName = params?.relativePath
-        ? `\`${normalizeParameter(params.relativePath)}\``
-        : '${1:<my_streaming_query>}';
+    const streamingQueryName = getStreamingQueryNameSnippet(params?.relativePath);
 
     const sysData = params?.streamingQueryData;
     const rawQueryText = getStringifiedData(sysData?.resultSets?.[0]?.result?.[0]?.Text);
     let queryText = toLF(rawQueryText);
     queryText = trimOuterEmptyLines(queryText);
     queryText = stripIndentByFirstLine(queryText);
-    queryText = normalizeParameter(queryText);
 
-    const bodyQueryText = queryText ? queryText : '${2:<streaming_query_text>}';
+    const bodyQueryText = queryText ? escapeSnippetText(queryText) : '${2:<streaming_query_text>}';
     return `ALTER STREAMING QUERY ${streamingQueryName} SET (
     FORCE = TRUE, -- Allow to drop last query checkpoint if query state can't be loaded
 ) AS
@@ -463,9 +470,7 @@ END DO;`;
 };
 
 export const dropStreamingQueryTemplate = (params?: SchemaQueryParams) => {
-    const streamingQueryName = params?.relativePath
-        ? `\`${normalizeParameter(params.relativePath)}\``
-        : '${1:<my_streaming_query>}';
+    const streamingQueryName = getStreamingQueryNameSnippet(params?.relativePath);
     return `DROP STREAMING QUERY ${streamingQueryName};`;
 };
 
