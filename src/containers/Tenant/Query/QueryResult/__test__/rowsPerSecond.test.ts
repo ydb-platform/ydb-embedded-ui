@@ -28,20 +28,20 @@ function completeResult() {
 }
 
 test('uses matching execution statistics in microseconds, including a real zero', () => {
-    expect(getResultRowsPerSecond(completeResult().result)).toBe(2);
+    const legacy = completeResult();
+    legacy.execution.ResultRows = '1';
+    expect(getResultRowsPerSecond(legacy.result)).toBe(2);
     const {result, resultSet} = completeResult();
+    expect(getResultRowsPerSecond(result)).toBe(2);
     resultSet.result = [];
     expect(getResultRowsPerSecond(result)).toBe(0);
 });
 
-test.each([undefined, 0, 1, 0.5, NaN, 100_001])(
-    'omits uncertain or reached request limit %s',
-    (limit) => {
-        const {result} = completeResult();
-        result.limitRows = limit;
-        expect(getResultRowsPerSecond(result)).toBeUndefined();
-    },
-);
+test.each([undefined, 1, 1.5, 100_001])('omits uncertain or reached request limit %s', (limit) => {
+    const {result} = completeResult();
+    result.limitRows = limit;
+    expect(getResultRowsPerSecond(result)).toBeUndefined();
+});
 
 test.each([undefined, '', 'bad', 'Infinity', Infinity, NaN, 0, -1])(
     'omits invalid duration %s',

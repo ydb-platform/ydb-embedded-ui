@@ -1,5 +1,9 @@
 {
   "title_navigation": "Navigation",
+  "action_collapse-object-details": "Collapse object details",
+  "action_expand-object-details": "Expand object details",
+  "action_collapse-navigation-panel": "Collapse navigation panel",
+  "action_expand-navigation-panel": "Expand navigation panel",
   "action_copySchemaPath": "Copy schema path",
   "action_openInDiagnostics": "Open in Diagnostics"
 }

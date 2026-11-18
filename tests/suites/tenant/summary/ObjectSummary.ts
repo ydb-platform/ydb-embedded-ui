@@ -43,19 +43,22 @@ export class ObjectSummary {
         this.createDirectoryButton = page.locator('button.g-button_view_action:has-text("Create")');
         this.refreshButton = page.locator('.ydb-object-summary__refresh-button');
 
-        // Info panel collapse/expand buttons
-        this.infoCollapseButton = page.locator(
-            '.ydb-object-summary__info-controls .kv-pane-visibility-button_type_collapse',
-        );
-        this.infoExpandButton = page.locator(
-            '.ydb-object-summary__info-controls .kv-pane-visibility-button_type_expand',
-        );
-        this.summaryCollapseButton = page.locator(
-            '.ydb-object-summary__actions .kv-pane-visibility-button_type_collapse',
-        );
-        this.summaryExpandButton = page.locator(
-            '.ydb-object-summary__actions .kv-pane-visibility-button_type_expand',
-        );
+        this.infoCollapseButton = page.getByRole('button', {
+            name: 'Collapse object details',
+            exact: true,
+        });
+        this.infoExpandButton = page.getByRole('button', {
+            name: 'Expand object details',
+            exact: true,
+        });
+        this.summaryCollapseButton = page.getByRole('button', {
+            name: 'Collapse navigation panel',
+            exact: true,
+        });
+        this.summaryExpandButton = page.getByRole('button', {
+            name: 'Expand navigation panel',
+            exact: true,
+        });
         this.overviewWrapper = page.locator('.ydb-object-summary__overview-wrapper');
     }
 

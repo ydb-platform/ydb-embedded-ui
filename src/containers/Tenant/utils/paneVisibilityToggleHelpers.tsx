@@ -59,8 +59,8 @@ interface ToggleButtonProps {
     isCollapsed?: boolean;
     initialDirection?: 'right' | 'left' | 'top' | 'bottom';
     className?: string;
-    collapseLabel?: string;
-    expandLabel?: string;
+    collapseLabel: string;
+    expandLabel: string;
 }
 
 const b = cn('kv-pane-visibility-button');
@@ -71,8 +71,8 @@ export function PaneVisibilityToggleButtons({
     isCollapsed,
     initialDirection = 'top',
     className,
-    collapseLabel = 'Collapse',
-    expandLabel = 'Expand',
+    collapseLabel,
+    expandLabel,
 }: ToggleButtonProps) {
     useResizeObserverTrigger([isCollapsed]);
     return (
