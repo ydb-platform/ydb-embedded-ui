@@ -3,10 +3,7 @@ import {Xmark} from '@gravity-ui/icons';
 import {Alert, Button, DefinitionList, Flex, Icon, Table, Text, Tooltip} from '@gravity-ui/uikit';
 import type {TableColumnConfig} from '@gravity-ui/uikit';
 
-import {
-    BridgeSyncStatusLabel,
-    getBridgeSyncStatusPresentation,
-} from '../../../../../components/BridgeSyncStatusLabel';
+import {BridgeSyncStatusLabel} from '../../../../../components/BridgeSyncStatusLabel';
 import {HoverPopup} from '../../../../../components/HoverPopup/HoverPopup';
 import {InternalLink} from '../../../../../components/InternalLink';
 import {useStorageGroupPath} from '../../../../../routes';
@@ -18,6 +15,7 @@ import {EMPTY_DATA_PLACEHOLDER} from '../../../../../utils/constants';
 import {formatDateTime} from '../../../../../utils/dataFormatters/dataFormatters';
 import {parseUsToMs} from '../../../../../utils/timeParsers';
 import {bytesToSize, parseOptionalNonNegativeNumber} from '../../../../../utils/utils';
+import {SyncPartnerPileName} from '../../../SyncPartnerPileName';
 
 import i18n from './i18n';
 
@@ -31,8 +29,8 @@ function formatBytes(value: number) {
 
 function hasSyncDetails(group: PreparedStorageGroup) {
     return (
-        group.BridgeSyncStatus !== BridgeSyncStatus.NOT_REQUIRED &&
-        Boolean(getBridgeSyncStatusPresentation(group.BridgeSyncStatus))
+        group.BridgeSyncStatus === BridgeSyncStatus.SYNCING ||
+        group.BridgeSyncStatus === BridgeSyncStatus.PENDING
     );
 }
 
@@ -69,8 +67,7 @@ function SyncDetails({group, onClose}: {group: PreparedStorageGroup; onClose: Vo
                     {i18n('field_group-id')}
                 </Text>
             ),
-            className: b('partner-cell'),
-            width: 100,
+            className: b('partner-cell', {id: true}),
             template: ({GroupId}) =>
                 GroupId ? (
                     <InternalLink to={getGroupPath(GroupId)}>{GroupId}</InternalLink>
@@ -85,13 +82,8 @@ function SyncDetails({group, onClose}: {group: PreparedStorageGroup; onClose: Vo
                     {i18n('field_pile')}
                 </Text>
             ),
-            className: b('partner-cell'),
-            width: 90,
-            template: ({PileName}) => (
-                <Text ellipsis className={b('partner-pile')} title={PileName}>
-                    {PileName || EMPTY_DATA_PLACEHOLDER}
-                </Text>
-            ),
+            className: b('partner-cell', {pile: true}),
+            template: ({PileName}) => <SyncPartnerPileName name={PileName} />,
         },
     ];
 
@@ -147,7 +139,11 @@ function SyncDetails({group, onClose}: {group: PreparedStorageGroup; onClose: Vo
                         </Text>
                         <DefinitionList nameMaxWidth={200} className={b('metrics')}>
                             <DefinitionList.Item name={i18n('field_reported')}>
-                                {formatDateTime(reported, {defaultValue: EMPTY_DATA_PLACEHOLDER})}
+                                <Text variant="inherit" whiteSpace="nowrap">
+                                    {formatDateTime(reported, {
+                                        defaultValue: EMPTY_DATA_PLACEHOLDER,
+                                    })}
+                                </Text>
                             </DefinitionList.Item>
                         </DefinitionList>
                         <Alert
@@ -182,11 +178,7 @@ export function StorageGroupSyncPopover({group}: {group: PreparedStorageGroup}) 
             renderPopupContent={({onClose}) => <SyncDetails group={group} onClose={onClose} />}
         >
             <Flex as="span" inline onClick={(event) => event.stopPropagation()}>
-                <BridgeSyncStatusLabel
-                    status={group.BridgeSyncStatus}
-                    withInfo={Boolean(group.BridgeSyncLastError?.trim())}
-                    interactive
-                />
+                <BridgeSyncStatusLabel status={group.BridgeSyncStatus} withInfo interactive />
             </Flex>
         </HoverPopup>
     );

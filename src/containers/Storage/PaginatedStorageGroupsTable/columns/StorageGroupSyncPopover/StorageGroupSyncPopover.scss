@@ -4,9 +4,11 @@
     gap: var(--g-spacing-2);
 
     box-sizing: border-box;
-    max-width: min(338px, calc(100vw - 64px));
+    width: min(400px, calc(100vw - 64px));
 
     &__body {
+        flex: 1;
+
         min-width: 0;
     }
 
@@ -27,20 +29,22 @@
     &__partners {
         border-radius: var(--g-border-radius-m);
         box-shadow: inset 0 0 0 1px var(--g-color-line-generic);
-
-        .g-table__table {
-            table-layout: fixed;
-        }
     }
 
     & &__partner-cell {
         box-sizing: border-box;
         height: 32px;
         padding: var(--g-spacing-1) var(--g-spacing-2);
-    }
 
-    &__partner-pile {
-        display: block;
+        &_id {
+            width: 1px;
+
+            white-space: nowrap;
+        }
+
+        &_pile {
+            max-width: 0;
+        }
     }
 
     &__message.g-alert {

@@ -1,5 +1,5 @@
 import {ArrowsRotateLeft, Check, CirclePause, CircleQuestion} from '@gravity-ui/icons';
-import {Icon, Label} from '@gravity-ui/uikit';
+import {Icon, Label, Text} from '@gravity-ui/uikit';
 import type {IconData, LabelProps} from '@gravity-ui/uikit';
 
 import {BridgeSyncStatus} from '../../types/api/cluster';
@@ -56,7 +56,7 @@ export function BridgeSyncStatusLabel({
         return EMPTY_DATA_PLACEHOLDER;
     }
     if (!presentation.icon) {
-        return presentation.label();
+        return <Text color="hint">{presentation.label()}</Text>;
     }
 
     return (
