@@ -1,5 +1,5 @@
 import type {QuerySettings} from '../../../../types/store/query';
-import {RESOURCE_POOL_NO_OVERRIDE_VALUE} from '../../../../utils/query';
+import {RESOURCE_POOL_NO_OVERRIDE_VALUE, getEffectiveQueryTimeout} from '../../../../utils/query';
 
 const settingKeys = [
     'queryMode',
@@ -13,7 +13,12 @@ const settingKeys = [
     'resourcePool',
 ] as const;
 
-export function getQuerySettingsMetricaParams(initial: QuerySettings, applied: QuerySettings) {
+export function getQuerySettingsMetricaParams(
+    initial: QuerySettings,
+    draft: QuerySettings,
+    streamingEnabled: boolean,
+) {
+    const applied = {...draft, timeout: getEffectiveQueryTimeout(draft, streamingEnabled)};
     const changed = settingKeys.filter((key) => initial[key] !== applied[key]);
     if (!changed.length) {
         return undefined;

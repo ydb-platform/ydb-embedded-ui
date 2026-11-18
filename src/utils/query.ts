@@ -16,6 +16,7 @@ import type {
     IQueryResult,
     QueryAction,
     QueryMode,
+    QuerySettings,
     StatisticsMode,
     TracingLevel,
     TransactionMode,
@@ -490,4 +491,11 @@ export const querySettingsRestoreSchema = z
 
 export function isStreamingSupportedForMode(mode: QueryMode) {
     return mode === QUERY_MODES.query;
+}
+
+export function getEffectiveQueryTimeout(settings: QuerySettings, streamingEnabled: boolean) {
+    return (
+        settings.timeout ??
+        (streamingEnabled && isStreamingSupportedForMode(settings.queryMode) ? null : undefined)
+    );
 }

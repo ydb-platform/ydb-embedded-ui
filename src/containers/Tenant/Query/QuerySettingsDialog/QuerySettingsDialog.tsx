@@ -11,6 +11,7 @@ import {
     TextInput,
 } from '@gravity-ui/uikit';
 import {zodResolver} from '@hookform/resolvers/zod';
+import {flushSync} from 'react-dom';
 import type {FieldErrors} from 'react-hook-form';
 import {Controller, useForm} from 'react-hook-form';
 import type {z} from 'zod';
@@ -104,10 +105,12 @@ const advancedFields = [
 
 function SettingRow({
     name,
+    labelFor = name,
     help,
     children,
 }: {
     name: keyof QuerySettings;
+    labelFor?: string;
     help?: string;
     children: React.ReactNode;
 }) {
@@ -115,7 +118,7 @@ function SettingRow({
     return (
         <div className={b('dialog-row')}>
             <div className={b('field-title')}>
-                <label htmlFor={name}>{title}</label>
+                <label htmlFor={labelFor}>{title}</label>
                 {help && (
                     <HelpMark aria-label={i18n('context_field-help', {field: title})}>
                         {help}
@@ -198,15 +201,21 @@ function QuerySettingsForm({initialValues, onSubmit, onClose}: QuerySettingsForm
     );
 
     const submit = (data: QuerySettings) => {
-        const params = getQuerySettingsMetricaParams(openedSettings, data);
+        const params = getQuerySettingsMetricaParams(openedSettings, data, isQueryStreamingEnabled);
         if (params) {
             reachMetricaGoal('applyQuerySettings', params);
         }
         onSubmit(data);
     };
+    const revealInvalidField = () => {
+        if (!advancedExpanded) {
+            // The field must be visible before native validation or react-hook-form focuses it.
+            flushSync(() => setAdvancedExpanded(true));
+        }
+    };
     const showErrors = (formErrors: FieldErrors<QuerySettingsFormInput>) => {
         if (advancedFields.some((field) => formErrors[field])) {
-            setAdvancedExpanded(true);
+            revealInvalidField();
         }
     };
 
@@ -248,11 +257,12 @@ function QuerySettingsForm({initialValues, onSubmit, onClose}: QuerySettingsForm
                     <Controller
                         name="limitRows"
                         control={control}
-                        render={({field}) => (
+                        render={({field: {ref, ...field}}) => (
                             <TextInput
                                 id="limitRows"
                                 type="number"
                                 {...field}
+                                controlRef={ref}
                                 value={field.value?.toString() ?? ''}
                                 className={b('limit-rows')}
                                 placeholder="10000"
@@ -310,7 +320,11 @@ function QuerySettingsForm({initialValues, onSubmit, onClose}: QuerySettingsForm
                             React.cloneElement(summary, {className: b('advanced-toggle')})
                         }
                     </Disclosure.Summary>
-                    <div className={b('advanced-fields')} hidden={!advancedExpanded}>
+                    <div
+                        className={b('advanced-fields')}
+                        hidden={!advancedExpanded}
+                        onInvalid={revealInvalidField}
+                    >
                         <SettingRow name="queryMode" help={i18n('context_query-type')}>
                             <Controller
                                 name="queryMode"
@@ -336,15 +350,19 @@ function QuerySettingsForm({initialValues, onSubmit, onClose}: QuerySettingsForm
                             />
                         </SettingRow>
                         {enableTracingLevel && (
-                            <SettingRow name="tracingLevel" help={i18n('context_tracing')}>
+                            <SettingRow
+                                name="tracingLevel"
+                                labelFor="tracing-switch"
+                                help={i18n('context_tracing')}
+                            >
                                 <Controller
                                     name="tracingLevel"
                                     control={control}
                                     render={({field}) => (
                                         <div className={b('tracing')}>
                                             <Switch
+                                                id="tracing-switch"
                                                 checked={field.value !== TRACING_LEVELS.off}
-                                                controlProps={{'aria-label': i18n('field_tracing')}}
                                                 onUpdate={(enabled) =>
                                                     field.onChange(
                                                         enabled
@@ -380,11 +398,12 @@ function QuerySettingsForm({initialValues, onSubmit, onClose}: QuerySettingsForm
                                 <Controller
                                     name="outputChunkMaxSize"
                                     control={control}
-                                    render={({field}) => (
+                                    render={({field: {ref, ...field}}) => (
                                         <TextInput
                                             id="outputChunkMaxSize"
                                             type="number"
                                             {...field}
+                                            controlRef={ref}
                                             value={field.value?.toString() ?? ''}
                                             className={b('output-chunk-max-size')}
                                             placeholder="1000000"
@@ -429,6 +448,7 @@ function QuerySettingsForm({initialValues, onSubmit, onClose}: QuerySettingsForm
                                 render={({field}) => (
                                     <QuerySettingsTimeout
                                         id="timeout"
+                                        controlRef={field.ref}
                                         value={field.value as string | number | null | undefined}
                                         onChange={field.onChange}
                                         onToggle={(enabled) => field.onChange(enabled ? '' : null)}
