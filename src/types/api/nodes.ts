@@ -24,6 +24,15 @@ export interface TNodesInfo {
     MaximumSlotsPerDisk?: string;
     /** uint64 */
     MaximumDisksPerNode?: string;
+
+    /** Data sources that failed while the response was collected, e.g. `bsc-timeout` */
+    Problems?: string[];
+    /** Raised when the requested filter was not applied */
+    NeedFilter?: boolean;
+    /** Raised when the requested grouping was not applied */
+    NeedGroup?: boolean;
+    /** Raised when the requested sorting was not applied */
+    NeedSort?: boolean;
 }
 
 export interface TNodeInfo {
@@ -35,6 +44,12 @@ export interface TNodeInfo {
     DiskSpaceUsage?: number;
     UptimeSeconds?: number;
     Disconnected?: boolean;
+    /**
+     * The node did not answer in time: neither an answer nor a disconnect was received,
+     * so its real state is unknown. The node has no state then, and `Disconnected`
+     * may or may not be set for it as well. Sent by newer backends only.
+     */
+    ResponseTimeout?: boolean;
 
     SystemState: TSystemStateInfo;
     PDisks?: TPDiskStateInfo[];
@@ -365,6 +380,8 @@ export interface NodesRequestParams {
     uptime?: number;
     /** return nodes with SystemState !== EFlag.Green */
     problems_only?: boolean;
+    /** exclude disconnected nodes; requires /viewer/nodes/alive capability */
+    alive?: boolean;
     /** filter nodes by id or host */
     filter?: string;
     filter_peer_role?: NodesPeerRole; // v14

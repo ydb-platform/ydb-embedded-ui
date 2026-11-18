@@ -38,6 +38,7 @@ export const NODES_COLUMNS_IDS = {
     Tablets: 'Tablets',
     PDisks: 'PDisks',
     PileName: 'PileName',
+    Roles: 'Roles',
     PDiskUsage: CAPACITY_METRICS_COLUMN_IDS.MaxPDiskUsage,
     VDiskSlotUsage: CAPACITY_METRICS_COLUMN_IDS.MaxVDiskSlotUsage,
     VDiskRawUsage: CAPACITY_METRICS_COLUMN_IDS.MaxVDiskRawUsage,
@@ -146,6 +147,9 @@ export const NODES_COLUMNS_TITLES = {
     get PileName() {
         return i18n('field_pile-name');
     },
+    get Roles() {
+        return i18n('field_roles');
+    },
     get MaxPDiskUsage() {
         return CAPACITY_METRICS_COLUMN_TITLES.MaxPDiskUsage;
     },
@@ -249,6 +253,7 @@ export const NODES_COLUMNS_TO_DATA_FIELDS: Record<NodesColumnId, NodesRequiredFi
     Tablets: ['Tablets', 'Database'],
     PDisks: ['PDisks'],
     PileName: ['PileName'],
+    Roles: ['SystemState'],
     MaxPDiskUsage: ['MaxPDiskUsage'],
     MaxVDiskSlotUsage: ['MaxVDiskSlotUsage', 'CapacityAlert'],
     MaxVDiskRawUsage: ['MaxVDiskRawUsage'],
@@ -284,6 +289,7 @@ const NODES_COLUMNS_TO_SORT_FIELDS: Record<NodesColumnId, NodesSortValue | undef
     Tablets: undefined,
     PDisks: undefined,
     PileName: undefined,
+    Roles: undefined,
     MaxPDiskUsage: 'MaxPDiskUsage',
     MaxVDiskSlotUsage: 'MaxVDiskSlotUsage',
     MaxVDiskRawUsage: 'MaxVDiskRawUsage',

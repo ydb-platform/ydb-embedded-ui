@@ -1,3 +1,5 @@
+import React from 'react';
+
 import {ResponseError} from '../../../../components/Errors/ResponseError';
 import {JsonViewer} from '../../../../components/JsonViewer/JsonViewer';
 import {Loader} from '../../../../components/Loader';
@@ -10,6 +12,15 @@ import './Describe.scss';
 
 const b = cn('ydb-describe');
 
+// react-unipika keeps the Full value dialog in its internal state when the viewer value changes
+// and has no API to close it, so close it the same way a user would.
+function closeFullValueDialog() {
+    const dialog = document
+        .querySelector('.g-ru-full-value-dialog__full-value')
+        ?.closest('[role="dialog"]');
+    dialog?.dispatchEvent(new KeyboardEvent('keydown', {key: 'Escape', bubbles: true}));
+}
+
 interface IDescribeProps {
     path: string;
     database: string;
@@ -21,38 +32,42 @@ const Describe = ({path, database, databaseFullPath, scrollContainerRef}: IDescr
     const [autoRefreshInterval] = useAutoRefreshInterval();
     const useMetaProxy = useClusterWithProxy();
 
-    const {currentData, isFetching, error} = overviewApi.useGetOverviewQuery(
+    const {data, currentData, isFetching, error} = overviewApi.useGetOverviewQuery(
         {path, database, databaseFullPath, useMetaProxy},
         {pollingInterval: autoRefreshInterval},
     );
 
+    // The viewer stays mounted between objects, so its Full value dialog must not outlive the object.
+    React.useEffect(() => {
+        closeFullValueDialog();
+    }, [path, database]);
+
     const loading = isFetching && currentData === undefined;
 
-    if (loading) {
-        return <Loader size="m" />;
-    }
-
-    if (!currentData && !error) {
-        return <div className={b('message-container')}>Empty</div>;
-    }
-
     return (
-        <div className={b()}>
-            {error ? <ResponseError error={error} /> : null}
-            {currentData ? (
-                <div className={b('result')}>
-                    <JsonViewer
-                        value={currentData}
-                        withClipboardButton={{
-                            withLabel: false,
-                            copyText: JSON.stringify(currentData),
-                        }}
-                        search
-                        collapsedInitially
-                        scrollContainerRef={scrollContainerRef}
-                    />
-                </div>
+        <div className={b()} data-qa="describe">
+            {loading ? <Loader size="m" /> : null}
+            {!loading && !currentData && !error ? (
+                <div className={b('message-container')}>Empty</div>
             ) : null}
+            {error ? <ResponseError error={error} /> : null}
+            {/* Keep the viewer mounted while the next object loads to preserve expanded paths. */}
+            <div hidden={!currentData}>
+                {data ? (
+                    <div className={b('result')}>
+                        <JsonViewer
+                            value={data}
+                            withClipboardButton={{
+                                withLabel: false,
+                                copyText: JSON.stringify(data),
+                            }}
+                            search
+                            collapsedInitially
+                            scrollContainerRef={scrollContainerRef}
+                        />
+                    </div>
+                ) : null}
+            </div>
         </div>
     );
 };

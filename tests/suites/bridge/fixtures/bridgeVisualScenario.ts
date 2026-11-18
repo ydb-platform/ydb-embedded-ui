@@ -89,14 +89,21 @@ function makePileIssueBranch({name, healthStatus}: PileScenario, pileIndex: numb
 }
 
 export const bridgeVisualCluster: TClusterInfo = {
-    Version: 8,
+    Version: 11,
     Domain: '/Root',
     BridgeInfo: {
+        BridgeDatabases: '8',
+        BridgeDatabasesComplete: true,
+        DatabaseCountsBySyncStatus: {SYNCED: '5', SYNCING: '1', PENDING: '1', UNKNOWN: '1'},
         Piles: pileScenarios.map(({name, state, nodes}, index) => ({
             PileId: index + 1,
             Name: name,
             State: state,
-            Nodes: nodes,
+            Nodes: 16,
+            StorageNodes: 8,
+            AliveStorageNodes: Math.min(nodes, 8),
+            ComputeNodes: 8,
+            AliveComputeNodes: Math.max(nodes - 8, 0),
         })),
     },
 };

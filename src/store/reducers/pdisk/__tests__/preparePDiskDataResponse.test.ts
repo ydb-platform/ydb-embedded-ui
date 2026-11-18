@@ -23,6 +23,16 @@ describe('preparePDiskDataResponse', () => {
         expect(slots.filter((slot) => slot.SlotType === 'empty')).toHaveLength(1);
     });
 
+    test('keeps the datacenter caption separate from its bridge color key', () => {
+        const result = preparePDiskDataResponse([
+            {},
+            {
+                SystemStateInfo: [{Location: {DataCenter: 'dc-a', BridgePileName: 'pile-a'}}],
+            },
+        ]);
+        expect(result).toMatchObject({NodeDC: 'dc-a', NodeDCKey: 'P=PILE-A/DC-A'});
+    });
+
     const rawData = {
         Whiteboard: {
             PDisk: {

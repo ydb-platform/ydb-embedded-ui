@@ -48,6 +48,7 @@ export function ClusterDrawerHealthcheck({
 
     return (
         <HealthcheckDrawer
+            target={clusterName ? {scope: 'cluster', request: {clusterName}} : undefined}
             isDrawerVisible={isVisible && Boolean(clusterName)}
             onCloseDrawer={handleCloseDrawer}
             renderDrawerContent={renderDrawerContent}

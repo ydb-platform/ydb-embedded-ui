@@ -19,6 +19,10 @@ let mockTenant: TTenant | undefined;
 let mockNavigationV2 = false;
 const POLLING_INTERVAL = 200;
 
+jest.mock('../../../../../utils/hooks/useWhoami', () => ({
+    useIsUserAllowedToMakeChanges: () => true,
+}));
+
 jest.mock('../../../../../utils/hooks', () => ({
     useAutoRefreshInterval: () => [POLLING_INTERVAL],
     useTypedSelector: jest.requireActual('react-redux').useSelector,

@@ -196,52 +196,6 @@ export const setupEmptyOperationsMock = async (page: Page) => {
     });
 };
 
-export const setupLargeOperationsMock = async (page: Page, totalOperations = 1000) => {
-    await setupOperationsMock(page, {totalOperations});
-};
-
-export const setupOperationMutationMocks = async (page: Page) => {
-    // Mock cancel operation
-    await page.route(`${backend}/operation/cancel*`, async (route) => {
-        await new Promise((resolve) => setTimeout(resolve, MOCK_DELAY));
-
-        await route.fulfill({
-            status: 200,
-            contentType: 'application/json',
-            body: JSON.stringify({
-                status: 'SUCCESS',
-            }),
-        });
-    });
-
-    // Mock forget operation
-    await page.route(`${backend}/operation/forget*`, async (route) => {
-        await new Promise((resolve) => setTimeout(resolve, MOCK_DELAY));
-
-        await route.fulfill({
-            status: 200,
-            contentType: 'application/json',
-            body: JSON.stringify({
-                status: 'SUCCESS',
-            }),
-        });
-    });
-};
-
-export const setupOperationErrorMock = async (page: Page) => {
-    await page.route(`${backend}/operation/list*`, async (route) => {
-        await new Promise((resolve) => setTimeout(resolve, MOCK_DELAY));
-
-        await route.fulfill({
-            status: 500,
-            contentType: 'application/json',
-            body: JSON.stringify({
-                error: 'Internal server error',
-            }),
-        });
-    });
-};
-
 export const setupOperation403Mock = async (page: Page) => {
     await page.route(`${backend}/operation/list*`, async (route) => {
         await new Promise((resolve) => setTimeout(resolve, MOCK_DELAY));
@@ -254,12 +208,6 @@ export const setupOperation403Mock = async (page: Page) => {
             }),
         });
     });
-};
-
-// Helper to setup all required mocks for operations
-export const setupAllOperationMocks = async (page: Page, options?: {totalOperations?: number}) => {
-    await setupOperationsMock(page, options);
-    await setupOperationMutationMocks(page);
 };
 
 export const setupOperationNetworkErrorMock = async (page: Page) => {

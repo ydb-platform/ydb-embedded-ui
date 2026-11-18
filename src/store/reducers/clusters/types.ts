@@ -26,7 +26,10 @@ export interface PreparedCluster extends Omit<MetaExtendedClusterInfo, 'name' | 
     clusterExternalName?: string;
 }
 
+export type ClusterAvailability = 'available' | 'unavailable';
+
 export interface ClustersFilters {
+    availability: ClusterAvailability[];
     status: string[];
     service: string[];
     version: string[];

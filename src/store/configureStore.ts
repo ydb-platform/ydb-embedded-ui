@@ -12,12 +12,10 @@ import {getUrlData} from './getUrlData';
 import rootReducer from './reducers';
 import {api as storeApi} from './reducers/api';
 import {preloadUserSettingsFromLS, syncUserSettingsFromLS} from './reducers/settings/settings';
+import {basename, setRuntimeParams} from './runtimeParams';
 import getLocationMiddleware from './state-url-mapping';
 
-export let backend: string | undefined,
-    basename: string,
-    clusterName: string | undefined,
-    environment: string | undefined;
+export {backend, basename, clusterName, environment} from './runtimeParams';
 
 function getUrlDataAndSetParams({
     singleClusterMode,
@@ -33,7 +31,7 @@ function getUrlDataAndSetParams({
         customBackend,
         allowedEnvironments,
     });
-    ({basename, clusterName, environment, backend} = params);
+    setRuntimeParams(params);
 }
 
 function _configureStore<

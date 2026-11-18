@@ -104,6 +104,75 @@ describe('useStorageNodesSelectedColumns', () => {
         },
     );
 
+    test('shows Roles column only in Expert mode, hidden by default', () => {
+        useSetting.mockImplementation((_key: string, defaultValue: unknown) => [
+            defaultValue,
+            setSavedColumns,
+        ]);
+
+        const {result, rerender} = renderHook(
+            ({expertMode}) =>
+                useStorageNodesSelectedColumns({
+                    visibleEntities: 'all',
+                    columnsSettings: {expertMode},
+                }),
+            {initialProps: {expertMode: false}},
+        );
+
+        expect(result.current.columnsToSelect.map(({id}) => id)).not.toContain(
+            NODES_COLUMNS_IDS.Roles,
+        );
+
+        rerender({expertMode: true});
+
+        expect(
+            result.current.columnsToSelect.find(({id}) => id === NODES_COLUMNS_IDS.Roles),
+        ).toEqual(expect.objectContaining({selected: false}));
+        expect(result.current.columnsToShow.map(({name}) => name)).not.toContain(
+            NODES_COLUMNS_IDS.Roles,
+        );
+    });
+
+    test('preserves Roles selection when saving columns outside Expert mode', () => {
+        useSetting.mockReturnValue([
+            [
+                {id: NODES_COLUMNS_IDS.NodeId, selected: true},
+                {id: NODES_COLUMNS_IDS.Roles, selected: true},
+                {id: NODES_COLUMNS_IDS.PDisks, selected: true},
+            ],
+            setSavedColumns,
+        ]);
+
+        const {result} = renderHook(() =>
+            useStorageNodesSelectedColumns({
+                visibleEntities: 'all',
+                columnsSettings: {expertMode: false},
+            }),
+        );
+
+        expect(result.current.columnsToShow.map(({name}) => name)).not.toContain(
+            NODES_COLUMNS_IDS.Roles,
+        );
+
+        result.current.setColumns(result.current.columnsToSelect);
+
+        const savedColumns = setSavedColumns.mock.calls[0][0] as Array<{
+            id: string;
+            selected: boolean;
+        }>;
+        const trackedIds: string[] = [
+            NODES_COLUMNS_IDS.NodeId,
+            NODES_COLUMNS_IDS.Roles,
+            NODES_COLUMNS_IDS.PDisks,
+        ];
+
+        expect(savedColumns.filter(({id}) => trackedIds.includes(id))).toEqual([
+            {id: NODES_COLUMNS_IDS.NodeId, selected: true},
+            {id: NODES_COLUMNS_IDS.Roles, selected: true},
+            {id: NODES_COLUMNS_IDS.PDisks, selected: true},
+        ]);
+    });
+
     test('replaces legacy disk usage with explicit capacity columns when enabled', () => {
         useBlobStorageCapacityMetricsEnabled.mockReturnValue(true);
 

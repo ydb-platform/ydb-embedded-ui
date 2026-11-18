@@ -363,9 +363,20 @@ const calculateTenantEntities = (tenant: TTenant) => {
     return {nodesCount, groupsCount};
 };
 
-export const prepareTenants = (tenants: TTenant[]): PreparedTenant[] => {
+export const prepareTenants = (
+    tenants: TTenant[],
+    metaErrors?: PreparedTenant['metaErrors'],
+): PreparedTenant[] => {
+    const tenantsById = new Map<TTenant['Id'], TTenant>();
+    for (const tenant of tenants) {
+        // Keep the first match, including missing and empty IDs, just like Array.find.
+        if (!tenantsById.has(tenant.Id)) {
+            tenantsById.set(tenant.Id, tenant);
+        }
+    }
+
     return tenants.map((tenant) => {
-        const sharedDatabase = tenants.find((item) => item.Id === tenant.ResourceId);
+        const sharedDatabase = tenantsById.get(tenant.ResourceId);
         const sharedTenantName = sharedDatabase?.Name;
         const sharedNodeIds = sharedDatabase?.NodeIds;
         const controlPlaneName = getControlPlaneValue(tenant);
@@ -374,9 +385,13 @@ export const prepareTenants = (tenants: TTenant[]): PreparedTenant[] => {
 
         return {
             ...tenant,
+            ...(metaErrors !== undefined ? {metaErrors} : {}),
 
             sharedTenantName,
             sharedNodeIds,
+            ...(sharedDatabase?.ControlPlane
+                ? {sharedControlPlane: sharedDatabase.ControlPlane}
+                : {}),
             controlPlaneName,
             cpu,
             memory,

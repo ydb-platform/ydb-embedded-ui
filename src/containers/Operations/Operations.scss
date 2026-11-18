@@ -1,4 +1,28 @@
 .operations {
+    &__id-copy {
+        pointer-events: none;
+
+        opacity: 0;
+    }
+
+    &__id-cell:hover &__id-copy,
+    &__id-cell:focus-within &__id-copy {
+        pointer-events: auto;
+
+        opacity: 1;
+    }
+
+    &__error-text {
+        overflow: auto;
+
+        max-height: 300px;
+        margin: 0;
+
+        user-select: text;
+        white-space: pre-wrap;
+        overflow-wrap: anywhere;
+    }
+
     &__search {
         width: 220px;
     }

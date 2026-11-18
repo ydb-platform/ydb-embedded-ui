@@ -1,4 +1,5 @@
 import type {EFlag} from './enums';
+import type {MetaTenants} from './meta';
 import type {TMemoryStats, TPoolStats} from './nodes';
 import type {TTabletStateInfo} from './tablet';
 
@@ -19,6 +20,8 @@ export interface TTenants {
 export interface TTenantInfo {
     TenantInfo?: TTenant[];
     Errors?: string[];
+    /** Partial errors from meta; database data may still be available. */
+    errors?: MetaTenants['errors'];
 }
 
 export interface TTenant {

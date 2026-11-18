@@ -1,0 +1,247 @@
+// Datacenter palette from Figma. Token names are independent of DC identities.
+
+.g-root_theme_light,
+.g-root_theme_light-hc {
+    --ydb-dc-turquoise-text: #005c54;
+    --ydb-dc-turquoise-base: #00b8a933;
+    --ydb-dc-turquoise-base-hover: #00b8a947;
+    --ydb-dc-turquoise-outline-base: #00b8a900;
+    --ydb-dc-turquoise-outline-base-hover: #00b8a91a;
+    --ydb-dc-turquoise-outline-stroke: #00b8a9d9;
+    --ydb-dc-turquoise-filled-outline-base: #00b8a91f;
+    --ydb-dc-turquoise-filled-outline-base-hover: #00b8a933;
+    --ydb-dc-turquoise-filled-outline-stroke: #00b8a9ad;
+
+    --ydb-dc-purple-text: #6420aa;
+    --ydb-dc-purple-base: #9836f433;
+    --ydb-dc-purple-base-hover: #9836f447;
+    --ydb-dc-purple-outline-base: #9836f400;
+    --ydb-dc-purple-outline-base-hover: #9836f41a;
+    --ydb-dc-purple-outline-stroke: #9836f4d9;
+    --ydb-dc-purple-filled-outline-base: #9836f41f;
+    --ydb-dc-purple-filled-outline-base-hover: #9836f433;
+    --ydb-dc-purple-filled-outline-stroke: #9836f4ad;
+
+    --ydb-dc-blue-text: #153ab0;
+    --ydb-dc-blue-base: #2059ff33;
+    --ydb-dc-blue-base-hover: #2059ff47;
+    --ydb-dc-blue-outline-base: #2059ff00;
+    --ydb-dc-blue-outline-base-hover: #2059ff1a;
+    --ydb-dc-blue-outline-stroke: #2059ffd9;
+    --ydb-dc-blue-filled-outline-base: #2059ff1f;
+    --ydb-dc-blue-filled-outline-base-hover: #2059ff33;
+    --ydb-dc-blue-filled-outline-stroke: #2059ffad;
+
+    --ydb-dc-orange-text: #843e00;
+    --ydb-dc-orange-base: #f5840033;
+    --ydb-dc-orange-base-hover: #f5840047;
+    --ydb-dc-orange-outline-base: #f5840000;
+    --ydb-dc-orange-outline-base-hover: #f584001a;
+    --ydb-dc-orange-outline-stroke: #f58400d9;
+    --ydb-dc-orange-filled-outline-base: #f584001f;
+    --ydb-dc-orange-filled-outline-base-hover: #f5840033;
+    --ydb-dc-orange-filled-outline-stroke: #f58400ad;
+
+    --ydb-dc-red-text: #951121;
+    --ydb-dc-red-base: #e62e4033;
+    --ydb-dc-red-base-hover: #e62e4047;
+    --ydb-dc-red-outline-base: #e62e4000;
+    --ydb-dc-red-outline-base-hover: #e62e401a;
+    --ydb-dc-red-outline-stroke: #e62e40d9;
+    --ydb-dc-red-filled-outline-base: #e62e401f;
+    --ydb-dc-red-filled-outline-base-hover: #e62e4033;
+    --ydb-dc-red-filled-outline-stroke: #e62e40ad;
+
+    --ydb-dc-pink-text: #86115b;
+    --ydb-dc-pink-base: #e3269f33;
+    --ydb-dc-pink-base-hover: #e3269f47;
+    --ydb-dc-pink-outline-base: #e3269f00;
+    --ydb-dc-pink-outline-base-hover: #e3269f1a;
+    --ydb-dc-pink-outline-stroke: #e3269fd9;
+    --ydb-dc-pink-filled-outline-base: #e3269f1f;
+    --ydb-dc-pink-filled-outline-base-hover: #e3269f33;
+    --ydb-dc-pink-filled-outline-stroke: #e3269fad;
+
+    --ydb-dc-sky-text: #00577f;
+    --ydb-dc-sky-base: #00a7ef33;
+    --ydb-dc-sky-base-hover: #00a7ef47;
+    --ydb-dc-sky-outline-base: #00a7ef00;
+    --ydb-dc-sky-outline-base-hover: #00a7ef1a;
+    --ydb-dc-sky-outline-stroke: #00a7efd9;
+    --ydb-dc-sky-filled-outline-base: #00a7ef1f;
+    --ydb-dc-sky-filled-outline-base-hover: #00a7ef33;
+    --ydb-dc-sky-filled-outline-stroke: #00a7efad;
+
+    --ydb-dc-brown-text: #5f3b23;
+    --ydb-dc-brown-base: #865a3d33;
+    --ydb-dc-brown-base-hover: #865a3d47;
+    --ydb-dc-brown-outline-base: #865a3d00;
+    --ydb-dc-brown-outline-base-hover: #865a3d1a;
+    --ydb-dc-brown-outline-stroke: #865a3dd9;
+    --ydb-dc-brown-filled-outline-base: #865a3d1f;
+    --ydb-dc-brown-filled-outline-base-hover: #865a3d33;
+    --ydb-dc-brown-filled-outline-stroke: #865a3dad;
+
+    --ydb-dc-green-text: #166020;
+    --ydb-dc-green-base: #36b23b33;
+    --ydb-dc-green-base-hover: #36b23b47;
+    --ydb-dc-green-outline-base: #36b23b00;
+    --ydb-dc-green-outline-base-hover: #36b23b1a;
+    --ydb-dc-green-outline-stroke: #36b23bd9;
+    --ydb-dc-green-filled-outline-base: #36b23b1f;
+    --ydb-dc-green-filled-outline-base-hover: #36b23b33;
+    --ydb-dc-green-filled-outline-stroke: #36b23bad;
+
+    --ydb-dc-yellow-text: #655500;
+    --ydb-dc-yellow-base: #e6c80033;
+    --ydb-dc-yellow-base-hover: #e6c80047;
+    --ydb-dc-yellow-outline-base: #e6c80000;
+    --ydb-dc-yellow-outline-base-hover: #e6c8001a;
+    --ydb-dc-yellow-outline-stroke: #e6c800d9;
+    --ydb-dc-yellow-filled-outline-base: #e6c8001f;
+    --ydb-dc-yellow-filled-outline-base-hover: #e6c80033;
+    --ydb-dc-yellow-filled-outline-stroke: #e6c800ad;
+
+    --ydb-dc-sage-text: #305851;
+    --ydb-dc-sage-base: #4d9b8733;
+    --ydb-dc-sage-base-hover: #4d9b8747;
+    --ydb-dc-sage-outline-base: #4d9b8700;
+    --ydb-dc-sage-outline-base-hover: #4d9b871a;
+    --ydb-dc-sage-outline-stroke: #4d9b87d9;
+    --ydb-dc-sage-filled-outline-base: #4d9b871f;
+    --ydb-dc-sage-filled-outline-base-hover: #4d9b8733;
+    --ydb-dc-sage-filled-outline-stroke: #4d9b87ad;
+
+    --ydb-dc-slate-text: #44465f;
+    --ydb-dc-slate-base: #7476a433;
+    --ydb-dc-slate-base-hover: #7476a447;
+    --ydb-dc-slate-outline-base: #7476a400;
+    --ydb-dc-slate-outline-base-hover: #7476a41a;
+    --ydb-dc-slate-outline-stroke: #7476a4d9;
+    --ydb-dc-slate-filled-outline-base: #7476a41f;
+    --ydb-dc-slate-filled-outline-base-hover: #7476a433;
+    --ydb-dc-slate-filled-outline-stroke: #7476a4ad;
+}
+
+.g-root_theme_dark,
+.g-root_theme_dark-hc {
+    --ydb-dc-turquoise-text: #71f1de;
+    --ydb-dc-turquoise-base: #00c9ba33;
+    --ydb-dc-turquoise-base-hover: #00c9ba47;
+    --ydb-dc-turquoise-outline-base: #00c9ba00;
+    --ydb-dc-turquoise-outline-base-hover: #00c9ba1a;
+    --ydb-dc-turquoise-outline-stroke: #00c9bad1;
+    --ydb-dc-turquoise-filled-outline-base: #00c9ba29;
+    --ydb-dc-turquoise-filled-outline-base-hover: #00c9ba3d;
+    --ydb-dc-turquoise-filled-outline-stroke: #00c9baa6;
+
+    --ydb-dc-purple-text: #e3beff;
+    --ydb-dc-purple-base: #ad60ff33;
+    --ydb-dc-purple-base-hover: #ad60ff47;
+    --ydb-dc-purple-outline-base: #ad60ff00;
+    --ydb-dc-purple-outline-base-hover: #ad60ff1a;
+    --ydb-dc-purple-outline-stroke: #ad60ffd1;
+    --ydb-dc-purple-filled-outline-base: #ad60ff29;
+    --ydb-dc-purple-filled-outline-base-hover: #ad60ff3d;
+    --ydb-dc-purple-filled-outline-stroke: #ad60ffa6;
+
+    --ydb-dc-blue-text: #abc4ff;
+    --ydb-dc-blue-base: #4176ff33;
+    --ydb-dc-blue-base-hover: #4176ff47;
+    --ydb-dc-blue-outline-base: #4176ff00;
+    --ydb-dc-blue-outline-base-hover: #4176ff1a;
+    --ydb-dc-blue-outline-stroke: #4176ffd1;
+    --ydb-dc-blue-filled-outline-base: #4176ff29;
+    --ydb-dc-blue-filled-outline-base-hover: #4176ff3d;
+    --ydb-dc-blue-filled-outline-stroke: #4176ffa6;
+
+    --ydb-dc-orange-text: #ffce95;
+    --ydb-dc-orange-base: #ff880033;
+    --ydb-dc-orange-base-hover: #ff880047;
+    --ydb-dc-orange-outline-base: #ff880000;
+    --ydb-dc-orange-outline-base-hover: #ff88001a;
+    --ydb-dc-orange-outline-stroke: #ff8800d1;
+    --ydb-dc-orange-filled-outline-base: #ff880029;
+    --ydb-dc-orange-filled-outline-base-hover: #ff88003d;
+    --ydb-dc-orange-filled-outline-stroke: #ff8800a6;
+
+    --ydb-dc-red-text: #ffb4ba;
+    --ydb-dc-red-base: #ff405233;
+    --ydb-dc-red-base-hover: #ff405247;
+    --ydb-dc-red-outline-base: #ff405200;
+    --ydb-dc-red-outline-base-hover: #ff40521a;
+    --ydb-dc-red-outline-stroke: #ff4052d1;
+    --ydb-dc-red-filled-outline-base: #ff405229;
+    --ydb-dc-red-filled-outline-base-hover: #ff40523d;
+    --ydb-dc-red-filled-outline-stroke: #ff4052a6;
+
+    --ydb-dc-pink-text: #ffb0e2;
+    --ydb-dc-pink-base: #f444b733;
+    --ydb-dc-pink-base-hover: #f444b747;
+    --ydb-dc-pink-outline-base: #f444b700;
+    --ydb-dc-pink-outline-base-hover: #f444b71a;
+    --ydb-dc-pink-outline-stroke: #f444b7d1;
+    --ydb-dc-pink-filled-outline-base: #f444b729;
+    --ydb-dc-pink-filled-outline-base-hover: #f444b73d;
+    --ydb-dc-pink-filled-outline-stroke: #f444b7a6;
+
+    --ydb-dc-sky-text: #98e4ff;
+    --ydb-dc-sky-base: #24bfff33;
+    --ydb-dc-sky-base-hover: #24bfff47;
+    --ydb-dc-sky-outline-base: #24bfff00;
+    --ydb-dc-sky-outline-base-hover: #24bfff1a;
+    --ydb-dc-sky-outline-stroke: #24bfffd1;
+    --ydb-dc-sky-filled-outline-base: #24bfff29;
+    --ydb-dc-sky-filled-outline-base-hover: #24bfff3d;
+    --ydb-dc-sky-filled-outline-stroke: #24bfffa6;
+
+    --ydb-dc-brown-text: #eac5a7;
+    --ydb-dc-brown-base: #ac795833;
+    --ydb-dc-brown-base-hover: #ac795847;
+    --ydb-dc-brown-outline-base: #ac795800;
+    --ydb-dc-brown-outline-base-hover: #ac79581a;
+    --ydb-dc-brown-outline-stroke: #ac7958d1;
+    --ydb-dc-brown-filled-outline-base: #ac795829;
+    --ydb-dc-brown-filled-outline-base-hover: #ac79583d;
+    --ydb-dc-brown-filled-outline-stroke: #ac7958a6;
+
+    --ydb-dc-green-text: #a0f485;
+    --ydb-dc-green-base: #49ce4533;
+    --ydb-dc-green-base-hover: #49ce4547;
+    --ydb-dc-green-outline-base: #49ce4500;
+    --ydb-dc-green-outline-base-hover: #49ce451a;
+    --ydb-dc-green-outline-stroke: #49ce45d1;
+    --ydb-dc-green-filled-outline-base: #49ce4529;
+    --ydb-dc-green-filled-outline-base-hover: #49ce453d;
+    --ydb-dc-green-filled-outline-stroke: #49ce45a6;
+
+    --ydb-dc-yellow-text: #fff278;
+    --ydb-dc-yellow-base: #ebd50033;
+    --ydb-dc-yellow-base-hover: #ebd50047;
+    --ydb-dc-yellow-outline-base: #ebd50000;
+    --ydb-dc-yellow-outline-base-hover: #ebd5001a;
+    --ydb-dc-yellow-outline-stroke: #ebd500d1;
+    --ydb-dc-yellow-filled-outline-base: #ebd50029;
+    --ydb-dc-yellow-filled-outline-base-hover: #ebd5003d;
+    --ydb-dc-yellow-filled-outline-stroke: #ebd500a6;
+
+    --ydb-dc-sage-text: #b8d7cf;
+    --ydb-dc-sage-base: #65a49533;
+    --ydb-dc-sage-base-hover: #65a49547;
+    --ydb-dc-sage-outline-base: #65a49500;
+    --ydb-dc-sage-outline-base-hover: #65a4951a;
+    --ydb-dc-sage-outline-stroke: #65a495d1;
+    --ydb-dc-sage-filled-outline-base: #65a49529;
+    --ydb-dc-sage-filled-outline-base-hover: #65a4953d;
+    --ydb-dc-sage-filled-outline-stroke: #65a495a6;
+
+    --ydb-dc-slate-text: #c7c8db;
+    --ydb-dc-slate-base: #8586ac33;
+    --ydb-dc-slate-base-hover: #8586ac47;
+    --ydb-dc-slate-outline-base: #8586ac00;
+    --ydb-dc-slate-outline-base-hover: #8586ac1a;
+    --ydb-dc-slate-outline-stroke: #8586acd1;
+    --ydb-dc-slate-filled-outline-base: #8586ac29;
+    --ydb-dc-slate-filled-outline-base-hover: #8586ac3d;
+    --ydb-dc-slate-filled-outline-stroke: #8586aca6;
+}

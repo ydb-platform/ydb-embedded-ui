@@ -1,24 +1,26 @@
 import React from 'react';
 
+import {Flex, Text} from '@gravity-ui/uikit';
 import {skipToken} from '@reduxjs/toolkit/query';
 import {Helmet} from 'react-helmet-async';
 import {StringParam, useQueryParams} from 'use-query-params';
 
-import {EntityPageTitle} from '../../components/EntityPageTitle/EntityPageTitle';
+import {StickyAutoRefreshControl} from '../../components/AutoRefreshControl/StickyAutoRefreshControl';
+import {CopyableValue} from '../../components/CopyableValue/CopyableValue';
 import {ResponseError} from '../../components/Errors/ResponseError';
 import {InfoViewerSkeleton} from '../../components/InfoViewerSkeleton/InfoViewerSkeleton';
-import {PageMetaWithAutorefresh} from '../../components/PageMeta/PageMeta';
 import {StorageGroupInfo} from '../../components/StorageGroupInfo/StorageGroupInfo';
 import {useCapabilitiesLoaded} from '../../store/reducers/capabilities/hooks';
 import {setHeaderBreadcrumbs} from '../../store/reducers/header/header';
 import {storageApi} from '../../store/reducers/storage/storage';
-import {EFlag} from '../../types/api/enums';
 import {valueIsDefined} from '../../utils';
 import {cn} from '../../utils/cn';
+import {EMPTY_DATA_PLACEHOLDER} from '../../utils/constants';
 import {useAutoRefreshInterval, useTypedDispatch} from '../../utils/hooks';
 import {useDatabaseFromQuery} from '../../utils/hooks/useDatabaseFromQuery';
 import {useAppTitle} from '../App/AppTitleContext';
 import {PaginatedStorage} from '../Storage/PaginatedStorage';
+import {StorageGroupStateLabel} from '../Storage/StorageGroupStateLabel';
 
 import {storageGroupPageKeyset} from './i18n';
 
@@ -33,10 +35,6 @@ export function StorageGroupPage() {
 
     const [{groupId}] = useQueryParams({groupId: StringParam});
 
-    React.useEffect(() => {
-        dispatch(setHeaderBreadcrumbs('storageGroup', {groupId, database}));
-    }, [dispatch, groupId, database]);
-
     const [autoRefreshInterval] = useAutoRefreshInterval();
     const capabilitiesLoaded = useCapabilitiesLoaded();
     const groupQuery = storageApi.useGetStorageGroupsInfoQuery(
@@ -49,7 +47,11 @@ export function StorageGroupPage() {
         },
     );
 
-    const storageGroupData = groupQuery.data?.groups?.[0];
+    const storageGroupData = groupQuery.currentData?.groups?.[0];
+
+    React.useEffect(() => {
+        dispatch(setHeaderBreadcrumbs('storageGroup', {groupId: groupId ?? undefined, database}));
+    }, [dispatch, groupId, database]);
 
     const loading = groupQuery.isFetching && storageGroupData === undefined;
     const {appTitle} = useAppTitle();
@@ -67,30 +69,36 @@ export function StorageGroupPage() {
         );
     };
 
-    const renderPageMeta = () => {
-        if (!groupId) {
-            return null;
-        }
-
-        const items = [`${storageGroupPageKeyset('pool-name')}: ${storageGroupData?.PoolName}`];
-
-        return (
-            <PageMetaWithAutorefresh
-                className={storageGroupPageCn('meta')}
-                loading={loading}
-                items={items}
-            />
-        );
-    };
-
     const renderPageTitle = () => {
         return (
-            <EntityPageTitle
+            <Flex
                 className={storageGroupPageCn('title')}
-                entityName={storageGroupPageKeyset('storage-group')}
-                status={storageGroupData?.Overall || EFlag.Grey}
-                id={groupId}
-            />
+                alignItems="flex-start"
+                gap={2}
+                wrap="nowrap"
+            >
+                <Flex
+                    className={storageGroupPageCn('title-content')}
+                    alignItems="center"
+                    gap={2}
+                    wrap="wrap"
+                >
+                    <Text variant="header-1">{storageGroupPageKeyset('storage-group')}</Text>
+                    <CopyableValue
+                        copyText={groupId}
+                        fieldName={storageGroupPageKeyset('storage-group')}
+                        copyButtonLabel={storageGroupPageKeyset('action_copy-group-id-from-title')}
+                    >
+                        <Text variant="header-1" color="hint">
+                            {groupId || EMPTY_DATA_PLACEHOLDER}
+                        </Text>
+                    </CopyableValue>
+                    <StorageGroupStateLabel
+                        state={storageGroupData?.State}
+                        stateInfo={storageGroupData?.StateInfo}
+                    />
+                </Flex>
+            </Flex>
         );
     };
 
@@ -107,9 +115,9 @@ export function StorageGroupPage() {
         }
         return (
             <React.Fragment>
-                <div className={storageGroupPageCn('storage-title')}>
+                <Text as="h2" variant="subheader-3" className={storageGroupPageCn('storage-title')}>
                     {storageGroupPageKeyset('storage')}
-                </div>
+                </Text>
                 <PaginatedStorage
                     database={database}
                     groupId={groupId}
@@ -132,10 +140,12 @@ export function StorageGroupPage() {
     return (
         <div className={storageGroupPageCn(null)} ref={containerRef}>
             {renderHelmet()}
-            {renderPageMeta()}
-            {renderPageTitle()}
-            {renderError()}
-            {renderInfo()}
+            {groupId ? <StickyAutoRefreshControl /> : null}
+            <div className={storageGroupPageCn('summary')}>
+                {renderPageTitle()}
+                {renderError()}
+                {renderInfo()}
+            </div>
             {renderStorage()}
         </div>
     );

@@ -2,6 +2,8 @@ import type {EFlag} from '../../../types/api/enums';
 import type {TNodeInfo, TNodesInfo} from '../../../types/api/nodes';
 import {TPDiskState} from '../../../types/api/pdisk';
 import type {StorageGroupsResponse, TGroupsStorageGroupInfo} from '../../../types/api/storage';
+import {prepareResponseDataQuality} from '../../../utils/dataIssues/dataQuality';
+import {getNodeDatacenterKey} from '../../../utils/datacenters';
 import {
     getColorSeverity,
     getDataSeverityColor,
@@ -36,6 +38,16 @@ const normalizeMaxPercent = (value: number | string | null | undefined): number 
 };
 
 // ==== Prepare groups ====
+
+function parseLatencyUsToMs(value: unknown): number | undefined {
+    if (typeof value !== 'string' && typeof value !== 'number') {
+        return undefined;
+    }
+
+    const latency = parseOptionalNonNegativeNumber(value);
+
+    return latency === undefined ? undefined : parseUsToMs(latency);
+}
 
 function getGroupDiskSpaceStatus(group: TGroupsStorageGroupInfo): EFlag {
     const {DiskSpace, VDisks = []} = group;
@@ -88,16 +100,21 @@ const prepareStorageNodeData = (
                 pDisk.Realtime !== undefined);
         return prepareWhiteboardPDiskData({...pDisk, NodeId}, hasWhiteboardData ? pDisk : null);
     });
+    const pDisksById = new Map(pDisks?.map((pDisk) => [pDisk.PDiskId, pDisk]));
     const vDisks = VDisks?.map((vDisk) => {
+        const pDisk = vDisk.PDiskId === undefined ? undefined : pDisksById.get(vDisk.PDiskId);
         return {
             ...prepareWhiteboardVDiskData({...vDisk, VDiskId: vDisk.VDiskId}),
             NodeId,
+            PDiskType: pDisk?.Type,
+            PDiskPath: pDisk?.Path,
         };
     });
 
     return {
         ...restNodeParams,
         ...prepareNodeSystemState(SystemState),
+        DCKey: getNodeDatacenterKey(node),
         // There is NodeId both in node and its system state
         // We should use only NodeId from node, since it's always present (there may be no SystemState)
         NodeId,
@@ -204,6 +221,7 @@ export const prepareStorageNodesResponse = (data: TNodesInfo): PreparedStorageRe
         found: Number(FoundNodes),
         tableGroups,
         columnsSettings: {maxSlotsPerDisk, maxDisksPerNode},
+        dataQuality: prepareResponseDataQuality(data),
     };
 };
 
@@ -243,9 +261,9 @@ export function prepareGroupsResponse(data: StorageGroupsResponse): PreparedStor
             Used: Number(Used),
             Limit: Number(Limit),
 
-            LatencyPutTabletLogMs: parseUsToMs(LatencyPutTabletLog),
-            LatencyPutUserDataMs: parseUsToMs(LatencyPutUserData),
-            LatencyGetFastMs: parseUsToMs(LatencyGetFast),
+            LatencyPutTabletLogMs: parseLatencyUsToMs(LatencyPutTabletLog),
+            LatencyPutUserDataMs: parseLatencyUsToMs(LatencyPutUserData),
+            LatencyGetFastMs: parseLatencyUsToMs(LatencyGetFast),
 
             Degraded: Number(MissingDisks),
             Overall,
@@ -277,5 +295,6 @@ export function prepareGroupsResponse(data: StorageGroupsResponse): PreparedStor
         total: Number(TotalGroups) || preparedGroups.length,
         found: Number(FoundGroups),
         tableGroups,
+        dataQuality: prepareResponseDataQuality(data),
     };
 }

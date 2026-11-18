@@ -2,6 +2,7 @@ import {expect, test} from '@playwright/test';
 import type {Page} from '@playwright/test';
 
 import {database} from '../../../utils/constants';
+import {Sidebar} from '../../sidebar/Sidebar';
 import {NavigationTabs, QueryEditorMode, TenantPage} from '../TenantPage';
 
 import {
@@ -32,6 +33,52 @@ async function selectAsyncReplicationTemplate(
 }
 
 test.describe('Query Editor modes', () => {
+    for (const mode of [QueryEditorMode.SingleTab, QueryEditorMode.MultiTab]) {
+        test(`Word wrap can be changed and persists in ${mode} mode`, async ({page}) => {
+            const tenantPage = await openQueryEditorMode(page, mode);
+            const query = `SELECT '${'long value '.repeat(100)}';`;
+            await tenantPage.queryEditor.setQuery(query);
+
+            const hasHorizontalOverflow = () =>
+                tenantPage.queryEditor.editorTextArea.evaluate(() => {
+                    const editor = window.ydbEditor;
+                    if (!editor) {
+                        throw new Error('Expected a ready query editor');
+                    }
+                    return editor.getScrollWidth() > editor.getLayoutInfo().contentWidth;
+                });
+
+            await expect.poll(hasHorizontalOverflow).toBe(false);
+
+            const sidebar = new Sidebar(page);
+            await sidebar.clickSettings();
+            await sidebar.clickEditorSection();
+            const wordWrap = sidebar.getSettingsRoot().getByRole('radiogroup', {name: 'Word wrap'});
+            await expect(wordWrap.getByRole('radio', {name: 'On', exact: true})).toBeChecked();
+            await wordWrap.getByRole('radio', {name: 'Off', exact: true}).check();
+            await sidebar.closeDrawer();
+
+            await expect.poll(hasHorizontalOverflow).toBe(true);
+            await expect.poll(() => tenantPage.queryEditor.getEditorContent()).toBe(query);
+
+            await tenantPage.queryEditor.setQuery('');
+            await page.reload();
+            await tenantPage.queryEditor.waitForEditorReady();
+            await tenantPage.queryEditor.setQuery(query);
+            await expect.poll(hasHorizontalOverflow).toBe(true);
+            await expect.poll(() => tenantPage.queryEditor.getEditorContent()).toBe(query);
+
+            await sidebar.clickSettings();
+            await sidebar.clickEditorSection();
+            await expect(wordWrap.getByRole('radio', {name: 'Off', exact: true})).toBeChecked();
+            await wordWrap.getByRole('radio', {name: 'On', exact: true}).check();
+            await sidebar.closeDrawer();
+
+            await expect.poll(hasHorizontalOverflow).toBe(false);
+            await expect.poll(() => tenantPage.queryEditor.getEditorContent()).toBe(query);
+        });
+    }
+
     test('Single-tab mode renders editor without internal tabs', async ({page}) => {
         const tenantPage = await openQueryEditorMode(page, QueryEditorMode.SingleTab);
 

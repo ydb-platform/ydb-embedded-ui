@@ -5,9 +5,11 @@ import {
     selectCheckStatus,
 } from '../../store/reducers/healthcheckInfo/healthcheckInfo';
 import {useTypedSelector} from '../../utils/hooks';
+import {useDatabaseHealthcheckAvailable} from '../../utils/hooks/useDatabaseHealthcheckAvailable';
 
 import {Healthcheck} from './Healthcheck/Healthcheck';
 import {HealthcheckDrawer} from './Healthcheck/components/HealthcheckDrawer';
+import {getDatabaseHealthcheckAssistantTarget} from './Healthcheck/utils';
 import {useCurrentSchema} from './TenantContext';
 import i18n from './i18n';
 import {useTenantQueryParams} from './useTenantQueryParams';
@@ -18,12 +20,15 @@ interface TenantDrawerHealthcheckProps {
 }
 
 export function TenantDrawerHealthcheck({children, clusterName}: TenantDrawerHealthcheckProps) {
+    const healthcheckAvailable = useDatabaseHealthcheckAvailable();
     const {database} = useCurrentSchema();
     const {
         handleShowHealthcheckChange,
         showHealthcheck,
         handleIssuesFilterChange,
         handleHealthcheckViewChange,
+        issuesFilter,
+        view,
     } = useTenantQueryParams();
 
     const healthcheckStatus = useTypedSelector((state) =>
@@ -40,13 +45,31 @@ export function TenantDrawerHealthcheck({children, clusterName}: TenantDrawerHea
         handleHealthcheckViewChange(undefined);
     }, [handleShowHealthcheckChange, handleIssuesFilterChange, handleHealthcheckViewChange]);
 
+    React.useEffect(() => {
+        if (
+            healthcheckAvailable === false &&
+            (showHealthcheck !== undefined || view !== undefined || issuesFilter !== undefined)
+        ) {
+            handleCloseDrawer();
+        }
+    }, [healthcheckAvailable, showHealthcheck, view, issuesFilter, handleCloseDrawer]);
+
     const renderDrawerContent = React.useCallback(() => {
         return <Healthcheck database={database} clusterName={clusterName} />;
     }, [database, clusterName]);
 
     return (
         <HealthcheckDrawer
-            isDrawerVisible={Boolean(showHealthcheck)}
+            target={
+                database
+                    ? getDatabaseHealthcheckAssistantTarget({
+                          database,
+                          clusterName,
+                          scope: 'database',
+                      })
+                    : undefined
+            }
+            isDrawerVisible={Boolean(healthcheckAvailable && showHealthcheck)}
             onCloseDrawer={handleCloseDrawer}
             renderDrawerContent={renderDrawerContent}
             drawerId="tenant-healthcheck-details"

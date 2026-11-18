@@ -1,6 +1,6 @@
 {
   "title_empty": "No operations data",
-  "pleaceholder_search": "Search operations",
+  "pleaceholder_search": "Filter by ID",
   "placeholder_kind": "Select operation kind",
   "kind_ssBackgrounds": "SS/Backgrounds",
   "kind_export": "Export",
@@ -36,5 +36,24 @@
   "text_cancel": "This will cancel the operation in progress. This action cannot be undone.",
   "text_forget": "This will remove the operation from the list. This action cannot be undone.",
   "text_forgotten": "The operation {{id}} has been forgotten",
-  "text_cancelled": "The operation {{id}} has been cancelled"
+  "text_cancelled": "The operation {{id}} has been cancelled",
+  "field_operation-source": "Operation source",
+  "value_database": "Database",
+  "value_control-plane": "Control plane",
+  "value_completed": "Completed",
+  "value_pending": "Pending",
+  "value_error": "Error",
+  "column_user": "User",
+  "column_operation": "Operation",
+  "column_started-at": "Started at",
+  "column_updated-at": "Updated at",
+  "placeholder_filter-by-id": "Filter by ID",
+  "field_filter-status": "Filter operations by status",
+  "title_no-matching-operations": "No matching operations",
+  "action_show-details": "Show details",
+  "action_show-details-for-operation": "Show details for operation {{id}}",
+  "title_operation-error": "Operation {{id}}",
+  "action_close": "Close",
+  "column_id": "ID",
+  "action_copy-operation-id": "Copy operation {{id}} ID"
 }

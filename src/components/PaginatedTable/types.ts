@@ -37,10 +37,15 @@ export interface Column<T> {
     align: AlignType;
 }
 
-export interface PaginatedTableData<T> {
+export interface PaginatedTableData<T, M = unknown> {
     data: T[];
     total: number;
     found: number;
+    /**
+     * What the fetcher tells about the response besides the rows. The table does not look into it
+     * and hands it to `onChunkDataChange` as is: the type parameter ties the fetcher to the callback.
+     */
+    meta?: M;
 }
 
 type FetchDataParams<F, E = {}> = {
@@ -52,9 +57,19 @@ type FetchDataParams<F, E = {}> = {
     signal?: AbortSignal;
 } & E;
 
-export type FetchData<T, F = undefined, E = {}> = (
+export type FetchData<T, F = undefined, E = {}, M = unknown> = (
     params: FetchDataParams<F, E>,
-) => Promise<PaginatedTableData<T>>;
+) => Promise<PaginatedTableData<T, M>>;
+
+/**
+ * Tells what rows of a chunk are in the table now: its data while the chunk renders its rows
+ * and is loaded for the current filters and sorting, `undefined` otherwise. Chunks are kept
+ * loaded further from the viewport than they are rendered, and such a chunk reports `undefined`.
+ */
+export type OnChunkDataChange<T, M = unknown> = (
+    chunkOffset: number,
+    data: PaginatedTableData<T, M> | undefined,
+) => void;
 
 export type OnError = (error?: IResponseError) => void;
 

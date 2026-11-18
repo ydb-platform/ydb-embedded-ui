@@ -1,0 +1,8 @@
+.ydb-node-host-wrapper {
+    &__state-unknown {
+        display: inline-flex;
+        flex-shrink: 0;
+
+        color: var(--g-color-text-secondary);
+    }
+}

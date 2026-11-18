@@ -27,6 +27,7 @@ export type Capability =
     | '/viewer/cluster'
     | '/vdisk/blobindexstat'
     | '/viewer/nodes'
+    | '/viewer/nodes/alive'
     | '/viewer/peers'
     | '/viewer/acl'
     | '/viewer/topic_data'

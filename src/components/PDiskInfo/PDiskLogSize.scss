@@ -1,0 +1,12 @@
+.ydb-pdisk-log-size {
+    width: 100%;
+
+    white-space: nowrap;
+
+    &__progress {
+        flex: 0 0 auto;
+
+        width: var(--ydb-pdisk-log-size-progress-width, 100px);
+        margin: 0;
+    }
+}

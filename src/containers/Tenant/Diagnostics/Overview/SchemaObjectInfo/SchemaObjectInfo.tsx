@@ -18,6 +18,7 @@ export interface SchemaObjectInfoProps {
     path: string;
     itemsAfterType?: YDBDefinitionListItem[];
     additionalItems?: YDBDefinitionListItem[];
+    createdContent?: YDBDefinitionListItem['content'];
 }
 
 export function SchemaObjectInfo({
@@ -26,6 +27,7 @@ export function SchemaObjectInfo({
     path,
     itemsAfterType,
     additionalItems,
+    createdContent,
 }: SchemaObjectInfoProps) {
     const showAdministrativeFields = useUserPermissions()?.IsAdministrationAllowed === true;
     const items = React.useMemo(
@@ -37,8 +39,17 @@ export function SchemaObjectInfo({
                 itemsAfterType,
                 additionalItems,
                 showAdministrativeFields,
+                createdContent,
             }),
-        [additionalItems, data, fallbackType, itemsAfterType, path, showAdministrativeFields],
+        [
+            additionalItems,
+            createdContent,
+            data,
+            fallbackType,
+            itemsAfterType,
+            path,
+            showAdministrativeFields,
+        ],
     );
 
     return (

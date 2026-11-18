@@ -61,11 +61,6 @@ export const STATISTICS_MODES_TITLES: Record<StatisticsMode, string> = {
     [STATISTICS_MODES.profile]: 'Profile',
 } as const;
 
-export const STATISTICS_MODES_WITH_SVG: readonly StatisticsMode[] = [
-    STATISTICS_MODES.full,
-    STATISTICS_MODES.profile,
-];
-
 export const TRACING_LEVELS = {
     off: 'off',
     toplevel: 'toplevel',

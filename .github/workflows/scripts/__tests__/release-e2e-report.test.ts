@@ -1,4 +1,4 @@
-import {execFileSync} from 'node:child_process';
+import {execFileSync, spawnSync} from 'node:child_process';
 import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
@@ -16,6 +16,7 @@ const provenance = {
     ydb_sha: 'a'.repeat(40),
     image_digest: `sha256:${'b'.repeat(64)}`,
     frontend_mode: 'npm-start',
+    ui_sha: 'd'.repeat(40),
 };
 const image = {
     Id: 'sha256:container-image',
@@ -42,6 +43,29 @@ test.each(['npm-start', undefined])('labels new and historical frontend modes: %
     const result = summarize(report, {...provenance, frontend_mode: mode}, context);
     expect(result.status).toBe('passed');
     expect(result.summary).toContain(`Frontend: ${mode ?? 'image'}`);
+});
+
+test.each([undefined, null, '', 'main', ['d'.repeat(40)]])(
+    'labels an unavailable UI revision without exposing invalid metadata: %p',
+    (uiSha) => {
+        const result = summarize(
+            report,
+            {...provenance, ui_sha: uiSha},
+            {...context, merge: 'skipped'},
+        );
+        expect(result.status).toBe('incomplete');
+        expect(result.summary).toContain('UI: unavailable. Tests: unavailable.');
+    },
+);
+
+test('keeps a valid UI revision when the explicit test revision is invalid', () => {
+    const result = summarize(
+        report,
+        {...provenance, tests_sha: 'main'},
+        {...context, merge: 'skipped'},
+    );
+    expect(result.status).toBe('incomplete');
+    expect(result.summary).toContain(`UI: ${provenance.ui_sha}. Tests: unavailable.`);
 });
 
 test('a failed test or job cannot produce a passing summary', () => {
@@ -164,10 +188,16 @@ test('recovers completed failed tests while the parent run is still running', as
         'failed',
     );
     const ui = {ui_sha: 'd'.repeat(40), playwright_version: '1.58.0', workflow_sha: workflowSha};
-    expect(prepareReport(ui, source)).toEqual(ui);
+    expect(prepareReport(ui, source)).toEqual({...ui, tests_sha: ui.ui_sha});
+    const override = {...ui, tests_sha: 'f'.repeat(40)};
+    expect(prepareReport(override, source)).toEqual(override);
+    const summary = summarize(report, override, context).summary;
+    expect(summary).toContain(`UI: ${ui.ui_sha}`);
+    expect(summary).toContain(`Tests: ${override.tests_sha}`);
     for (const invalid of [
         undefined,
         {...ui, ui_sha: 'main'},
+        {...ui, tests_sha: 'main'},
         {...ui, playwright_version: 'latest'},
         {...ui, workflow_sha: 'e'.repeat(40)},
     ]) {
@@ -223,6 +253,44 @@ describe('report files', () => {
         fs.writeFileSync(file, contents);
         return file;
     };
+
+    test('CLI reports a failed preparation without undefined revision fields', () => {
+        write(
+            'downloaded/release-e2e-provenance/provenance.json',
+            JSON.stringify({workflow_sha: workflowSha, playwright_version: '1.58.0'}),
+        );
+        write(
+            'report-metadata/report-source.json',
+            JSON.stringify({source_workflow_sha: workflowSha}),
+        );
+        const summary = path.join(directory, 'job-summary.md');
+        const run = (command: string) =>
+            spawnSync(
+                process.execPath,
+                [path.resolve(__dirname, '../release-e2e-report.js'), command],
+                {
+                    cwd: directory,
+                    encoding: 'utf8',
+                    env: {
+                        ...process.env,
+                        GITHUB_OUTPUT: path.join(directory, 'outputs'),
+                        GITHUB_STEP_SUMMARY: summary,
+                        REPORT_SHARDS: '0',
+                        TEST_JOBS_RESULT: 'incomplete',
+                        SANITIZE_RESULT: 'success',
+                        MERGE_RESULT: 'skipped',
+                    },
+                },
+            );
+        const prepare = run('prepare');
+        expect(prepare.status).toBe(1);
+        expect(prepare.stderr).toContain('Missing or invalid provenance');
+        expect(run('summarize').status).toBe(1);
+        const markdown = fs.readFileSync(summary, 'utf8');
+        expect(markdown).toContain('Release UI e2e: incomplete');
+        expect(markdown).toContain('UI: unavailable. Tests: unavailable.');
+        expect(markdown).not.toContain('undefined');
+    });
 
     test('removes unsafe artifact links while preserving their targets and regular reports', () => {
         const outside = write('runner-file', 'private fixture');

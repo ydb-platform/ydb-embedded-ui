@@ -1,8 +1,10 @@
 @use '../../styles/mixins';
 
 .node {
+    --sticky-tabs-height: 40px;
+    --data-table-start: var(--sticky-tabs-height);
     --ydb-configs-controls-height: 62px;
-    --ydb-configs-container-height: calc(100vh - var(--header-height));
+    --ydb-configs-container-height: calc(100vh - var(--header-height) - var(--sticky-tabs-height));
     position: relative;
 
     overflow: auto;
@@ -22,7 +24,11 @@
     }
 
     &__meta {
-        margin-top: 20px;
+        display: flex;
+        align-items: center;
+
+        min-height: 28px;
+        padding-right: 121px;
     }
 
     &__tabs,
@@ -31,6 +37,12 @@
     }
 
     &__tabs {
+        z-index: 3;
+
+        height: var(--sticky-tabs-height);
+        padding-right: 125px;
+
+        @include mixins.sticky-top();
         @include mixins.tabs-wrapper-styles();
     }
     &__treads {

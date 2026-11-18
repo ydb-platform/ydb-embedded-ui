@@ -16,6 +16,9 @@ import {
 import {getVersionMap, getVersionsData} from '../../utils/versions/clusterVersionColors';
 import type {VersionsDataMap} from '../../utils/versions/types';
 
+/** Newer handlers send this code together with `NeedGroup` */
+const GROUP_NOT_APPLIED_PROBLEM = 'group-not-applied';
+
 interface UseGetVersionValuesProps {
     cluster?: TClusterInfo;
     versionsDataMap?: VersionsDataMap;
@@ -54,7 +57,25 @@ export function useGetPreparedVersions({
         return parseNodesToPreparedVersions(currentData.nodes, versionsDataMap);
     }, [currentData, versionsDataMap, cluster]);
 
-    return preparedVersions;
+    // The request is skipped when the versions come with the cluster.
+    // Without grouping the handler returns the nodes, and the versions are counted from them,
+    // so neither the flag nor the code newer handlers send with it is a problem here
+    const responseQuality = currentData?.dataQuality;
+    const dataQuality = React.useMemo(() => {
+        if (!responseQuality) {
+            return undefined;
+        }
+
+        return {
+            ...responseQuality,
+            needGroup: false,
+            problems: responseQuality.problems.filter(
+                (problem) => problem !== GROUP_NOT_APPLIED_PROBLEM,
+            ),
+        };
+    }, [responseQuality]);
+
+    return {preparedVersions, dataQuality};
 }
 
 export function useVersionsDataMap(cluster?: TClusterInfo) {

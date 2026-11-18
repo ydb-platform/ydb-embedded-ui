@@ -106,6 +106,10 @@ export const useStorageGroupsHandlerHasGrouping = () => {
     return useGetFeatureVersion('/storage/groups') > 4;
 };
 
+export const useViewerNodesAliveFilterAvailable = () => {
+    return useGetFeatureVersion('/viewer/nodes/alive') >= 1;
+};
+
 export const useViewerNodesHandlerHasGrouping = () => {
     return useGetFeatureVersion('/viewer/nodes') > 6;
 };
@@ -123,6 +127,12 @@ export const useViewerNodesHandlerHasNetworkStats = () => {
 // It is not very common for databases, but an often case for clusters
 export const useNodesHandlerHasWorkingClusterNetworkStats = () => {
     return useGetFeatureVersion('/viewer/nodes') >= 16;
+};
+
+// From this version the handler adds `filter-not-applied` to Problems when it drops a filter.
+// Before it a dropped storage filter can only be guessed from the `bsc-storage-*` problems
+export const useViewerNodesHandlerReportsDroppedFilters = () => {
+    return useGetFeatureVersion('/viewer/nodes') >= 23;
 };
 
 export const useViewerPeersHandlerAvailable = () => {

@@ -4,6 +4,7 @@ import {ChartTreemap} from '@gravity-ui/icons';
 import {Button, Flex, Icon, Select, Text} from '@gravity-ui/uikit';
 
 import {EntitiesCount} from '../../../components/EntitiesCount/EntitiesCount';
+import {HideUnavailableNodesSwitch} from '../../../components/HideUnavailableNodesSwitch/HideUnavailableNodesSwitch';
 import {usePaginatedTableState} from '../../../components/PaginatedTable/PaginatedTableContext';
 import {Search} from '../../../components/Search/Search';
 import {UptimeFilter} from '../../../components/UptimeFIlter';
@@ -29,6 +30,9 @@ interface StorageControlsProps {
     entitiesCountCurrent: number;
     entitiesCountTotal?: number;
     entitiesLoading: boolean;
+
+    /** Warning about the data of the table; the controls are sticky, so it is always in sight */
+    dataIssuesIndicator?: React.ReactNode;
 }
 
 export function StorageNodesControls({
@@ -38,6 +42,8 @@ export function StorageNodesControls({
     entitiesCountCurrent,
     entitiesCountTotal,
     entitiesLoading,
+
+    dataIssuesIndicator,
 }: StorageControlsProps) {
     const {
         nodesSearchValue,
@@ -127,6 +133,10 @@ export function StorageNodesControls({
                         {i18n('controls_expert-mode')}
                     </Button>
                 ) : null}
+                <HideUnavailableNodesSwitch className={b('hide-unavailable')} />
+                {dataIssuesIndicator ? (
+                    <div className={b('data-issues')}>{dataIssuesIndicator}</div>
+                ) : null}
             </Flex>
             {canUseStorageExpertMode && isStorageExpertMode ? (
                 <StorageNodesExpertModePanel />
@@ -138,9 +148,11 @@ export function StorageNodesControls({
 export function StorageNodesControlsWithTableState({
     withTypeSelector,
     withGroupBySelect,
+    dataIssuesIndicator,
 }: {
     withTypeSelector?: boolean;
     withGroupBySelect?: boolean;
+    dataIssuesIndicator?: React.ReactNode;
 }) {
     const {tableState} = usePaginatedTableState();
 
@@ -151,6 +163,7 @@ export function StorageNodesControlsWithTableState({
             entitiesCountCurrent={tableState.foundEntities}
             entitiesCountTotal={tableState.totalEntities}
             entitiesLoading={tableState.isInitialLoad}
+            dataIssuesIndicator={dataIssuesIndicator}
         />
     );
 }

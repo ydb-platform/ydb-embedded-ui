@@ -181,16 +181,64 @@ test.describe('Object Summary', async () => {
     test('Monaco editor shows column list after upsert query loading completes', async ({page}) => {
         const objectSummary = new ObjectSummary(page);
         const queryEditor = new QueryEditor(page);
+        const tableName = 'upsert_template_table';
+        const tablePath = `${database}/${tableName}`;
+        const table = {Name: tableName, PathType: 'EPathTypeTable'};
+        const schemaResponse = Promise.withResolvers<void>();
 
-        const tableName = await queryEditor.createNewFakeTable();
-        await objectSummary.clickRefreshButton();
+        await page.route(`${backend}/viewer/json/describe?*`, async (route) => {
+            const path = new URL(route.request().url()).searchParams.get('path');
+            if (path !== database && path !== tablePath) {
+                await route.continue();
+                return;
+            }
 
-        await objectSummary.clickActionMenuItem(tableName, RowTableAction.UpsertQuery);
+            if (path === tablePath) {
+                await schemaResponse.promise;
+            }
+            await route.fulfill({
+                json: {
+                    Status: 'StatusSuccess',
+                    Path: path,
+                    PathDescription:
+                        path === tablePath
+                            ? {
+                                  Self: table,
+                                  Table: {
+                                      Columns: [
+                                          {Name: 'item_id', Type: 'Int32'},
+                                          {Name: 'payload', Type: 'Utf8'},
+                                      ],
+                                      KeyColumnNames: ['item_id'],
+                                  },
+                              }
+                            : {
+                                  Self: {Name: 'local', PathType: 'EPathTypeSubDomain'},
+                                  Children: [table],
+                              },
+                },
+            });
+        });
 
-        const upsertContent = await queryEditor.editorTextArea.inputValue();
-        expect(upsertContent).toContain('UPSERT INTO');
-        expect(upsertContent).toContain('VALUES');
-        expect(upsertContent).toMatch(/\(\s*`\w+`\s*(,\s*`\w+`\s*)*\)/); // Backticked columns in parentheses
+        try {
+            await objectSummary.clickRefreshButton();
+            await objectSummary.clickActionsButton(tableName);
+            await expect
+                .poll(() => objectSummary.isActionItemLoading(RowTableAction.UpsertQuery))
+                .toBe(true);
+
+            schemaResponse.resolve();
+            await expect
+                .poll(() => objectSummary.isActionItemLoading(RowTableAction.UpsertQuery))
+                .toBe(false);
+            await objectSummary.clickActionsMenuItem(RowTableAction.UpsertQuery);
+
+            await expect
+                .poll(async () => (await queryEditor.getEditorContent()).replace(/\r\n/g, '\n'))
+                .toBe(`UPSERT INTO \`${tableName}\`\n( \`item_id\`, \`payload\` )\nVALUES (   );`);
+        } finally {
+            schemaResponse.resolve();
+        }
     });
 
     test('Different tables show different column lists in Monaco editor', async ({page}) => {

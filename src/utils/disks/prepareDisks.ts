@@ -1,6 +1,6 @@
 import {isNil} from 'lodash';
 
-import type {TPDiskStateInfo} from '../../types/api/pdisk';
+import type {TPDiskInfo, TPDiskStateInfo} from '../../types/api/pdisk';
 import type {TVDiskStateInfo, TVSlotId} from '../../types/api/vdisk';
 import {stringifyVdiskId} from '../dataFormatters/dataFormatters';
 import {isNumeric, parseOptionalNonNegativeNumber} from '../utils';
@@ -8,7 +8,7 @@ import {isNumeric, parseOptionalNonNegativeNumber} from '../utils';
 import {calculatePDiskSeverity} from './calculatePDiskSeverity';
 import {calculateVDiskSeverity} from './calculateVDiskSeverity';
 import {getPDiskType} from './getPDiskType';
-import {getPDiskId, isFullVDiskData} from './helpers';
+import {getPDiskId, isFullVDiskData, makeVDiskLocationKey} from './helpers';
 import type {PreparedPDisk, PreparedVDisk} from './types';
 
 export function prepareWhiteboardVDiskData(
@@ -21,16 +21,7 @@ export function prepareWhiteboardVDiskData(
     if (!isFullVDiskData(vDiskState)) {
         const {NodeId, PDiskId, VSlotId, ...restVDiskFields} = vDiskState;
 
-        const vDiskId =
-            !isNil(VSlotId) && !isNil(PDiskId) && !isNil(NodeId)
-                ? {
-                      NodeId,
-                      PDiskId,
-                      VSlotId,
-                  }
-                : undefined;
-
-        const StringifiedId = stringifyVdiskId(vDiskId);
+        const StringifiedId = makeVDiskLocationKey(NodeId, PDiskId, VSlotId) ?? '';
 
         return {
             ...restVDiskFields,
@@ -66,13 +57,7 @@ export function prepareWhiteboardVDiskData(
         AllocatedSize: AllocatedSize,
         SlotSize: PDisk?.EnforcedDynamicSlotSize,
     });
-    const WhiteboardSize = hasWhiteboardData
-        ? prepareWhiteboardVDiskSizeFields({
-              AvailableSize,
-              AllocatedSize,
-              SlotSize: PDisk?.EnforcedDynamicSlotSize,
-          })
-        : undefined;
+    const WhiteboardSize = hasWhiteboardData ? vDiskSizeFields.DisplaySize : undefined;
 
     const Severity = calculateVDiskSeverity(vDiskState);
 
@@ -124,7 +109,7 @@ export function prepareWhiteboardVDiskData(
 }
 
 export function prepareWhiteboardPDiskData(
-    pdiskState: TPDiskStateInfo = {},
+    pdiskState: TPDiskStateInfo & Pick<TPDiskInfo, 'StatusV2'> = {},
     whiteboardSizeSource: Pick<TPDiskStateInfo, 'AvailableSize' | 'TotalSize'> | null = pdiskState,
 ): PreparedPDisk {
     const hasWhiteboardData = pdiskState.HasWhiteboardData ?? Boolean(whiteboardSizeSource);
@@ -170,33 +155,7 @@ export function prepareWhiteboardPDiskData(
         State,
         Severity,
         SlotSize: EnforcedDynamicSlotSize,
-    };
-}
-
-function prepareWhiteboardVDiskSizeFields({
-    AvailableSize,
-    AllocatedSize,
-    SlotSize,
-}: {
-    AvailableSize: unknown;
-    AllocatedSize: unknown;
-    SlotSize: unknown;
-}) {
-    const allocatedSize = parseOptionalNonNegativeNumber(AllocatedSize);
-    const availableSize = parseOptionalNonNegativeNumber(AvailableSize);
-    const slotSize = parseOptionalNonNegativeNumber(SlotSize);
-    const preparedSizeFields = prepareVDiskSizeFields({
-        AvailableSize: availableSize,
-        AllocatedSize: allocatedSize,
-        SlotSize: slotSize,
-    });
-
-    return {
-        AllocatedSize: allocatedSize === undefined ? undefined : preparedSizeFields.AllocatedSize,
-        SizeLimit:
-            availableSize === undefined && slotSize === undefined
-                ? undefined
-                : preparedSizeFields.SizeLimit,
+        DriveStatus: pdiskState.Status ?? pdiskState.StatusV2,
     };
 }
 
@@ -253,12 +212,27 @@ export function prepareVDiskSizeFields({
     });
     const allocatedPercent = sizeLimit > 0 ? Math.floor((allocated * 100) / sizeLimit) : NaN;
 
+    // Preserve missing values for display without changing the legacy calculations above.
+    const displayAllocatedSize = parseOptionalNonNegativeNumber(AllocatedSize);
+    const displayAvailableSize = parseOptionalNonNegativeNumber(AvailableSize);
+    const displaySlotSize = parseOptionalNonNegativeNumber(SlotSize);
+    let displaySizeLimit: number | undefined;
+    if (!displayAvailableSize && displaySlotSize) {
+        displaySizeLimit = displaySlotSize;
+    } else if (displayAllocatedSize !== undefined && displayAvailableSize !== undefined) {
+        displaySizeLimit = displayAllocatedSize + displayAvailableSize;
+    }
+
     return {
         AvailableSize: available,
         AllocatedSize: allocated,
         SizeLimit: sizeLimit,
         FreeSize: freeSize,
         AllocatedPercent: allocatedPercent,
+        DisplaySize: {
+            AllocatedSize: displayAllocatedSize,
+            SizeLimit: displaySizeLimit,
+        },
     };
 }
 

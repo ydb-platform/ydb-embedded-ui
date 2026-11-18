@@ -14,6 +14,8 @@ interface TenantOverviewTableLayoutProps {
     error?: unknown;
     tableClassNameModifiers?: NoStrictEntityMods;
     withData?: boolean;
+    /** Shown above the table, e.g. a warning about the data in the table */
+    notice?: React.ReactNode;
     children?: React.ReactNode;
 }
 
@@ -23,6 +25,7 @@ export function TenantOverviewTableLayout({
     loading,
     tableClassNameModifiers = {},
     withData,
+    notice,
     children,
 }: TenantOverviewTableLayoutProps) {
     const renderContent = () => {
@@ -40,6 +43,7 @@ export function TenantOverviewTableLayout({
         <React.Fragment>
             {title && <div className={b('title')}>{title}</div>}
             {error ? <ResponseError error={error} /> : null}
+            {notice}
             <div className={b('table', tableClassNameModifiers)}>{renderContent()}</div>
         </React.Fragment>
     );

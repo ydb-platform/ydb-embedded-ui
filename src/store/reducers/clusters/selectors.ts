@@ -1,6 +1,11 @@
 import escapeRegExp from 'lodash/escapeRegExp';
 
-import type {ClustersFilters, ClustersStateSlice, PreparedCluster} from './types';
+import type {
+    ClusterAvailability,
+    ClustersFilters,
+    ClustersStateSlice,
+    PreparedCluster,
+} from './types';
 
 // ==== Simple selectors ====
 
@@ -9,8 +14,25 @@ export const selectStatusFilter = (state: ClustersStateSlice) => state.clusters.
 export const selectServiceFilter = (state: ClustersStateSlice) => state.clusters.service;
 export const selectVersionFilter = (state: ClustersStateSlice) => state.clusters.version;
 export const selectGalaxyFilter = (state: ClustersStateSlice) => state.clusters.galaxy;
+export const selectAvailabilityFilter = (state: ClustersStateSlice) => state.clusters.availability;
 
 // ==== Filters ====
+
+const isMatchesByAvailability = (
+    clusterData: PreparedCluster,
+    selectedAvailability: ClusterAvailability[],
+) => {
+    return selectedAvailability.includes(
+        clusterData.settings?.unavailable === true ? 'unavailable' : 'available',
+    );
+};
+
+export function filterClustersByAvailability(
+    clusters: PreparedCluster[],
+    availability: ClusterAvailability[],
+) {
+    return clusters.filter((cluster) => isMatchesByAvailability(cluster, availability));
+}
 
 const isMatchesByStatus = (clusterData: PreparedCluster, selectedStatuses: string[]) => {
     return (
@@ -85,6 +107,7 @@ const isMatchesByTextQuery = (clusterData: PreparedCluster, searchQuery = '') =>
 export function filterClusters(clusters: PreparedCluster[], filters: ClustersFilters) {
     return clusters.filter((cluster) => {
         return (
+            isMatchesByAvailability(cluster, filters.availability) &&
             isMatchesByGalaxy(cluster, filters.galaxy) &&
             isMatchesByStatus(cluster, filters.status) &&
             isMatchesByService(cluster, filters.service) &&

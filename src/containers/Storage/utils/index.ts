@@ -2,13 +2,12 @@ import React from 'react';
 
 import {isNil} from 'lodash';
 
-import {selectNodesMap} from '../../../store/reducers/nodesList';
 import type {PreparedStorageGroup} from '../../../store/reducers/storage/types';
 import type {Erasure} from '../../../types/api/storage';
+import type {DataIssuesSubject} from '../../../utils/dataIssues/classify';
 import type {PreparedPDisk, PreparedVDisk} from '../../../utils/disks/types';
 import {generateEvaluator} from '../../../utils/generateEvaluator';
-import {useTypedSelector} from '../../../utils/hooks';
-import {useDatabaseFromQuery} from '../../../utils/hooks/useDatabaseFromQuery';
+import {useNodesMap} from '../../../utils/hooks/useNodesMap';
 import type {StorageViewContext} from '../types';
 
 const defaultDegradationEvaluator = generateEvaluator(['success', 'warning', 'danger'], 1, 2);
@@ -103,14 +102,32 @@ export function getStorageGroupsInitialEntitiesCount(
     return DEFAULT_ENTITIES_COUNT;
 }
 
+/** Describes the storage nodes table to the classification of the problems of its responses */
+export function getStorageNodesDataIssuesSubject({
+    database,
+    groupId,
+    reportsDroppedFilters,
+}: {
+    database?: string;
+    groupId?: string | number;
+    reportsDroppedFilters?: boolean;
+}): DataIssuesSubject {
+    return {
+        type: 'nodes',
+        storageNodes: true,
+        hasDatabase: Boolean(database),
+        hasGroupFilter: !isNil(groupId) && groupId !== '',
+        reportsDroppedFilters: Boolean(reportsDroppedFilters),
+    };
+}
+
 function isErasureWithDifferentDC(erasure?: Erasure) {
     // These erasure types suppose the data distributed across 3 different DC
     return erasure === 'mirror-3-dc' || erasure === 'mirror-3of4';
 }
 
 export function useVDisksWithDCMargins(vDisks: PreparedVDisk[] = [], erasure?: Erasure) {
-    const database = useDatabaseFromQuery();
-    const nodesMap = useTypedSelector((state) => selectNodesMap(state, database));
+    const nodesMap = useNodesMap();
 
     return React.useMemo(() => {
         const disksWithMargins: number[] = [];

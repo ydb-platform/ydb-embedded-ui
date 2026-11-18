@@ -4,6 +4,7 @@ import type {PayloadAction} from '@reduxjs/toolkit';
 import type {TTenantInfo} from '../../../types/api/tenant';
 import {useClusterNameFromQuery} from '../../../utils/hooks/useDatabaseFromQuery';
 import {useDatabasesV2} from '../../../utils/hooks/useDatabasesV2';
+import {backend, environment} from '../../runtimeParams';
 import {api} from '../api';
 import {getDatabaseDataTag} from '../entityDataTags';
 import {prepareTenants} from '../tenants/utils';
@@ -59,6 +60,8 @@ export const tenantApi = api.injectEndpoints({
                     database: string;
                     clusterName?: string;
                     isMetaDatabasesAvailable: boolean;
+                    environment?: string;
+                    backend?: string;
                 },
                 {signal},
             ) => {
@@ -77,14 +80,27 @@ export const tenantApi = api.injectEndpoints({
                     } else {
                         tenantData = await window.api.viewer.getTenantInfo({database}, {signal});
                     }
-                    const databases = prepareTenants(tenantData.TenantInfo || []);
+                    const databases = prepareTenants(
+                        tenantData.TenantInfo || [],
+                        tenantData.errors,
+                    );
                     // previous meta versions do not support filtering databases by name
                     const data =
                         databases.find(
-                            (tenant) => tenant.Name === database || tenant.Id === database,
+                            (tenant) =>
+                                tenant.Name === database ||
+                                tenant.Id === database ||
+                                tenant.ControlPlane?.id === database,
                         ) ?? databases[0];
                     if (!data) {
-                        return {error: {code: 'EMPTY_TENANT_INFO'}};
+                        return {
+                            error: {
+                                code: 'EMPTY_TENANT_INFO',
+                                ...(tenantData.errors !== undefined
+                                    ? {metaErrors: tenantData.errors}
+                                    : {}),
+                            },
+                        };
                     }
                     return {data};
                 } catch (error) {
@@ -108,8 +124,12 @@ export const tenantApi = api.injectEndpoints({
                 ];
             },
             serializeQueryArgs: ({queryArgs}) => {
-                const {clusterName, database} = queryArgs;
-                return {clusterName, database};
+                return {
+                    clusterName: queryArgs.clusterName,
+                    database: queryArgs.database,
+                    environment: queryArgs.environment,
+                    backend: queryArgs.backend,
+                };
             },
         }),
     }),
@@ -130,6 +150,8 @@ export function useTenantBaseInfo(
             database,
             clusterName,
             isMetaDatabasesAvailable,
+            environment,
+            backend,
         },
         {skip: skip || !database},
     );
@@ -139,6 +161,7 @@ export function useTenantBaseInfo(
     return {
         databaseData: currentData,
         controlPlane: ControlPlane,
+        metaErrors: currentData?.metaErrors,
         name: Name,
         id: Id,
         databaseType: Type,

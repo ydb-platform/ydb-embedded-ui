@@ -1,9 +1,12 @@
+import {randomUUID} from 'node:crypto';
+
 import {expect, request as playwrightRequest, test} from '@playwright/test';
 
+import type {ExecuteQueryResponse} from '../../../../../src/types/api/query';
 import {getClipboardContent} from '../../../../utils/clipboard';
 import {backend, database} from '../../../../utils/constants';
 import {TenantPage} from '../../TenantPage';
-import {longRunningStreamQuery, simpleQuery} from '../../constants';
+import {longRunningStreamQuery} from '../../constants';
 import {QueryEditor} from '../../queryEditor/models/QueryEditor';
 import {
     Diagnostics,
@@ -60,10 +63,20 @@ test.describe('Diagnostics Queries tab', async () => {
         const diagnostics = new Diagnostics(page);
         await diagnostics.clickRadioSwitch(QueriesSwitch.Running);
 
-        const runningQueryMarker = `e2e-running-query-${test.info().project.name}-${Date.now()}`;
-        const runningQuery = `-- ${runningQueryMarker}\n${new Array(400)
-            .fill(simpleQuery)
-            .join('\n')}`;
+        const runningQueryId = randomUUID();
+        const runningQueryMarker = `e2e-running-query-${test.info().project.name}-${runningQueryId}`;
+        // Separate runtime stages leave cancellation points between batches.
+        const queryStatements = Array.from(
+            {length: 10},
+            (_, index) => `SELECT x,
+    Digest::Argon2(CAST(x AS String), "test_salt_${index}_" || CAST(n.NodeId AS String)) AS hash
+FROM (SELECT NodeId FROM \`.sys/nodes\` LIMIT 1) AS n
+CROSS JOIN AS_TABLE(AsList(AsStruct($data AS x))) AS r
+FLATTEN BY x;`,
+        );
+        const runningQuery = `-- ${runningQueryMarker}
+$data = ListFromRange(1, 50000);
+${queryStatements.join('\n')}`;
         const storageState = await page.context().storageState();
         const queryRequestContext = await playwrightRequest.newContext({storageState});
         const csrfToken = (await page.context().cookies(backend)).find(
@@ -81,9 +94,11 @@ test.describe('Diagnostics Queries tab', async () => {
                     query: runningQuery,
                     database,
                     action: 'execute-query',
+                    query_id: runningQueryId,
                     syntax: 'yql_v1',
                     schema: 'multipart',
                 },
+                timeout: 20_000,
             })
             .then(async (response) => {
                 if (!response.ok()) {
@@ -91,33 +106,113 @@ test.describe('Diagnostics Queries tab', async () => {
                         `Running query request failed with ${response.status()}: ${await response.text()}`,
                     );
                 }
+                return response.text();
             })
             .catch((error: unknown) => {
                 runningQueryRequestError = error;
             });
 
+        const deadline = Date.now() + 10_000;
+        let pendingPoll: Promise<boolean> | undefined;
+        const refreshRunningQueries = async () => {
+            if (runningQueryRequestError) {
+                throw runningQueryRequestError;
+            }
+
+            const timeout = Math.max(1, deadline - Date.now());
+            const [requestResult, refreshResult] = await Promise.allSettled([
+                page.waitForEvent('requestfinished', {
+                    predicate: (request) => {
+                        if (
+                            new URL(request.url()).pathname !== '/viewer/json/query' ||
+                            request.method() !== 'POST'
+                        ) {
+                            return false;
+                        }
+                        const body: {query?: string} = request.postDataJSON();
+                        return Boolean(
+                            body.query?.includes('`.sys/query_sessions`') &&
+                                /SELECT\s+\*/i.test(body.query),
+                        );
+                    },
+                    timeout,
+                }),
+                diagnostics.clickRefreshButton(timeout),
+            ]);
+            if (refreshResult.status === 'rejected') {
+                throw refreshResult.reason;
+            }
+            if (requestResult.status === 'rejected') {
+                throw requestResult.reason;
+            }
+            const response = await requestResult.value.response();
+            if (!response) {
+                throw new Error('Running queries request completed without a response');
+            }
+            expect(response.ok(), `Running queries HTTP status: ${response.status()}`).toBe(true);
+            const body: ExecuteQueryResponse & {status?: string} = await response.json();
+            expect(body.status, `Running queries response: ${await response.text()}`).toBe(
+                'SUCCESS',
+            );
+            const result = body.result?.[0];
+            const queryColumn = result?.columns?.findIndex(({name}) => name === 'Query') ?? -1;
+            return Boolean(
+                result?.rows?.some((row) => {
+                    const query = row[queryColumn];
+                    return typeof query === 'string' && query.includes(runningQueryMarker);
+                }),
+            );
+        };
+
         try {
             await expect
                 .poll(
-                    async () => {
-                        if (runningQueryRequestError) {
-                            throw runningQueryRequestError;
-                        }
-
-                        await diagnostics.clickRefreshButton();
-                        const queryTexts = await page
-                            .locator('.ydb-fixed-height-query')
-                            .allInnerTexts();
-                        return queryTexts.some((queryText) =>
-                            queryText.includes(runningQueryMarker),
-                        );
+                    () => {
+                        pendingPoll = refreshRunningQueries();
+                        return pendingPoll;
                     },
                     {timeout: 10_000},
                 )
                 .toBe(true);
+            await expect(
+                page.locator('.ydb-fixed-height-query').filter({hasText: runningQueryMarker}),
+            ).toBeVisible();
         } finally {
-            await queryRequestContext.dispose();
-            await runningQueryRequest;
+            await pendingPoll?.catch(() => undefined);
+            try {
+                // Closing the HTTP context alone can leave the server query running.
+                const cancelResponse = await queryRequestContext.post(
+                    `${backend}/viewer/json/query`,
+                    {
+                        params: {database},
+                        headers: csrfToken ? {'X-CSRF-Token': csrfToken} : undefined,
+                        data: {
+                            database,
+                            action: 'cancel-query',
+                            query_id: runningQueryId,
+                        },
+                        timeout: 5_000,
+                    },
+                );
+                const cancelResponseBody = await cancelResponse.text();
+                const alreadyFinished =
+                    cancelResponse.status() === 400 && cancelResponseBody === 'Query not found';
+                expect(cancelResponse.ok() || alreadyFinished, cancelResponseBody).toBe(true);
+                const responseBody = await runningQueryRequest;
+                if (!runningQueryRequestError) {
+                    expect(responseBody).toBeDefined();
+                    const cancelled = /"event"\s*:\s*"Aborted"/.test(responseBody || '');
+                    const completedSuccessfully =
+                        /"event"\s*:\s*"QueryResponse"/.test(responseBody || '') &&
+                        /"status"\s*:\s*"SUCCESS"/.test(responseBody || '');
+                    expect(cancelled || completedSuccessfully).toBe(true);
+                }
+            } finally {
+                await queryRequestContext.dispose();
+            }
+        }
+        if (runningQueryRequestError) {
+            throw runningQueryRequestError;
         }
     });
 

@@ -15,6 +15,7 @@ export const PDisksGroupBy = {
     Maintenance: 'Maintenance',
     Device: 'Device',
     DriveType: 'DriveType',
+    Datacenter: 'DC',
     All: 'All',
 } as const;
 

@@ -22,6 +22,7 @@ const EDITOR_OPTIONS: EditorOptions = {
 export function useEditorOptions() {
     const [enableAutocomplete] = useSetting(SETTING_KEYS.ENABLE_AUTOCOMPLETE);
     const [autocompleteOnEnter] = useSetting(SETTING_KEYS.AUTOCOMPLETE_ON_ENTER);
+    const [wordWrap] = useSetting(SETTING_KEYS.WORD_WRAP);
     const isMultiTabQueryEditorEnabled = useMultiTabQueryEditorEnabled();
 
     const options = React.useMemo<EditorOptions>(() => {
@@ -30,6 +31,7 @@ export function useEditorOptions() {
             quickSuggestions: useAutocomplete,
             suggestOnTriggerCharacters: useAutocomplete,
             acceptSuggestionOnEnter: autocompleteOnEnter ? 'on' : 'off',
+            wordWrap: wordWrap === 'off' ? 'off' : 'on',
             ...EDITOR_OPTIONS,
         };
 
@@ -42,7 +44,7 @@ export function useEditorOptions() {
             padding: {top: MULTI_TAB_EDITOR_PADDING_TOP_PX},
             scrollBeyondLastLine: false,
         };
-    }, [enableAutocomplete, autocompleteOnEnter, isMultiTabQueryEditorEnabled]);
+    }, [enableAutocomplete, autocompleteOnEnter, wordWrap, isMultiTabQueryEditorEnabled]);
 
     return options;
 }

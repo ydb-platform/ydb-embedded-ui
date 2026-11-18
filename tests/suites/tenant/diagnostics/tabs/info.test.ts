@@ -286,6 +286,8 @@ test.describe('Diagnostics Info tab', async () => {
     });
 
     test('Info tab shows resource utilization', async ({page}) => {
+        await setupMetricTabsTenantInfoMock(page);
+
         const pageQueryParams = {
             schema: database,
             database,
@@ -777,8 +779,8 @@ test.describe('Diagnostics Info tab', async () => {
                         {
                             rows: [['RUNNING', '{}', 'SELECT 1;']],
                             columns: [
-                                {name: 'State', type: 'Utf8?'},
-                                {name: 'Error', type: 'Utf8?'},
+                                {name: 'Status', type: 'Utf8?'},
+                                {name: 'Issues', type: 'Utf8?'},
                                 {name: 'Text', type: 'Utf8?'},
                             ],
                         },
@@ -805,6 +807,137 @@ test.describe('Diagnostics Info tab', async () => {
         await expect(page).toHaveScreenshot('streaming-query-info-describe-fallback.png', {
             clip: infoContentBox,
         });
+    });
+
+    test('Streaming Query Info displays lifecycle fields', async ({page}) => {
+        const mockStreamingQueryPath = '/local/test_streaming_query';
+        const createStep = 1_767_326_645_000;
+        await setupMonitoringUserMock(page, false);
+
+        await page.route('**/viewer/json/describe?*', async (route) => {
+            const url = new URL(route.request().url());
+            const path = url.searchParams.get('path');
+            const subs = url.searchParams.get('subs');
+
+            if (path === mockStreamingQueryPath && subs === '0') {
+                await route.fulfill({
+                    json: {
+                        Status: 'StatusSuccess',
+                        Path: mockStreamingQueryPath,
+                        PathDescription: {
+                            Self: {
+                                Name: 'test_streaming_query',
+                                PathType: 'EPathTypeStreamingQuery',
+                                CreateStep: String(createStep),
+                            },
+                        },
+                    },
+                });
+                return;
+            }
+
+            if (path === database && subs === '1') {
+                await route.fulfill({
+                    json: {
+                        Path: database,
+                        PathDescription: {
+                            Self: {
+                                Name: 'local',
+                                PathType: 'EPathTypeSubDomain',
+                            },
+                            Children: [
+                                {
+                                    Name: 'test_streaming_query',
+                                    PathType: 'EPathTypeStreamingQuery',
+                                },
+                            ],
+                        },
+                    },
+                });
+                return;
+            }
+
+            await route.continue();
+        });
+
+        await page.route('**/viewer/json/query?*', async (route) => {
+            await route.fulfill({
+                json: {
+                    version: 8,
+                    result: [
+                        {
+                            rows: [
+                                [
+                                    '2026-01-02T04:05:06',
+                                    'starter',
+                                    '2026-01-02T05:06:07',
+                                    'editor',
+                                    '2026-01-02T06:07:08',
+                                    'stopper',
+                                    'STOPPED',
+                                    '{}',
+                                    'SELECT 1;',
+                                ],
+                            ],
+                            columns: [
+                                {name: 'StartedAt', type: 'Utf8?'},
+                                {name: 'StartedBy', type: 'Utf8?'},
+                                {name: 'ModifiedAt', type: 'Utf8?'},
+                                {name: 'ModifiedBy', type: 'Utf8?'},
+                                {name: 'FinishedAt', type: 'Utf8?'},
+                                {name: 'StoppedBy', type: 'Utf8?'},
+                                {name: 'Status', type: 'Utf8?'},
+                                {name: 'Issues', type: 'Utf8?'},
+                                {name: 'Text', type: 'Utf8?'},
+                            ],
+                        },
+                    ],
+                },
+            });
+        });
+
+        const tenantPage = new TenantPage(page);
+        await tenantPage.goto({
+            schema: mockStreamingQueryPath,
+            database,
+            databasePage: 'diagnostics',
+            diagnosticsTab: 'overview',
+        });
+
+        const infoContent = page.locator('.kv-detailed-overview');
+        const getInfoValue = (label: string) =>
+            infoContent
+                .locator('.g-definition-list__item')
+                .filter({has: page.locator('dt').getByText(label, {exact: true})})
+                .locator('dd');
+        const createdDate = await page.evaluate((timestamp) => {
+            const date = new Date(timestamp);
+            const pad = (value: number) => String(value).padStart(2, '0');
+
+            return `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())} ${pad(
+                date.getHours(),
+            )}:${pad(date.getMinutes())}:${pad(date.getSeconds())}`;
+        }, createStep);
+
+        await expect(getInfoValue('Created')).toHaveText(createdDate);
+        await expect(getInfoValue('Started')).toHaveText('2026-01-02 04:05:06 by starter');
+        await expect(getInfoValue('Modified')).toHaveText('2026-01-02 05:06:07 by editor');
+        await expect(getInfoValue('Stopped')).toHaveText('2026-01-02 06:07:08 by stopper');
+        for (const [field, author] of [
+            ['Started', 'starter'],
+            ['Modified', 'editor'],
+            ['Stopped', 'stopper'],
+        ]) {
+            await expect(getInfoValue(field).locator('.g-label_theme_normal')).toHaveText(author);
+        }
+        await expect(getInfoValue('Created').locator('.g-label')).toHaveCount(0);
+        await expect(getInfoValue('State')).toHaveText('STOPPED');
+        await expect(infoContent.getByTestId('schema-object-info').locator('dt')).toHaveText([
+            'Type',
+            'State',
+            'Full Path',
+            'Created',
+        ]);
     });
 
     test('View Info includes YQL code preview', async ({page}) => {
@@ -873,4 +1006,111 @@ test.describe('Diagnostics Info tab', async () => {
         await expect(yqlCodePreview.locator('.shiki')).toBeVisible();
         await expect(infoContent).toHaveScreenshot('view-info-yql-code-preview.png');
     });
+});
+
+async function setupDatabaseDatacentersMock(
+    page: Page,
+    datacenters: (string | undefined)[],
+    tenantType: 'Dedicated' | 'Serverless' = 'Dedicated',
+) {
+    const nodeListRequests: URL[] = [];
+    const clusterRequests: string[] = [];
+    const responses: Record<string, unknown> = {
+        whoami: {
+            IsDatabaseAllowed: true,
+            IsViewerAllowed: false,
+            IsMonitoringAllowed: false,
+            IsAdministrationAllowed: false,
+        },
+        capabilities: {Capabilities: {}},
+        tenantinfo: {TenantInfo: [{Name: database, Type: tenantType, Overall: 'Green'}]},
+        describe: {
+            Status: 'StatusSuccess',
+            Path: database,
+            PathDescription: {Self: {Name: 'local', PathType: 'EPathTypeSubDomain'}},
+        },
+        nodelist: datacenters.map((dc, index) => ({
+            Id: index + 1,
+            Host: `dc-node-${index + 1}`,
+            Location: {DataCenter: dc},
+        })),
+    };
+    await page.route('**/viewer/**', (route) => {
+        const url = new URL(route.request().url());
+        const endpoint = url.pathname.split('/').pop() ?? '';
+        if (endpoint === 'nodelist') {
+            nodeListRequests.push(url);
+        }
+        if (endpoint === 'cluster') {
+            clusterRequests.push(url.href);
+        }
+        return route.fulfill({json: responses[endpoint] ?? {}});
+    });
+    return {nodeListRequests, clusterRequests};
+}
+
+test.describe('Datacenter info screenshots', () => {
+    test('hides datacenters for a serverless database', async ({page}) => {
+        await page.addInitScript(() => localStorage.setItem('enableTenantNavigationV2', 'true'));
+        await setupDatabaseDatacentersMock(page, ['DC-A', 'DC-B'], 'Serverless');
+        await new TenantPage(page).goto({
+            database,
+            schema: database,
+            databasePage: 'diagnostics',
+            diagnosticsTab: 'overview',
+        });
+        await expect(page.getByText('Serverless', {exact: true})).toBeVisible();
+        const info = page.getByTestId('schema-object-info');
+        await expect(info).toBeVisible();
+        await expect(info.getByText('Datacenters', {exact: true})).toHaveCount(0);
+        await expect(page.getByTestId('database-datacenters')).toHaveCount(0);
+    });
+
+    for (const theme of ['light', 'dark']) {
+        test.describe(theme, () => {
+            test.beforeEach(async ({page}) => {
+                await page.addInitScript((value) => {
+                    localStorage.setItem('theme', value);
+                    localStorage.setItem('enableTenantNavigationV2', 'true');
+                }, theme);
+                await page.setViewportSize({width: 1200, height: 800});
+            });
+
+            test(`shows database node counts in ${theme} theme`, async ({page}) => {
+                const {nodeListRequests, clusterRequests} = await setupDatabaseDatacentersMock(
+                    page,
+                    ['dc-a', 'DC-A', 'DC-B', undefined],
+                );
+                await new TenantPage(page).goto({
+                    database,
+                    schema: database,
+                    databasePage: 'diagnostics',
+                    diagnosticsTab: 'overview',
+                });
+                const labels = page
+                    .getByTestId('database-datacenters')
+                    .locator('.ydb-datacenter-label');
+                await expect(labels).toHaveCount(3);
+                for (const [index, name, count, color] of [
+                    [0, 'DC-A', '2 nodes', 'turquoise'],
+                    [1, 'DC-B', '1 node', 'purple'],
+                    [2, 'Unknown', '1 node', 'neutral'],
+                ] as const) {
+                    await expect(labels.nth(index)).toContainText(name);
+                    await expect(labels.nth(index)).toContainText(count);
+                    await expect(labels.nth(index)).toHaveClass(
+                        new RegExp(`ydb-datacenter-color_color_${color}`),
+                    );
+                }
+                expect(nodeListRequests).toHaveLength(1);
+                expect(nodeListRequests[0].searchParams.get('database')).toBe(database);
+                expect(nodeListRequests[0].searchParams.has('include_storage')).toBe(false);
+                expect(clusterRequests).toEqual([]);
+                await page.evaluate(() => document.fonts.ready);
+                await expect(page.getByTestId('schema-object-info')).toHaveScreenshot(
+                    `database-datacenters-${theme}.png`,
+                );
+            });
+        });
+    }
 });

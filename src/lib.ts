@@ -46,6 +46,8 @@ export type {
     IllustrationComponent,
     IllustrationName,
     RenderHealthcheckAssistantAction,
+    ResolveUser,
+    HealthcheckDrawerExtensionProps,
 } from './uiFactory/types';
 export type {
     HealthcheckAssistantActionProps,
@@ -55,3 +57,5 @@ export type {
 
 export {configureUIFactory} from './uiFactory/uiFactory';
 export {configureZod} from './utils/zod/configureZod';
+
+export type {DatacenterColorIndexes} from './utils/datacenters';

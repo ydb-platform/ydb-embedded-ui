@@ -35,6 +35,7 @@ import {
     TENANT_PAGES_IDS,
 } from '../../store/reducers/tenant/constants';
 import {CLUSTER_DEFAULT_TITLE, UNBREAKABLE_GAP, getTabletLabel} from '../../utils/constants';
+import {getPDiskId} from '../../utils/disks/helpers';
 import {TenantTabsGroups} from '../Tenant/TenantPages';
 
 import {headerKeyset} from './i18n';
@@ -205,8 +206,9 @@ const getPDiskBreadcrumbs: GetBreadcrumbs<PDiskBreadcrumbsOptions> = (options, q
     });
 
     let text = headerKeyset('breadcrumbs.pDisk');
-    if (pDiskId) {
-        text += ` ${pDiskId}`;
+    const diskId = getPDiskId({nodeId, pDiskId}) ?? pDiskId;
+    if (diskId) {
+        text += ` ${diskId}`;
     }
 
     const hasLink = pDiskId && nodeId;

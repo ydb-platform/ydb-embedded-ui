@@ -25,6 +25,7 @@ import {
 import type {GetStorageNodesColumnsParams} from './types';
 
 const LEGACY_CAPACITY_COLUMN_IDS: NodesColumnId[] = [NODES_COLUMNS_IDS.DiskSpaceUsage];
+const EXPERT_MODE_ONLY_COLUMN_IDS: NodesColumnId[] = [NODES_COLUMNS_IDS.Roles];
 
 export function useStorageNodesSelectedColumns({
     visibleEntities,
@@ -82,32 +83,39 @@ export function useStorageNodesSelectedColumns({
         stickyColumns,
     );
 
-    const hiddenCapacityColumnIds = blobMetricsEnabled
-        ? LEGACY_CAPACITY_COLUMN_IDS
-        : CAPACITY_METRICS_USER_SETTINGS_COLUMNS_IDS;
+    // Hidden columns stay in saved settings, so their selection and position survive mode switches
+    const hiddenColumnIds = React.useMemo(() => {
+        const hiddenCapacityColumnIds = blobMetricsEnabled
+            ? LEGACY_CAPACITY_COLUMN_IDS
+            : CAPACITY_METRICS_USER_SETTINGS_COLUMNS_IDS;
+
+        return columnsSettings?.expertMode
+            ? hiddenCapacityColumnIds
+            : [...hiddenCapacityColumnIds, ...EXPERT_MODE_ONLY_COLUMN_IDS];
+    }, [blobMetricsEnabled, columnsSettings?.expertMode]);
     const setColumns: typeof selectedColumns.setColumns = React.useCallback(
         (value) => {
             selectedColumns.setColumns(
                 mergeColumnsPreservingHiddenPositions(
                     value,
                     selectedColumns.columnsToSelect,
-                    hiddenCapacityColumnIds,
+                    hiddenColumnIds,
                 ),
             );
         },
-        [hiddenCapacityColumnIds, selectedColumns],
+        [hiddenColumnIds, selectedColumns],
     );
 
     return React.useMemo(() => {
         return {
             ...selectedColumns,
             columnsToShow: selectedColumns.columnsToShow.filter(
-                ({name}) => !hiddenCapacityColumnIds.some((columnId) => columnId === name),
+                ({name}) => !hiddenColumnIds.some((columnId) => columnId === name),
             ),
             columnsToSelect: selectedColumns.columnsToSelect.filter(
-                ({id}) => !hiddenCapacityColumnIds.some((columnId) => columnId === id),
+                ({id}) => !hiddenColumnIds.some((columnId) => columnId === id),
             ),
             setColumns,
         };
-    }, [hiddenCapacityColumnIds, selectedColumns, setColumns]);
+    }, [hiddenColumnIds, selectedColumns, setColumns]);
 }

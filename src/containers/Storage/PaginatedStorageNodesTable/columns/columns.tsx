@@ -19,6 +19,7 @@ import {
     getPoolsColumn,
     getRAMColumn,
     getRackColumn,
+    getRolesColumn,
     getTabletsColumn,
     getUptimeColumn,
     getVersionColumn,
@@ -73,7 +74,7 @@ export const getStorageNodesColumns = ({
 }: GetStorageNodesColumnsParams): NodesColumn[] => {
     const columns: NodesColumn[] = [
         getNodeIdColumn(),
-        getHostColumn({database}),
+        getHostColumn({database, storageNodes: true}),
         getNodeNameColumn(),
         getDataCenterColumn(),
         getPileNameColumn(),
@@ -85,6 +86,7 @@ export const getStorageNodesColumns = ({
         getMemoryColumn(),
         getDiskSpaceUsageColumn(),
         getVersionColumn(),
+        getRolesColumn(),
         getMissingDisksColumn(),
         getPDisksColumn({viewContext, columnsSettings}),
         getTabletsColumn({database}),

@@ -9,7 +9,10 @@ import {isErrorWithRetry} from '../CriticalActionDialog/utils';
 interface ButtonWithConfirmDialogProps<T, K> {
     children: React.ReactNode;
     onConfirmAction: (isRetry?: boolean) => Promise<T>;
-    onConfirmActionSuccess?: (() => Promise<K>) | VoidFunction;
+    onConfirmActionSuccess?:
+        | ((isDialogOpen: boolean) => Promise<K>)
+        | ((isDialogOpen: boolean) => void);
+    onDialogOpen?: () => VoidFunction;
     dialogHeader: string;
     dialogText?: string;
     dialogWarning?: string;
@@ -30,6 +33,7 @@ export function ButtonWithConfirmDialog<T, K>({
     children,
     onConfirmAction,
     onConfirmActionSuccess,
+    onDialogOpen,
     dialogHeader,
     dialogText,
     dialogWarning,
@@ -48,6 +52,14 @@ export function ButtonWithConfirmDialog<T, K>({
     const [isConfirmDialogVisible, setIsConfirmDialogVisible] = React.useState(false);
     const [buttonLoading, setButtonLoading] = React.useState(false);
     const [withRetry, setWithRetry] = React.useState(false);
+    const dialogInteraction = React.useRef<{open: boolean; release?: VoidFunction}>();
+    const releaseDialog = React.useCallback(() => {
+        const interaction = dialogInteraction.current;
+        dialogInteraction.current = undefined;
+        interaction?.release?.();
+    }, []);
+
+    React.useEffect(() => releaseDialog, [releaseDialog]);
 
     const handleConfirmAction = async (isRetry?: boolean) => {
         setButtonLoading(true);
@@ -58,7 +70,7 @@ export function ButtonWithConfirmDialog<T, K>({
         setWithRetry(false);
 
         try {
-            await onConfirmActionSuccess?.();
+            await onConfirmActionSuccess?.(dialogInteraction.current?.open ?? false);
         } finally {
             setButtonLoading(false);
         }
@@ -72,7 +84,10 @@ export function ButtonWithConfirmDialog<T, K>({
     const renderButton = () => {
         return (
             <Button
-                onClick={() => setIsConfirmDialogVisible(true)}
+                onClick={() => {
+                    dialogInteraction.current = {open: true, release: onDialogOpen?.()};
+                    setIsConfirmDialogVisible(true);
+                }}
                 view={buttonView}
                 width={buttonWidth}
                 disabled={buttonDisabled}
@@ -116,8 +131,12 @@ export function ButtonWithConfirmDialog<T, K>({
                 onConfirmActionSuccess={handleConfirmActionSuccess}
                 onConfirmActionError={handleConfirmActionError}
                 onClose={() => {
+                    if (dialogInteraction.current) {
+                        dialogInteraction.current.open = false;
+                    }
                     setIsConfirmDialogVisible(false);
                 }}
+                onTransitionOutComplete={releaseDialog}
             />
             {renderContent()}
         </React.Fragment>

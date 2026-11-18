@@ -2,20 +2,29 @@ import React from 'react';
 
 import {isNil} from 'lodash';
 
+import {DataIssuesIndicator} from '../../../components/DataIssuesAlert/DataIssuesIndicator';
+import {EmptyTableGroups} from '../../../components/DataIssuesAlert/EmptyTableGroups';
 import {ResponseError} from '../../../components/Errors/ResponseError';
 import type {PaginatedTableData} from '../../../components/PaginatedTable';
 import {PaginatedTableWithLayout} from '../../../components/PaginatedTable/PaginatedTableWithLayout';
 import {TableColumnSetup} from '../../../components/TableColumnSetup/TableColumnSetup';
-import {NODES_COLUMNS_TITLES} from '../../../components/nodesColumns/constants';
+import {
+    NODES_COLUMNS_TITLES,
+    NODES_COLUMNS_TO_DATA_FIELDS,
+} from '../../../components/nodesColumns/constants';
 import type {NodesColumnId} from '../../../components/nodesColumns/constants';
 import type {NodesColumn} from '../../../components/nodesColumns/types';
 import {useClusterWithProxy} from '../../../store/reducers/cluster/cluster';
 import {nodesApi} from '../../../store/reducers/nodes/nodes';
 import type {PreparedStorageNode} from '../../../store/reducers/storage/types';
-import type {NodesGroupByField, NodesPeerRole} from '../../../types/api/nodes';
+import type {NodesGroupByField, NodesPeerRole, NodesRequiredField} from '../../../types/api/nodes';
+import {useGroupedTableDataIssues} from '../../../utils/dataIssues/useTableDataIssues';
+import type {ChunkDataChangeHandler} from '../../../utils/dataIssues/useTableDataQuality';
 import {useAutoRefreshInterval} from '../../../utils/hooks';
+import {useHideUnavailableNodes} from '../../../utils/hooks/useHideUnavailableNodes';
 import {useSelectedColumns} from '../../../utils/hooks/useSelectedColumns';
 import {NodesUptimeFilterValues} from '../../../utils/nodes';
+import {getRequiredDataFields} from '../../../utils/tableUtils/getRequiredDataFields';
 import {TableGroup} from '../../Storage/TableGroup/TableGroup';
 import {useExpandedGroups} from '../../Storage/TableGroup/useExpandedTableGroups';
 import {NodesControls} from '../NodesControls/NodesControls';
@@ -23,6 +32,8 @@ import {NodesTable} from '../NodesTable';
 import i18n from '../i18n';
 import {b} from '../shared';
 import {useNodesPageQueryParams} from '../useNodesPageQueryParams';
+
+const NODE_SEARCH_FIELDS_REQUIRED = new Set<NodesRequiredField>(['Host', 'NodeName']);
 
 interface NodeGroupProps {
     name: string;
@@ -38,6 +49,8 @@ interface NodeGroupProps {
     scrollContainerRef: React.RefObject<HTMLElement>;
     onIsExpandedChange: (name: string, isExpanded: boolean) => void;
     onDataFetched?: (data: PaginatedTableData<PreparedStorageNode>) => void;
+    onChunkDataChange: ChunkDataChangeHandler;
+    rowsMayBeMissing: boolean;
 }
 
 const NodeGroup = React.memo(function NodeGroup({
@@ -54,6 +67,8 @@ const NodeGroup = React.memo(function NodeGroup({
     scrollContainerRef,
     onIsExpandedChange,
     onDataFetched,
+    onChunkDataChange,
+    rowsMayBeMissing,
 }: NodeGroupProps) {
     return (
         <TableGroup
@@ -82,6 +97,8 @@ const NodeGroup = React.memo(function NodeGroup({
                         columns={columns}
                         scrollContainerRef={scrollContainerRef}
                         onDataFetched={onDataFetched}
+                        onChunkDataChange={onChunkDataChange}
+                        rowsMayBeMissing={rowsMayBeMissing}
                     />
                 }
                 tableWrapperProps={{
@@ -125,6 +142,7 @@ export function GroupedNodesComponent({
     );
     const useMetaProxy = useClusterWithProxy();
     const [autoRefreshInterval] = useAutoRefreshInterval();
+    const {hideUnavailable} = useHideUnavailableNodes();
 
     const {columnsToShow, columnsToSelect, setColumns} = useSelectedColumns(
         columns,
@@ -133,6 +151,15 @@ export function GroupedNodesComponent({
         defaultColumnsIds,
         requiredColumnsIds,
     );
+
+    const searchFieldsRequired = React.useMemo(() => {
+        const activeFieldsRequired = getRequiredDataFields(
+            columnsToShow.map(({name}) => name),
+            NODES_COLUMNS_TO_DATA_FIELDS,
+        );
+
+        return activeFieldsRequired.filter((field) => NODE_SEARCH_FIELDS_REQUIRED.has(field));
+    }, [columnsToShow]);
 
     const schemaPathParam = React.useMemo(() => {
         if (!isNil(path) && !isNil(databaseFullPath)) {
@@ -145,9 +172,11 @@ export function GroupedNodesComponent({
         {
             path: schemaPathParam,
             database,
+            alive: hideUnavailable || undefined,
             filter: searchValue.trim(),
             filter_peer_role: peerRoleFilter,
             group: groupByParam,
+            fieldsRequired: searchValue.trim() ? searchFieldsRequired : undefined,
             limit: 0,
         },
         {
@@ -159,6 +188,9 @@ export function GroupedNodesComponent({
     const {tableGroups, found = 0, total = 0} = currentData || {};
 
     const {expandedGroups, setIsGroupExpanded} = useExpandedGroups(tableGroups);
+
+    const {issues, problems, rowsMayBeMissing, getGroupChunkDataChangeHandler} =
+        useGroupedTableDataIssues({type: 'nodes', hasDatabase: Boolean(database)}, currentData);
 
     // Initialize the table state with the API data
     const initialState = React.useMemo(
@@ -192,12 +224,21 @@ export function GroupedNodesComponent({
                         scrollContainerRef={scrollContainerRef}
                         onIsExpandedChange={setIsGroupExpanded}
                         onDataFetched={onDataFetched}
+                        onChunkDataChange={getGroupChunkDataChangeHandler(name)}
+                        rowsMayBeMissing={rowsMayBeMissing}
                     />
                 );
             });
         }
 
-        return i18n('no-nodes-groups');
+        return (
+            <EmptyTableGroups
+                issues={issues}
+                problems={problems}
+                rowsMayBeMissing={rowsMayBeMissing}
+                emptyMessage={i18n('no-nodes-groups')}
+            />
+        );
     };
 
     return (
@@ -210,6 +251,9 @@ export function GroupedNodesComponent({
                     entitiesCountCurrent={found}
                     entitiesCountTotal={total}
                     entitiesLoading={isLoading}
+                    dataIssuesIndicator={
+                        <DataIssuesIndicator compact issues={issues} problems={problems} />
+                    }
                     withGroupBySelect
                 />
             }

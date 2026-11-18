@@ -29,6 +29,18 @@ export interface StorageGroupGroups {
     GroupCount?: string;
 }
 
+export type TStorageGroupStateCount =
+    | {Disks: {Value?: number}; FailRealms?: never}
+    | {Disks?: never; FailRealms: {Value?: number}};
+
+export interface TStorageGroupStateInfo {
+    Status?: string;
+    /** Disks for none/block-4-2; affected fail realms for mirror-3-dc. Omitted for ok. */
+    Count?: TStorageGroupStateCount;
+    /** Non-zero failed-domain counts per affected realm, in descending order. */
+    FailedDomainsPerRealm?: number[];
+}
+
 export interface TGroupsStorageGroupInfo {
     GroupId?: string;
     /** uint64 */
@@ -55,6 +67,8 @@ export interface TGroupsStorageGroupInfo {
      * dead:n - group is not okay, n fail realms are not available
      */
     State?: string;
+    /** May be absent even on newer backends when the state cannot be determined. */
+    StateInfo?: TStorageGroupStateInfo;
     /** uint64 */
     MissingDisks?: string;
 

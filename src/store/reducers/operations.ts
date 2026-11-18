@@ -1,4 +1,8 @@
 import type {
+    ControlPlaneOperationList,
+    ControlPlaneOperationListParams,
+} from '../../types/api/controlPlaneOperations';
+import type {
     OperationCancelRequestParams,
     OperationForgetRequestParams,
     OperationKind,
@@ -12,6 +16,15 @@ import type {StartTableCompactionParams} from '../../utils/tableCompaction';
 import {api} from './api';
 
 export const DEFAULT_PAGE_SIZE = 20;
+const CONTROL_PLANE_PAGE_SIZE = 100;
+
+export type ControlPlaneOperationQueryParams = Omit<
+    ControlPlaneOperationListParams,
+    'pageToken'
+> & {
+    environment?: string;
+    backend?: string;
+};
 
 // Validate and normalize the response to ensure it has proper structure
 function validateOperationListResponse(data: TOperationList): TOperationList {
@@ -33,6 +46,35 @@ function getNextPageToken(data: TOperationList) {
 
 export const operationsApi = api.injectEndpoints({
     endpoints: (build) => ({
+        getControlPlaneOperationList: build.infiniteQuery<
+            ControlPlaneOperationList,
+            ControlPlaneOperationQueryParams,
+            string | undefined
+        >({
+            infiniteQueryOptions: {
+                initialPageParam: undefined,
+                getNextPageParam: (lastPage) => lastPage.next_page_token || undefined,
+            },
+            queryFn: async ({queryArg, pageParam}, {signal}) => {
+                try {
+                    if (!window.api.meta) {
+                        throw new Error('Meta API is not available.');
+                    }
+                    const data = await window.api.meta.getControlPlaneOperationList(
+                        {
+                            ...queryArg,
+                            pageSize: queryArg.pageSize ?? CONTROL_PLANE_PAGE_SIZE,
+                            pageToken: pageParam,
+                        },
+                        {signal},
+                    );
+                    return {data};
+                } catch (error) {
+                    return {error};
+                }
+            },
+            providesTags: ['All', 'OperationList'],
+        }),
         getOperationList: build.infiniteQuery<
             TOperationList, // Full response type to access next_page_token
             {database: string; kind: OperationKind; page_size?: number}, // Include page_size in query arg

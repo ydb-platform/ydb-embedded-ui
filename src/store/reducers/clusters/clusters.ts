@@ -8,6 +8,7 @@ import type {ClustersFilters} from './types';
 import {prepareClustersData} from './utils';
 
 const initialState: ClustersFilters = {
+    availability: ['available'],
     clusterName: '',
     status: [],
     service: [],

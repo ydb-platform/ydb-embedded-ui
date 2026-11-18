@@ -1,5 +1,6 @@
 import React from 'react';
 
+import {DataIssuesIndicator} from '../../../components/DataIssuesAlert/DataIssuesIndicator';
 import type {PaginatedTableData} from '../../../components/PaginatedTable';
 import {PaginatedTableWithLayout} from '../../../components/PaginatedTable/PaginatedTableWithLayout';
 import {TableColumnSetup} from '../../../components/TableColumnSetup/TableColumnSetup';
@@ -9,6 +10,8 @@ import type {NodesColumn} from '../../../components/nodesColumns/types';
 import {useViewerNodesHandlerHasGrouping} from '../../../store/reducers/capabilities/hooks';
 import type {PreparedStorageNode} from '../../../store/reducers/storage/types';
 import type {NodesGroupByField} from '../../../types/api/nodes';
+import {useTableDataIssues} from '../../../utils/dataIssues/useTableDataIssues';
+import {useHideUnavailableNodes} from '../../../utils/hooks/useHideUnavailableNodes';
 import {useSelectedColumns} from '../../../utils/hooks/useSelectedColumns';
 import {NodesTable} from '../NodesTable';
 import {useNodesPageQueryParams} from '../useNodesPageQueryParams';
@@ -47,6 +50,7 @@ export function NodesComponent({
         withPeerRoleFilter,
     );
     const viewerNodesHandlerHasGrouping = useViewerNodesHandlerHasGrouping();
+    const {hideUnavailable} = useHideUnavailableNodes();
 
     const {columnsToShow, columnsToSelect, setColumns} = useSelectedColumns(
         columns,
@@ -56,12 +60,20 @@ export function NodesComponent({
         requiredColumnsIds,
     );
 
+    const {issues, problems, rowsMayBeMissing, handleChunkDataChange} = useTableDataIssues({
+        type: 'nodes',
+        hasDatabase: Boolean(database),
+    });
+
     return (
         <PaginatedTableWithLayout
             controls={
                 <NodesControlsWithTableState
                     withGroupBySelect={viewerNodesHandlerHasGrouping}
                     groupByParams={groupByParams}
+                    dataIssuesIndicator={
+                        <DataIssuesIndicator compact issues={issues} problems={problems} />
+                    }
                     withPeerRoleFilter={withPeerRoleFilter}
                 />
             }
@@ -85,11 +97,19 @@ export function NodesComponent({
                     columns={columnsToShow}
                     scrollContainerRef={scrollContainerRef}
                     onDataFetched={onDataFetched}
+                    onChunkDataChange={handleChunkDataChange}
+                    rowsMayBeMissing={rowsMayBeMissing}
                 />
             }
             tableWrapperProps={{
                 scrollContainerRef,
-                scrollDependencies: [searchValue, withProblems, uptimeFilter, peerRoleFilter],
+                scrollDependencies: [
+                    searchValue,
+                    withProblems,
+                    uptimeFilter,
+                    peerRoleFilter,
+                    hideUnavailable,
+                ],
             }}
         />
     );

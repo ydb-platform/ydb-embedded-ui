@@ -1,0 +1,15 @@
+.ydb-pdisk-info {
+    --g-definition-list-item-gap: var(--g-spacing-3);
+
+    &__column {
+        flex: 1 1 400px;
+
+        min-width: 0;
+        max-width: 500px;
+    }
+
+    &__identity-value {
+        min-width: 0;
+        overflow-wrap: anywhere;
+    }
+}

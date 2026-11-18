@@ -6,6 +6,7 @@ import type {TNodeInfo} from '../types/api/nodesList';
 import type {NodesMap} from '../types/store/nodesList';
 
 import {HOUR_IN_SECONDS} from './constants';
+import {getDatacenterKey} from './datacenters';
 
 import {valueIsDefined} from '.';
 
@@ -29,12 +30,35 @@ export const isUnavailableNode = <
     node: T,
 ) => !node.SystemState || node.SystemState === EFlag.Grey;
 
+/**
+ * The node has no state only because it did not answer in time (see `TNodeInfo.ResponseTimeout`).
+ * It may be alive, so it must not be presented as unavailable for sure.
+ */
+export const isNodeResponseTimedOut = <
+    T extends Pick<TSystemStateInfo, 'SystemState'> & {ResponseTimeout?: boolean},
+>(
+    node: T,
+) => node.ResponseTimeout === true && isUnavailableNode(node);
+
+function getNodePileName(node: TNodeInfo) {
+    const legacyLocation = node.PhysicalLocation?.Location || node.PhysicalLocation?.DataCenterId;
+    return node.Location?.BridgePileName || legacyLocation?.match(/(?:^|\/)P=([^/]+)/)?.[1];
+}
+
 export const prepareNodesMap = (nodesList?: TNodeInfo[]) => {
     return nodesList?.reduce<NodesMap>((nodeHosts, node) => {
         if (valueIsDefined(node.Id)) {
+            const physicalLocation = node.PhysicalLocation;
+            // The legacy numeric Rack can be a hash of the actual rack name.
+            const Rack =
+                node.Location?.Rack || physicalLocation?.Location?.match(/(?:^|\/)R=([^/]+)/)?.[1];
+
             nodeHosts.set(node.Id, {
                 Host: node.Host,
-                DC: node.PhysicalLocation?.DataCenterId,
+                DC: node.Location?.DataCenter || physicalLocation?.DataCenterId,
+                DCKey: getDatacenterKey(node.Location, physicalLocation?.DataCenterId),
+                Rack,
+                PileName: getNodePileName(node),
             });
         }
         return nodeHosts;
@@ -57,6 +81,7 @@ export function calculateLoadAveragePercents(node: TSystemStateInfo = {}) {
 export interface PreparedNodeSystemState extends TSystemStateInfo {
     Rack?: string;
     DC?: string;
+    DCKey?: string;
     LoadAveragePercents?: number[];
     TenantName?: string;
     SharedCacheLimit?: number;
@@ -83,6 +108,7 @@ export function prepareNodeSystemState(
         ...systemState,
         Rack,
         DC,
+        DCKey: getDatacenterKey(systemState.Location, systemState.DataCenter),
         LoadAveragePercents,
         TenantName,
         SharedCacheLimit,

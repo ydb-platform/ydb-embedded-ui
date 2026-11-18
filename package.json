@@ -1,6 +1,6 @@
 {
   "name": "ydb-embedded-ui",
-  "version": "22.2.0",
+  "version": "22.10.0",
   "files": [
     "dist",
     "src"
@@ -38,7 +38,7 @@
     "@reduxjs/toolkit": "^2.8.2",
     "@tanstack/react-table": "^8.20.6",
     "@ydb-platform/monaco-ghost": "^0.6.1",
-    "axios": "^1.18.0",
+    "axios": "^1.20.0",
     "axios-retry": "^4.5.0",
     "colord": "^2.10.0",
     "copy-to-clipboard": "^3.3.3",
@@ -50,7 +50,7 @@
     "numeral": "^2.0.6",
     "path-to-regexp": "^3.3.0",
     "qrcode": "^1.5.4",
-    "qs": "^6.16.0",
+    "qs": "^6.16.1",
     "react-error-boundary": "^4.1.2",
     "react-helmet-async": "^2.0.5",
     "react-hook-form": "^7.55.0",
@@ -66,7 +66,7 @@
     "uuid": "^14.0.0",
     "web-vitals": "^1.1.2",
     "ydb-ui-components": "^6.1.0",
-    "zod": "^4.4.3"
+    "zod": "^4.6.6"
   },
   "scripts": {
     "analyze": "source-map-explorer 'build/static/js/*.js'",
@@ -89,6 +89,7 @@
     "prepare": "husky",
     "test:e2e:install": "npx playwright install --with-deps",
     "test:e2e": "npx playwright test --config=playwright.config.ts",
+    "test:e2e:control-plane": "playwright test --config=tests/controlPlane/playwright.config.ts",
     "test:e2e:update-snapshots": "npx playwright test --config=playwright.config.ts --update-snapshots",
     "test:e2e:local": "PLAYWRIGHT_BASE_URL=http://localhost:3000/ npm run test:e2e",
     "test:e2e:docker": "bash scripts/playwright-docker.sh",

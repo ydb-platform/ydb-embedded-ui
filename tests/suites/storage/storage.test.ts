@@ -2,7 +2,7 @@ import {expect, test} from '@playwright/test';
 
 import {PageModel} from '../../models/PageModel';
 import {NodePage} from '../nodes/NodePage';
-import {ClusterStorageTable} from '../paginatedTable/paginatedTable';
+import {ClusterStorageTable, PaginatedTable} from '../paginatedTable/paginatedTable';
 
 import {StoragePage} from './StoragePage';
 import {DATABASE, GROUP_ID, NODE_ID, setupVDiskPageMocks} from './vdiskPageMocks';
@@ -106,6 +106,140 @@ test.describe('Storage groups API without capabilities', () => {
                 page.getByRole('link', {name: GROUP_ID, exact: true}).first(),
             ).toBeVisible();
             expect(legacyStorageRequests).toEqual([]);
+        });
+    }
+});
+
+test.describe('Storage group latency', () => {
+    for (const {name, fields, expected} of [
+        {
+            name: 'omitted fields',
+            fields: {},
+            expected: ['—', '—', '—'],
+        },
+        {
+            name: 'null fields',
+            fields: {
+                LatencyPutTabletLog: null,
+                LatencyPutUserData: null,
+                LatencyGetFast: null,
+            },
+            expected: ['—', '—', '—'],
+        },
+        {
+            name: 'invalid fields',
+            fields: {
+                LatencyPutTabletLog: 'invalid',
+                LatencyPutUserData: '',
+                LatencyGetFast: '-1',
+            },
+            expected: ['—', '—', '—'],
+        },
+        {
+            name: 'explicit zero',
+            fields: {
+                LatencyPutTabletLog: '0',
+                LatencyPutUserData: 0,
+                LatencyGetFast: '0',
+            },
+            expected: ['0 ms', '0 ms', '0 ms'],
+        },
+        {
+            name: 'valid values with rounding',
+            fields: {
+                LatencyPutTabletLog: '2500',
+                LatencyPutUserData: '1000',
+                LatencyGetFast: '499',
+            },
+            expected: ['3 ms', '1 ms', '0 ms'],
+        },
+        {
+            name: 'mixed available and missing fields',
+            fields: {
+                LatencyPutUserData: '0',
+                LatencyGetFast: '2500',
+            },
+            expected: ['—', '0 ms', '3 ms'],
+        },
+        {
+            name: 'empty response',
+            fields: null,
+            expected: ['—', '—', '—'],
+        },
+    ]) {
+        test(`renders ${name}`, async ({page}) => {
+            await setupVDiskPageMocks(page);
+            await page.addInitScript(() => {
+                localStorage.setItem(
+                    'storageGroupsSelectedColumns',
+                    JSON.stringify([
+                        {id: 'GroupId', selected: true},
+                        {id: 'Latency', selected: true},
+                    ]),
+                );
+            });
+            const groups =
+                fields === null
+                    ? []
+                    : [
+                          {
+                              GroupId: GROUP_ID,
+                              PoolName: 'dynamic_storage_pool:1',
+                              GroupGeneration: '1',
+                              ErasureSpecies: 'mirror-3-dc',
+                              State: 'ok',
+                              ...fields,
+                          },
+                      ];
+            await page.route('**/storage/groups?*', (route) =>
+                route.fulfill({
+                    json: {
+                        StorageGroups: groups,
+                        TotalGroups: groups.length,
+                        FoundGroups: groups.length,
+                    },
+                }),
+            );
+
+            const storageResponse = page.waitForResponse(
+                (response) =>
+                    response.url().includes('/storage/groups?') &&
+                    new URL(response.url()).searchParams.get('group_id') === GROUP_ID &&
+                    response.ok(),
+            );
+            await new PageModel(page, 'storageGroup', {
+                groupId: GROUP_ID,
+                database: DATABASE,
+                type: 'groups',
+            }).goto();
+            await storageResponse;
+
+            const groupInfo = page.locator('.ydb-storage-group-page__info');
+            const labels = [
+                'Latency (Put Tablet Log)',
+                'Latency (Put User Data)',
+                'Latency (Get Fast)',
+            ];
+            for (const [index, label] of labels.entries()) {
+                const row = groupInfo.locator('.g-definition-list__item').filter({
+                    has: page.getByText(label, {exact: true}),
+                });
+                await expect(row.locator('.g-definition-list__definition')).toHaveText(
+                    expected[index],
+                );
+            }
+
+            if (groups.length) {
+                const table = new PaginatedTable(page, '.ydb-storage-group-page');
+                await expect(new StoragePage(page).getGroupRow(GROUP_ID)).toBeVisible();
+                await expect
+                    .poll(async () =>
+                        (await table.getColumnValues('Latency')).map((value) =>
+                            value.replace(/\s+/g, ' '),
+                        ),
+                    )
+                    .toEqual([expected[0]]);
+            }
         });
     }
 });

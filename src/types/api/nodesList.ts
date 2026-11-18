@@ -1,3 +1,5 @@
+import type {TSystemStateInfo} from './nodes';
+
 /**
  * endpoint: /viewer/json/nodesList
  *
@@ -11,6 +13,7 @@ export interface TNodeInfo {
     ResolveHost?: string;
     Address?: string;
     Port?: number;
+    Location?: TSystemStateInfo['Location'];
     PhysicalLocation?: TNodeLocation;
 }
 

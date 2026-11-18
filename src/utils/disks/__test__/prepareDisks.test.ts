@@ -117,6 +117,10 @@ describe('prepareWhiteboardVDiskData', () => {
             SizeLimit: 197520261120,
             FreeSize: 188523479040,
             AllocatedPercent: 4,
+            DisplaySize: {
+                AllocatedSize: 8996782080,
+                SizeLimit: 197520261120,
+            },
             WhiteboardSize: {
                 AllocatedSize: 8996782080,
                 SizeLimit: 197520261120,
@@ -265,6 +269,7 @@ describe('prepareVDiskSizeFields', () => {
             SizeLimit: 500, // allocated (100) + available (400) = 500
             FreeSize: 400,
             AllocatedPercent: 20, // 100 / 500 * 100 = 20%
+            DisplaySize: {AllocatedSize: 100, SizeLimit: 500},
         });
     });
 
@@ -281,6 +286,7 @@ describe('prepareVDiskSizeFields', () => {
             SizeLimit: 500, // SlotSize is used when available is 0
             FreeSize: 0,
             AllocatedPercent: 100, // 500 / 500 * 100 = 100%
+            DisplaySize: {AllocatedSize: 500, SizeLimit: 500},
         });
     });
 
@@ -297,6 +303,7 @@ describe('prepareVDiskSizeFields', () => {
             SizeLimit: 500, // SlotSize is used when available is undefined
             FreeSize: 200,
             AllocatedPercent: 60, // 300 / 500 * 100 = 60%
+            DisplaySize: {AllocatedSize: 300, SizeLimit: 500},
         });
     });
 
@@ -313,6 +320,7 @@ describe('prepareVDiskSizeFields', () => {
             SizeLimit: 500,
             FreeSize: 200,
             AllocatedPercent: 60,
+            DisplaySize: {AllocatedSize: 300, SizeLimit: 500},
         });
     });
 
@@ -329,6 +337,7 @@ describe('prepareVDiskSizeFields', () => {
             SizeLimit: 500,
             FreeSize: NaN,
             AllocatedPercent: NaN,
+            DisplaySize: {AllocatedSize: undefined, SizeLimit: 500},
         });
     });
 
@@ -345,6 +354,7 @@ describe('prepareVDiskSizeFields', () => {
             SizeLimit: NaN,
             FreeSize: 400,
             AllocatedPercent: NaN,
+            DisplaySize: {AllocatedSize: undefined, SizeLimit: undefined},
         });
     });
 
@@ -361,6 +371,7 @@ describe('prepareVDiskSizeFields', () => {
             SizeLimit: 500, // allocated (500)
             FreeSize: 0,
             AllocatedPercent: 100, // 500 / 500 * 100 = 100%
+            DisplaySize: {AllocatedSize: 500, SizeLimit: 500},
         });
     });
 
@@ -377,6 +388,7 @@ describe('prepareVDiskSizeFields', () => {
             SizeLimit: 500, // SlotSize is used as limit
             FreeSize: 0,
             AllocatedPercent: 160, // 800 / 500 * 100 = 160%
+            DisplaySize: {AllocatedSize: 800, SizeLimit: 500},
         });
     });
 
@@ -393,7 +405,32 @@ describe('prepareVDiskSizeFields', () => {
             SizeLimit: NaN,
             FreeSize: NaN,
             AllocatedPercent: NaN,
+            DisplaySize: {AllocatedSize: undefined, SizeLimit: undefined},
         });
+    });
+
+    test.each([undefined, null, '', '   ', 'invalid', -1, NaN, Infinity])(
+        'preserves the known slot limit when allocated size is %p',
+        (allocatedSize) => {
+            const data = prepareVDiskSizeFields({
+                AllocatedSize: allocatedSize as string | number | undefined,
+                AvailableSize: undefined,
+                SlotSize: '500',
+            });
+
+            expect(data.DisplaySize).toEqual({AllocatedSize: undefined, SizeLimit: 500});
+        },
+    );
+
+    test('does not infer a display limit from missing available size and a zero slot size', () => {
+        const data = prepareVDiskSizeFields({
+            AllocatedSize: '100',
+            AvailableSize: '',
+            SlotSize: '0',
+        });
+
+        expect(data.DisplaySize).toEqual({AllocatedSize: 100, SizeLimit: undefined});
+        expect(data.SizeLimit).toBe(100);
     });
 });
 

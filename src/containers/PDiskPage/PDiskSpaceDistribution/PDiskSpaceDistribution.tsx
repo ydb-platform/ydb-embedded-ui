@@ -4,8 +4,8 @@ import {DDisk} from '../../../components/DDisk/DDisk';
 import {DiskStateProgressBar} from '../../../components/DiskStateProgressBar/DiskStateProgressBar';
 import {HoverPopup} from '../../../components/HoverPopup/HoverPopup';
 import {InternalLink} from '../../../components/InternalLink';
-import {ProgressViewer} from '../../../components/ProgressViewer/ProgressViewer';
-import {VDiskInfo} from '../../../components/VDiskInfo/VDiskInfo';
+import {PDiskLogSize} from '../../../components/PDiskInfo/PDiskLogSize';
+import {VDiskPopup} from '../../../components/VDiskPopup/VDiskPopup';
 import type {YDBDefinitionListItem} from '../../../components/YDBDefinitionList/YDBDefinitionList';
 import {YDBDefinitionList} from '../../../components/YDBDefinitionList/YDBDefinitionList';
 import {useVDiskPagePath} from '../../../routes';
@@ -16,6 +16,7 @@ import type {
     SlotItem,
     SlotItemType,
 } from '../../../store/reducers/pdisk/types';
+import type {NodeMetadata} from '../../../types/store/nodesList';
 import {valueIsDefined} from '../../../utils';
 import {formatBytes} from '../../../utils/bytesParsers';
 import {cn} from '../../../utils/cn';
@@ -81,6 +82,12 @@ export function PDiskSpaceDistribution({data}: PDiskSpaceDistributionProps) {
                     minNonLogTotal={minNonLogTotal}
                     pDiskId={PDiskId}
                     nodeId={NodeId}
+                    nodeData={{
+                        Host: data.NodeHost,
+                        DC: data.NodeDC,
+                        DCKey: data.NodeDCKey,
+                        Rack: data.NodeRack,
+                    }}
                     getVDiskPagePath={getVDiskPagePath}
                     key={index}
                 />
@@ -111,6 +118,7 @@ interface SlotProps<T extends SlotItemType> {
 
     pDiskId?: string | number;
     nodeId?: string | number;
+    nodeData?: NodeMetadata;
     getVDiskPagePath?: (
         params: {nodeId: string | number | undefined; vDiskId: string | undefined},
         query?: {activeTab?: string},
@@ -139,6 +147,7 @@ function Slot<T extends SlotItemType>({
     item,
     minNonLogTotal,
     nodeId,
+    nodeData,
     getVDiskPagePath,
 }: SlotProps<T>) {
     const renderContent = () => {
@@ -156,7 +165,14 @@ function Slot<T extends SlotItemType>({
 
             return (
                 <HoverPopup
-                    renderPopupContent={() => <VDiskInfo data={item.SlotData} withTitle />}
+                    renderPopupContent={({onClose}) => (
+                        <VDiskPopup
+                            data={item.SlotData}
+                            nodeData={nodeData}
+                            onClose={onClose}
+                            view="space-distribution"
+                        />
+                    )}
                     contentClassName={b('vdisk-popup')}
                     placement={['right', 'top']}
                 >
@@ -279,20 +295,14 @@ function LogInfo({data}: LogInfoProps) {
     const items: YDBDefinitionListItem[] = [
         {
             name: pDiskPageKeyset('label.log-size'),
-            content: (
-                <ProgressViewer
-                    value={LogUsedSize}
-                    capacity={LogTotalSize}
-                    formatValues={formatStorageValuesToGb}
-                />
-            ),
+            content: <PDiskLogSize used={LogUsedSize} total={LogTotalSize} />,
         },
     ];
 
     if (valueIsDefined(SystemSize)) {
         items.push({
             name: pDiskPageKeyset('label.system-size'),
-            content: formatBytes({value: SystemSize}),
+            content: formatBytes({value: SystemSize, fixedDecimalPlaces: 2}),
         });
     }
 

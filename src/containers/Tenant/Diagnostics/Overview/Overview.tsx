@@ -110,7 +110,7 @@ function Overview({type, path, database, databaseFullPath}: OverviewProps) {
                 />
             ),
             [EPathType.EPathTypeStreamingQuery]: () => (
-                <StreamingQueryInfo path={path} database={database} />
+                <StreamingQueryInfo path={path} database={database} data={data} />
             ),
         };
 
@@ -128,6 +128,10 @@ function Overview({type, path, database, databaseFullPath}: OverviewProps) {
         }
 
         const content = pathTypeToComponent[type]?.();
+
+        if (isStreamingQuery) {
+            return content;
+        }
 
         const commonInfo = (
             <SchemaObjectInfoContainer data={currentData ?? undefined} type={type} path={path} />

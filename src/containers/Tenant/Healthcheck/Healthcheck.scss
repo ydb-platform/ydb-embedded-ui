@@ -93,7 +93,12 @@
         }
     }
     &__issue-status {
-        text-align: start;
+        display: flex;
+        flex-shrink: 0;
+    }
+    &__issue-title {
+        min-width: 0;
+        overflow-wrap: anywhere;
     }
     &__issue-content {
         --g-definition-list-item-gap: var(--g-spacing-3);

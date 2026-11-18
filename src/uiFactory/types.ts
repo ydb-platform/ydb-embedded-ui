@@ -7,7 +7,10 @@ import type {
     GetHealthcheckViewTitles,
     GetHealthcheckViewsOrder,
 } from '../containers/Tenant/Healthcheck/shared';
-import type {HealthcheckAssistantActionProps} from '../containers/Tenant/Healthcheck/types';
+import type {
+    HealthcheckAssistantActionProps,
+    HealthcheckAssistantTarget,
+} from '../containers/Tenant/Healthcheck/types';
 import type {ClusterInfo} from '../store/reducers/cluster/cluster';
 import type {PreparedStorageNode} from '../store/reducers/storage/types';
 import type {PreparedTenant} from '../store/reducers/tenants/types';
@@ -15,6 +18,7 @@ import type {ClusterLink, DatabaseLink} from '../types/additionalProps';
 import type {MetaBaseClusterInfo} from '../types/api/meta';
 import type {ETenantType} from '../types/api/tenant';
 import type {TUserToken} from '../types/api/whoami';
+import type {DatacenterColorIndexes} from '../utils/datacenters';
 import type {GetLogsLink} from '../utils/logs';
 import type {GetMonitoringClusterLink, GetMonitoringLink} from '../utils/monitoring';
 
@@ -39,6 +43,14 @@ export interface UIFactory<H extends string = CommonIssueCategory, T extends str
     onDeleteCluster?: HandleDeleteCluster;
 
     homePageTitle?: string;
+
+    /**
+     * Permanent positive indexes keyed by the full uppercase DC name.
+     * Other DCs get session-local indexes after the registry's maximum as responses arrive.
+     * Existing assignments are retained; only newly received names are sorted.
+     * Invalid indexes remain neutral.
+     */
+    datacenterColorIndexes?: DatacenterColorIndexes;
 
     getLogsLink?: GetLogsLink;
     getMonitoringLink?: GetMonitoringLink;
@@ -70,7 +82,7 @@ export interface UIFactory<H extends string = CommonIssueCategory, T extends str
          * Renders after the drawer header and before Healthcheck content.
          * Stays mounted while the drawer is open, independent of loading, error or issue state.
          */
-        renderDrawerExtension?: () => React.ReactNode;
+        renderDrawerExtension?: (props: HealthcheckDrawerExtensionProps) => React.ReactNode;
     };
     hasAccess: HasAccess;
     hideGrantAccess?: boolean;
@@ -80,6 +92,9 @@ export interface UIFactory<H extends string = CommonIssueCategory, T extends str
     useDatabaseId?: boolean;
 
     emMetaAvailable?: boolean;
+
+    /** Renders a CP operation author. The renderer owns loading and falls back to ID. */
+    resolveUser?: ResolveUser;
 
     useMetaProxy?: boolean;
     useClusterDomain?: boolean;
@@ -211,6 +226,10 @@ export type RenderNodeTooltipActions = (props: {data?: PreparedStorageNode}) => 
 
 export type RenderChatPanel = () => React.ReactNode;
 
+export interface HealthcheckDrawerExtensionProps {
+    target?: HealthcheckAssistantTarget;
+}
+
 export type RenderHealthcheckAssistantAction = (
     props: HealthcheckAssistantActionProps,
 ) => React.ReactNode;
@@ -272,3 +291,5 @@ export type GetReportProblemUrl = (params: {
     requestUrl?: string;
     traceId?: string;
 }) => string | undefined;
+
+export type ResolveUser = (params: {userId: string; clusterName?: string}) => React.ReactNode;

@@ -9,6 +9,28 @@
     }
 }
 
+@mixin capacity-alert-label-colors($color) {
+    background-color: var(--ydb-capacity-alert-label-background);
+
+    @if $color == 'green' {
+        --ydb-capacity-alert-label-background: var(--g-color-base-positive-light);
+
+        color: var(--g-color-text-positive-heavy);
+    } @else if $color == 'yellow' {
+        --ydb-capacity-alert-label-background: var(--g-color-base-warning-light);
+
+        color: var(--g-color-text-warning-heavy);
+    } @else if $color == 'red' {
+        --ydb-capacity-alert-label-background: var(--g-color-base-danger-light);
+
+        color: var(--g-color-base-danger-heavy);
+    } @else {
+        --ydb-capacity-alert-label-background: var(--ydb-space-#{$color}-bg);
+
+        color: var(--ydb-space-#{$color}-text);
+    }
+}
+
 @mixin container() {
     max-width: 1170px;
     margin: 0 auto;

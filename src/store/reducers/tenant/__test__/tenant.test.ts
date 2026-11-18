@@ -1,6 +1,7 @@
 import {configureStore} from '@reduxjs/toolkit';
 
 import type {YdbEmbeddedAPI} from '../../../../services/api';
+import {parseMetaTenants} from '../../../../services/parsers/parseMetaTenants';
 import type {TTenant} from '../../../../types/api/tenant';
 import {api} from '../../api';
 import {tenantApi} from '../tenant';
@@ -31,6 +32,39 @@ describe('tenantApi.getTenantInfo', () => {
         window.api = originalApi;
     });
 
+    test('keeps CP identity isolated across environments and backends', async () => {
+        const getTenantInfo = jest.fn();
+        window.api = {viewer: {getTenantInfo}} as unknown as YdbEmbeddedAPI;
+        const store = createTestStore();
+        const endpoint = tenantApi.endpoints.getTenantInfo;
+        const scopes = [
+            {environment: 'env-a', backend: '/runtime-a'},
+            {environment: 'env-b', backend: '/runtime-a'},
+            {environment: 'env-b', backend: '/runtime-b'},
+        ];
+        try {
+            for (const [index, scope] of scopes.entries()) {
+                const args = {...queryArgs, ...scope};
+                expect(endpoint.select(args)(store.getState()).data).toBeUndefined();
+                const tenant = {
+                    Name: queryArgs.database,
+                    ControlPlane: {id: `cp-${index}`, folder_id: `folder-${index}`},
+                };
+                getTenantInfo.mockResolvedValueOnce({TenantInfo: [tenant]});
+                await store.dispatch(endpoint.initiate(args, {subscribe: false}));
+                expect(endpoint.select(args)(store.getState()).data?.ControlPlane).toEqual(
+                    tenant.ControlPlane,
+                );
+            }
+            expect(getTenantInfo).toHaveBeenCalledTimes(3);
+            expect(
+                endpoint.select({...queryArgs, ...scopes[0]})(store.getState()).data?.ControlPlane,
+            ).toEqual({id: 'cp-0', folder_id: 'folder-0'});
+        } finally {
+            store.dispatch(api.util.resetApiState());
+        }
+    });
+
     test('returns EMPTY_TENANT_INFO when TenantInfo is empty', async () => {
         window.api = {
             viewer: {
@@ -46,6 +80,59 @@ describe('tenantApi.getTenantInfo', () => {
         expect(result).toMatchObject({
             status: 'rejected',
             error: {code: 'EMPTY_TENANT_INFO'},
+        });
+    });
+
+    test('preserves partial meta errors alongside the selected database', async () => {
+        const response = {
+            databases: [{Id: 'database-id', Name: '/local/database'}],
+            errors: {control_plane: 'Simulated CP outage: database-id'},
+        };
+        window.api = {
+            meta: {
+                getTenantsV2: jest.fn().mockResolvedValue(parseMetaTenants(response)),
+            },
+        } as unknown as YdbEmbeddedAPI;
+        const store = createTestStore();
+        const args = {...queryArgs, clusterName: 'test-cluster', isMetaDatabasesAvailable: true};
+
+        await store.dispatch(tenantApi.endpoints.getTenantInfo.initiate(args, {subscribe: false}));
+
+        expect(tenantApi.endpoints.getTenantInfo.select(args)(store.getState())).toMatchObject({
+            status: 'fulfilled',
+            data: {
+                Id: 'database-id',
+                Name: '/local/database',
+                metaErrors: {control_plane: 'Simulated CP outage: database-id'},
+            },
+        });
+    });
+
+    test('preserves meta errors when no database is returned', async () => {
+        window.api = {
+            meta: {
+                getTenantsV2: jest.fn().mockResolvedValue(
+                    parseMetaTenants({
+                        errors: {control_plane: 'Control plane unavailable'},
+                    }),
+                ),
+            },
+        } as unknown as YdbEmbeddedAPI;
+        const store = createTestStore();
+
+        const result = await store.dispatch(
+            tenantApi.endpoints.getTenantInfo.initiate(
+                {...queryArgs, clusterName: 'test-cluster', isMetaDatabasesAvailable: true},
+                {subscribe: false},
+            ),
+        );
+
+        expect(result).toMatchObject({
+            status: 'rejected',
+            error: {
+                code: 'EMPTY_TENANT_INFO',
+                metaErrors: {control_plane: 'Control plane unavailable'},
+            },
         });
     });
 
@@ -105,6 +192,45 @@ describe('tenantApi.getTenantInfo', () => {
             data: expect.objectContaining({Id: matchingTenant.Id, Name: matchingTenant.Name}),
         });
     });
+
+    test.each([false, true])(
+        'selects a non-first database by CP ID from an unfiltered meta response (V2=%s)',
+        async (isMetaDatabasesAvailable) => {
+            const firstTenant: TTenant = {
+                Id: 'viewer-first',
+                Name: '/local/first',
+                ControlPlane: {id: 'cp-first'},
+            };
+            const matchingTenant: TTenant = {
+                Id: 'viewer-second',
+                Name: '/local/second',
+                ControlPlane: {id: 'cp-second'},
+            };
+            const getTenants = jest
+                .fn()
+                .mockResolvedValue({TenantInfo: [firstTenant, matchingTenant]});
+            window.api = {
+                meta: {getTenants, getTenantsV2: getTenants},
+            } as unknown as YdbEmbeddedAPI;
+            const store = createTestStore();
+
+            const result = await store.dispatch(
+                tenantApi.endpoints.getTenantInfo.initiate(
+                    {database: 'cp-second', clusterName: 'test-cluster', isMetaDatabasesAvailable},
+                    {subscribe: false},
+                ),
+            );
+
+            expect(getTenants).toHaveBeenCalledWith(
+                {database: 'cp-second', clusterName: 'test-cluster'},
+                expect.objectContaining({signal: expect.any(AbortSignal)}),
+            );
+            expect(result).toMatchObject({
+                status: 'fulfilled',
+                data: expect.objectContaining(matchingTenant),
+            });
+        },
+    );
 
     test('uses the first database for the legacy meta path when no exact match exists', async () => {
         const firstTenant: TTenant = {Id: '/local/first', Name: '/local/first'};

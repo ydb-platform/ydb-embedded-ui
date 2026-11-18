@@ -1,10 +1,14 @@
 import React from 'react';
 
+import {DataIssuesIndicator} from '../../../components/DataIssuesAlert/DataIssuesIndicator';
+import {EmptyTableGroups} from '../../../components/DataIssuesAlert/EmptyTableGroups';
 import {ResponseError} from '../../../components/Errors/ResponseError/ResponseError';
 import {PaginatedTableWithLayout} from '../../../components/PaginatedTable/PaginatedTableWithLayout';
 import {TableColumnSetup} from '../../../components/TableColumnSetup/TableColumnSetup';
 import {storageApi} from '../../../store/reducers/storage/storage';
 import type {GroupsGroupByField} from '../../../types/api/storage';
+import {useGroupedTableDataIssues} from '../../../utils/dataIssues/useTableDataIssues';
+import type {ChunkDataChangeHandler} from '../../../utils/dataIssues/useTableDataQuality';
 import {useAutoRefreshInterval} from '../../../utils/hooks';
 import {renderPaginatedTableErrorMessage} from '../../../utils/renderPaginatedTableErrorMessage';
 import type {PaginatedStorageProps} from '../PaginatedStorage';
@@ -34,6 +38,8 @@ interface StorageGroupGroupProps {
     scrollContainerRef: React.RefObject<HTMLElement>;
     onIsExpandedChange: (name: string, isExpanded: boolean) => void;
     handleShowAllGroups: VoidFunction;
+    onChunkDataChange: ChunkDataChangeHandler;
+    rowsMayBeMissing: boolean;
 }
 
 export const StorageGroupGroup = React.memo(function StorageGroupGroup({
@@ -50,6 +56,8 @@ export const StorageGroupGroup = React.memo(function StorageGroupGroup({
     columns,
     onIsExpandedChange,
     handleShowAllGroups,
+    onChunkDataChange,
+    rowsMayBeMissing,
 }: StorageGroupGroupProps) {
     return (
         <TableGroup
@@ -78,6 +86,8 @@ export const StorageGroupGroup = React.memo(function StorageGroupGroup({
                         renderErrorMessage={renderPaginatedTableErrorMessage}
                         columns={columns}
                         initialEntitiesCount={count}
+                        onChunkDataChange={onChunkDataChange}
+                        rowsMayBeMissing={rowsMayBeMissing}
                     />
                 }
                 tableWrapperProps={{
@@ -125,6 +135,9 @@ export function GroupedStorageGroupsComponent({
 
     const {expandedGroups, setIsGroupExpanded} = useExpandedGroups(tableGroups);
 
+    const {issues, problems, rowsMayBeMissing, getGroupChunkDataChangeHandler} =
+        useGroupedTableDataIssues({type: 'storageGroups'}, currentData);
+
     // Initialize the table state with the API data
     const initialState = React.useMemo(
         () => ({
@@ -158,12 +171,21 @@ export function GroupedStorageGroupsComponent({
                         onIsExpandedChange={setIsGroupExpanded}
                         handleShowAllGroups={handleShowAllGroups}
                         columns={columnsToShow}
+                        onChunkDataChange={getGroupChunkDataChangeHandler(name)}
+                        rowsMayBeMissing={rowsMayBeMissing}
                     />
                 );
             });
         }
 
-        return i18n('no-groups');
+        return (
+            <EmptyTableGroups
+                issues={issues}
+                problems={problems}
+                rowsMayBeMissing={rowsMayBeMissing}
+                emptyMessage={i18n('no-groups')}
+            />
+        );
     };
 
     return (
@@ -176,6 +198,9 @@ export function GroupedStorageGroupsComponent({
                     entitiesCountCurrent={found}
                     entitiesCountTotal={total}
                     entitiesLoading={isLoading}
+                    dataIssuesIndicator={
+                        <DataIssuesIndicator compact issues={issues} problems={problems} />
+                    }
                 />
             }
             extraControls={

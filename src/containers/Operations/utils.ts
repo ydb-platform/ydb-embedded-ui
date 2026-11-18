@@ -8,9 +8,38 @@ import type {
     IncrementalBackupMetadata,
     IndexBuildMetadata,
     RestoreMetadata,
+    TIssueMessage,
     TOperation,
 } from '../../types/api/operations';
 import {OPERATION_METADATA_TYPE_URLS} from '../../types/api/operations';
+
+export function getOperationErrorText(issues: TIssueMessage[] = []): string {
+    const messages: string[] = [];
+    const visit = (items: TIssueMessage[], depth: number) => {
+        for (const issue of items) {
+            if (issue.message?.trim()) {
+                messages.push(`${'  '.repeat(depth)}${issue.message}`);
+            }
+            if (issue.issues) {
+                visit(issue.issues, depth + 1);
+            }
+        }
+    };
+    visit(issues, 0);
+    return messages.join('\n');
+}
+
+export function filterControlPlaneOperations<T extends {id?: string; controlPlaneStatus?: string}>(
+    operations: T[],
+    operationId: string,
+    operationStatus: string,
+): T[] {
+    return operations.filter(
+        (operation) =>
+            (!operationId || operation.id?.includes(operationId)) &&
+            (!operationStatus || operation.controlPlaneStatus === operationStatus),
+    );
+}
 
 interface ResolveOperationsRenderStateParams {
     hasData: boolean;

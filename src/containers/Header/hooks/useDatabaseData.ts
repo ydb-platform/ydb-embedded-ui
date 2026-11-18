@@ -1,6 +1,7 @@
 import {skipToken} from '@reduxjs/toolkit/query';
 
 import {tenantApi} from '../../../store/reducers/tenant/tenant';
+import {backend, environment} from '../../../store/runtimeParams';
 import type {MetaBaseClusterInfo} from '../../../types/api/meta';
 import {uiFactory} from '../../../uiFactory/uiFactory';
 import {useDatabasesV2} from '../../../utils/hooks/useDatabasesV2';
@@ -26,7 +27,7 @@ export function useDatabaseData({
     const shouldRequestTenantData = database && isDatabasePage;
 
     const params = shouldRequestTenantData
-        ? {database, clusterName, isMetaDatabasesAvailable}
+        ? {database, clusterName, isMetaDatabasesAvailable, environment, backend}
         : skipToken;
 
     const {currentData: databaseData, isLoading: isDatabaseDataLoading} =

@@ -2,11 +2,16 @@ import React from 'react';
 
 import {useHistory} from 'react-router-dom';
 
+import {getEmptyDataWithIssuesMessage} from '../../../components/DataIssuesAlert/DataIssuesAlert';
 import {
     getNodeHostLabel,
     getNodeHostPath,
 } from '../../../components/NodeHostWrapper/NodeHostWrapper';
-import type {PaginatedTableData, RenderErrorMessage} from '../../../components/PaginatedTable';
+import type {
+    OnChunkDataChange,
+    PaginatedTableData,
+    RenderErrorMessage,
+} from '../../../components/PaginatedTable';
 import {PAGINATED_TABLE_IDS, ResizeablePaginatedTable} from '../../../components/PaginatedTable';
 import {NODES_COLUMNS_IDS} from '../../../components/nodesColumns/constants';
 import type {NodesColumn} from '../../../components/nodesColumns/types';
@@ -14,6 +19,9 @@ import {VISIBLE_ENTITIES} from '../../../store/reducers/storage/constants';
 import type {PreparedStorageNode, VisibleEntities} from '../../../store/reducers/storage/types';
 import type {NodesGroupByField} from '../../../types/api/nodes';
 import {cn} from '../../../utils/cn';
+import type {DataQualityMeta} from '../../../utils/dataIssues/types';
+import {useDatacenterNodesFetcher} from '../../../utils/hooks/useDatacenterNodesFetcher';
+import {useHideUnavailableNodes} from '../../../utils/hooks/useHideUnavailableNodes';
 import {NodesUptimeFilterValues, isUnavailableNode} from '../../../utils/nodes';
 import {STORAGE_NODES_DEFAULT_ROW_HEIGHT} from '../PaginatedStorageNodes/nodeExpertModeLayout';
 
@@ -49,6 +57,9 @@ interface PaginatedStorageNodesTableProps {
     initialEntitiesCount?: number;
     rowHeight?: number;
     onDataFetched?: (data: PaginatedTableData<PreparedStorageNode>) => void;
+    onChunkDataChange?: OnChunkDataChange<PreparedStorageNode, DataQualityMeta>;
+    /** Rows may be missing: an empty table does not prove there are no such nodes */
+    rowsMayBeMissing?: boolean;
 }
 
 export const PaginatedStorageNodesTable = ({
@@ -67,11 +78,16 @@ export const PaginatedStorageNodesTable = ({
     initialEntitiesCount,
     rowHeight = STORAGE_NODES_DEFAULT_ROW_HEIGHT,
     onDataFetched,
+    onChunkDataChange,
+    rowsMayBeMissing,
 }: PaginatedStorageNodesTableProps) => {
     const history = useHistory();
+    const fetchNodes = useDatacenterNodesFetcher(getStorageNodes);
+    const {hideUnavailable} = useHideUnavailableNodes();
     const tableFilters = React.useMemo(() => {
         return {
             searchValue,
+            hideUnavailable,
             visibleEntities,
             nodesUptimeFilter,
             database,
@@ -81,6 +97,7 @@ export const PaginatedStorageNodesTable = ({
             filterGroupBy,
         };
     }, [
+        hideUnavailable,
         searchValue,
         visibleEntities,
         nodesUptimeFilter,
@@ -101,11 +118,12 @@ export const PaginatedStorageNodesTable = ({
                     onShowAll={onShowAll}
                     nodesUptimeFilter={nodesUptimeFilter}
                     visibleEntities={visibleEntities}
+                    rowsMayBeMissing={rowsMayBeMissing}
                 />
             );
         }
 
-        return i18n('empty.default');
+        return rowsMayBeMissing ? getEmptyDataWithIssuesMessage() : i18n('empty.default');
     };
 
     return (
@@ -113,7 +131,7 @@ export const PaginatedStorageNodesTable = ({
             getKeyboardRowKey={(node) => node.NodeId}
             getKeyboardRowLabel={getNodeHostLabel}
             onKeyboardActivate={(node) => {
-                const nodePath = getNodeHostPath(node, database);
+                const nodePath = getNodeHostPath(node, database, {storageNodes: true});
                 if (nodePath) {
                     history.push(nodePath);
                 }
@@ -121,7 +139,7 @@ export const PaginatedStorageNodesTable = ({
             columnsWidthLSKey={STORAGE_NODES_COLUMNS_WIDTH_LS_KEY}
             scrollContainerRef={scrollContainerRef}
             columns={columns}
-            fetchData={getStorageNodes}
+            fetchData={fetchNodes}
             rowHeight={
                 columns.some((column) => column.name === NODES_COLUMNS_IDS.PDisks)
                     ? rowHeight
@@ -134,6 +152,7 @@ export const PaginatedStorageNodesTable = ({
             filters={tableFilters}
             tableName={PAGINATED_TABLE_IDS.STORAGE_NODES}
             onDataFetched={onDataFetched}
+            onChunkDataChange={onChunkDataChange}
         />
     );
 };

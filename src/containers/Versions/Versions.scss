@@ -4,14 +4,11 @@
     --ydb-info-viewer-font-size: var(--g-text-body-2-font-size);
     --ydb-info-viewer-line-height: var(--g-text-body-2-line-height);
 
+    padding-top: var(--g-spacing-4);
     padding-right: var(--g-spacing-5);
 
     font-size: var(--ydb-info-viewer-font-size);
     line-height: var(--ydb-info-viewer-line-height);
-
-    &__overall {
-        margin-top: var(--g-spacing-4);
-    }
 
     &__loader {
         margin-top: var(--g-spacing-4);

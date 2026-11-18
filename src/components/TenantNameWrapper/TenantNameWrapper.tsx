@@ -61,7 +61,9 @@ export function TenantNameWrapper({
         tenant,
         additionalTenantsProps,
         externalLink,
-        useDatabaseId: uiFactory.useDatabaseId && settings?.use_meta_proxy !== false,
+        useDatabaseId: uiFactory.useDatabaseId,
+        isMetaDatabasesAvailable: emMetaAvailable,
+        settings,
     });
     const useMetaProxy = uiFactory.useMetaProxy && settings?.use_meta_proxy !== false;
 

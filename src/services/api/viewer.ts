@@ -431,12 +431,16 @@ export class ViewerAPI extends BaseYdbAPI {
         );
     }
 
-    getNodesList({database}: {database?: string}, {concurrentId, signal}: AxiosOptions = {}) {
+    getNodesList(
+        {database, include_storage: includeStorage}: {database?: string; include_storage?: boolean},
+        {concurrentId, signal}: AxiosOptions = {},
+    ) {
         return this.get<TEvNodesInfo>(
             this.getPath('/viewer/json/nodelist'),
             {
                 enums: true,
                 database,
+                include_storage: includeStorage,
             },
             {
                 concurrentId,

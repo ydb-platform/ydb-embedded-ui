@@ -1,6 +1,6 @@
 import type {EFlag} from '../../types/api/enums';
 import type {EDriveStatus, TPDiskInfo, TPDiskStateInfo} from '../../types/api/pdisk';
-import type {EVDiskStatus, TVDiskStateInfo, TVSlotId} from '../../types/api/vdisk';
+import type {EVDiskStatus, TVDiskStateInfo} from '../../types/api/vdisk';
 import type {ValueOf} from '../../types/common';
 
 import type {PDISK_TYPES} from './getPDiskType';
@@ -98,6 +98,8 @@ export interface PreparedVDisk
     extends Omit<TVDiskStateInfo, 'PDisk' | 'AvailableSize' | 'AllocatedSize' | 'Donors'> {
     Status?: EVDiskStatus;
     PDisk?: PreparedPDisk;
+    PDiskType?: string;
+    PDiskPath?: string;
     Severity?: number;
     StringifiedId?: string;
 
@@ -106,6 +108,11 @@ export interface PreparedVDisk
     AllocatedPercent?: number;
     SizeLimit?: number;
     FreeSize?: number;
+    /** Size values for display, preserving missing source values independently. */
+    DisplaySize?: {
+        AllocatedSize?: number;
+        SizeLimit?: number;
+    };
     WhiteboardSize?: {
         AllocatedSize?: number;
         SizeLimit?: number;
@@ -118,7 +125,8 @@ export interface PreparedVDisk
 
 export type PDiskType = ValueOf<typeof PDISK_TYPES>;
 
-export interface UnavailableDonor extends TVSlotId {
+export interface UnavailableDonor
+    extends Pick<PreparedVDisk, 'NodeId' | 'PDiskId' | 'VDiskSlotId'> {
     DonorMode?: boolean;
     StoragePoolName?: string;
 }

@@ -41,6 +41,8 @@ export interface TVDiskStateInfo {
     SatisfactionRank?: TVDiskSatisfactionRank;
     /** Is VDisk replicated? (i.e. contains all blobs it must have) */
     Replicated?: boolean;
+    /** Detailed Whiteboard replication status. May be absent on older nodes. */
+    DetailedReplicationStatus?: EVDiskDetailedReplicationStatus;
     /** Does this VDisk has any yet unreplicated phantom-like blobs? */
     UnreplicatedPhantoms?: boolean;
     /** The same for the non-phantom-like blobs. */
@@ -136,6 +138,13 @@ export enum EVDiskState {
     SyncGuidRecoveryError = 'SyncGuidRecoveryError',
     OK = 'OK',
     PDiskError = 'PDiskError',
+}
+
+export enum EVDiskDetailedReplicationStatus {
+    Replicated = 'Replicated',
+    WaitingForToken = 'WaitingForToken',
+    InProgress = 'InProgress',
+    PhantomsOnly = 'PhantomsOnly',
 }
 
 /**

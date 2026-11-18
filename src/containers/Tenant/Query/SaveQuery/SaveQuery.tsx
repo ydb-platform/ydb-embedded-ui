@@ -1,8 +1,9 @@
 import React from 'react';
 
 import NiceModal from '@ebay/nice-modal-react';
+import {FloppyDisk} from '@gravity-ui/icons';
 import type {ButtonButtonProps} from '@gravity-ui/uikit';
-import {Button, Dialog, DropdownMenu, TextInput} from '@gravity-ui/uikit';
+import {ActionTooltip, Button, Dialog, DropdownMenu, Icon, TextInput} from '@gravity-ui/uikit';
 
 import {
     selectActiveTab,
@@ -125,9 +126,11 @@ export function SaveQuery({buttonProps = {}}: SaveQueryProps) {
             <DropdownMenu
                 items={items}
                 renderSwitcher={(props) => (
-                    <Button {...props} {...buttonProps}>
-                        {i18n('action.edit')}
-                    </Button>
+                    <ActionTooltip title={i18n('action.edit')}>
+                        <Button {...props} {...buttonProps} aria-label={i18n('action.edit')}>
+                            <Icon data={FloppyDisk} size={16} />
+                        </Button>
+                    </ActionTooltip>
                 )}
                 popupProps={{placement: 'top'}}
             />
@@ -137,7 +140,11 @@ export function SaveQuery({buttonProps = {}}: SaveQueryProps) {
     return currentSavedQueryName ? (
         renderSaveDropdownMenu()
     ) : (
-        <SaveQueryButton {...buttonProps} dialogProps={{queryBody: currentInput}} />
+        <ActionTooltip title={i18n('action.save')}>
+            <Button onClick={onSaveQueryClick} {...buttonProps} aria-label={i18n('action.save')}>
+                <Icon data={FloppyDisk} size={16} />
+            </Button>
+        </ActionTooltip>
     );
 }
 

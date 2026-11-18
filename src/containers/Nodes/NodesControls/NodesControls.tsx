@@ -3,6 +3,7 @@ import React from 'react';
 import {Select, Text} from '@gravity-ui/uikit';
 
 import {EntitiesCount} from '../../../components/EntitiesCount';
+import {HideUnavailableNodesSwitch} from '../../../components/HideUnavailableNodesSwitch/HideUnavailableNodesSwitch';
 import {ProblemFilter} from '../../../components/ProblemFilter/ProblemFilter';
 import {Search} from '../../../components/Search';
 import {UptimeFilter} from '../../../components/UptimeFIlter';
@@ -27,6 +28,9 @@ interface NodesControlsProps {
     entitiesCountCurrent: number;
     entitiesCountTotal?: number;
     entitiesLoading: boolean;
+
+    /** Warning about the data of the table; the controls are sticky, so it is always in sight */
+    dataIssuesIndicator?: React.ReactNode;
 }
 
 export function NodesControls({
@@ -38,6 +42,8 @@ export function NodesControls({
     entitiesCountCurrent,
     entitiesCountTotal,
     entitiesLoading,
+
+    dataIssuesIndicator,
 }: NodesControlsProps) {
     const {
         searchValue,
@@ -101,12 +107,14 @@ export function NodesControls({
                     />
                 </React.Fragment>
             ) : null}
+            <HideUnavailableNodesSwitch />
             <EntitiesCount
                 current={entitiesCountCurrent}
                 total={entitiesCountTotal}
                 label={i18n('nodes')}
                 loading={entitiesLoading}
             />
+            {dataIssuesIndicator}
         </React.Fragment>
     );
 }

@@ -2,7 +2,7 @@ import React from 'react';
 
 import {Magnifier} from '@gravity-ui/icons';
 import DataTable from '@gravity-ui/react-data-table';
-import {Icon, Select, Text} from '@gravity-ui/uikit';
+import {Flex, Icon, Select, Text} from '@gravity-ui/uikit';
 
 import {ResponseError} from '../../components/Errors/ResponseError';
 import {ResizeableDataTable} from '../../components/ResizeableDataTable/ResizeableDataTable';
@@ -13,16 +13,19 @@ import {useEmMetaAvailable} from '../../store/reducers/capabilities/hooks';
 import {changeClustersFilters, clustersApi} from '../../store/reducers/clusters/clusters';
 import {
     filterClusters,
+    filterClustersByAvailability,
+    selectAvailabilityFilter,
     selectClusterNameFilter,
     selectGalaxyFilter,
     selectServiceFilter,
     selectStatusFilter,
     selectVersionFilter,
 } from '../../store/reducers/clusters/selectors';
-import type {PreparedCluster} from '../../store/reducers/clusters/types';
+import type {ClusterAvailability, PreparedCluster} from '../../store/reducers/clusters/types';
 import {uiFactory} from '../../uiFactory/uiFactory';
 import {DEFAULT_TABLE_SETTINGS, EMPTY_DATA_PLACEHOLDER} from '../../utils/constants';
 import {useAutoRefreshInterval, useTypedDispatch, useTypedSelector} from '../../utils/hooks';
+import {useIsUserAllowedToMakeChanges} from '../../utils/hooks/useIsUserAllowedToMakeChanges';
 import {useSelectedColumns} from '../../utils/hooks/useSelectedColumns';
 import {getMinorVersion} from '../../utils/versions';
 
@@ -40,6 +43,20 @@ import {calculateClusterPath} from './utils';
 
 import './Clusters.scss';
 
+interface FilterOption {
+    value: string;
+    content: string;
+}
+
+function toFilterOptions(values: Iterable<string>, selected: string[]): FilterOption[] {
+    // Keep selected values in options so they stay visible and can be unchecked
+    // even if no cluster matching current availability filter has them
+    const uniqValues = new Set(values);
+    selected.forEach((value) => uniqValues.add(value));
+
+    return Array.from(uniqValues).map((value) => ({value, content: value}));
+}
+
 interface ClustersProps {
     scrollContainerRef: React.RefObject<HTMLElement>;
 }
@@ -53,6 +70,8 @@ export function Clusters({scrollContainerRef}: ClustersProps) {
     const dispatch = useTypedDispatch();
 
     const emMetaAvailable = useEmMetaAvailable();
+    const isMonitoringAllowed = useIsUserAllowedToMakeChanges();
+    const healthcheckAvailable = !emMetaAvailable || isMonitoringAllowed;
     const isEditClusterAvailable = emMetaAvailable && uiFactory.onEditCluster !== undefined;
     const isDeleteClusterAvailable = emMetaAvailable && uiFactory.onDeleteCluster !== undefined;
 
@@ -61,6 +80,7 @@ export function Clusters({scrollContainerRef}: ClustersProps) {
     const service = useTypedSelector(selectServiceFilter);
     const version = useTypedSelector(selectVersionFilter);
     const galaxy = useTypedSelector(selectGalaxyFilter);
+    const availability = useTypedSelector(selectAvailabilityFilter);
 
     const changeStatus = (value: string[]) => {
         dispatch(changeClustersFilters({status: value}));
@@ -76,6 +96,16 @@ export function Clusters({scrollContainerRef}: ClustersProps) {
     };
     const changeGalaxy = (value: string[]) => {
         dispatch(changeClustersFilters({galaxy: value}));
+    };
+    const changeAvailability = (value: string[]) => {
+        dispatch(
+            changeClustersFilters({
+                availability: value.filter(
+                    (item): item is ClusterAvailability =>
+                        item === 'available' || item === 'unavailable',
+                ),
+            }),
+        );
     };
 
     const [healthcheckClusterName, setHealthcheckClusterName] = React.useState<string | undefined>(
@@ -94,13 +124,27 @@ export function Clusters({scrollContainerRef}: ClustersProps) {
     }, []);
     const rawColumns = React.useMemo(() => {
         return getClustersColumns({
+            healthcheckAvailable: Boolean(healthcheckAvailable),
             isEditClusterAvailable,
             isDeleteClusterAvailable,
-            onStatusClick: handleStatusClick,
+            onStatusClick: healthcheckAvailable ? handleStatusClick : undefined,
         });
-    }, [isDeleteClusterAvailable, isEditClusterAvailable, handleStatusClick]);
+    }, [isDeleteClusterAvailable, isEditClusterAvailable, handleStatusClick, healthcheckAvailable]);
 
     const clusters = query.data;
+    const hasUnavailableClusters = clusters?.some(
+        (cluster) => cluster.settings?.unavailable === true,
+    );
+    const showAvailabilityFilter =
+        hasUnavailableClusters || availability.length !== 1 || availability[0] !== 'available';
+    const availabilityOptions = [
+        {value: 'available', content: i18n('value_available')},
+        {value: 'unavailable', content: i18n('value_unavailable')},
+    ];
+    const availabilitySummary =
+        availability.length === availabilityOptions.length
+            ? i18n('controls_select-placeholder')
+            : availabilityOptions.find((option) => option.value === availability[0])?.content;
 
     // Check which columns have data across all clusters
     const {hasAnyStatus, hasAnyService, hasAnyGalaxy} = React.useMemo(() => {
@@ -152,13 +196,18 @@ export function Clusters({scrollContainerRef}: ClustersProps) {
         return columnsToShow.filter((column) => allowedColumnIds.has(column.name));
     }, [columnsToShow, filteredColumnsToSelect]);
 
+    // Filter options are built only from clusters matching selected availability,
+    // so e.g. values of unavailable clusters are not offered when only available ones are shown
+    const clustersForFilterOptions = React.useMemo(() => {
+        return filterClustersByAvailability(clusters ?? [], availability);
+    }, [clusters, availability]);
+
     const {servicesToSelect, versions, galaxiesToSelect} = React.useMemo(() => {
         const clustersServices = new Set<string>();
         const uniqVersions = new Set<string>();
         const clustersGalaxies = new Set<string>();
 
-        const clusterList = clusters ?? [];
-        clusterList.forEach((cluster) => {
+        clustersForFilterOptions.forEach((cluster) => {
             if (cluster.service) {
                 clustersServices.add(cluster.service);
             }
@@ -171,31 +220,32 @@ export function Clusters({scrollContainerRef}: ClustersProps) {
         });
 
         return {
-            servicesToSelect: Array.from(clustersServices).map((value) => ({
-                value,
-                content: value,
-            })),
-            versions: Array.from(uniqVersions).map((value) => ({value, content: value})),
-            galaxiesToSelect: Array.from(clustersGalaxies).map((value) => ({
-                value,
-                content: value,
-            })),
+            servicesToSelect: toFilterOptions(clustersServices, service),
+            versions: toFilterOptions(uniqVersions, version),
+            galaxiesToSelect: toFilterOptions(clustersGalaxies, galaxy),
         };
-    }, [clusters]);
+    }, [clustersForFilterOptions, service, version, galaxy]);
 
     const filteredClusters = React.useMemo(() => {
-        return filterClusters(clusters ?? [], {clusterName, status, service, version, galaxy});
-    }, [clusterName, clusters, service, status, version, galaxy]);
+        return filterClusters(clusters ?? [], {
+            clusterName,
+            status,
+            service,
+            version,
+            galaxy,
+            availability,
+        });
+    }, [clusterName, clusters, service, status, version, galaxy, availability]);
 
     const statuses = React.useMemo(() => {
-        return Array.from(
-            new Set(
-                (clusters ?? []).map((cluster) => cluster.status).filter(Boolean),
-            ) as Set<string>,
-        )
-            .sort()
-            .map((el) => ({value: el, content: el}));
-    }, [clusters]);
+        const clustersStatuses = clustersForFilterOptions
+            .map((cluster) => cluster.status)
+            .filter((value): value is string => Boolean(value));
+
+        return toFilterOptions(clustersStatuses, status).sort((left, right) =>
+            left.value > right.value ? 1 : -1,
+        );
+    }, [clustersForFilterOptions, status]);
 
     const renderControls = () => {
         return (
@@ -260,6 +310,37 @@ export function Clusters({scrollContainerRef}: ClustersProps) {
                         width={200}
                     />
                 ) : null}
+                {showAvailabilityFilter ? (
+                    <Select
+                        multiple
+                        label={i18n('controls_availability-select-label')}
+                        placeholder={i18n('value_none')}
+                        value={availability}
+                        options={availabilityOptions}
+                        onUpdate={changeAvailability}
+                        width={200}
+                        popupWidth={280}
+                        popupClassName={b('availability-popup')}
+                        hasCounter={false}
+                        qa="clusters-availability"
+                        getOptionHeight={(option) => (option.value === 'unavailable' ? 56 : 36)}
+                        renderOption={(option) => (
+                            <Flex direction="column">
+                                <Text>{option.content}</Text>
+                                {option.value === 'unavailable' ? (
+                                    <Text color="secondary" variant="body-1">
+                                        {i18n('context_unavailable-admin')}
+                                    </Text>
+                                ) : null}
+                            </Flex>
+                        )}
+                        renderSelectedOption={(_option, index) => (
+                            <React.Fragment>
+                                {index === 0 ? availabilitySummary : null}
+                            </React.Fragment>
+                        )}
+                    />
+                ) : null}
             </React.Fragment>
         );
     };
@@ -313,14 +394,20 @@ export function Clusters({scrollContainerRef}: ClustersProps) {
     return (
         <ClusterDrawerHealthcheck
             clusterName={healthcheckClusterName}
-            isVisible={Boolean(healthcheckClusterName)}
+            isVisible={Boolean(healthcheckAvailable && healthcheckClusterName)}
             onClose={handleDrawerClose}
         >
             <div>
                 <TableWithControlsLayout
                     fullHeight
                     className={b(null)}
-                    keyboardNavigationResetKey={JSON.stringify([status, service, version, galaxy])}
+                    keyboardNavigationResetKey={JSON.stringify([
+                        status,
+                        service,
+                        version,
+                        galaxy,
+                        availability,
+                    ])}
                 >
                     <TableWithControlsLayout.Controls
                         className={b('controls')}

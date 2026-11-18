@@ -1,5 +1,6 @@
 import type {TPDiskInfoResponse} from '../../../types/api/pdisk';
 import {getPDiskId} from '../../../utils/disks/helpers';
+import {getDatacenterQueryContext} from '../../datacenterQueryContext';
 import type {GetState} from '../../defaultStore';
 import {api} from '../api';
 import {queryCapability} from '../capabilities/capabilities';
@@ -15,6 +16,7 @@ export const pDiskApi = api.injectEndpoints({
     endpoints: (build) => ({
         getPdiskInfo: build.query({
             queryFn: async ({nodeId, pDiskId}: PDiskParams, {signal, getState, dispatch}) => {
+                const meta = getDatacenterQueryContext(getState);
                 const pDiskInfoHandlerVersion = await queryCapability('/pdisk/info', undefined, {
                     getState: getState as GetState,
                     dispatch,
@@ -48,7 +50,7 @@ export const pDiskApi = api.injectEndpoints({
                         window.api.viewer.getNodeInfo({nodeId}, {signal}),
                     ]);
                     const data = preparePDiskDataResponse(response);
-                    return {data};
+                    return {data, meta};
                 } catch (error) {
                     return {error};
                 }

@@ -5,6 +5,7 @@ import {Dialog, Tab, TabList, TabProvider} from '@gravity-ui/uikit';
 import {skipToken} from '@reduxjs/toolkit/query';
 
 import {tenantApi} from '../../store/reducers/tenant/tenant';
+import {backend, environment} from '../../store/runtimeParams';
 import {cn} from '../../utils/cn';
 import {useTypedSelector} from '../../utils/hooks';
 import {useClusterNameFromQuery} from '../../utils/hooks/useDatabaseFromQuery';
@@ -56,7 +57,7 @@ function ConnectToDBDialog({
     // Since there is no ControlPlane data in this case
     const shouldRequestTenantData = database && !endpointFromProps && !singleClusterMode;
     const params = shouldRequestTenantData
-        ? {database, clusterName, isMetaDatabasesAvailable}
+        ? {database, clusterName, isMetaDatabasesAvailable, environment, backend}
         : skipToken;
     const {currentData: tenantData, isLoading: isTenantDataLoading} =
         tenantApi.useGetTenantInfoQuery(params);

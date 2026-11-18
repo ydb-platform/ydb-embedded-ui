@@ -9,6 +9,7 @@ import type {
     PDisksGroupByValue,
     VDisksGroupByValue,
 } from '../../../src/containers/Storage/StorageExpertModePanel/constants';
+import {DISKS_POPUP_DEBOUNCE_TIMEOUT} from '../../../src/containers/Storage/shared';
 import {ECapacityAlert, EFlag} from '../../../src/types/api/enums';
 import {TPDiskState} from '../../../src/types/api/pdisk';
 import {EVDiskState} from '../../../src/types/api/vdisk';
@@ -479,6 +480,222 @@ async function prepareNodesPage(
     }
 }
 
+for (const firstDisk of ['vdisk', 'pdisk'] as const) {
+    test(`keeps paired disk popups open when moving between cards from ${firstDisk}`, async ({
+        page,
+    }) => {
+        await page.setViewportSize({width: 1800, height: 1000});
+        await enableExpertMode(page, VDisksGroupBy.All);
+        await page.addInitScript(() => {
+            localStorage.setItem('storagePDisksGroupBy', JSON.stringify('All'));
+        });
+        await setupVDiskColoringMocks(page);
+        await gotoStoragePage(page, VDisksGroupBy.All);
+        await expectStorageGroupRowsReady(page);
+
+        const row = getStorageGroupRow(page, 0);
+        const vDisk = getVDiskItems(row).first();
+        const pDisk = getPDiskItems(row).first();
+        const firstAnchor = firstDisk === 'vdisk' ? vDisk : pDisk;
+        const popupFor = (id: string) =>
+            page.locator('.ydb-popover').filter({has: page.getByText(id, {exact: true})});
+        const vDiskPopup = popupFor('9000000000-1-0-0-0');
+        const pDiskPopup = popupFor('7000-100');
+        const popups = [vDiskPopup, pDiskPopup];
+        const hoverPopup = async (popup: Locator) => {
+            const point = await popup.evaluate((element) => {
+                const {left, top, width, height} = element.getBoundingClientRect();
+                for (const x of [left + 12, left + width - 12, left + width / 2]) {
+                    for (const y of [top + 12, top + height - 12, top + height / 2]) {
+                        const target = document.elementFromPoint(x, y);
+                        if (target && element.contains(target)) {
+                            return {x, y};
+                        }
+                    }
+                }
+                return undefined;
+            });
+            if (!point) {
+                throw new Error('The popup has no exposed area to hover');
+            }
+            await page.mouse.move(point.x, point.y);
+        };
+        const zIndex = (popup: Locator) =>
+            popup
+                .locator('xpath=ancestor::*[@data-floating-ui-placement][1]')
+                .evaluate((element) => Number(getComputedStyle(element).zIndex));
+
+        await firstAnchor.hover();
+        for (const popup of popups) {
+            await expect(popup).toBeVisible();
+        }
+        await page.clock.install({time: new Date('2026-01-01T00:00:00Z')});
+        await page.clock.pauseAt(new Date('2026-01-01T00:00:01Z'));
+
+        for (const [foreground, background] of [
+            [pDiskPopup, vDiskPopup],
+            [vDiskPopup, pDiskPopup],
+            [pDiskPopup, vDiskPopup],
+        ]) {
+            await hoverPopup(foreground);
+            // Let the previous card's 200 ms close timer run while staying on its peer.
+            await page.clock.runFor(400);
+            for (const popup of popups) {
+                await expect(popup).toBeVisible();
+            }
+            await expect(getVDiskProgressBar(vDisk)).toHaveClass(
+                /storage-disk-progress-bar_highlighted/,
+            );
+            await expect(getPDiskProgressBar(pDisk)).toHaveClass(
+                /storage-disk-progress-bar_highlighted/,
+            );
+            await expect
+                .poll(async () => (await zIndex(foreground)) - (await zIndex(background)))
+                .toBeGreaterThan(0);
+        }
+
+        await hoverPopup(vDiskPopup);
+        await page.clock.runFor(50);
+        await hoverPopup(pDiskPopup);
+        await page.clock.runFor(400);
+        for (const popup of popups) {
+            await expect(popup).toBeVisible();
+        }
+
+        await page.clock.resume();
+        // Clicking Evict in the peer must release the PDisk context-menu pin, not the pair.
+        await pDiskPopup.getByText('7000-100', {exact: true}).dispatchEvent('contextmenu');
+        await hoverPopup(vDiskPopup);
+        await vDiskPopup.getByRole('button', {name: 'Evict VDisk', exact: true}).click();
+        const evictionDialog = page.getByRole('dialog');
+        await expect(evictionDialog).toBeVisible();
+        const anchorBox = await vDisk.boundingBox();
+        if (!anchorBox) {
+            throw new Error('VDisk anchor has no bounding box');
+        }
+        await page.mouse.move(
+            anchorBox.x + anchorBox.width / 2,
+            anchorBox.y + anchorBox.height / 2,
+        );
+        await page.waitForTimeout(400);
+        for (const popup of popups) {
+            await expect(popup).toBeVisible();
+        }
+        await page.keyboard.press('Escape');
+        await expect(evictionDialog).toBeHidden();
+        await page.waitForTimeout(400);
+        for (const popup of popups) {
+            await expect(popup).toBeVisible();
+        }
+        await page.mouse.move(0, 0);
+        for (const popup of popups) {
+            await expect(popup).toBeHidden();
+        }
+
+        await firstAnchor.hover();
+        for (const popup of popups) {
+            await expect(popup).toBeVisible();
+        }
+        await hoverPopup(vDiskPopup);
+        await hoverPopup(pDiskPopup);
+        await page.clock.pauseAt(new Date((await page.evaluate(() => Date.now())) + 1000));
+        await page.keyboard.press('Escape');
+        await page.clock.runFor(25);
+        // Escape dismisses the pair, including the sibling that previously lost hover.
+        await hoverPopup(vDiskPopup);
+        await page.clock.runFor(400);
+        for (const popup of popups) {
+            await expect(popup).toBeHidden();
+        }
+        await page.clock.resume();
+
+        await page.mouse.move(0, 0);
+        await firstAnchor.hover();
+        for (const popup of popups) {
+            await expect(popup).toBeVisible();
+        }
+        await getVDiskItems(row).nth(1).hover();
+        const nextPopups = [popupFor('9000000000-1-0-0-1'), popupFor('7001-101')];
+        for (const popup of nextPopups) {
+            await expect(popup).toBeVisible();
+        }
+        for (const popup of popups) {
+            await expect(popup).toBeHidden();
+        }
+        await page.mouse.move(0, 0);
+        for (const popup of nextPopups) {
+            await expect(popup).toBeHidden();
+        }
+    });
+}
+
+for (const openDialog of [false, true]) {
+    test(`keeps the active VDisk ${openDialog ? 'eviction dialog' : 'card'} after briefly crossing another disk`, async ({
+        page,
+    }) => {
+        const response = createMockStorageGroupsResponse();
+        const disks = response.StorageGroups?.[0].VDisks;
+        const first = disks?.[0];
+        const complete = disks?.[ALL_GREEN_VDISK_INDEX].Whiteboard;
+        if (!first || !complete?.VDiskId) {
+            throw new Error('Missing storage VDisk fixture');
+        }
+        first.Whiteboard = {
+            ...complete,
+            VDiskId: {...complete.VDiskId, VDisk: 0},
+            NodeId: 7000,
+            PDiskId: 100,
+            VDiskSlotId: 200,
+        };
+        await page.setViewportSize({width: 1800, height: 1000});
+        await enableExpertMode(page, VDisksGroupBy.State, false);
+        await setupVDiskColoringMocks(page, response);
+        await gotoStoragePage(page, VDisksGroupBy.State, false);
+        const row = getStorageGroupRow(page, 0);
+        const disksInRow = row.locator('.ydb-storage-vdisks__item');
+        const popup = page.locator('.vdisk-storage-popup').filter({hasText: '9000000000-1-0-0-0'});
+        const otherPopup = page
+            .locator('.vdisk-storage-popup')
+            .filter({hasText: '9000000000-1-0-0-1'});
+        await disksInRow.nth(0).hover();
+        await expect(popup).toBeVisible();
+        await popup.getByText('9000000000-1-0-0-0', {exact: true}).hover();
+        const otherBox = await disksInRow.nth(1).boundingBox();
+        const target = openDialog
+            ? popup.getByRole('button', {name: 'Evict VDisk', exact: true})
+            : popup.getByText('9000000000-1-0-0-0', {exact: true});
+        const targetBox = await target.boundingBox();
+        if (!otherBox || !targetBox) {
+            throw new Error('Missing disk or popup target bounds');
+        }
+        await page.clock.install({time: new Date('2026-01-01T00:00:00Z')});
+        await page.clock.pauseAt(new Date('2026-01-01T00:00:01Z'));
+        await page.mouse.move(otherBox.x + otherBox.width / 2, otherBox.y + otherBox.height / 2);
+        await page.clock.runFor(DISKS_POPUP_DEBOUNCE_TIMEOUT / 4);
+        await page.mouse.move(
+            targetBox.x + targetBox.width / 2,
+            targetBox.y + targetBox.height / 2,
+        );
+        if (openDialog) {
+            await page.mouse.click(
+                targetBox.x + targetBox.width / 2,
+                targetBox.y + targetBox.height / 2,
+            );
+        }
+        await page.clock.runFor(DISKS_POPUP_DEBOUNCE_TIMEOUT * 2);
+        await page.clock.resume();
+        await expect(otherPopup).toHaveCount(0);
+        await expect(popup).toBeVisible();
+        if (openDialog) {
+            await expect(page.getByRole('dialog')).toBeVisible();
+            await page.keyboard.press('Escape');
+            await expect(page.getByRole('dialog')).toBeHidden();
+        }
+        await page.mouse.move(0, 0);
+        await expect(popup).toBeHidden();
+    });
+}
+
 test('keeps paired disk popups inside the viewport without expanding the page', async ({
     page,
 }, testInfo) => {
@@ -508,6 +725,7 @@ test('keeps paired disk popups inside the viewport without expanding the page', 
     });
     await expect(vDiskPopup).toBeVisible();
     await expect(pDiskPopup).toBeHidden();
+    await expect(vDiskPopup).toHaveCSS('width', '400px');
     await expect(getPDiskProgressBar(pDisk)).toHaveClass(/storage-disk-progress-bar_highlighted/);
     await expect
         .poll(() => page.evaluate(() => document.documentElement.scrollWidth))
@@ -531,6 +749,22 @@ test('keeps paired disk popups inside the viewport without expanding the page', 
     });
     await expect(pDisk).toBeInViewport();
     await expect(pDiskPopup).toBeVisible();
+    await expect(pDiskPopup).toHaveCSS('width', '400px');
+    const floatingVDisk = vDiskPopup.locator('xpath=ancestor::*[@data-floating-ui-placement][1]');
+    const floatingPDisk = pDiskPopup.locator('xpath=ancestor::*[@data-floating-ui-placement][1]');
+    const zIndex = (popup: Locator) =>
+        popup.evaluate((element) => Number(getComputedStyle(element).zIndex));
+    for (const [anchor, foreground, background] of [
+        [vDisk, floatingVDisk, floatingPDisk],
+        [pDisk, floatingPDisk, floatingVDisk],
+        [vDisk, floatingVDisk, floatingPDisk],
+    ]) {
+        await anchor.hover();
+        await expect
+            .poll(async () => (await zIndex(foreground)) - (await zIndex(background)))
+            .toBeGreaterThan(0);
+    }
+    await expect(vDiskPopup.getByText('PDisk ID', {exact: true})).toHaveCount(1);
     for (const popup of [vDiskPopup, pDiskPopup]) {
         await expect(popup).toBeInViewport({ratio: 1});
     }
@@ -575,7 +809,7 @@ test('keeps paired disk popups inside the viewport without expanding the page', 
     expect(maxPageWidthWhileClosing).toBe(pageWidth);
 });
 
-test('wheel over disk popups scrolls the page', async ({page}) => {
+test('wheel over disk popups scrolls the page and clears clipped hover state', async ({page}) => {
     const response = createMockStorageGroupsResponse();
     const group = response.StorageGroups?.[0];
     if (!group) {
@@ -595,7 +829,8 @@ test('wheel over disk popups scrolls the page', async ({page}) => {
     for (const name of ['PDisk', 'VDisk']) {
         await scroll.evaluate((element) => element.scrollTo({top: 0, left: 0}));
         const row = getStorageGroupRow(page, 0);
-        await (name === 'PDisk' ? getPDiskItems(row) : getVDiskItems(row)).first().hover();
+        const anchor = (name === 'PDisk' ? getPDiskItems(row) : getVDiskItems(row)).first();
+        await anchor.hover();
         const action = page.getByRole('link', {name: `Go to ${name}`, exact: true});
         await expect(action).toHaveAttribute('href', /nodeId=7000/);
         const popup = page.locator('.ydb-popover').filter({has: action});
@@ -603,11 +838,215 @@ test('wheel over disk popups scrolls the page', async ({page}) => {
         await expect(popup).toHaveCSS('overflow-y', 'visible');
         await action.hover();
         const before = await scroll.evaluate((element) => element.scrollTop);
-        await page.mouse.wheel(0, 200);
+        await page.mouse.wheel(0, 600);
         await expect
             .poll(() => scroll.evaluate((element) => element.scrollTop))
-            .toBeGreaterThan(before);
-        await page.keyboard.press('Escape');
+            .toBeGreaterThan(before + 500);
+        await expect(anchor).not.toBeInViewport();
+        await page.mouse.move(0, 0);
+        await scroll.evaluate((element) => element.scrollTo({top: 0}));
+        await expect(anchor).toBeInViewport();
+        await expect(page.locator('.ydb-popover').filter({visible: true})).toHaveCount(0);
+
+        await anchor.hover();
+        await expect(action).toBeVisible();
+        await page.mouse.move(0, 0);
+        await expect(page.locator('.ydb-popover').filter({visible: true})).toHaveCount(0);
+    }
+});
+
+test.describe('Capacity alert popup palette', () => {
+    const cases = [
+        [
+            ALL_GREEN_VDISK_INDEX,
+            'Green',
+            '--g-color-text-positive-heavy',
+            '--g-color-base-positive-light',
+        ],
+        [1, 'Cyan', '--ydb-space-cyan-text', '--ydb-space-cyan-bg'],
+        [5, 'Light yellow', '--ydb-space-light-yellow-text', '--ydb-space-light-yellow-bg'],
+        [2, 'Yellow', '--g-color-text-warning-heavy', '--g-color-base-warning-light'],
+        [6, 'Light orange', '--ydb-space-light-orange-text', '--ydb-space-light-orange-bg'],
+        [7, 'Pre orange', '--ydb-space-pre-orange-text', '--ydb-space-pre-orange-bg'],
+        [3, 'Orange', '--ydb-space-orange-text', '--ydb-space-orange-bg'],
+        [4, 'Red', '--g-color-base-danger-heavy', '--g-color-base-danger-light'],
+        [8, 'Black', '--ydb-space-black-text', '--ydb-space-black-bg'],
+    ] as const;
+
+    for (const theme of ['light', 'dark']) {
+        for (const [index, text, textToken, backgroundToken] of cases) {
+            test(`uses ${text} Space colors in disk popups and legends in ${theme} theme`, async ({
+                page,
+            }) => {
+                await page.setViewportSize({width: 2560, height: 1440});
+                await page.addInitScript((value) => {
+                    localStorage.setItem('theme', value);
+                    localStorage.setItem('blobStorageCapacityMetrics', JSON.stringify(true));
+                }, theme);
+                await enableExpertMode(page, VDisksGroupBy.State);
+                await setupVDiskColoringMocks(page);
+                await gotoStoragePage(page, VDisksGroupBy.State);
+                await expectStorageGroupRowsReady(page);
+
+                const row = getStorageGroupRow(page, 0);
+                await getVDiskItems(row).nth(index).hover();
+                const [color, background] = await Promise.all([
+                    resolveThemeColor(page, textToken),
+                    resolveThemeColor(page, backgroundToken),
+                ]);
+
+                for (const id of [`9000000000-1-0-0-${index}`, `${7000 + index}-${100 + index}`]) {
+                    const popup = page.locator('.ydb-popover').filter({
+                        has: page.getByText(id, {exact: true}),
+                    });
+                    const badge = popup
+                        .locator('.g-label')
+                        .filter({hasText: new RegExp(`^${text}$`)});
+                    await expect(badge).toBeVisible();
+                    await expect(badge).toHaveCSS('color', color);
+                    await expect(badge).toHaveCSS('background-color', background);
+                }
+
+                await page.keyboard.press('Escape');
+                await expect(page.locator('.ydb-popover').filter({visible: true})).toHaveCount(0);
+
+                for (const name of ['VDisks:', 'PDisks:']) {
+                    const control = page.getByRole('radiogroup', {name, exact: true});
+                    await control.getByRole('radio', {name: 'Space', exact: true}).check();
+                    const legend = control.locator('..');
+                    const badge = legend.locator(
+                        `.ydb-storage-expert-mode-panel__label_${text.toLowerCase().replaceAll(' ', '-')}`,
+                    );
+                    await expect(badge).toHaveCSS('color', color);
+                    await expect(badge).toHaveCSS('background-color', background);
+                    await badge.hover();
+                    await expect(badge).toHaveCSS('background-color', background);
+                }
+            });
+        }
+    }
+});
+
+test.describe('Datacenter storage screenshots', () => {
+    for (const theme of ['light', 'dark']) {
+        test(`colors both disk types and the legend in ${theme} theme`, async ({page}) => {
+            const response = createMockStorageGroupsResponse();
+            const group = response.StorageGroups?.[0];
+            if (!group?.VDisks) {
+                throw new Error('The storage fixture must contain a group with disks');
+            }
+            const originalDisks = group.VDisks;
+            const disks = [7, 8, ALL_GREEN_VDISK_INDEX].map((index) => originalDisks[index]);
+            group.VDisks = disks;
+            response.StorageGroups = [group];
+            response.TotalGroups = response.FoundGroups = 1;
+            const nodeList = disks.map((disk, index) => ({
+                Id: disk.NodeId,
+                Host: `dc-storage-node-${index + 1}`,
+                Location: {DataCenter: ['dc-a', 'DC-B', undefined][index]},
+            }));
+            await setupVDiskColoringMocks(page, response);
+            await page.route('**/viewer/json/nodelist?*', (route) => {
+                expect(new URL(route.request().url()).searchParams.get('include_storage')).toBe(
+                    'true',
+                );
+                return route.fulfill({json: nodeList});
+            });
+            await page.route('**/viewer/json/cluster?*', (route) =>
+                route.fulfill({json: {DataCenters: ['DC-A', 'DC-B']}}),
+            );
+            await page.addInitScript((value) => {
+                localStorage.setItem('theme', value);
+                localStorage.setItem('enableStorageExpertMode', 'true');
+                localStorage.setItem('storageExpertMode', 'true');
+                localStorage.setItem('storagePDisksGroupBy', JSON.stringify('DC'));
+                localStorage.setItem(
+                    'storageGroupsSelectedColumns',
+                    JSON.stringify([
+                        {id: 'GroupId', selected: true},
+                        {id: 'VDisksPDisks', selected: true},
+                    ]),
+                );
+            }, theme);
+            await page.setViewportSize({width: 1400, height: 700});
+            await gotoStoragePage(page, VDisksGroupBy.Datacenter);
+
+            const row = getStorageGroupRow(page, 0);
+            for (const items of [
+                getVDiskItems(row),
+                row.locator('.ydb-storage-disks__pdisk-item'),
+            ]) {
+                const links = items.getByRole('link');
+                await expect(links).toHaveText(['DC-A', 'DC-B', '']);
+                const unknown = links.nth(2).getByRole('img', {name: 'Unknown', exact: true});
+                await expect(unknown).toBeVisible();
+                await expect(unknown).toHaveAttribute('title', 'Unknown');
+                await expect(unknown.locator(':scope > svg')).toBeVisible();
+                await expect(
+                    links.first().locator('.storage-disk-progress-bar__datacenter-name'),
+                ).toHaveCSS('text-overflow', 'clip');
+                for (const [index, color] of ['turquoise', 'purple', 'neutral'].entries()) {
+                    await expect(
+                        links.nth(index).locator('.storage-disk-progress-bar'),
+                    ).toHaveClass(new RegExp(`ydb-datacenter-color_color_${color}`));
+                }
+            }
+            const legend = page.getByTestId('storage-pdisks-expert-mode-legend');
+            await expect(legend.locator('.ydb-datacenter-label:visible')).toHaveText([
+                'DC-A',
+                'DC-B',
+                'Unknown',
+            ]);
+            const panel = page.locator('.ydb-storage-expert-mode-panel');
+            const panelBox = await panel.boundingBox();
+            const rowBox = await row.boundingBox();
+            if (!panelBox || !rowBox) {
+                throw new Error('The datacenter legend and storage group must be visible');
+            }
+            await expect(page).toHaveScreenshot(`storage-datacenters-${theme}.png`, {
+                clip: {
+                    x: panelBox.x,
+                    y: panelBox.y,
+                    width: panelBox.width,
+                    height: rowBox.y + rowBox.height - panelBox.y,
+                },
+            });
+            await hideFloatingPopups(page);
+            for (const item of [
+                getVDiskItems(row).first(),
+                row.locator('.ydb-storage-disks__pdisk-item').first(),
+            ]) {
+                const bar = item.locator('.storage-disk-progress-bar');
+                const background = await bar.evaluate(
+                    (element) => getComputedStyle(element).backgroundColor,
+                );
+                await bar.hover();
+                await bar.evaluate((element) => {
+                    element.getAnimations().forEach((animation) => animation.finish());
+                });
+                await expect(bar).not.toHaveCSS('background-color', background);
+                await page.mouse.move(0, 0);
+                await bar.evaluate((element) => {
+                    element.getAnimations().forEach((animation) => animation.finish());
+                });
+                await expect(bar).toHaveCSS('background-color', background);
+            }
+            await page.route('**/viewer/json/nodelist?*', (route) =>
+                route.fulfill({
+                    json: nodeList.map((node, index) =>
+                        index === 2 ? {...node, Location: {BridgePileName: 'pile-c'}} : node,
+                    ),
+                }),
+            );
+            await page.reload();
+            const pileLabel = legend
+                .locator('.ydb-datacenter-label:visible')
+                .filter({hasText: 'P=PILE-C/'});
+            await expect(pileLabel).toHaveClass(/ydb-datacenter-color_color_blue/);
+            await expect(
+                legend.locator('.ydb-datacenter-label:visible').filter({hasText: 'Unknown'}),
+            ).toHaveClass(/ydb-datacenter-color_color_neutral/);
+        });
     }
 });
 
@@ -912,7 +1351,7 @@ test.describe('VDisk Coloring - Expert Mode visual snapshots', () => {
             },
             {
                 mode: 'Compaction',
-                status: 'Fresh compaction: OK. Level compaction: Impaired.',
+                status: 'Fresh compaction: Ok. Level compaction: Impaired.',
                 missingStatus: 'Fresh compaction: N/D. Level compaction: N/D.',
             },
         ]) {
@@ -1942,6 +2381,46 @@ test.describe('VDisk Coloring - Expert Mode visual snapshots', () => {
 test.describe('PDisk Coloring - Expert Mode visual snapshots', () => {
     test.describe.configure({timeout: 300_000});
 
+    for (const capacityMetricsEnabled of [false, true]) {
+        test(`selects PDisk Space source with capacity metrics ${capacityMetricsEnabled ? 'enabled' : 'disabled'}`, async ({
+            page,
+        }) => {
+            const response = createMockStorageGroupsResponse();
+            const pDisk = response.StorageGroups?.[0]?.VDisks?.[0]?.PDisk;
+            if (!pDisk?.Whiteboard || !pDisk.PDiskId) {
+                throw new Error('Cannot prepare PDisk with partial Whiteboard size');
+            }
+            pDisk.TotalSize = '100000000000';
+            pDisk.AvailableSize = '60000000000';
+            delete pDisk.Whiteboard.AvailableSize;
+            delete pDisk.Whiteboard.TotalSize;
+
+            await page.addInitScript((enabled) => {
+                localStorage.setItem('blobStorageCapacityMetrics', JSON.stringify(enabled));
+            }, capacityMetricsEnabled);
+            await page.setViewportSize({width: 1500, height: 1000});
+            await enableExpertMode(page, VDisksGroupBy.State);
+            await setupVDiskColoringMocks(page, response);
+            await gotoStoragePage(page, VDisksGroupBy.State);
+            await expectStorageGroupRowsReady(page);
+
+            const pDiskItem = getPDiskItems(getStorageGroupRow(page, 0)).first();
+            await getPDiskProgressBar(pDiskItem).hover();
+            const popup = page.locator('.ydb-popover').filter({
+                has: page.getByText(pDisk.PDiskId, {exact: true}),
+            });
+            await expect(popup).toBeVisible();
+            const space = popup
+                .locator('.g-definition-list__item')
+                .filter({has: page.getByText('Space', {exact: true})})
+                .locator('.g-definition-list__definition');
+            await expect(space).toHaveText(capacityMetricsEnabled ? '—' : /40\.00 \/ 100\.00\s*GB/);
+            await expect(popup.getByText('PDisk Usage', {exact: true})).toHaveCount(
+                capacityMetricsEnabled ? 1 : 0,
+            );
+        });
+    }
+
     test('labels node PDisk links in every Expert mode', async ({page}) => {
         const response = createMockStorageNodesResponse();
         const [missing, bscOnly, withWhiteboard, partial] = response.Nodes?.[0]?.PDisks ?? [];
@@ -1950,7 +2429,7 @@ test.describe('PDisk Coloring - Expert Mode visual snapshots', () => {
         }
         Object.assign(missing, {AvailableSize: undefined, TotalSize: undefined});
         Object.assign(bscOnly, {
-            DriveStatus: 'BROKEN',
+            Status: 'BROKEN',
             DecommitStatus: 'DECOMMIT_IMMINENT',
             MaintenanceStatus: 'LONG_TERM_MAINTENANCE_PLANNED',
             AvailableSize: '50',
@@ -1961,7 +2440,7 @@ test.describe('PDisk Coloring - Expert Mode visual snapshots', () => {
             PDiskCapacityAlert: ECapacityAlert.RED,
             Device: EFlag.Green,
             Realtime: EFlag.Red,
-            DriveStatus: 'FAULTY',
+            Status: 'FAULTY',
             DecommitStatus: 'DECOMMIT_PENDING',
             MaintenanceStatus: 'NO_NEW_VDISKS',
             AvailableSize: '100',
@@ -1972,7 +2451,7 @@ test.describe('PDisk Coloring - Expert Mode visual snapshots', () => {
             PDiskCapacityAlert: undefined,
             Device: undefined,
             Realtime: undefined,
-            DriveStatus: undefined,
+            Status: undefined,
             DecommitStatus: undefined,
             MaintenanceStatus: undefined,
             AvailableSize: undefined,

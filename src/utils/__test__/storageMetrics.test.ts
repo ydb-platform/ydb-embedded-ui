@@ -101,6 +101,22 @@ describe('storageMetrics', () => {
         expect(formatMetricPercent(50)).toBe('50%');
     });
 
+    test.each([0, 0.0001, 0.004])('omits decimals when %s percent rounds to zero', (value) => {
+        expect(formatMetricPercent(value, 2)).toBe('0%');
+        expect(formatNormalizedMetricPercent(value / 100)).toBe('0%');
+    });
+
+    test('keeps fixed precision for non-zero storage percentages', () => {
+        expect(formatMetricPercent(1, 2)).toBe('1.00%');
+        expect(formatMetricPercent(0.005, 2)).toBe('0.01%');
+        expect(formatNormalizedMetricPercent(0.01)).toBe('1.00%');
+    });
+
+    test('formats zero storage sizes without decimals in fixed-precision pairs', () => {
+        expect(formatStorageMetricPair(0, 2_000_000_000, 2)).toBe(`0 / 2.00${UNBREAKABLE_GAP}GB`);
+        expect(formatStorageMetricPair(1, 0, 2)).toBe(`0 / 0${UNBREAKABLE_GAP}GB`);
+    });
+
     test('formatMetricPercent keeps one decimal for non-integer values', () => {
         expect(formatMetricPercent(64.2)).toBe('64.2%');
     });
@@ -121,15 +137,26 @@ describe('storageMetrics', () => {
         );
     });
 
-    test('formatStorageMetricPair returns placeholder when either value is missing or invalid', () => {
-        expect(formatStorageMetricPair(undefined, 2_000_000_000)).toBe(EMPTY_DATA_PLACEHOLDER);
-        expect(formatStorageMetricPair(null as unknown as number, 2_000_000_000)).toBe(
-            EMPTY_DATA_PLACEHOLDER,
-        );
-        expect(formatStorageMetricPair(1_000_000_000, null as unknown as number)).toBe(
-            EMPTY_DATA_PLACEHOLDER,
-        );
-        expect(formatStorageMetricPair(Number.NaN, 2_000_000_000)).toBe(EMPTY_DATA_PLACEHOLDER);
+    test.each([undefined, null, '', Number.NaN, Infinity, -1])(
+        'keeps the known storage size when the other value is %s',
+        (missing) => {
+            const value = missing as number | string | undefined;
+            expect(formatStorageMetricPair(value, 2_000_000_000)).toBe(`— / 2${UNBREAKABLE_GAP}GB`);
+            expect(formatStorageMetricPair(1_000_000_000, value)).toBe(`1${UNBREAKABLE_GAP}GB / —`);
+            expect(formatStorageMetricPair(value, 2_000_000_000, 2)).toBe(
+                `— / 2.00${UNBREAKABLE_GAP}GB`,
+            );
+            expect(formatStorageMetricPair(1_000_000_000, value, 2)).toBe(
+                `1.00${UNBREAKABLE_GAP}GB / —`,
+            );
+            expect(formatStorageMetricPair(value, value, 2)).toBe(EMPTY_DATA_PLACEHOLDER);
+        },
+    );
+
+    test('keeps zero and legacy precision in a partial storage pair', () => {
+        expect(formatStorageMetricPair(0, undefined, 2)).toBe(`0${UNBREAKABLE_GAP}GB / —`);
+        expect(formatStorageMetricPair(undefined, 0, 2)).toBe(`— / 0${UNBREAKABLE_GAP}GB`);
+        expect(formatStorageMetricPair(560_000_000, undefined)).toBe(`0.6${UNBREAKABLE_GAP}GB / —`);
     });
 
     test('formatNormalizedMetricPercent formats normalized values with fixed precision', () => {
@@ -153,8 +180,9 @@ describe('storageMetrics', () => {
         expect(formatMetricCountPair(0, 4)).toBe('0 / 4');
     });
 
-    test('formatMetricCountPair returns placeholder when either count is null', () => {
-        expect(formatMetricCountPair(null, 4)).toBe(EMPTY_DATA_PLACEHOLDER);
-        expect(formatMetricCountPair(0, null)).toBe(EMPTY_DATA_PLACEHOLDER);
+    test('formatMetricCountPair preserves each known count', () => {
+        expect(formatMetricCountPair(null, 4)).toBe('— / 4');
+        expect(formatMetricCountPair(0, null)).toBe('0 / —');
+        expect(formatMetricCountPair(null, undefined)).toBe(EMPTY_DATA_PLACEHOLDER);
     });
 });
