@@ -81,6 +81,7 @@ export function PDiskSpaceDistribution({data}: PDiskSpaceDistributionProps) {
                     item={item}
                     minNonLogTotal={minNonLogTotal}
                     pDiskId={PDiskId}
+                    pDiskState={data.State}
                     nodeId={NodeId}
                     nodeData={{
                         Host: data.NodeHost,
@@ -117,6 +118,7 @@ interface SlotProps<T extends SlotItemType> {
     minNonLogTotal: number;
 
     pDiskId?: string | number;
+    pDiskState?: PDiskData['State'];
     nodeId?: string | number;
     nodeData?: NodeMetadata;
     getVDiskPagePath?: (
@@ -146,13 +148,14 @@ function getSlotHeight<T extends SlotItemType>(item: SlotItem<T>, minNonLogTotal
 function Slot<T extends SlotItemType>({
     item,
     minNonLogTotal,
+    pDiskState,
     nodeId,
     nodeData,
     getVDiskPagePath,
 }: SlotProps<T>) {
     const renderContent = () => {
         if (isDDiskSlot(item)) {
-            return <DDisk data={item.SlotData} />;
+            return <DDisk data={item.SlotData} pDiskState={pDiskState} showInventoryLink />;
         }
         if (isVDiskSlot(item)) {
             const vDiskPagePath = getVDiskPagePath?.({

@@ -8,15 +8,25 @@ import {getTabletGroups} from './getNbsTabletGroups';
 import {requestStorageData} from './requestStorageData';
 import {prepareStorageNodesResponse} from './utils';
 
+interface StorageClusterContext {
+    backend?: string;
+    clusterName?: string;
+    environment?: string;
+}
+
 export const storageApi = api.injectEndpoints({
     endpoints: (builder) => ({
+        getNbsStorageConfiguration: builder.query({
+            queryFn: async (_context: StorageClusterContext, {signal}) => {
+                try {
+                    return {data: await window.api.storage.getNbsStorageConfiguration({signal})};
+                } catch (error) {
+                    return {error};
+                }
+            },
+        }),
         getNbsTabletDetails: builder.query({
-            queryFn: async (
-                {
-                    tabletId,
-                }: {tabletId: string; backend?: string; clusterName?: string; environment?: string},
-                {signal},
-            ) => {
+            queryFn: async ({tabletId}: StorageClusterContext & {tabletId: string}, {signal}) => {
                 try {
                     return {data: await getTabletGroups(tabletId, signal)};
                 } catch (error) {
@@ -25,12 +35,21 @@ export const storageApi = api.injectEndpoints({
             },
             providesTags: ['All', 'StorageData'],
         }),
-        getNbsTabletGroups: builder.query({
-            queryFn: async (params: NbsListParams, {signal}) => {
+        getNbsStorageGroups: builder.query({
+            queryFn: async (
+                {
+                    view,
+                    params,
+                }: StorageClusterContext & {
+                    view: 'tablets' | 'disks';
+                    params: NbsListParams;
+                },
+                {signal},
+            ) => {
                 try {
                     const data = await window.api.storage.getNbsStorage(
-                        'tablets',
-                        {...params, limit: 1},
+                        view,
+                        {...params, groups_only: true},
                         {signal},
                     );
                     return {data};

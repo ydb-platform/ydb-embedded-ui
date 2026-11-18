@@ -374,6 +374,7 @@ export interface NodesRequestParams {
     with?: NodesWithFilter;
 
     storage?: boolean;
+    includeDDisks?: boolean;
     tablets?: boolean;
 
     /** return nodes with less uptime in seconds */

@@ -57,7 +57,11 @@ export class PDiskAPI extends BaseYdbAPI {
     }
 
     getPDiskInfo(
-        {nodeId, pDiskId}: {nodeId: string | number; pDiskId: string | number},
+        {
+            nodeId,
+            pDiskId,
+            includeDDisks,
+        }: {nodeId: string | number; pDiskId: string | number; includeDDisks?: boolean},
         {concurrentId, signal}: AxiosOptions = {},
     ) {
         return this.get<TPDiskInfoResponse>(
@@ -65,7 +69,7 @@ export class PDiskAPI extends BaseYdbAPI {
             {
                 node_id: nodeId,
                 pdisk_id: pDiskId,
-                include_ddisks: true,
+                include_ddisks: includeDDisks || undefined,
             },
             {concurrentId, requestConfig: {signal}},
         );

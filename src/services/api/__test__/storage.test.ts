@@ -52,13 +52,29 @@ test('CMS errors in successful HTTP responses must not appear as empty tables', 
     await expect(api.getNbsStorage('tablets', {})).rejects.toThrow('Cannot collect cluster state');
 });
 
+test.each([{inventory: true}, {groups_only: true}])(
+    'ignoring %p on old CMS does not appear as an empty view',
+    async (params) => {
+        const {api} = createApi({Status: {Code: 'OK'}, TotalCount: 0});
+        await expect(api.getNbsStorage('disks', params)).rejects.toThrow(
+            'CMS does not support the requested NBS storage view',
+        );
+    },
+);
+
+test('a supported empty inventory retains the zero count', async () => {
+    const result = {Status: {Code: 'OK'}, TotalCount: 0, UnfilteredCount: 0};
+    const {api} = createApi(result);
+    await expect(api.getNbsStorage('disks', {inventory: true})).resolves.toEqual(result);
+});
+
 test('tablet snapshot preserves backend prefix, uint64 ID and cancellation', async () => {
     const snapshot = {Status: 'OK', TabletId: '18446744073709551615', Groups: []};
     const {api, requests} = createApi(snapshot);
     const signal = new AbortController().signal;
     expect(await api.getNbsTablet(snapshot.TabletId, {signal})).toEqual(snapshot);
     expect(requests[0].url).toBe('/backend/node/8/cms/api/json/ddisk/tablet');
-    expect(requests[0].params).toEqual({tablet_id: snapshot.TabletId});
+    expect(requests[0].params).toEqual({tablet_id: snapshot.TabletId, include_health: true});
     expect(requests[0].signal).toBe(signal);
 });
 test('tablet snapshot errors remain visible', async () => {

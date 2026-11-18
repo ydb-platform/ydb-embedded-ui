@@ -1,3 +1,10 @@
+import type {DDiskComponentStatus, TDDiskStateInfo} from './ddisk';
+
+export interface NbsMissingGroups {
+    Missing: number;
+    Count: number;
+}
+
 export interface NbsTablet {
     TabletId: string;
     DiskId?: string;
@@ -6,6 +13,10 @@ export interface NbsTablet {
     LastChangedAt?: string | number;
     UnavailableDDiskCount?: number;
     UnavailablePersistentBufferCount?: number;
+    UnavailableDDiskGroups?: NbsMissingGroups[];
+    UnavailablePersistentBufferGroups?: NbsMissingGroups[];
+    GroupsWithUnknownDDiskStatus?: number;
+    GroupsWithUnknownPersistentBufferStatus?: number;
     Degrade?: number;
     DiskUsage?: number;
 }
@@ -21,7 +32,16 @@ export interface NbsDisk {
     State?: string;
     DDiskOccupancy?: number;
     PersistentBufferOccupancy?: number;
+    DDiskStatus?: DDiskComponentStatus;
+    PersistentBufferStatus?: DDiskComponentStatus;
+    DDiskStatusReason?: string;
+    PersistentBufferStatusReason?: string;
+    AllocatedSize?: number | string;
+    AvailableSize?: number | string;
+    TotalSize?: number | string;
 }
+
+export type NbsGroupBy = 'degrade' | 'disk_usage' | 'state';
 
 export interface NbsListParams {
     offset?: number;
@@ -30,18 +50,32 @@ export interface NbsListParams {
     sort_by?: string;
     sort_desc?: boolean;
     only_problems?: boolean;
-    group_by?: 'degrade' | 'disk_usage';
+    group_by?: NbsGroupBy;
     filter_group?: string;
     filter_tablet_id?: string;
     include_tablet_ids?: boolean;
+    groups_only?: boolean;
+    inventory?: boolean;
+    fields_required?: string;
+    timeout?: number;
+    node_id?: number;
+    pdisk_id?: number;
+    tablet_id?: string;
 }
 
 export interface NbsListResponse {
     Status?: {Code?: string; Reason?: string};
     TotalCount?: number;
+    UnfilteredCount?: number;
+    FieldsAvailable?: string[];
     Tablets?: NbsTablet[];
     Disks?: NbsDisk[];
     Groups?: {Name: string; Count: number}[];
+}
+
+export interface NbsMemberHealth {
+    Status?: DDiskComponentStatus;
+    Reason?: string;
 }
 
 export interface NbsDirectBlockGroup {
@@ -49,6 +83,13 @@ export interface NbsDirectBlockGroup {
     NumVChunksClaimed?: number;
     DDiskId?: NbsDisk['DiskId'][];
     PersistentBufferDDiskId?: NbsDisk['DiskId'][];
+    DDiskHealth?: NbsMemberHealth[];
+    PersistentBufferHealth?: NbsMemberHealth[];
+    UnavailableDDiskCount?: number;
+    UnavailablePersistentBufferCount?: number;
+    UnknownDDiskCount?: number;
+    UnknownPersistentBufferCount?: number;
+    MonitoredQuorum?: 'Quorum' | 'NoQuorum' | 'Unknown';
 }
 
 export interface NbsTabletResponse {
@@ -57,4 +98,6 @@ export interface NbsTabletResponse {
     TabletId?: string;
     Revision?: string | number;
     Groups?: NbsDirectBlockGroup[];
+    Slots?: (Omit<TDDiskStateInfo, 'AllocatedSize' | 'AvailableSize' | 'TotalSize'> &
+        Pick<NbsDisk, 'AllocatedSize' | 'AvailableSize' | 'TotalSize'>)[];
 }

@@ -5,6 +5,14 @@ import type {AxiosOptions} from './base';
 import {BaseYdbAPI} from './base';
 
 export class StorageAPI extends BaseYdbAPI {
+    getNbsStorageConfiguration({signal}: AxiosOptions = {}) {
+        return this.get<{Configured: boolean | null}>(
+            this.getPath('/storage/nbs'),
+            {},
+            {requestConfig: {signal}},
+        );
+    }
+
     async getNbsStorage(
         view: 'tablets' | 'disks',
         params: NbsListParams,
@@ -18,13 +26,16 @@ export class StorageAPI extends BaseYdbAPI {
         if (result.Status?.Code !== 'OK') {
             throw new Error(result.Status?.Reason || result.Status?.Code || 'Invalid CMS response');
         }
+        if ((params.inventory || params.groups_only) && result.UnfilteredCount === undefined) {
+            throw new Error('CMS does not support the requested NBS storage view');
+        }
         return result;
     }
 
     async getNbsTablet(tabletId: string, {concurrentId, signal}: AxiosOptions = {}) {
         const result = await this.get<NbsTabletResponse>(
             this.getPath('/cms/api/json/ddisk/tablet'),
-            {tablet_id: tabletId},
+            {tablet_id: tabletId, include_health: true},
             {concurrentId, requestConfig: {signal}},
         );
         if (result.Status !== 'OK') {

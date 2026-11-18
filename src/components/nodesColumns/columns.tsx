@@ -470,11 +470,24 @@ export function getTabletsColumn<
         sortable: false,
     };
 }
-export function getMissingDisksColumn<T extends {Missing?: number}>(): Column<T> {
+export function getMissingDisksColumn<
+    T extends {Missing?: number; MissingDDiskSlots?: number},
+>(): Column<T> {
     return {
         name: NODES_COLUMNS_IDS.Missing,
         header: NODES_COLUMNS_TITLES.Missing,
-        render: ({row}) => row.Missing,
+        render: ({row}) => {
+            if (!row.MissingDDiskSlots) {
+                return row.Missing;
+            }
+
+            return (
+                <div>
+                    <div>{row.Missing}</div>
+                    <div>{i18n('missing-ddisk-slots', {count: row.MissingDDiskSlots})}</div>
+                </div>
+            );
+        },
         align: DataTable.CENTER,
         defaultOrder: DataTable.DESCENDING,
         width: 100,

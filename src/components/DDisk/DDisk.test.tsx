@@ -42,13 +42,51 @@ test('links to the selected DDisk and Persistent Buffer instead of a VDisk', () 
     expect(screen.queryByText(/VDisk/)).not.toBeInTheDocument();
 });
 
-test.each([false, true])('unavailable DDisks are red (compact=%s)', (compact) => {
-    render(<DDisk data={{HasWhiteboardData: false}} compact={compact} />);
-    expect(screen.getByRole('button')).toHaveClass('ydb-ddisk_failed', 'ydb-ddisk_unavailable');
+test.each([false, true])('missing samples are not failures (compact=%s)', (compact) => {
+    render(
+        <DDisk
+            data={{HasWhiteboardData: false}}
+            pDiskState={TPDiskState.Normal}
+            compact={compact}
+        />,
+    );
+    expect(screen.getByRole('button')).toHaveClass('ydb-ddisk_unavailable');
+    expect(screen.getByRole('button')).not.toHaveClass('ydb-ddisk_failed');
     expect(screen.getByRole('button')).toHaveAttribute(
         'aria-description',
         'Current disk data is unavailable',
     );
+});
+
+test('reported unavailability is visible without assuming a missing sample', () => {
+    render(<DDisk data={{}} unavailable compact />);
+    expect(screen.getByRole('button')).toHaveClass('ydb-ddisk_failed');
+    expect(screen.getByRole('button')).not.toHaveClass('ydb-ddisk_unavailable');
+    expect(screen.getByRole('button')).toHaveAttribute(
+        'aria-description',
+        'Disk reported unavailable',
+    );
+});
+
+test('a Persistent Buffer failure does not mark the paired DDisk as failed', () => {
+    const data = {
+        NodeId: 1,
+        PDiskId: 2,
+        DDiskSlotId: 3,
+        DDiskStatus: 'Ready',
+        PersistentBufferStatus: 'Broken',
+        PersistentBufferStatusReason: 'I/O error',
+    } as const;
+    render(
+        <div>
+            <DDisk data={data} role="ddisk" />
+            <DDisk data={data} role="buffer" />
+        </div>,
+    );
+    expect(screen.getByRole('button', {name: 'DDisk 1:2:3'})).not.toHaveClass('ydb-ddisk_failed');
+    const buffer = screen.getByRole('button', {name: 'Persistent Buffer 1:2:3'});
+    expect(buffer).toHaveClass('ydb-ddisk_failed');
+    expect(buffer).toHaveAttribute('aria-description', 'Failed (I/O error)');
 });
 
 test.each([TPDiskState.DeviceIoError, TPDiskState.Stopped, TPDiskState.OpenFileError])(

@@ -1,7 +1,5 @@
-import {useRouteMatch} from 'react-router-dom';
-
-import routes from '../../routes';
 import {useIsUserAllowedToMakeChanges} from '../../utils/hooks/useIsUserAllowedToMakeChanges';
+import {useNbsStorageAvailableInClusterView} from '../../utils/hooks/useNbsStorageAvailability';
 
 import {NbsStorage} from './NbsStorage/NbsStorage';
 import {PaginatedStorageGroups} from './PaginatedStorageGroups';
@@ -33,8 +31,8 @@ export interface PaginatedStorageProps {
 
 export const PaginatedStorage = (props: PaginatedStorageProps) => {
     const {storageType} = useStorageQueryParams();
-    const isClusterStorage = Boolean(useRouteMatch(routes.cluster));
-    useSaveStorageType();
+    const nbsAvailable = useNbsStorageAvailableInClusterView();
+    useSaveStorageType(nbsAvailable);
     useSaveStorageExpertMode();
     useSaveVDisksGroupBy();
     useSavePDisksGroupBy();
@@ -42,11 +40,7 @@ export const PaginatedStorage = (props: PaginatedStorageProps) => {
     useSaveNodesPDisksGroupBy();
     const isUserAllowedToMakeChanges = useIsUserAllowedToMakeChanges();
 
-    if (
-        (storageType === 'nbs' || storageType === 'ddisks') &&
-        isUserAllowedToMakeChanges &&
-        isClusterStorage
-    ) {
+    if (nbsAvailable && (storageType === 'nbs' || storageType === 'ddisks')) {
         return <NbsStorage key={storageType} {...props} disks={storageType === 'ddisks'} />;
     }
 

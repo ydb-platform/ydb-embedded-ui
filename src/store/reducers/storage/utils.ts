@@ -87,6 +87,18 @@ const prepareStorageNodeData = (
             return pDisk.State !== TPDiskState.Normal;
         }).length || 0;
 
+    const missingDDiskSlots = new Set<string>();
+    for (const {PDiskId, DDiskSlotId, DDiskStatus, PersistentBufferStatus} of node.DDisks ?? []) {
+        if (
+            PDiskId !== undefined &&
+            DDiskSlotId !== undefined &&
+            ((DDiskStatus && DDiskStatus !== 'Ready') ||
+                (PersistentBufferStatus && PersistentBufferStatus !== 'Ready'))
+        ) {
+            missingDDiskSlots.add(`${PDiskId}:${DDiskSlotId}`);
+        }
+    }
+
     const pDisks = PDisks?.map((pDisk) => {
         // Older viewers have no marker; identity and sizes can also come from BSC.
         const hasWhiteboardData =
@@ -121,6 +133,7 @@ const prepareStorageNodeData = (
         PDisks: pDisks,
         VDisks: vDisks,
         Missing: missing,
+        MissingDDiskSlots: node.DDisks ? missingDDiskSlots.size : undefined,
         MaximumSlotsPerDisk: maximumSlotsPerDisk,
         MaximumDisksPerNode: maximumDisksPerNode,
         MaxPDiskUsage: normalizeMaxPercent(MaxPDiskUsage),

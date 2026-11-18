@@ -4,6 +4,7 @@ import type {NbsDisk, NbsListParams, NbsTablet} from '../../../types/api/nbs';
 export type NbsRow = NbsTablet | NbsDisk;
 export interface NbsFilters extends NbsListParams {
     disks: boolean;
+    scope?: string;
 }
 
 export const getNbsStorage: FetchData<NbsRow, NbsFilters> = async ({
@@ -12,12 +13,12 @@ export const getNbsStorage: FetchData<NbsRow, NbsFilters> = async ({
     filters,
     signal,
 }) => {
-    const {disks = false, ...params} = filters ?? {};
+    const {disks = false, scope: _scope, ...params} = filters ?? {};
     const response = await window.api.storage.getNbsStorage(
         disks ? 'disks' : 'tablets',
         {
             ...params,
-            ...(disks ? {include_tablet_ids: false} : {}),
+            ...(disks ? {include_tablet_ids: false, inventory: true} : {}),
             limit,
             offset,
         },
@@ -25,7 +26,7 @@ export const getNbsStorage: FetchData<NbsRow, NbsFilters> = async ({
     );
     return {
         data: (disks ? response.Disks : response.Tablets) ?? [],
-        total: response.TotalCount ?? 0,
+        total: response.UnfilteredCount ?? response.TotalCount ?? 0,
         found: response.TotalCount ?? 0,
     };
 };

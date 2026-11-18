@@ -184,6 +184,7 @@ export const PDiskWithVDisks = React.memo(function PDiskWithVDisks({
                                         data={vDisk.ddisk}
                                         pDiskState={pDiskProps.data?.State}
                                         compact
+                                        showInventoryLink
                                     />
                                 </div>
                             ) : (

@@ -110,6 +110,16 @@ export const useViewerNodesAliveFilterAvailable = () => {
     return useGetFeatureVersion('/viewer/nodes/alive') >= 1;
 };
 
+export const useViewerNodesHasDDisks = () => useGetFeatureVersion('/viewer/nodes/ddisks') >= 1;
+
+export function useNbsStorageApiAvailable() {
+    const discovery = useGetFeatureVersion('/storage/nbs');
+    const tablets = useGetFeatureVersion('/cms/api/json/ddisk/tablets');
+    const tablet = useGetFeatureVersion('/cms/api/json/ddisk/tablet');
+    const disks = useGetFeatureVersion('/cms/api/json/ddisk/disks');
+    return discovery >= 1 && tablets >= 1 && tablet >= 1 && disks >= 1;
+}
+
 export const useViewerNodesHandlerHasGrouping = () => {
     return useGetFeatureVersion('/viewer/nodes') > 6;
 };

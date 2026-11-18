@@ -1,7 +1,10 @@
-import {Button, Link} from '@gravity-ui/uikit';
+import {Button, Flex, Label, Link, Text} from '@gravity-ui/uikit';
 
 import type {Column} from '../../../components/PaginatedTable';
 import {ProgressViewer} from '../../../components/ProgressViewer/ProgressViewer';
+import type {DDiskComponentStatus} from '../../../types/api/ddisk';
+import type {NbsMissingGroups} from '../../../types/api/nbs';
+import {formatBytes} from '../../../utils/bytesParsers';
 import {EMPTY_DATA_PLACEHOLDER} from '../../../utils/constants';
 import {getDDiskDeveloperUIHrefs} from '../../../utils/developerUI/ddisk';
 import {
@@ -12,6 +15,50 @@ import {
 import {formatUsage} from './getData';
 import type {NbsRow} from './getData';
 import i18n from './i18n';
+
+function renderRoleStatus(status?: DDiskComponentStatus, reason?: string) {
+    const labels = {
+        Ready: {text: i18n('status-ready'), theme: 'success'},
+        Initializing: {text: i18n('status-initializing'), theme: 'warning'},
+        Broken: {text: i18n('status-broken'), theme: 'danger'},
+        Stopping: {text: i18n('status-stopping'), theme: 'warning'},
+    } as const;
+    const label = status && labels[status];
+    return (
+        <Flex direction="column" alignItems="flex-start" gap={1}>
+            <Label theme={label?.theme}>{label?.text ?? i18n('unknown')}</Label>
+            {reason && (
+                <Text variant="caption-2" ellipsis title={reason}>
+                    {reason}
+                </Text>
+            )}
+        </Flex>
+    );
+}
+
+function renderGroupFailures(bins?: NbsMissingGroups[], unknownGroups?: number) {
+    if (!bins && unknownGroups === undefined) {
+        return EMPTY_DATA_PLACEHOLDER;
+    }
+    const counts = new Map(bins?.map(({Missing, Count}) => [Missing, Count]));
+    const missingCounts = [...new Set([1, 2, 3, ...counts.keys()])];
+    return (
+        <Flex direction="column" gap={1}>
+            <Text>
+                {missingCounts
+                    .map((missing) =>
+                        i18n('missing-bin', {missing, count: counts.get(missing) ?? 0}),
+                    )
+                    .join(' · ')}
+            </Text>
+            {unknownGroups !== undefined && (
+                <Text variant="caption-2" color="secondary">
+                    {i18n('unknown-groups', {count: unknownGroups})}
+                </Text>
+            )}
+        </Flex>
+    );
+}
 
 export function useNbsColumns(disks: boolean, onShowGroups: (tabletId: string) => void) {
     const hasDeveloperUi = useHasDeveloperUi();
@@ -47,7 +94,10 @@ export function useNbsColumns(disks: boolean, onShowGroups: (tabletId: string) =
                       return null;
                   }
                   const id = `${row.DiskId.NodeId}:${row.DiskId.PDiskId}:${row.DiskId.DDiskSlotId}`;
-                  const href = getDDiskDeveloperUIHrefs({...row, ...row.DiskId}).ddisk;
+                  const href = getDDiskDeveloperUIHrefs({
+                      NodeId: row.DiskId.NodeId,
+                      DDiskPath: row.DDiskPath,
+                  }).ddisk;
                   return hasDeveloperUi && href ? <Link href={href}>{id}</Link> : id;
               }),
               column('pool', i18n('pool'), ({row}) =>
@@ -60,14 +110,45 @@ export function useNbsColumns(disks: boolean, onShowGroups: (tabletId: string) =
                       if ('TabletId' in row) {
                           return null;
                       }
-                      const href = getDDiskDeveloperUIHrefs({...row, ...row.DiskId}).buffer;
+                      const href = getDDiskDeveloperUIHrefs({
+                          NodeId: row.DiskId.NodeId,
+                          PersistentBufferId: row.PersistentBufferId,
+                      }).buffer;
                       const id = row.PersistentBufferId || EMPTY_DATA_PLACEHOLDER;
                       return hasDeveloperUi && href ? <Link href={href}>{id}</Link> : id;
                   },
                   200,
               ),
-              column('state', i18n('state'), ({row}) =>
+              column('state', i18n('pdisk-state'), ({row}) =>
                   !('TabletId' in row) ? (row.State ?? EMPTY_DATA_PLACEHOLDER) : null,
+              ),
+              column('ddisk-status', i18n('ddisk-status'), ({row}) =>
+                  !('TabletId' in row)
+                      ? renderRoleStatus(row.DDiskStatus, row.DDiskStatusReason)
+                      : null,
+              ),
+              column(
+                  'buffer-status',
+                  i18n('buffer-status'),
+                  ({row}) =>
+                      !('TabletId' in row)
+                          ? renderRoleStatus(
+                                row.PersistentBufferStatus,
+                                row.PersistentBufferStatusReason,
+                            )
+                          : null,
+                  200,
+              ),
+              column(
+                  'shared-slot',
+                  i18n('shared-slot'),
+                  ({row}) =>
+                      !('TabletId' in row) &&
+                      row.AllocatedSize !== undefined &&
+                      row.TotalSize !== undefined
+                          ? `${formatBytes({value: row.AllocatedSize})} / ${formatBytes({value: row.TotalSize})}`
+                          : EMPTY_DATA_PLACEHOLDER,
+                  180,
               ),
               column('ddiskUsage', i18n('ddisk-usage'), ({row}) =>
                   !('TabletId' in row) ? usage(row.DDiskOccupancy) : null,
@@ -101,12 +182,18 @@ export function useNbsColumns(disks: boolean, onShowGroups: (tabletId: string) =
               column(
                   'tablet',
                   i18n('tablet'),
-                  ({row}) =>
-                      'TabletId' in row ? (
+                  ({row}) => {
+                      if (!('TabletId' in row)) {
+                          return null;
+                      }
+                      return hasDeveloperUi ? (
                           <Link href={createTabletDeveloperUIHref(row.TabletId, 'app')}>
                               {row.TabletId}
                           </Link>
-                      ) : null,
+                      ) : (
+                          row.TabletId
+                      );
+                  },
                   220,
               ),
               column(
@@ -137,21 +224,27 @@ export function useNbsColumns(disks: boolean, onShowGroups: (tabletId: string) =
               ),
               column(
                   'missingDDisk',
-                  i18n('missing-ddisks'),
+                  i18n('ddisk-group-failures'),
                   ({row}) =>
                       'TabletId' in row
-                          ? (row.UnavailableDDiskCount ?? EMPTY_DATA_PLACEHOLDER)
+                          ? renderGroupFailures(
+                                row.UnavailableDDiskGroups,
+                                row.GroupsWithUnknownDDiskStatus,
+                            )
                           : null,
-                  190,
+                  210,
               ),
               column(
                   'missingBuffer',
-                  i18n('missing-buffers'),
+                  i18n('buffer-group-failures'),
                   ({row}) =>
                       'TabletId' in row
-                          ? (row.UnavailablePersistentBufferCount ?? EMPTY_DATA_PLACEHOLDER)
+                          ? renderGroupFailures(
+                                row.UnavailablePersistentBufferGroups,
+                                row.GroupsWithUnknownPersistentBufferStatus,
+                            )
                           : null,
-                  190,
+                  210,
               ),
           ];
     return columns;

@@ -11,7 +11,7 @@ test.each(['backend', 'clusterName', 'environment'] as const)(
                 getDefaultMiddleware().concat(storageApi.middleware),
         });
         const scope = {tabletId: '41', backend: '/a', clusterName: 'alpha', environment: 'prod'};
-        const data = {groups: [{DirectBlockGroupId: 0, Degrade: 1}], disks: []};
+        const data = {groups: [{DirectBlockGroupId: 0, UnavailableDDiskCount: 1}], slots: []};
         await store.dispatch(storageApi.util.upsertQueryData('getNbsTabletDetails', scope, data));
         expect(
             storageApi.endpoints.getNbsTabletDetails.select(scope)(store.getState()).data,

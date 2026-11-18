@@ -472,17 +472,18 @@ export function useSaveStorageExpertMode() {
     }, [normalizedStorageExpertMode, queryStorageExpertMode, setQueryStorageExpertMode]);
 }
 
-export function useSaveStorageType() {
+export function useSaveStorageType(nbsAvailable?: boolean) {
     const [queryStorageType, setQueryStorageType] = useQueryParam('type', StringParam);
     const [savedStorageType] = useSetting<StorageType>(
         SETTING_KEYS.STORAGE_TYPE,
         STORAGE_TYPES.groups,
     );
 
-    const normalizedStorageType = React.useMemo(
-        () => storageTypeSchema.parse(queryStorageType ?? savedStorageType),
-        [queryStorageType, savedStorageType],
-    );
+    const requestedType = storageTypeSchema.parse(queryStorageType ?? savedStorageType);
+    const normalizedStorageType =
+        nbsAvailable === false && (requestedType === 'nbs' || requestedType === 'ddisks')
+            ? STORAGE_TYPES.groups
+            : requestedType;
 
     React.useEffect(() => {
         if (normalizedStorageType !== queryStorageType) {

@@ -1,6 +1,6 @@
 import React from 'react';
 
-import {Checkbox, Flex, Select, Text} from '@gravity-ui/uikit';
+import {Button, Checkbox, Flex, Select, Text} from '@gravity-ui/uikit';
 import {BooleanParam, StringParam, useQueryParams} from 'use-query-params';
 import {z} from 'zod';
 
@@ -10,7 +10,9 @@ import {LoaderWrapper} from '../../../components/LoaderWrapper/LoaderWrapper';
 import {PAGINATED_TABLE_IDS, PaginatedTable} from '../../../components/PaginatedTable';
 import {PaginatedTableWithLayout} from '../../../components/PaginatedTable/PaginatedTableWithLayout';
 import {Search} from '../../../components/Search/Search';
+import {backend, clusterName, environment} from '../../../store';
 import {storageApi} from '../../../store/reducers/storage/storage';
+import type {NbsGroupBy, NbsListParams} from '../../../types/api/nbs';
 import {useAutoRefreshInterval} from '../../../utils/hooks';
 import {renderPaginatedTableErrorMessage} from '../../../utils/renderPaginatedTableErrorMessage';
 import type {PaginatedStorageProps} from '../PaginatedStorage';
@@ -26,6 +28,12 @@ import type {NbsFilters, NbsRow} from './getData';
 import i18n from './i18n';
 import {useNbsColumns} from './useNbsColumns';
 
+const locationIdSchema = z
+    .string()
+    .regex(/^\d+$/)
+    .transform(Number)
+    .pipe(z.number().int().min(0).max(0xffffffff));
+
 export function NbsStorage({disks, scrollContainerRef}: PaginatedStorageProps & {disks: boolean}) {
     const {storageType, handleStorageTypeChange} = useStorageQueryParams();
     const [interval] = useAutoRefreshInterval();
@@ -35,6 +43,9 @@ export function NbsStorage({disks, scrollContainerRef}: PaginatedStorageProps & 
         nbsSearch: StringParam,
         ddisksSearch: StringParam,
         nbsGroupBy: StringParam,
+        ddisksGroupBy: StringParam,
+        ddisksNodeId: StringParam,
+        ddisksPDiskId: StringParam,
         nbsSort: StringParam,
         ddisksSort: StringParam,
         nbsDesc: BooleanParam,
@@ -50,23 +61,40 @@ export function NbsStorage({disks, scrollContainerRef}: PaginatedStorageProps & 
     const sort = sortOptions.includes(requestedSort) ? requestedSort : sortOptions[0];
     const descending = (disks ? query.ddisksDesc : query.nbsDesc) ?? false;
     const problems = (disks ? query.ddisksProblems : query.nbsProblems) ?? false;
-    const groupBy =
-        !disks && (query.nbsGroupBy === 'degrade' || query.nbsGroupBy === 'disk_usage')
-            ? query.nbsGroupBy
-            : undefined;
-    const filters = React.useMemo<NbsFilters>(
+    const requestedGroup = disks ? query.ddisksGroupBy : query.nbsGroupBy;
+    const groupByOptions: {value: NbsGroupBy; content: string}[] = disks
+        ? [{value: 'state', content: i18n('pdisk-state')}]
+        : [
+              {value: 'degrade', content: i18n('degrade')},
+              {value: 'disk_usage', content: i18n('usage')},
+          ];
+    const groupBy = groupByOptions.find(({value}) => value === requestedGroup)?.value;
+    const nodeId = disks ? locationIdSchema.safeParse(query.ddisksNodeId).data : undefined;
+    const pdiskId = disks ? locationIdSchema.safeParse(query.ddisksPDiskId).data : undefined;
+    const listParams = React.useMemo<NbsListParams>(
         () => ({
-            disks,
             filter: search,
-            sort_by: sort,
-            sort_desc: descending,
             only_problems: problems,
             group_by: groupBy,
+            inventory: disks || undefined,
+            node_id: nodeId,
+            pdisk_id: pdiskId,
         }),
-        [disks, search, sort, descending, problems, groupBy],
+        [search, problems, groupBy, disks, nodeId, pdiskId],
     );
-    const {currentData, error, isFetching} = storageApi.useGetNbsTabletGroupsQuery(
-        {filter: search, only_problems: problems, group_by: groupBy},
+    const scope = JSON.stringify([backend, clusterName, environment]);
+    const filters = React.useMemo<NbsFilters>(
+        () => ({
+            ...listParams,
+            disks,
+            sort_by: sort,
+            sort_desc: descending,
+            scope,
+        }),
+        [listParams, disks, sort, descending, scope],
+    );
+    const {currentData, error, isFetching} = storageApi.useGetNbsStorageGroupsQuery(
+        {view: disks ? 'disks' : 'tablets', params: listParams, backend, clusterName, environment},
         {
             skip: !groupBy,
             pollingInterval: interval,
@@ -109,6 +137,7 @@ export function NbsStorage({disks, scrollContainerRef}: PaginatedStorageProps & 
             fetchData={getNbsStorage}
             filters={{...filters, filter_group: group}}
             initialEntitiesCount={count}
+            rowHeight={52}
             scrollContainerRef={scrollContainerRef}
             renderErrorMessage={renderPaginatedTableErrorMessage}
             renderEmptyDataMessage={() => i18n('empty')}
@@ -120,13 +149,16 @@ export function NbsStorage({disks, scrollContainerRef}: PaginatedStorageProps & 
         />
     );
     const groupTitle = (name: string) => {
-        if (name === 'unknown') {
-            return i18n('unknown');
-        }
         if (groupBy === 'degrade') {
             return `${i18n('degrade')}: ${name}`;
         }
-        return Number(name) === 100 ? '≥100%' : `${name}–${Number(name) + 10}%`;
+        if (groupBy === 'disk_usage') {
+            if (name === 'unknown') {
+                return i18n('unknown');
+            }
+            return Number(name) === 100 ? '≥100%' : `${name}–${Number(name) + 10}%`;
+        }
+        return name;
     };
     return (
         <DrawerWrapper
@@ -167,23 +199,20 @@ export function NbsStorage({disks, scrollContainerRef}: PaginatedStorageProps & 
                                 value={storageType}
                                 onChange={handleStorageTypeChange}
                             />
-                            {!disks && (
-                                <React.Fragment>
-                                    <Text>{i18n('group-by')}</Text>
-                                    <Select
-                                        aria-label={i18n('group-by')}
-                                        value={[groupBy ?? '']}
-                                        options={[
-                                            {value: '', content: i18n('none')},
-                                            {value: 'degrade', content: i18n('degrade')},
-                                            {value: 'disk_usage', content: i18n('usage')},
-                                        ]}
-                                        onUpdate={([value]) =>
-                                            setQuery({nbsGroupBy: value || undefined}, 'replaceIn')
-                                        }
-                                    />
-                                </React.Fragment>
-                            )}
+                            <Text>{i18n('group-by')}</Text>
+                            <Select
+                                aria-label={i18n('group-by')}
+                                value={[groupBy ?? '']}
+                                options={[{value: '', content: i18n('none')}, ...groupByOptions]}
+                                onUpdate={([value]) =>
+                                    setQuery(
+                                        disks
+                                            ? {ddisksGroupBy: value || undefined}
+                                            : {nbsGroupBy: value || undefined},
+                                        'replaceIn',
+                                    )
+                                }
+                            />
                             <Text>{i18n('sort')}</Text>
                             <Select
                                 aria-label={i18n('sort')}
@@ -222,6 +251,27 @@ export function NbsStorage({disks, scrollContainerRef}: PaginatedStorageProps & 
                                 {i18n('problems')}
                             </Checkbox>
                         </Flex>
+                        {(nodeId !== undefined || pdiskId !== undefined) && (
+                            <Flex alignItems="center" gap={2}>
+                                {nodeId !== undefined && (
+                                    <Text>{i18n('location-node', {nodeId})}</Text>
+                                )}
+                                {pdiskId !== undefined && (
+                                    <Text>{i18n('location-pdisk', {pdiskId})}</Text>
+                                )}
+                                <Button
+                                    view="flat"
+                                    onClick={() =>
+                                        setQuery(
+                                            {ddisksNodeId: undefined, ddisksPDiskId: undefined},
+                                            'replaceIn',
+                                        )
+                                    }
+                                >
+                                    {i18n('clear-location')}
+                                </Button>
+                            </Flex>
+                        )}
                         {!disks && <Text color="secondary">{i18n('usage-help')}</Text>}
                     </Flex>
                 }
@@ -235,7 +285,7 @@ export function NbsStorage({disks, scrollContainerRef}: PaginatedStorageProps & 
                                         key={name}
                                         title={groupTitle(name)}
                                         count={count}
-                                        entityName={i18n('nbs-tablets')}
+                                        entityName={i18n(disks ? 'ddisks' : 'nbs-tablets')}
                                         expanded={Boolean(expandedGroups[name])}
                                         onIsExpandedChange={(_, expanded) =>
                                             setIsGroupExpanded(name, expanded)
