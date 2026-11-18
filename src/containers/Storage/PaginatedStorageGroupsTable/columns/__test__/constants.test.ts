@@ -4,6 +4,7 @@ import {
     STORAGE_GROUPS_COLUMNS_IDS,
     getStorageGroupsColumnSortField,
     getStorageGroupsGroupByOptions,
+    storageGroupsGroupByParamSchema,
 } from '../constants';
 
 describe('storage groups capacity column contracts', () => {
@@ -24,10 +25,21 @@ describe('storage groups capacity column contracts', () => {
         expect(disabledOptionValues).not.toContain('CapacityAlert');
     });
 
-    test('hides Pile Name group-by when bridge mode is disabled', () => {
+    test('hides bridge groupings when bridge mode is disabled', () => {
         const optionValues = getStorageGroupsGroupByOptions(true, false).map(({value}) => value);
 
         expect(optionValues).not.toContain('PileName');
+        expect(optionValues).not.toContain('BridgeSyncStatus');
+    });
+
+    test('accepts sync-status grouping and hides it on unsupported backends', () => {
+        expect(storageGroupsGroupByParamSchema.parse('BridgeSyncStatus')).toBe('BridgeSyncStatus');
+        expect(getStorageGroupsGroupByOptions(false, true).map(({value}) => value)).toContain(
+            'BridgeSyncStatus',
+        );
+        const legacy = getStorageGroupsGroupByOptions(false, true, false).map(({value}) => value);
+        expect(legacy).toContain('PileName');
+        expect(legacy).not.toContain('BridgeSyncStatus');
     });
 
     test.each([

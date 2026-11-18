@@ -3,6 +3,8 @@ import React from 'react';
 import {
     useBlobStorageCapacityMetricsEnabled,
     useBridgeModeEnabled,
+    useStorageGroupsHandlerHasBridgeMode,
+    useStorageGroupsHandlerHasBridgeSyncStatus,
 } from '../../../../store/reducers/capabilities/hooks';
 import {VISIBLE_ENTITIES} from '../../../../store/reducers/storage/constants';
 import {VDisksGroupBy} from '../../../../utils/disks/groupBy';
@@ -42,8 +44,10 @@ export function useStorageGroupsSelectedColumns({
 }: GetStorageGroupsColumnsParams) {
     const isUserAllowedToMakeChanges = useIsUserAllowedToMakeChanges();
     const isViewerUser = useIsViewerUser();
-    const bridgeModeEnabled = useBridgeModeEnabled();
     const blobMetricsEnabled = useBlobStorageCapacityMetricsEnabled();
+    const bridgeModeEnabled = useBridgeModeEnabled();
+    const handlerHasBridgeMode = useStorageGroupsHandlerHasBridgeMode();
+    const handlerHasBridgeSyncStatus = useStorageGroupsHandlerHasBridgeSyncStatus();
     const isStorageExpertMode = useIsStorageExpertMode();
     const vdisksGroupBy = useVDisksGroupByParam();
     const pdisksGroupBy = usePDisksGroupByParam();
@@ -51,12 +55,25 @@ export function useStorageGroupsSelectedColumns({
     const isAllVDisksLayout = isStorageExpertMode && vdisksGroupBy === VDisksGroupBy.All;
     const isAllPDisksLayout = isStorageExpertMode && pdisksGroupBy === PDisksGroupBy.All;
 
-    const skippedColumnIds = React.useMemo(() => {
-        const skipped: StorageGroupsColumnId[] = [];
+    const bridgeColumns = React.useMemo(
+        () => [
+            {
+                id: STORAGE_GROUPS_COLUMNS_IDS.BridgeMode,
+                available: bridgeModeEnabled && handlerHasBridgeMode,
+            },
+            {id: STORAGE_GROUPS_COLUMNS_IDS.PileName, available: bridgeModeEnabled},
+            {
+                id: STORAGE_GROUPS_COLUMNS_IDS.BridgeSyncStatus,
+                available: bridgeModeEnabled && handlerHasBridgeSyncStatus,
+            },
+        ],
+        [bridgeModeEnabled, handlerHasBridgeMode, handlerHasBridgeSyncStatus],
+    );
 
-        if (!bridgeModeEnabled) {
-            skipped.push(STORAGE_GROUPS_COLUMNS_IDS.PileName);
-        }
+    const skippedColumnIds = React.useMemo(() => {
+        const skipped: StorageGroupsColumnId[] = bridgeColumns
+            .filter(({available}) => !available)
+            .map(({id}) => id);
 
         if (!isUserAllowedToMakeChanges) {
             skipped.push(...MONITORING_USER_COLUMNS_IDS);
@@ -67,7 +84,7 @@ export function useStorageGroupsSelectedColumns({
         }
 
         return skipped;
-    }, [bridgeModeEnabled, isUserAllowedToMakeChanges, isViewerUser]);
+    }, [bridgeColumns, isUserAllowedToMakeChanges, isViewerUser]);
 
     const columns = React.useMemo(() => {
         const allColumns = getStorageGroupsColumns({
@@ -104,13 +121,11 @@ export function useStorageGroupsSelectedColumns({
             ? [...DEFAULT_STORAGE_GROUPS_COLUMNS, STORAGE_GROUPS_COLUMNS_IDS.VDisksPDisks]
             : DEFAULT_STORAGE_GROUPS_COLUMNS;
 
-        if (!bridgeModeEnabled) {
-            return defaultStorageGroupsColumns;
-        }
-        return defaultStorageGroupsColumns.includes(STORAGE_GROUPS_COLUMNS_IDS.PileName)
-            ? defaultStorageGroupsColumns
-            : [...defaultStorageGroupsColumns, STORAGE_GROUPS_COLUMNS_IDS.PileName];
-    }, [bridgeModeEnabled, isStorageExpertMode]);
+        return [
+            ...defaultStorageGroupsColumns,
+            ...bridgeColumns.filter(({available}) => available).map(({id}) => id),
+        ];
+    }, [bridgeColumns, isStorageExpertMode]);
 
     const selectedColumns = useSelectedColumns(
         columns,

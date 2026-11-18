@@ -1,3 +1,4 @@
+import type {BridgeSyncStatus} from './cluster';
 import type {BackendSortParam, SchemaPathParam} from './common';
 import type {ECapacityAlert, EFlag} from './enums';
 import type {EDecommitStatus, EDriveStatus, EMaintenanceStatus, TPDiskStateInfo} from './pdisk';
@@ -41,7 +42,28 @@ export interface TStorageGroupStateInfo {
     FailedDomainsPerRealm?: number[];
 }
 
-export interface TGroupsStorageGroupInfo {
+export interface TBridgeGroupLink {
+    GroupId?: string;
+    PileName?: string;
+}
+
+export interface TBridgeGroupSyncInfo {
+    BridgeMode?: boolean;
+    BridgeSyncStatus?: BridgeSyncStatus;
+    BridgeGroups?: TBridgeGroupLink[];
+    BridgeSyncLastError?: string;
+    /** Unix microseconds. */
+    BridgeSyncLastErrorTimestamp?: string;
+    /** Unix microseconds. */
+    BridgeSyncLastProgressTimestamp?: string;
+    /** uint64, blob bytes per second. */
+    BridgeSyncCopyBytesPerSecond?: string;
+    /** uint64, a lower bound until the estimate is complete. */
+    BridgeSyncRemainingBytes?: string;
+    BridgeSyncRemainingBytesComplete?: boolean;
+}
+
+export interface TGroupsStorageGroupInfo extends TBridgeGroupSyncInfo {
     GroupId?: string;
     /** uint64 */
     GroupGeneration?: string;
@@ -174,6 +196,9 @@ export type Erasure = 'none' | 'block-4-2' | 'mirror-3-dc' | 'mirror-3of4';
  */
 export type GroupsSortField =
     | 'PoolName'
+    | 'PileName'
+    | 'BridgeMode'
+    | 'BridgeSyncStatus'
     | 'Kind'
     | 'MediaType'
     | 'Erasure'
@@ -209,6 +234,7 @@ export type GroupsGroupByField =
     | 'DiskSpaceUsage'
     | 'PoolName'
     | 'PileName'
+    | 'BridgeSyncStatus'
     | 'Kind'
     | 'Encryption'
     | 'MediaType'
@@ -221,6 +247,15 @@ export type GroupsRequiredField =
     | 'GroupId' // always required
     | 'PoolName'
     | 'PileName'
+    | 'BridgeMode'
+    | 'BridgeSyncStatus'
+    | 'BridgeGroups'
+    | 'BridgeSyncLastError'
+    | 'BridgeSyncLastErrorTimestamp'
+    | 'BridgeSyncLastProgressTimestamp'
+    | 'BridgeSyncCopyBytesPerSecond'
+    | 'BridgeSyncRemainingBytes'
+    | 'BridgeSyncRemainingBytesComplete'
     | 'Kind'
     | 'MediaType'
     | 'Erasure'

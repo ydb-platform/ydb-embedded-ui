@@ -9,7 +9,6 @@ import {Search} from '../../../components/Search/Search';
 import {
     useBlobStorageCapacityMetricsAvailable,
     useBlobStorageCapacityMetricsEnabled,
-    useBridgeModeEnabled,
 } from '../../../store/reducers/capabilities/hooks';
 import {SETTING_KEYS} from '../../../store/reducers/settings/constants';
 import {useSetting} from '../../../utils/hooks';
@@ -25,6 +24,8 @@ import {StorageVisibleEntitiesFilter} from '../StorageVisibleEntitiesFilter/Stor
 import i18n from '../i18n';
 import {b} from '../shared';
 import {useIsStorageExpertMode, useStorageQueryParams} from '../useStorageQueryParams';
+
+import {useStorageGroupsBridgeGrouping} from './useStorageGroupsBridgeGrouping';
 
 interface StorageControlsProps {
     withTypeSelector?: boolean;
@@ -70,16 +71,26 @@ export function StorageGroupsControls({
     );
     const isStorageExpertMode = useIsStorageExpertMode();
     const storageExpertModeAvailable = useBlobStorageCapacityMetricsAvailable();
-    const bridgeModeEnabled = useBridgeModeEnabled();
     const blobMetricsEnabled = useBlobStorageCapacityMetricsEnabled();
+    const {bridgeModeEnabled, bridgeSyncGroupingAvailable} = useStorageGroupsBridgeGrouping();
 
     const isVDisksPDisksColumnVisible = React.useMemo(() => {
         return columns.some((column) => column.name === STORAGE_GROUPS_COLUMNS_IDS.VDisksPDisks);
     }, [columns]);
 
     const groupByOptions = React.useMemo(() => {
-        return getStorageGroupsGroupByOptions(blobMetricsEnabled, bridgeModeEnabled);
-    }, [bridgeModeEnabled, blobMetricsEnabled]);
+        return getStorageGroupsGroupByOptions(
+            blobMetricsEnabled,
+            bridgeModeEnabled,
+            bridgeSyncGroupingAvailable,
+        );
+    }, [bridgeModeEnabled, blobMetricsEnabled, bridgeSyncGroupingAvailable]);
+
+    const groupByValue =
+        storageGroupsGroupByParam &&
+        groupByOptions.some(({value}) => value === storageGroupsGroupByParam)
+            ? [storageGroupsGroupByParam]
+            : [];
 
     const handleGroupBySelectUpdate = (value: string[]) => {
         handleStorageGroupsGroupByParamChange(value[0]);
@@ -118,9 +129,7 @@ export function StorageGroupsControls({
                             qa="storage-groups-group-by"
                             placeholder={'-'}
                             width={150}
-                            defaultValue={
-                                storageGroupsGroupByParam ? [storageGroupsGroupByParam] : undefined
-                            }
+                            value={groupByValue}
                             onUpdate={handleGroupBySelectUpdate}
                             options={groupByOptions}
                         />

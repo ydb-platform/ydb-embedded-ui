@@ -85,6 +85,8 @@ test('Describe preserves expanded and collapsed fields when switching objects', 
 });
 
 test('Describe closes Full value when the object changes', async ({page}) => {
+    // Keep the long value's button visible without horizontal scrolling in WebKit.
+    await page.setViewportSize({width: 1440, height: 900});
     const {waitForDelayedDescribe, releaseDescribe} = await mockDescribe(page);
     const describe = await openDescribe(page);
 

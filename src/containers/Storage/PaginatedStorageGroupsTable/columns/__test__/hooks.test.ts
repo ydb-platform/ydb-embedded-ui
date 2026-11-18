@@ -15,6 +15,8 @@ import {useStorageGroupsSelectedColumns} from '../hooks';
 jest.mock('../../../../../store/reducers/capabilities/hooks', () => ({
     useBlobStorageCapacityMetricsEnabled: jest.fn(),
     useBridgeModeEnabled: jest.fn(),
+    useStorageGroupsHandlerHasBridgeMode: () => false,
+    useStorageGroupsHandlerHasBridgeSyncStatus: () => false,
 }));
 
 jest.mock('../../../../../utils/hooks/useIsUserAllowedToMakeChanges', () => ({
