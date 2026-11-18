@@ -85,13 +85,25 @@ async function analyze(editor: QueryEditor) {
 }
 
 test.describe('Query editor regressions @query-editor-redesign', () => {
-    test('keeps New query inside a narrow editor pane', async ({page}) => {
-        await openEditor(page);
+    test('New query stays beside Run on desktop and usable in a narrow pane', async ({page}) => {
         await page.setViewportSize({width: 1440, height: 900});
-        const toolbar = page.locator('.ydb-query-editor-controls');
-        await expect(toolbar).toHaveCSS('height', '60px');
-        await page.setViewportSize({width: 560, height: 800});
+        const editor = await openEditor(page);
+        const run = editor.getQueryActionButton(ButtonNames.Run);
         const newQuery = page.getByTestId('new-sql-dropdown-switcher');
+        await expect
+            .poll(() =>
+                run.or(newQuery).evaluateAll((buttons) => {
+                    const [first, second] = buttons.map((button) => button.getBoundingClientRect());
+                    return (
+                        buttons.length === 2 &&
+                        first.top < second.bottom &&
+                        second.top < first.bottom
+                    );
+                }),
+            )
+            .toBe(true);
+
+        await page.setViewportSize({width: 560, height: 800});
         await expect(newQuery).toBeInViewport({ratio: 1});
         await newQuery.click();
         await expect(page.getByRole('menuitem', {name: 'Tables', exact: true})).toBeVisible();

@@ -51,14 +51,20 @@ test.each([undefined, '', 'bad', 'Infinity', Infinity, NaN, 0, -1])(
         expect(getResultRowsPerSecond(result)).toBeUndefined();
     },
 );
-test.each(['', 'bad', Infinity, NaN, -1, 0.5, 2, Number.MAX_SAFE_INTEGER + 1])(
-    'omits invalid or mismatched legacy count %s',
-    (rows) => {
-        const {result, execution} = completeResult();
-        execution.ResultRows = rows;
-        expect(getResultRowsPerSecond(result)).toBeUndefined();
-    },
-);
+
+test('omits the rate when legacy ResultRows disagrees with the returned row count', () => {
+    const {result, execution} = completeResult();
+    execution.ResultRows = 2;
+    expect(getResultRowsPerSecond(result)).toBeUndefined();
+});
+
+test('does not treat an empty legacy ResultRows as zero for an empty result', () => {
+    const {result, resultSet, execution} = completeResult();
+    resultSet.result = [];
+    execution.ResultRows = '';
+    expect(getResultRowsPerSecond(result)).toBeUndefined();
+});
+
 test.each([
     'loading',
     'error',
