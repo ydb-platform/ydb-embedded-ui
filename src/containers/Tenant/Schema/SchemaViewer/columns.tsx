@@ -1,7 +1,8 @@
 import DataTable from '@gravity-ui/react-data-table';
-import {Icon} from '@gravity-ui/uikit';
+import {Icon, Label} from '@gravity-ui/uikit';
 
 import {EColumnCodec} from '../../../../types/api/schema';
+import {EMPTY_DATA_PLACEHOLDER} from '../../../../utils/constants';
 import {getColumnWidth} from '../../../../utils/getColumnWidth';
 
 import i18n from './i18n';
@@ -23,6 +24,7 @@ const SCHEMA_TABLE_COLUMS_IDS = {
     familyName: 'familyName',
     prefferedPoolKind: 'prefferedPoolKind',
     columnCodec: 'columnCodec',
+    dictionaryEncoding: 'dictionaryEncoding',
 } satisfies Record<string, keyof SchemaData>;
 
 const idColumn: SchemaColumn = {
@@ -168,6 +170,23 @@ const compressionColumn: SchemaColumn = {
     render: ({row}) => row.columnCodec,
 };
 
+const encodingColumn: SchemaColumn = {
+    name: SCHEMA_TABLE_COLUMS_IDS.dictionaryEncoding,
+    get header() {
+        return i18n('field_encoding');
+    },
+    width: 130,
+    defaultOrder: DataTable.DESCENDING,
+    render: ({row}) =>
+        row.dictionaryEncoding === true ? (
+            <Label theme="info" size="s">
+                {i18n('value_dictionary')}
+            </Label>
+        ) : (
+            EMPTY_DATA_PLACEHOLDER
+        ),
+};
+
 const WIDTH_PREDICTION_ROWS_COUNT = 100;
 
 function normalizeColumns(columns: SchemaColumn[], data?: SchemaData[]) {
@@ -199,7 +218,7 @@ export function getExternalTableColumns(data?: SchemaData[]): SchemaColumn[] {
 }
 export function getColumnTableColumns(data?: SchemaData[]): SchemaColumn[] {
     return normalizeColumns(
-        [idColumn, nameColumn, typeColumn, notNullColumn, compressionColumn],
+        [idColumn, nameColumn, typeColumn, notNullColumn, compressionColumn, encodingColumn],
         data,
     );
 }
