@@ -16,7 +16,11 @@ import {TableColumnSetup} from '../../components/TableColumnSetup/TableColumnSet
 import {TableWithControlsLayout} from '../../components/TableWithControlsLayout/TableWithControlsLayout';
 import {TenantNameWrapper} from '../../components/TenantNameWrapper/TenantNameWrapper';
 import {getTenantLink} from '../../components/TenantNameWrapper/utils';
-import {useBridgeModeEnabled, useEmMetaAvailable} from '../../store/reducers/capabilities/hooks';
+import {
+    useBridgeModeEnabled,
+    useEmMetaAvailable,
+    useViewerTenantInfoHasBridgeFields,
+} from '../../store/reducers/capabilities/hooks';
 import {useClusterBaseInfo} from '../../store/reducers/cluster/cluster';
 import {SETTING_KEYS} from '../../store/reducers/settings/constants';
 import {
@@ -138,6 +142,8 @@ export const TenantsTable = ({
 
     const isCreateDBAvailable = useEmMetaAvailable() && uiFactory.onCreateDB !== undefined;
     const bridgeModeEnabled = useBridgeModeEnabled();
+    const tenantInfoHasBridgeFields = useViewerTenantInfoHasBridgeFields();
+    const bridgeColumnsAvailable = bridgeModeEnabled && tenantInfoHasBridgeFields;
 
     const {domain: domainRoot} = useClusterBaseInfo();
 
@@ -257,7 +263,7 @@ export const TenantsTable = ({
                     </Label>
                 ),
             },
-            ...(bridgeModeEnabled ? getDatabaseBridgeColumns() : []),
+            ...(bridgeColumnsAvailable ? getDatabaseBridgeColumns() : []),
             {
                 name: DATABASES_COLUMNS_IDS.CPU,
                 header: DATABASES_COLUMNS_TITLES[DATABASES_COLUMNS_IDS.CPU],
@@ -354,7 +360,7 @@ export const TenantsTable = ({
 
         return columns;
     }, [
-        bridgeModeEnabled,
+        bridgeColumnsAvailable,
         clusterName,
         additionalTenantsProps,
         environmentName,
