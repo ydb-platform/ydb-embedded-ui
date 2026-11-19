@@ -1,5 +1,22 @@
 # Changelog
 
+## [22.11.0](https://github.com/ydb-platform/ydb-embedded-ui/compare/v22.10.0...v22.11.0) (2026-11-19)
+
+
+### Features
+
+* **bridge:** add database and storage group sync columns ([#4602](https://github.com/ydb-platform/ydb-embedded-ui/issues/4602)) ([7262968](https://github.com/ydb-platform/ydb-embedded-ui/commit/7262968c8aa18a6eeb834b04042749273c565662))
+* **cluster:** update bridge pile cards ([#4590](https://github.com/ydb-platform/ydb-embedded-ui/issues/4590)) ([7cc919c](https://github.com/ydb-platform/ydb-embedded-ui/commit/7cc919cdea3fc1449627cd074d1a195b78fb98d4))
+* **storage:** show bridge sync details on the group page ([#4605](https://github.com/ydb-platform/ydb-embedded-ui/issues/4605)) ([ed91f20](https://github.com/ydb-platform/ydb-embedded-ui/commit/ed91f20c49e77848cb454655e868461ac9243570))
+
+
+### Bug Fixes
+
+* preserve backslashes in streaming query actions ([#4612](https://github.com/ydb-platform/ydb-embedded-ui/issues/4612)) ([0881423](https://github.com/ydb-platform/ydb-embedded-ui/commit/0881423ab4c2ed9ed442d292ae7dfb1d60b8652f))
+* **query:** correct result rates and fit narrow editor toolbars ([#4613](https://github.com/ydb-platform/ydb-embedded-ui/issues/4613)) ([94749c8](https://github.com/ydb-platform/ydb-embedded-ui/commit/94749c8f6332fcb8f30c2975d7200f2942531a3b))
+* **query:** keep editor controls and resize divider accessible ([#4601](https://github.com/ydb-platform/ydb-embedded-ui/issues/4601)) ([cca4e65](https://github.com/ydb-platform/ydb-embedded-ui/commit/cca4e65f1ffe33769c2ded08e57d5378d5f223ca))
+* **tenants:** gate bridge columns by viewer capability ([#4616](https://github.com/ydb-platform/ydb-embedded-ui/issues/4616)) ([882e494](https://github.com/ydb-platform/ydb-embedded-ui/commit/882e4941ae67744a71d6de8d777bf618747d96e7))
+
 ## [22.10.0](https://github.com/ydb-platform/ydb-embedded-ui/compare/v22.9.0...v22.10.0) (2026-11-17)
 
 
