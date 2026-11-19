@@ -41,6 +41,10 @@
         padding-bottom: 0;
     }
 
+    > .kv-split > .gutter {
+        flex-shrink: 0;
+    }
+
     &__monaco {
         position: relative;
 

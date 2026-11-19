@@ -271,6 +271,30 @@ test.describe('Test Query Editor', async () => {
         const explainSchema = await queryEditor.getExplainResult(ExplainResultType.Graph);
         await expect.poll(() => isGraphContentInsideViewport(explainSchema)).toBe(true);
 
+        const editorPane = page.locator('.query-editor__pane-wrapper_top');
+        const divider = page.locator('.query-editor > .kv-split > .gutter');
+        const {x, y} = await editorPane.evaluate((element) => {
+            const rect = element.getBoundingClientRect();
+            return {x: rect.x + rect.width / 2, y: rect.y};
+        });
+        await divider.hover();
+        await page.mouse.down();
+        await page.mouse.move(x, y, {steps: 8});
+        await page.mouse.up();
+        await expect
+            .poll(() => editorPane.evaluate((element) => element.getBoundingClientRect().height))
+            .toBe(160);
+        await page.getByRole('button', {name: 'Run', exact: true}).click({trial: true});
+
+        const collapsedHeight = await editorPane.evaluate((element) => element.clientHeight);
+        await divider.hover();
+        await page.mouse.down();
+        await page.mouse.move(x, y + collapsedHeight + 120, {steps: 8});
+        await page.mouse.up();
+        await expect
+            .poll(() => editorPane.evaluate((element) => element.clientHeight))
+            .toBeGreaterThan(collapsedHeight + 80);
+
         await explainSchema.evaluate((element) => {
             element.setAttribute('style', 'width: 320px; height: 180px');
         });

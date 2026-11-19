@@ -84,6 +84,8 @@ import './QueryEditor.scss';
 const b = cn('query-editor');
 
 const STOP_APPEAR_TIMEOUT = 400;
+const MIN_EDITOR_HEIGHT = 160;
+const MIN_RESULTS_HEIGHT = 52;
 
 const initialTenantCommonInfoState = {
     triggerExpand: false,
@@ -678,11 +680,12 @@ export default function QueryEditor({
                     defaultSizePaneKey={DEFAULT_SIZE_RESULT_PANE_KEY}
                     triggerCollapse={resultVisibilityState.triggerCollapse}
                     triggerExpand={resultVisibilityState.triggerExpand}
-                    minSize={[0, 52]}
+                    minSize={[MIN_EDITOR_HEIGHT, MIN_RESULTS_HEIGHT]}
                     collapsedSizes={[100, 0]}
                     onSplitStartDragAdditional={onSplitStartDragAdditional}
                 >
                     <div
+                        style={{minHeight: MIN_EDITOR_HEIGHT}}
                         className={b('pane-wrapper', {
                             top: true,
                             loading: isMultiTabQueryEditorEnabled && !isEditorReady,
