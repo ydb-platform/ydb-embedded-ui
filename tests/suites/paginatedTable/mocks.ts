@@ -24,7 +24,7 @@ export const generateNodeMock = async ({offset, limit}: NodeMockOptions) => {
             MemoryUsed: ((8 + (i % 4)) * 1024 * 1024 * 1024).toString(), // 8-12GB
             MemoryLimit: (16 * 1024 * 1024 * 1024).toString(), // 16GB
             TotalSessions: 100,
-            Tenants: ['local'],
+            Tenants: ['/local'],
         },
         CpuUsage: 10 + (i % 20),
         UptimeSeconds: 4 * 60 * 60, // 4 hours
