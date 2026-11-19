@@ -25,6 +25,7 @@ export type Capability =
     | '/viewer/feature_flags'
     | '/viewer/config'
     | '/viewer/cluster'
+    | '/viewer/tenantinfo'
     | '/vdisk/blobindexstat'
     | '/viewer/nodes'
     | '/viewer/nodes/alive'
