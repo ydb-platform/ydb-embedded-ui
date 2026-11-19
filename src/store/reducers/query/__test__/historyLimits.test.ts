@@ -1,5 +1,3 @@
-import {TextEncoder} from 'util';
-
 import {appendQueryToHistory, limitQueryHistory} from '../historyLimits';
 
 function requestBodyBytes(history: unknown[]) {
@@ -7,12 +5,6 @@ function requestBodyBytes(history: unknown[]) {
 }
 
 describe('query history size limits', () => {
-    beforeAll(() => {
-        if (typeof globalThis.TextEncoder === 'undefined') {
-            Object.defineProperty(globalThis, 'TextEncoder', {value: TextEncoder});
-        }
-    });
-
     it('skips a large new query without changing the previous history', () => {
         const history = [{queryText: 'SELECT 1;', queryId: 'old'}];
         const query = {queryText: 'a'.repeat(839_000), queryId: 'new'};

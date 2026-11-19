@@ -3,6 +3,7 @@ import type {ValueOf} from '../../../types/common';
 import {AclSyntax} from '../../../utils/constants';
 import {Lang} from '../../../utils/i18n';
 import {DEFAULT_QUERY_SETTINGS, QUERY_ACTIONS} from '../../../utils/query';
+import {limitQueryHistory} from '../query/historyLimits';
 import {STORAGE_TYPES} from '../storage/constants';
 import {TENANT_PAGES_IDS} from '../tenant/constants';
 
@@ -98,5 +99,8 @@ export const DEFAULT_USER_SETTINGS = {
 export const SETTINGS_OPTIONS: Record<string, SettingOptions | undefined> = {
     [SETTING_KEYS.THEME]: {
         preventBatching: true,
+    },
+    [SETTING_KEYS.QUERIES_HISTORY]: {
+        normalizeForMigration: (value) => (Array.isArray(value) ? limitQueryHistory(value) : value),
     },
 } as const;

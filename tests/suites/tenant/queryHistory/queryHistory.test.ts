@@ -47,9 +47,21 @@ test.describe('Query History', () => {
     });
 
     test('Executes an oversized query without adding it to history', async ({page}) => {
+        await page.evaluate(() => {
+            const setItem = Storage.prototype.setItem;
+            Storage.prototype.setItem = function (key, value) {
+                if (this === localStorage && key === 'queries_history') {
+                    throw new DOMException('Storage is full', 'QuotaExceededError');
+                }
+                setItem.call(this, key, value);
+            };
+        });
+
         const previousQuery = 'SELECT 11 AS kept_in_history;';
         await queryEditor.run(previousQuery, QUERY_MODES.script);
         await queryEditor.waitForStatus('Completed');
+        const localSaveWarning = page.getByText('Could not save settings in this browser.');
+        await expect(localSaveWarning).toBeVisible();
 
         const largeQuery = `/* ${'\\'.repeat(215_000)} */ SELECT 72 AS oversized_for_history;`;
         await page.evaluate((text) => window.ydbEditor?.setValue(text), largeQuery);
@@ -58,6 +70,7 @@ test.describe('Query History', () => {
         await expect(
             page.getByText('The query is too large to be added to query history automatically.'),
         ).toBeVisible();
+        await expect(localSaveWarning).toBeHidden();
         await queryEditor.waitForStatus('Completed');
         expect(await queryEditor.resultTable.getCellValue(1, 2)).toBe('72');
 

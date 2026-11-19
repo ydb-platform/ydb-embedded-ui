@@ -8,13 +8,12 @@ import type {
 import {serializeReduxError} from '../../../utils/errors/serializeReduxError';
 import type {AppDispatch} from '../../defaultStore';
 import {api} from '../api';
-import {limitQueryHistory} from '../query/historyLimits';
 
 import {
     shouldSnapshotBeforeOverwriteLocalStorage,
     snapshotLocalStorageToRemoteOnce,
 } from './RemoteLocalStorageSnapshot';
-import {SETTINGS_OPTIONS, SETTING_KEYS} from './constants';
+import {SETTINGS_OPTIONS} from './constants';
 import {
     applyRemoteSettingToStoreAndLocalStorage,
     getLocalStorageValueToMigrateIfRemoteMissing,
@@ -25,10 +24,15 @@ import {shouldSyncSettingToLS, stringifySettingValue} from './utils';
 const REMOTE_WRITE_DEBOUNCE_MS = 200;
 const REMOTE_WRITE_IN_FLIGHT_TIMEOUT_MS = 10_000;
 
+export const REMOTE_SETTINGS_WRITE_TIMEOUT_ERROR = 'RemoteSettingsWriteTimeoutError';
+
 async function withTimeout<T>(promise: Promise<T>, ms: number): Promise<T> {
     return new Promise<T>((resolve, reject) => {
         const timeoutId = window.setTimeout(() => {
-            reject(new Error('Remote settings write timed out'));
+            // Release the queue even if the HTTP write is still pending.
+            const error = new Error('Remote settings write timed out');
+            error.name = REMOTE_SETTINGS_WRITE_TIMEOUT_ERROR;
+            reject(error);
         }, ms);
 
         promise
@@ -146,10 +150,8 @@ function scheduleLocalStorageMigrationToRemoteIfMissing(args: {
 
     const promise = (async () => {
         try {
-            const value =
-                name === SETTING_KEYS.QUERIES_HISTORY && Array.isArray(valueToMigrate)
-                    ? limitQueryHistory(valueToMigrate)
-                    : valueToMigrate;
+            const normalize = SETTINGS_OPTIONS[name]?.normalizeForMigration;
+            const value = normalize ? normalize(valueToMigrate) : valueToMigrate;
             const data = await resolved.client.setSingleSetting({
                 name,
                 value: stringifySettingValue(value),

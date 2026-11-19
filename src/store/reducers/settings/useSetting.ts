@@ -5,14 +5,15 @@ import {skipToken} from '@reduxjs/toolkit/query';
 import {useTypedDispatch} from '../../../utils/hooks/useTypedDispatch';
 import {useTypedSelector} from '../../../utils/hooks/useTypedSelector';
 
-import {settingsApi} from './api';
+import {REMOTE_SETTINGS_WRITE_TIMEOUT_ERROR, settingsApi} from './api';
 import {getSettingValue, setSettingValue} from './settings';
+import type {SettingSaveTarget} from './types';
 
 type SaveSettingValue<T> = (value: T | undefined) => void;
 
 export function useSetting<T>(
     name?: string,
-    onSaveError?: () => void,
+    onSaveError?: (target: SettingSaveTarget) => void,
 ): {
     value: T | undefined;
     saveValue: SaveSettingValue<T>;
@@ -40,11 +41,23 @@ export function useSetting<T>(
             if (remoteAvailable) {
                 const saveRequest = setMetaSetting({name, value});
                 if (onSaveError) {
-                    saveRequest.unwrap().catch(onSaveError);
+                    saveRequest.unwrap().catch((error: unknown) => {
+                        if (
+                            error &&
+                            typeof error === 'object' &&
+                            'name' in error &&
+                            error.name === REMOTE_SETTINGS_WRITE_TIMEOUT_ERROR
+                        ) {
+                            return;
+                        }
+                        onSaveError('remote');
+                    });
                 }
                 return;
             }
-            dispatch(setSettingValue(name, value));
+            if (!dispatch(setSettingValue(name, value))) {
+                onSaveError?.('local');
+            }
         },
         [dispatch, remoteAvailable, name, onSaveError, setMetaSetting],
     );

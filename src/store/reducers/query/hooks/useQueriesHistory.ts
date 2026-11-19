@@ -3,6 +3,7 @@ import React from 'react';
 import {useEventHandler, useTypedDispatch, useTypedSelector} from '../../../../utils/hooks';
 import {sortByTimestampDescending} from '../../../../utils/sortByTimestamp';
 import {SETTING_KEYS} from '../../settings/constants';
+import type {SettingSaveTarget} from '../../settings/types';
 import {useSetting} from '../../settings/useSetting';
 import {appendQueryToHistory, limitQueryHistory} from '../historyLimits';
 import {
@@ -19,7 +20,7 @@ export function useQueriesHistory({
     onSaveError,
 }: {
     onQueryTooLarge: () => void;
-    onSaveError: () => void;
+    onSaveError: (target: SettingSaveTarget) => void;
 }) {
     const dispatch = useTypedDispatch();
     const queriesFilter = useTypedSelector(selectQueriesHistoryFilter);

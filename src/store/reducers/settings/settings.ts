@@ -63,12 +63,12 @@ export const getSettingValue = createSelector(
 
 export const setSettingValue = (name: string | undefined, value: unknown) => {
     return (dispatch: AppDispatch) => {
-        if (name) {
-            dispatch(settingsSlice.actions.setSettingValue({name, value}));
-            if (shouldSyncSettingToLS(name)) {
-                setSettingValueToLS(name, value);
-            }
+        if (!name) {
+            return true;
         }
+
+        dispatch(settingsSlice.actions.setSettingValue({name, value}));
+        return !shouldSyncSettingToLS(name) || setSettingValueToLS(name, value);
     };
 };
 

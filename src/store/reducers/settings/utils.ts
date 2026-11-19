@@ -33,15 +33,18 @@ export function readSettingValueFromLS<T = unknown>(name: string | undefined): T
         return undefined;
     }
 }
-export function setSettingValueToLS(name: string | undefined, value: unknown): void {
+export function setSettingValueToLS(name: string | undefined, value: unknown): boolean {
     if (!name) {
-        return;
+        return true;
     }
 
     try {
         const preparedValue = stringifySettingValue(value);
         localStorage.setItem(name, preparedValue);
-    } catch {}
+        return true;
+    } catch {
+        return false;
+    }
 }
 export function getSettingDefault(name: string) {
     return DEFAULT_USER_SETTINGS[name as SettingKey];

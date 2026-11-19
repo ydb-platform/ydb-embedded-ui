@@ -5,7 +5,10 @@ export interface SettingsState {
     systemSettings: SettingsObject;
 }
 
+export type SettingSaveTarget = 'local' | 'remote';
+
 export interface SettingOptions {
+    normalizeForMigration?: (value: unknown) => unknown;
     /** Save setting only to meta service */
     preventSyncWithLS?: boolean;
     /** Request setting immediatelly */

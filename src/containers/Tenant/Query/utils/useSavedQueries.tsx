@@ -6,31 +6,34 @@ import {
     syncSavedQueryTabsAfterUpdate,
 } from '../../../../store/reducers/query/query';
 import {SETTING_KEYS} from '../../../../store/reducers/settings/constants';
+import type {SettingSaveTarget} from '../../../../store/reducers/settings/types';
 import {useSetting} from '../../../../store/reducers/settings/useSetting';
 import type {SavedQuery} from '../../../../types/store/query';
-import createToast from '../../../../utils/createToast';
 import {useTypedDispatch} from '../../../../utils/hooks';
 import i18n from '../i18n';
 
 import type {RenameSavedQueryStatus} from './savedQueries';
 import {getSavedQueriesSizeError, renameSavedQueryInList, upsertSavedQuery} from './savedQueries';
+import {showQuerySettingsWarning} from './showQuerySettingsWarning';
 
 export type RenameSavedQueryResult = RenameSavedQueryStatus | 'size-limit';
 
 type UpdateSavedQueryResult = 'updated' | 'duplicate' | 'not-found' | 'size-limit';
 
-function notifySavedQueriesSyncError() {
-    createToast({
-        name: 'saved-queries-sync-error',
-        title: i18n('alert_saved-queries-sync-error'),
-        theme: 'warning',
-    });
+function notifySavedQueriesSaveError(target: SettingSaveTarget) {
+    showQuerySettingsWarning(
+        i18n(
+            target === 'local'
+                ? 'alert_query-settings-local-save-error'
+                : 'alert_saved-queries-sync-error',
+        ),
+    );
 }
 
 export function useSavedQueries() {
     const {value: savedQueries, saveValue: saveQueries} = useSetting<SavedQuery[]>(
         SETTING_KEYS.SAVED_QUERIES,
-        notifySavedQueriesSyncError,
+        notifySavedQueriesSaveError,
     );
 
     const dispatch = useTypedDispatch();
@@ -39,15 +42,13 @@ export function useSavedQueries() {
         (queries: SavedQuery[], changedQueryName: string) => {
             const error = getSavedQueriesSizeError(queries, changedQueryName);
             if (error) {
-                createToast({
-                    name: 'saved-queries-size-limit',
-                    title: i18n(
+                showQuerySettingsWarning(
+                    i18n(
                         error === 'query-too-large'
                             ? 'alert_saved-query-too-large'
                             : 'alert_saved-queries-list-full',
                     ),
-                    theme: 'warning',
-                });
+                );
                 return false;
             }
 

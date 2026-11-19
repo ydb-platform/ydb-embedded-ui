@@ -1,5 +1,3 @@
-import {TextEncoder} from 'util';
-
 import {EMPTY_DATA_PLACEHOLDER} from '../../../../../utils/constants';
 import {
     filterSavedQueries,
@@ -10,12 +8,6 @@ import {
     renameSavedQueryInList,
     upsertSavedQuery,
 } from '../savedQueries';
-
-beforeAll(() => {
-    if (typeof globalThis.TextEncoder === 'undefined') {
-        Object.defineProperty(globalThis, 'TextEncoder', {value: TextEncoder});
-    }
-});
 
 const queries = [
     {name: 'Weekly report', body: 'SELECT * FROM weekly;', updatedAt: 100},

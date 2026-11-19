@@ -4,10 +4,10 @@ import {Helmet} from 'react-helmet-async';
 
 import {useQueriesHistory} from '../../../store/reducers/query/hooks';
 import {changeUserInput} from '../../../store/reducers/query/query';
+import type {SettingSaveTarget} from '../../../store/reducers/settings/types';
 import {TENANT_QUERY_TABS_ID} from '../../../store/reducers/tenant/constants';
 import type {EPathSubType, EPathType} from '../../../types/api/schema';
 import {cn} from '../../../utils/cn';
-import createToast from '../../../utils/createToast';
 import {useTypedDispatch, useTypedSelector} from '../../../utils/hooks';
 import {useNavigationV2Enabled} from '../utils/useNavigationV2Enabled';
 
@@ -16,6 +16,7 @@ import QueryEditor from './QueryEditor/QueryEditor';
 import {QueryTabs, queryEditorTabs} from './QueryTabs/QueryTabs';
 import {SavedQueries} from './SavedQueries/SavedQueries';
 import i18n from './i18n';
+import {showQuerySettingsWarning} from './utils/showQuerySettingsWarning';
 
 import './Query.scss';
 
@@ -23,18 +24,16 @@ const b = cn('ydb-query');
 
 const queryHistoryNotifications = {
     onQueryTooLarge() {
-        createToast({
-            name: 'query-history-query-too-large',
-            title: i18n('alert_query-too-large-for-history'),
-            theme: 'warning',
-        });
+        showQuerySettingsWarning(i18n('alert_query-too-large-for-history'));
     },
-    onSaveError() {
-        createToast({
-            name: 'query-history-save-error',
-            title: i18n('alert_query-history-save-error'),
-            theme: 'warning',
-        });
+    onSaveError(target: SettingSaveTarget) {
+        showQuerySettingsWarning(
+            i18n(
+                target === 'local'
+                    ? 'alert_query-settings-local-save-error'
+                    : 'alert_query-history-save-error',
+            ),
+        );
     },
 };
 

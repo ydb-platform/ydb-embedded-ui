@@ -1,0 +1,84 @@
+import type React from 'react';
+
+import {configureStore} from '@reduxjs/toolkit';
+import {act, renderHook} from '@testing-library/react';
+import {Provider} from 'react-redux';
+
+import type {YdbEmbeddedAPI} from '../../../../services/api';
+import type {SetSettingResponse} from '../../../../types/api/settings';
+import {settingsApi} from '../api';
+import {SETTING_KEYS} from '../constants';
+import settings from '../settings';
+import {useSetting} from '../useSetting';
+
+const originalApi = window.api;
+const settingName = SETTING_KEYS.SAVED_QUERIES;
+
+function renderSetting(onSaveError: jest.Mock) {
+    const store = configureStore({
+        reducer: {settings, [settingsApi.reducerPath]: settingsApi.reducer},
+        middleware: (getDefaultMiddleware) => getDefaultMiddleware().concat(settingsApi.middleware),
+    });
+    const wrapper = ({children}: {children: React.ReactNode}) => (
+        <Provider store={store}>{children}</Provider>
+    );
+
+    return renderHook(() => useSetting<string[]>(settingName, onSaveError), {wrapper});
+}
+
+afterEach(() => {
+    window.api = originalApi;
+    jest.useRealTimers();
+    jest.restoreAllMocks();
+    localStorage.clear();
+});
+
+test('reports storage failure while keeping the setting in memory', () => {
+    window.api = {} as YdbEmbeddedAPI;
+    jest.spyOn(Storage.prototype, 'setItem').mockImplementation(() => {
+        throw new DOMException('Storage is full', 'QuotaExceededError');
+    });
+
+    const onSaveError = jest.fn();
+    const {result} = renderSetting(onSaveError);
+    const value = ['SELECT 1;'];
+    act(() => result.current.saveValue(value));
+
+    expect(onSaveError).toHaveBeenCalledWith('local');
+    expect(result.current.value).toBe(value);
+    expect(localStorage.getItem(settingName)).toBeNull();
+});
+
+test('keeps the queue moving without notifying on its timeout', async () => {
+    jest.useFakeTimers();
+    let finishSlowWrite: ((response: SetSettingResponse) => void) | undefined;
+    const slowWrite = new Promise<SetSettingResponse>((resolve) => {
+        finishSlowWrite = resolve;
+    });
+    const setSingleSetting = jest.fn().mockReturnValueOnce(slowWrite).mockRejectedValueOnce({
+        status: 413,
+    });
+    window.api = {
+        metaSettings: {getSingleSetting: async () => '[]', setSingleSetting},
+    } as unknown as YdbEmbeddedAPI;
+
+    const onSaveError = jest.fn();
+    const {result} = renderSetting(onSaveError);
+    await act(() => jest.advanceTimersByTimeAsync(0));
+    expect(result.current.isLoading).toBe(false);
+
+    act(() => result.current.saveValue(['SELECT 1;']));
+    await act(() => jest.advanceTimersByTimeAsync(200));
+    act(() => result.current.saveValue(['SELECT 2;']));
+
+    await act(() => jest.advanceTimersByTimeAsync(10_000));
+    expect(onSaveError).not.toHaveBeenCalled();
+    expect(setSingleSetting).toHaveBeenCalledTimes(1);
+
+    await act(() => jest.advanceTimersByTimeAsync(200));
+    expect(setSingleSetting).toHaveBeenCalledTimes(2);
+    expect(onSaveError).toHaveBeenCalledTimes(1);
+    expect(onSaveError).toHaveBeenCalledWith('remote');
+    await act(async () => finishSlowWrite?.({status: 'SUCCESS'}));
+    expect(onSaveError).toHaveBeenCalledTimes(1);
+});
