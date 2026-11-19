@@ -110,6 +110,7 @@ export interface QueryResult {
     executionId: string;
     type: QueryAction;
     statisticsMode?: StatisticsMode;
+    limitRows?: number;
     data?: PreparedQueryData;
     error?: unknown;
     queryId: string;

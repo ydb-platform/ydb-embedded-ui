@@ -31,7 +31,7 @@ const makeResponse = () => ({
     plan,
     ast: '(return (Int32 1))',
     result: [{columns: [{name: 'value', type: 'Int32'}], rows: [[1]], truncated: false}],
-    stats: {DurationUs: '500000', Executions: [{ResultRows: '1', DurationUs: '500000'}]},
+    stats: {DurationUs: '500000', Executions: [{DurationUs: '500000'}]},
 });
 const svg =
     '<svg xmlns="http://www.w3.org/2000/svg" width="500" height="100"><text x="10" y="50">Current plan</text></svg>';
@@ -85,6 +85,30 @@ async function analyze(editor: QueryEditor) {
 }
 
 test.describe('Query editor regressions @query-editor-redesign', () => {
+    test('New query stays beside Run on desktop and usable in a narrow pane', async ({page}) => {
+        await page.setViewportSize({width: 1440, height: 900});
+        const editor = await openEditor(page);
+        const run = editor.getQueryActionButton(ButtonNames.Run);
+        const newQuery = page.getByTestId('new-sql-dropdown-switcher');
+        await expect
+            .poll(() =>
+                run.or(newQuery).evaluateAll((buttons) => {
+                    const [first, second] = buttons.map((button) => button.getBoundingClientRect());
+                    return (
+                        buttons.length === 2 &&
+                        first.top < second.bottom &&
+                        second.top < first.bottom
+                    );
+                }),
+            )
+            .toBe(true);
+
+        await page.setViewportSize({width: 560, height: 800});
+        await expect(newQuery).toBeInViewport({ratio: 1});
+        await newQuery.click();
+        await expect(page.getByRole('menuitem', {name: 'Tables', exact: true})).toBeVisible();
+    });
+
     test('resizes columns locally and resets widths for another view or result', async ({page}) => {
         const editor = await openEditor(page);
         await page.route(queryUrl, (route) => route.fulfill({json: makeResponse()}));

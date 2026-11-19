@@ -59,6 +59,8 @@ interface ToggleButtonProps {
     isCollapsed?: boolean;
     initialDirection?: 'right' | 'left' | 'top' | 'bottom';
     className?: string;
+    collapseLabel: string;
+    expandLabel: string;
 }
 
 const b = cn('kv-pane-visibility-button');
@@ -69,13 +71,16 @@ export function PaneVisibilityToggleButtons({
     isCollapsed,
     initialDirection = 'top',
     className,
+    collapseLabel,
+    expandLabel,
 }: ToggleButtonProps) {
     useResizeObserverTrigger([isCollapsed]);
     return (
         <React.Fragment>
-            <ActionTooltip title="Collapse">
+            <ActionTooltip title={collapseLabel}>
                 <Button
                     view="flat-secondary"
+                    aria-label={collapseLabel}
                     onClick={onCollapse}
                     className={b(
                         {
@@ -89,9 +94,10 @@ export function PaneVisibilityToggleButtons({
                 </Button>
             </ActionTooltip>
 
-            <ActionTooltip title="Expand">
+            <ActionTooltip title={expandLabel}>
                 <Button
                     view="flat-secondary"
+                    aria-label={expandLabel}
                     onClick={onExpand}
                     className={b(
                         {

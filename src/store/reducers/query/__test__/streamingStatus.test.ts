@@ -196,6 +196,18 @@ describe('Streaming query status transitions', () => {
         expect(state.tabsById['tab-1'].result?.isLoading).toBe(true);
     });
 
+    test('keeps truncation across separately dispatched batches for a result set', () => {
+        const chunk: StreamDataChunk = {
+            meta: {event: 'StreamData', seq_no: 0, result_index: 0},
+            result: {columns: [{name: 'id', type: 'Uint64'}], rows: [['1']], truncated: true},
+        };
+        const addChunk = (next: StreamDataChunk) =>
+            addStreamingChunks({tabId: 'tab-1', executionId: EXECUTION_ID, chunks: [next]});
+        const first = queryReducer(createStateWithStreamingResult(), addChunk(chunk));
+        const final = queryReducer(first, addChunk({...chunk, result: {rows: [['2']]}}));
+        expect(final.tabsById['tab-1'].result?.data?.resultSets?.[0]?.truncated).toBe(true);
+    });
+
     test('setStreamQueryResponse should clear streaming status', () => {
         const initialState = createStateWithStreamingResult();
         initialState.tabsById['tab-1'].result!.streamingStatus = 'fetching';

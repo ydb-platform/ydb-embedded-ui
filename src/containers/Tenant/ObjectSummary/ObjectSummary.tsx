@@ -460,6 +460,8 @@ export function ObjectSummary({
                     title={i18n('action_copySchemaPath')}
                 />
                 <PaneVisibilityToggleButtons
+                    collapseLabel={i18n('action_collapse-object-details')}
+                    expandLabel={i18n('action_expand-object-details')}
                     onCollapse={onCollapseInfoHandler}
                     onExpand={onExpandInfoHandler}
                     isCollapsed={commonInfoVisibilityState.collapsed}
@@ -536,6 +538,8 @@ export function ObjectSummary({
                 <Flex className={b('actions')} gap={0.5}>
                     {!isCollapsed && <RefreshTreeButton />}
                     <PaneVisibilityToggleButtons
+                        collapseLabel={i18n('action_collapse-navigation-panel')}
+                        expandLabel={i18n('action_expand-navigation-panel')}
                         onCollapse={onCollapseSummary}
                         onExpand={onExpandSummary}
                         isCollapsed={isCollapsed}

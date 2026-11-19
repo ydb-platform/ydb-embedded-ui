@@ -9,7 +9,6 @@ function completeResult() {
         truncated: false,
     };
     const execution: NonNullable<TKqpStatsQuery['Executions']>[number] = {
-        ResultRows: '1',
         DurationUs: '500000',
         Extra: {},
     };
@@ -22,17 +21,26 @@ function completeResult() {
         type: 'execute',
         isLoading: false,
         endTime: 1,
+        limitRows: 10000,
         data,
     };
     return {result, resultSet, execution, resultSets, executions, data};
 }
 
 test('uses matching execution statistics in microseconds, including a real zero', () => {
-    expect(getResultRowsPerSecond(completeResult().result)).toBe(2);
-    const {result, resultSet, execution} = completeResult();
+    const legacy = completeResult();
+    legacy.execution.ResultRows = '1';
+    expect(getResultRowsPerSecond(legacy.result)).toBe(2);
+    const {result, resultSet} = completeResult();
+    expect(getResultRowsPerSecond(result)).toBe(2);
     resultSet.result = [];
-    execution.ResultRows = 0;
     expect(getResultRowsPerSecond(result)).toBe(0);
+});
+
+test.each([undefined, 1, 1.5, 100_001])('omits uncertain or reached request limit %s', (limit) => {
+    const {result} = completeResult();
+    result.limitRows = limit;
+    expect(getResultRowsPerSecond(result)).toBeUndefined();
 });
 
 test.each([undefined, '', 'bad', 'Infinity', Infinity, NaN, 0, -1])(
@@ -43,14 +51,20 @@ test.each([undefined, '', 'bad', 'Infinity', Infinity, NaN, 0, -1])(
         expect(getResultRowsPerSecond(result)).toBeUndefined();
     },
 );
-test.each([undefined, '', 'bad', Infinity, NaN, -1, 0.5, 2, Number.MAX_SAFE_INTEGER + 1])(
-    'omits missing, invalid or mismatched count %s',
-    (rows) => {
-        const {result, execution} = completeResult();
-        execution.ResultRows = rows;
-        expect(getResultRowsPerSecond(result)).toBeUndefined();
-    },
-);
+
+test('omits the rate when legacy ResultRows disagrees with the returned row count', () => {
+    const {result, execution} = completeResult();
+    execution.ResultRows = 2;
+    expect(getResultRowsPerSecond(result)).toBeUndefined();
+});
+
+test('does not treat an empty legacy ResultRows as zero for an empty result', () => {
+    const {result, resultSet, execution} = completeResult();
+    resultSet.result = [];
+    execution.ResultRows = '';
+    expect(getResultRowsPerSecond(result)).toBeUndefined();
+});
+
 test.each([
     'loading',
     'error',

@@ -1,6 +1,8 @@
 {
   "description.graph-is-not-supported": "Graph can not be rendered",
   "description.empty-result": "There is no {{activeSection}} for the request",
+  "action_collapse-results": "Collapse results",
+  "action_expand-results": "Expand results",
   "action.result": "Result",
   "action.stats": "Stats",
   "action.json": "JSON",

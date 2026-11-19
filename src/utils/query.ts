@@ -408,6 +408,8 @@ export const RESOURCE_POOL_NO_OVERRIDE_VALUE = '__no_pool_override__';
 
 export type ResourcePoolValue = typeof RESOURCE_POOL_NO_OVERRIDE_VALUE | string;
 
+export const MAX_QUERY_LIMIT_ROWS = 100_000;
+
 export const DEFAULT_QUERY_SETTINGS = {
     queryMode: QUERY_MODES.query,
     transactionMode: TRANSACTION_MODES.implicit,
@@ -436,7 +438,7 @@ export const querySettingsValidationSchema = z.object({
     ),
     limitRows: z.preprocess(
         emptyStringToUndefined,
-        z.coerce.number<string | number>().gt(0).lte(100_000).optional(),
+        z.coerce.number<string | number>().gt(0).lte(MAX_QUERY_LIMIT_ROWS).optional(),
     ),
     outputChunkMaxSize: z.preprocess(
         emptyStringToUndefined,
@@ -465,7 +467,7 @@ export const querySettingsRestoreSchema = z
         limitRows: z
             .preprocess(
                 emptyStringToUndefined,
-                z.coerce.number<string | number>().gt(0).lte(100_000).optional(),
+                z.coerce.number<string | number>().gt(0).lte(MAX_QUERY_LIMIT_ROWS).optional(),
             )
             .catch(DEFAULT_QUERY_SETTINGS.limitRows),
         outputChunkMaxSize: z

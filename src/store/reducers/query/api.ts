@@ -6,6 +6,7 @@ import type {StreamDataChunk} from '../../../types/store/streaming';
 import {valueIsDefined} from '../../../utils';
 import {QUERY_TECHNICAL_MARK} from '../../../utils/constants';
 import {
+    DEFAULT_QUERY_SETTINGS,
     MAX_QUERY_TIMEOUT_SECONDS,
     RESOURCE_POOL_NO_OVERRIDE_VALUE,
     isExecutionQueryAction,
@@ -147,6 +148,7 @@ export const queryApi = api.injectEndpoints({
                 {signal, dispatch, getState},
             ) => {
                 const executionId = uuidv4();
+                const limitRows = getLimitRowsParam(querySettings.limitRows);
                 const {query: finalQuery, preparedQueryPrefixLineCount} =
                     prepareQueryWithPragmasMetadata(query, querySettings.pragmas);
                 const resultSourcePosition = sourcePosition
@@ -160,6 +162,7 @@ export const queryApi = api.injectEndpoints({
                             executionId,
                             type: 'execute',
                             statisticsMode: querySettings.statisticsMode,
+                            limitRows: limitRows ?? DEFAULT_QUERY_SETTINGS.limitRows,
                             queryId: '',
                             isLoading: true,
                             startTime,
@@ -208,7 +211,7 @@ export const queryApi = api.injectEndpoints({
                             syntax,
                             stats: querySettings.statisticsMode,
                             tracingLevel: getTracingLevelParam(querySettings, enableTracingLevel),
-                            limit_rows: getLimitRowsParam(querySettings.limitRows),
+                            limit_rows: limitRows,
                             transaction_mode: getTransactionModeParam(
                                 querySettings.transactionMode,
                             ),
@@ -241,6 +244,7 @@ export const queryApi = api.injectEndpoints({
                             // Last chunk is query response chunk
                             onQueryResponseChunk: (chunk) => {
                                 if (!isFinalized) {
+                                    cancelPendingBatch(false);
                                     dispatch(setStreamQueryResponse({tabId, executionId, chunk}));
                                 }
                             },
@@ -354,6 +358,7 @@ export const queryApi = api.injectEndpoints({
                     actionType,
                     querySettings,
                 );
+                const limitRows = getLimitRowsParam(effectiveQuerySettings.limitRows);
                 const {query: finalQuery, preparedQueryPrefixLineCount} =
                     prepareQueryWithPragmasMetadata(query, effectiveQuerySettings.pragmas);
                 const resultSourcePosition = sourcePosition
@@ -391,7 +396,7 @@ export const queryApi = api.injectEndpoints({
                                 effectiveQuerySettings,
                                 enableTracingLevel,
                             ),
-                            limit_rows: getLimitRowsParam(effectiveQuerySettings.limitRows),
+                            limit_rows: limitRows,
                             transaction_mode: getTransactionModeParam(
                                 effectiveQuerySettings.transactionMode,
                             ),
@@ -455,6 +460,7 @@ export const queryApi = api.injectEndpoints({
                                 executionId,
                                 type: actionType,
                                 statisticsMode: effectiveQuerySettings.statisticsMode,
+                                limitRows: limitRows ?? DEFAULT_QUERY_SETTINGS.limitRows,
                                 data,
                                 isLoading: false,
                                 queryId,
