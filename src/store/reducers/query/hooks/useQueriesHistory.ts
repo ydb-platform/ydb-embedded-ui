@@ -1,13 +1,10 @@
 import React from 'react';
 
-import {
-    useEventHandler,
-    useSetting,
-    useTypedDispatch,
-    useTypedSelector,
-} from '../../../../utils/hooks';
+import {useEventHandler, useTypedDispatch, useTypedSelector} from '../../../../utils/hooks';
 import {sortByTimestampDescending} from '../../../../utils/sortByTimestamp';
 import {SETTING_KEYS} from '../../settings/constants';
+import {useSetting} from '../../settings/useSetting';
+import {appendQueryToHistory, limitQueryHistory} from '../historyLimits';
 import {
     changeUserInput,
     selectHistoryCurrentQueryId,
@@ -17,16 +14,20 @@ import {
 import type {QueryInHistory, QueryStats, RawQueryInHistory} from '../types';
 import {getQueryInHistory} from '../utils';
 
-const MAXIMUM_QUERIES_IN_HISTORY = 20;
-
-export function useQueriesHistory() {
+export function useQueriesHistory({
+    onQueryTooLarge,
+    onSaveError,
+}: {
+    onQueryTooLarge: () => void;
+    onSaveError: () => void;
+}) {
     const dispatch = useTypedDispatch();
     const queriesFilter = useTypedSelector(selectQueriesHistoryFilter);
     const historyCurrentQueryId = useTypedSelector(selectHistoryCurrentQueryId);
 
-    const [savedHistoryQueries, saveHistoryQueries] = useSetting<RawQueryInHistory[]>(
-        SETTING_KEYS.QUERIES_HISTORY,
-    );
+    const {value: savedHistoryQueries, saveValue: saveHistoryQueries} = useSetting<
+        RawQueryInHistory[]
+    >(SETTING_KEYS.QUERIES_HISTORY, onSaveError);
 
     const preparedQueries = React.useMemo(() => {
         const queries = savedHistoryQueries ?? [];
@@ -104,10 +105,15 @@ export function useQueriesHistory() {
             if (!queryText) {
                 return;
             }
-            // +1 to include new query
-            const sliceLimit = preparedQueries.length + 1 - MAXIMUM_QUERIES_IN_HISTORY;
-            const slicedQueries = preparedQueries.slice(sliceLimit < 0 ? 0 : sliceLimit);
-            const newQueries = [...slicedQueries, {queryText, queryId, startTime}];
+            const newQueries = appendQueryToHistory(preparedQueries, {
+                queryText,
+                queryId,
+                startTime,
+            });
+            if (!newQueries) {
+                onQueryTooLarge();
+                return;
+            }
 
             saveHistoryQueries(newQueries);
 
@@ -137,7 +143,7 @@ export function useQueriesHistory() {
                     realQueryId,
                     status,
                 };
-                saveHistoryQueries(newQueries);
+                saveHistoryQueries(limitQueryHistory(newQueries));
             }
         },
     );

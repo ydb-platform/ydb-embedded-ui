@@ -360,6 +360,7 @@ export default function QueryEditor({
             dispatch(setShowPreview(false));
 
             let historyQueryId: string | undefined;
+            let shouldSaveHistoryEntry = false;
             const queryId = uuidv4();
 
             const startTime = Date.now();
@@ -382,7 +383,7 @@ export default function QueryEditor({
                     // Queries with results stored on the server (operationId) get a separate history
                     // entry per launch, unless they match the most recent history item (handled above).
                     historyQueryId = queryId;
-                    saveQueryToHistory(text, queryId, startTime);
+                    shouldSaveHistoryEntry = true;
                 }
                 dispatch(setIsDirty(false));
             }
@@ -401,6 +402,7 @@ export default function QueryEditor({
                 queryId,
                 historyQueryId,
                 startTime,
+                shouldSaveHistoryEntry,
             };
         },
     );
@@ -524,7 +526,7 @@ export default function QueryEditor({
             return;
         }
 
-        const {tabId, queryId, historyQueryId, startTime} = execution;
+        const {tabId, queryId, historyQueryId, startTime, shouldSaveHistoryEntry} = execution;
         const {text, range} = queryExecution;
 
         if (isStreamingEnabled) {
@@ -587,6 +589,10 @@ export default function QueryEditor({
                 historyQueryId,
                 startTime,
             });
+        }
+
+        if (shouldSaveHistoryEntry) {
+            saveQueryToHistory(text, queryId, startTime);
         }
     });
 

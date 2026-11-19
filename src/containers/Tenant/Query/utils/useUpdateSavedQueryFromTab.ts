@@ -25,6 +25,10 @@ export function useUpdateSavedQueryFromTab() {
                 return true;
             }
 
+            if (result === 'size-limit') {
+                return false;
+            }
+
             const isDuplicate = result === 'duplicate';
             createToast({
                 name: isDuplicate ? 'saved-query-name-exists' : 'saved-query-not-found',

@@ -1,12 +1,21 @@
+import {TextEncoder} from 'util';
+
 import {EMPTY_DATA_PLACEHOLDER} from '../../../../../utils/constants';
 import {
     filterSavedQueries,
     formatSavedQueryUpdatedAt,
+    getSavedQueriesSizeError,
     hasSavedQueryName,
     hasSavedQueryNameCollision,
     renameSavedQueryInList,
     upsertSavedQuery,
 } from '../savedQueries';
+
+beforeAll(() => {
+    if (typeof globalThis.TextEncoder === 'undefined') {
+        Object.defineProperty(globalThis, 'TextEncoder', {value: TextEncoder});
+    }
+});
 
 const queries = [
     {name: 'Weekly report', body: 'SELECT * FROM weekly;', updatedAt: 100},
@@ -84,3 +93,24 @@ test.each([undefined, Number.NaN, Number.POSITIVE_INFINITY, 0, -1])(
     'renders an invalid timestamp as the shared placeholder',
     (updatedAt) => expect(formatSavedQueryUpdatedAt(updatedAt)).toBe(EMPTY_DATA_PLACEHOLDER),
 );
+
+test('reports a query that exceeds 16 MiB by itself after JSON escaping', () => {
+    const query = {name: 'Large query', body: '\\'.repeat(4 * 1024 * 1024), updatedAt: 300};
+
+    expect(getSavedQueriesSizeError([query], query.name)).toBe('query-too-large');
+});
+
+test('reports a full list when the new query fits by itself', () => {
+    const existing = {name: 'Existing query', body: '\\'.repeat(2_100_000), updatedAt: 100};
+    const candidate = {name: 'New query', body: '\\'.repeat(2_100_000), updatedAt: 300};
+
+    expect(getSavedQueriesSizeError([existing, candidate], candidate.name)).toBe('list-full');
+    expect(getSavedQueriesSizeError([candidate], candidate.name)).toBeUndefined();
+});
+
+test('checks the resulting list when replacing an existing query', () => {
+    const existing = {name: 'Existing query', body: '\\'.repeat(4_193_000), updatedAt: 100};
+    const replacement = upsertSavedQuery([existing], existing.name, '\\'.repeat(2000), 300);
+
+    expect(getSavedQueriesSizeError(replacement, existing.name)).toBeUndefined();
+});

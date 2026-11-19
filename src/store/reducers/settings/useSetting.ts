@@ -10,7 +10,10 @@ import {getSettingValue, setSettingValue} from './settings';
 
 type SaveSettingValue<T> = (value: T | undefined) => void;
 
-export function useSetting<T>(name?: string): {
+export function useSetting<T>(
+    name?: string,
+    onSaveError?: () => void,
+): {
     value: T | undefined;
     saveValue: SaveSettingValue<T>;
     isLoading: boolean;
@@ -35,12 +38,15 @@ export function useSetting<T>(name?: string): {
                 return;
             }
             if (remoteAvailable) {
-                setMetaSetting({name, value});
+                const saveRequest = setMetaSetting({name, value});
+                if (onSaveError) {
+                    saveRequest.unwrap().catch(onSaveError);
+                }
                 return;
             }
             dispatch(setSettingValue(name, value));
         },
-        [dispatch, remoteAvailable, name, setMetaSetting],
+        [dispatch, remoteAvailable, name, onSaveError, setMetaSetting],
     );
 
     return {value: settingValue, saveValue, isLoading} as const;

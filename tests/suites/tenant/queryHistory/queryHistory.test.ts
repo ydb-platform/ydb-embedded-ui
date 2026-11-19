@@ -46,6 +46,57 @@ test.describe('Query History', () => {
         await expect(queryRow).toBeVisible({timeout: VISIBILITY_TIMEOUT});
     });
 
+    test('Executes an oversized query without adding it to history', async ({page}) => {
+        const previousQuery = 'SELECT 11 AS kept_in_history;';
+        await queryEditor.run(previousQuery, QUERY_MODES.script);
+        await queryEditor.waitForStatus('Completed');
+
+        const largeQuery = `/* ${'\\'.repeat(215_000)} */ SELECT 72 AS oversized_for_history;`;
+        await page.evaluate((text) => window.ydbEditor?.setValue(text), largeQuery);
+        await queryEditor.clickRunButton();
+
+        await expect(
+            page.getByText('The query is too large to be added to query history automatically.'),
+        ).toBeVisible();
+        await queryEditor.waitForStatus('Completed');
+        expect(await queryEditor.resultTable.getCellValue(1, 2)).toBe('72');
+
+        await queryEditor.queryTabs.selectTab(QueryTabs.History);
+        await expect(await queryEditor.historyQueries.getQueryRow(previousQuery)).toBeVisible();
+        expect(await queryEditor.historyQueries.getQueryCount()).toBe(1);
+    });
+
+    test('Reports a server history error while keeping the SQL result and local history', async ({
+        page,
+    }) => {
+        await page.evaluate(() => {
+            Object.assign(window.api, {
+                metaSettings: {
+                    getSingleSetting: async () => undefined,
+                    setSingleSetting: async ({name}: {name: string}) => {
+                        if (name === 'queries_history') {
+                            throw new Error('HTTP 413');
+                        }
+                        return {status: 'SUCCESS'};
+                    },
+                },
+            });
+        });
+        // Re-render Query with the remote settings client enabled.
+        await queryEditor.queryTabs.selectTab(QueryTabs.History);
+        await queryEditor.queryTabs.selectTab(QueryTabs.Editor);
+
+        const sql = 'SELECT 73 AS history_save_failure;';
+        await queryEditor.run(sql, QUERY_MODES.script);
+
+        await expect(page.getByText('Could not save query history to the server.')).toBeVisible();
+        await queryEditor.waitForStatus('Completed');
+        expect(await queryEditor.resultTable.getCellValue(1, 2)).toBe('73');
+
+        await queryEditor.queryTabs.selectTab(QueryTabs.History);
+        await expect(await queryEditor.historyQueries.getQueryRow(sql)).toBeVisible();
+    });
+
     test('Multiple queries appear in correct order in history', async () => {
         const queries = [
             'SELECT 1 AS first_query;',

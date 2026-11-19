@@ -50,8 +50,7 @@ export function useQueryTabsActions() {
     const getDirtyConfirmation = useEventHandler((tab: QueryTabState): Promise<boolean> => {
         const handleSaveQuery = (queryName: string, queryBody: string) => {
             if (!tab.savedQueryName) {
-                saveQuery(queryName, queryBody);
-                return true;
+                return saveQuery(queryName, queryBody);
             }
 
             return updateSavedQueryFromTab(tab, queryName, queryBody);

@@ -8,12 +8,13 @@ import type {
 import {serializeReduxError} from '../../../utils/errors/serializeReduxError';
 import type {AppDispatch} from '../../defaultStore';
 import {api} from '../api';
+import {limitQueryHistory} from '../query/historyLimits';
 
 import {
     shouldSnapshotBeforeOverwriteLocalStorage,
     snapshotLocalStorageToRemoteOnce,
 } from './RemoteLocalStorageSnapshot';
-import {SETTINGS_OPTIONS} from './constants';
+import {SETTINGS_OPTIONS, SETTING_KEYS} from './constants';
 import {
     applyRemoteSettingToStoreAndLocalStorage,
     getLocalStorageValueToMigrateIfRemoteMissing,
@@ -145,9 +146,13 @@ function scheduleLocalStorageMigrationToRemoteIfMissing(args: {
 
     const promise = (async () => {
         try {
+            const value =
+                name === SETTING_KEYS.QUERIES_HISTORY && Array.isArray(valueToMigrate)
+                    ? limitQueryHistory(valueToMigrate)
+                    : valueToMigrate;
             const data = await resolved.client.setSingleSetting({
                 name,
-                value: stringifySettingValue(valueToMigrate),
+                value: stringifySettingValue(value),
             });
 
             const status = data?.status;

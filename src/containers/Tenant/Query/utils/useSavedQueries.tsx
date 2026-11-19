@@ -6,17 +6,56 @@ import {
     syncSavedQueryTabsAfterUpdate,
 } from '../../../../store/reducers/query/query';
 import {SETTING_KEYS} from '../../../../store/reducers/settings/constants';
+import {useSetting} from '../../../../store/reducers/settings/useSetting';
 import type {SavedQuery} from '../../../../types/store/query';
-import {useSetting, useTypedDispatch} from '../../../../utils/hooks';
+import createToast from '../../../../utils/createToast';
+import {useTypedDispatch} from '../../../../utils/hooks';
+import i18n from '../i18n';
 
-import {renameSavedQueryInList, upsertSavedQuery} from './savedQueries';
+import type {RenameSavedQueryStatus} from './savedQueries';
+import {getSavedQueriesSizeError, renameSavedQueryInList, upsertSavedQuery} from './savedQueries';
 
-type UpdateSavedQueryResult = 'updated' | 'duplicate' | 'not-found';
+export type RenameSavedQueryResult = RenameSavedQueryStatus | 'size-limit';
+
+type UpdateSavedQueryResult = 'updated' | 'duplicate' | 'not-found' | 'size-limit';
+
+function notifySavedQueriesSyncError() {
+    createToast({
+        name: 'saved-queries-sync-error',
+        title: i18n('alert_saved-queries-sync-error'),
+        theme: 'warning',
+    });
+}
 
 export function useSavedQueries() {
-    const [savedQueries, saveQueries] = useSetting<SavedQuery[]>(SETTING_KEYS.SAVED_QUERIES);
+    const {value: savedQueries, saveValue: saveQueries} = useSetting<SavedQuery[]>(
+        SETTING_KEYS.SAVED_QUERIES,
+        notifySavedQueriesSyncError,
+    );
 
     const dispatch = useTypedDispatch();
+
+    const saveQueriesWithinLimit = React.useCallback(
+        (queries: SavedQuery[], changedQueryName: string) => {
+            const error = getSavedQueriesSizeError(queries, changedQueryName);
+            if (error) {
+                createToast({
+                    name: 'saved-queries-size-limit',
+                    title: i18n(
+                        error === 'query-too-large'
+                            ? 'alert_saved-query-too-large'
+                            : 'alert_saved-queries-list-full',
+                    ),
+                    theme: 'warning',
+                });
+                return false;
+            }
+
+            saveQueries(queries);
+            return true;
+        },
+        [saveQueries],
+    );
 
     const deleteSavedQuery = React.useCallback(
         (queryName: string) => {
@@ -32,29 +71,34 @@ export function useSavedQueries() {
     const saveQuery = React.useCallback(
         (queryName: string | null, queryBody: string) => {
             if (!queryName) {
-                return;
+                return false;
             }
 
-            saveQueries(upsertSavedQuery(savedQueries ?? [], queryName, queryBody, Date.now()));
+            const queries = upsertSavedQuery(savedQueries ?? [], queryName, queryBody, Date.now());
+            return saveQueriesWithinLimit(queries, queryName);
         },
-        [savedQueries, saveQueries],
+        [savedQueries, saveQueriesWithinLimit],
     );
 
     const renameSavedQuery = React.useCallback(
-        (previousName: string, nextName: string) => {
+        (previousName: string, nextName: string): RenameSavedQueryResult => {
             const result = renameSavedQueryInList(
                 savedQueries ?? [],
                 previousName,
                 nextName,
                 Date.now(),
             );
-            if (result.status === 'renamed') {
-                saveQueries(result.queries);
-                dispatch(renameSavedQueryTabs({previousName, nextName}));
+            if (result.status !== 'renamed') {
+                return result.status;
             }
-            return result.status;
+            if (!saveQueriesWithinLimit(result.queries, nextName)) {
+                return 'size-limit';
+            }
+
+            dispatch(renameSavedQueryTabs({previousName, nextName}));
+            return 'renamed';
         },
-        [dispatch, savedQueries, saveQueries],
+        [dispatch, savedQueries, saveQueriesWithinLimit],
     );
 
     const updateSavedQuery = React.useCallback(
@@ -83,7 +127,15 @@ export function useSavedQueries() {
                 return 'not-found';
             }
 
-            saveQueries(upsertSavedQuery(renameResult.queries, nameToSave, queryBody, updatedAt));
+            const nextQueries = upsertSavedQuery(
+                renameResult.queries,
+                nameToSave,
+                queryBody,
+                updatedAt,
+            );
+            if (!saveQueriesWithinLimit(nextQueries, nameToSave)) {
+                return 'size-limit';
+            }
             dispatch(
                 syncSavedQueryTabsAfterUpdate({
                     sourceTabId,
@@ -96,7 +148,7 @@ export function useSavedQueries() {
 
             return 'updated';
         },
-        [dispatch, savedQueries, saveQueries],
+        [dispatch, savedQueries, saveQueriesWithinLimit],
     );
 
     return {

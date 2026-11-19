@@ -44,7 +44,9 @@ export function useSaveQueryWithTabSync() {
             const targetTabId = tabId ?? activeTab?.id;
 
             return (queryName: string | null, queryBody: string) => {
-                saveQuery(queryName, queryBody);
+                if (!saveQuery(queryName, queryBody)) {
+                    return false;
+                }
 
                 if (targetTabId && queryName) {
                     dispatch(
@@ -55,6 +57,7 @@ export function useSaveQueryWithTabSync() {
                         }),
                     );
                 }
+                return true;
             };
         },
         [activeTab, dispatch, saveQuery],
@@ -159,7 +162,7 @@ interface SaveQueryDialogCommonProps {
 interface SaveQueryDialogProps extends SaveQueryDialogCommonProps {
     open: boolean;
     savedQueries?: SavedQuery[];
-    onSaveQuery: (name: string | null, body: string) => void;
+    onSaveQuery: (name: string | null, body: string) => boolean;
 }
 
 function SaveQueryDialog({
@@ -205,7 +208,9 @@ function SaveQueryDialog({
     };
 
     const onSaveClick = () => {
-        onSaveQuery(queryName.trim(), queryBody);
+        if (!onSaveQuery(queryName.trim(), queryBody)) {
+            return;
+        }
         dispatch(setIsDirty(false));
         onCloseDialog();
         onSuccess?.();

@@ -7,6 +7,7 @@ import {changeUserInput} from '../../../store/reducers/query/query';
 import {TENANT_QUERY_TABS_ID} from '../../../store/reducers/tenant/constants';
 import type {EPathSubType, EPathType} from '../../../types/api/schema';
 import {cn} from '../../../utils/cn';
+import createToast from '../../../utils/createToast';
 import {useTypedDispatch, useTypedSelector} from '../../../utils/hooks';
 import {useNavigationV2Enabled} from '../utils/useNavigationV2Enabled';
 
@@ -14,10 +15,28 @@ import QueriesHistory from './QueriesHistory/QueriesHistory';
 import QueryEditor from './QueryEditor/QueryEditor';
 import {QueryTabs, queryEditorTabs} from './QueryTabs/QueryTabs';
 import {SavedQueries} from './SavedQueries/SavedQueries';
+import i18n from './i18n';
 
 import './Query.scss';
 
 const b = cn('ydb-query');
+
+const queryHistoryNotifications = {
+    onQueryTooLarge() {
+        createToast({
+            name: 'query-history-query-too-large',
+            title: i18n('alert_query-too-large-for-history'),
+            theme: 'warning',
+        });
+    },
+    onSaveError() {
+        createToast({
+            name: 'query-history-save-error',
+            title: i18n('alert_query-history-save-error'),
+            theme: 'warning',
+        });
+    },
+};
 
 interface QueryProps {
     theme: string;
@@ -32,7 +51,7 @@ export const Query = (props: QueryProps) => {
 
     const {queryTab = TENANT_QUERY_TABS_ID.newQuery} = useTypedSelector((state) => state.tenant);
 
-    const queriesHistory = useQueriesHistory();
+    const queriesHistory = useQueriesHistory(queryHistoryNotifications);
 
     const handleUserInputChange = (value: {input: string}) => {
         dispatch(changeUserInput(value));
