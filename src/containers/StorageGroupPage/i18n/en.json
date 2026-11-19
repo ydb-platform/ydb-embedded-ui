@@ -1,5 +1,7 @@
 {
   "storage-group": "Storage Group",
   "storage": "Storage",
-  "pool-name": "Pool Name"
+  "label_bridge-mode": "Bridge mode",
+  "title_sync": "Synchronisation details",
+  "action_copy-group-id-from-title": "Copy Storage Group ID from page title"
 }

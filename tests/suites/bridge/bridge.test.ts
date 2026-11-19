@@ -1,5 +1,7 @@
 import {expect, test} from '@playwright/test';
 
+import {BridgeSyncStatus} from '../../../src/types/api/cluster';
+import {PageModel} from '../../models/PageModel';
 import {backend, nodesPage} from '../../utils/constants';
 import {ClusterPage} from '../cluster/ClusterPage';
 import {ClusterNodesTable, ClusterStorageTable} from '../paginatedTable/paginatedTable';
@@ -16,8 +18,7 @@ import {
     mockCapabilities,
     mockClusterWithBridgePiles,
     mockNodesWithPile,
-    mockStateStorageReasons,
-    mockStorageGroupsWithPile,
+    mockStorageGroup,
 } from './mocks';
 
 test.describe('Bridge mode - Nodes table', () => {
@@ -75,7 +76,12 @@ test.describe('Bridge mode - Storage nodes', () => {
 test.describe('Bridge mode - Storage groups', () => {
     test('on: shows Bridge pile column', async ({page}) => {
         await mockCapabilities(page, true);
-        await mockStorageGroupsWithPile(page);
+        await mockStorageGroup(page, {
+            GroupId: '1',
+            PoolName: 'p',
+            MediaType: 'NVME',
+            PileName: 'r1',
+        });
         const storage = new StoragePage(page);
         await storage.goto({visible: 'all', type: 'groups'}, {waitUntil: 'domcontentloaded'});
         const table = new ClusterStorageTable(page);
@@ -94,6 +100,46 @@ test.describe('Bridge mode - Storage groups', () => {
         await table.waitForTableToLoad();
         const headers = await table.getHeaders();
         expect(headers.join(' ')).not.toContain('Bridge pile');
+    });
+});
+
+test.describe('Bridge mode - Storage group page', () => {
+    const groupId = '2147483665';
+    const poolName = 'storage-group-page-test-pool';
+
+    test.beforeEach(async ({page}) => {
+        await mockCapabilities(page, true, {'/storage/groups': 18});
+    });
+
+    test('shows sync details for a Bridge group', async ({page}) => {
+        const stage = 'FUTURE_BRIDGE_STAGE';
+        await mockStorageGroup(page, {
+            GroupId: groupId,
+            PoolName: poolName,
+            BridgeMode: true,
+            BridgeSyncStatus: BridgeSyncStatus.SYNCING,
+            BridgeSyncStage: stage,
+        });
+        await new PageModel(page, 'storageGroup', {groupId}).goto();
+
+        const toggle = page.getByRole('button', {name: /Synchronisation details/});
+        await expect(toggle).toBeVisible();
+        await toggle.click();
+        await expect(page.getByTestId('storage-group-sync-stage')).toContainText(stage);
+    });
+
+    test('hides sync details for an ordinary group in a Bridge cluster', async ({page}) => {
+        await mockStorageGroup(page, {
+            GroupId: groupId,
+            PoolName: poolName,
+            BridgeMode: false,
+        });
+        await new PageModel(page, 'storageGroup', {groupId}).goto();
+
+        await expect(
+            page.locator('.ydb-storage-group-page__info').getByText(poolName, {exact: true}),
+        ).toBeVisible();
+        await expect(page.getByText('Synchronisation details', {exact: true})).toHaveCount(0);
     });
 });
 
