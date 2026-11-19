@@ -1,11 +1,12 @@
 import React from 'react';
 
-import {Flex, Text} from '@gravity-ui/uikit';
+import {Disclosure, Flex, Label, Text} from '@gravity-ui/uikit';
 import {skipToken} from '@reduxjs/toolkit/query';
 import {Helmet} from 'react-helmet-async';
 import {StringParam, useQueryParams} from 'use-query-params';
 
 import {StickyAutoRefreshControl} from '../../components/AutoRefreshControl/StickyAutoRefreshControl';
+import {BridgeSyncStatusLabel} from '../../components/BridgeSyncStatusLabel';
 import {CopyableValue} from '../../components/CopyableValue/CopyableValue';
 import {ResponseError} from '../../components/Errors/ResponseError';
 import {InfoViewerSkeleton} from '../../components/InfoViewerSkeleton/InfoViewerSkeleton';
@@ -21,6 +22,7 @@ import {useDatabaseFromQuery} from '../../utils/hooks/useDatabaseFromQuery';
 import {useAppTitle} from '../App/AppTitleContext';
 import {PaginatedStorage} from '../Storage/PaginatedStorage';
 import {StorageGroupStateLabel} from '../Storage/StorageGroupStateLabel';
+import {StorageGroupSyncDetails} from '../Storage/StorageGroupSyncDetails/StorageGroupSyncDetails';
 
 import {storageGroupPageKeyset} from './i18n';
 
@@ -97,6 +99,11 @@ export function StorageGroupPage() {
                         state={storageGroupData?.State}
                         stateInfo={storageGroupData?.StateInfo}
                     />
+                    {storageGroupData?.BridgeMode === true && (
+                        <Label theme="utility" size="s">
+                            {storageGroupPageKeyset('label_bridge-mode')}
+                        </Label>
+                    )}
                 </Flex>
             </Flex>
         );
@@ -145,6 +152,25 @@ export function StorageGroupPage() {
                 {renderPageTitle()}
                 {renderError()}
                 {renderInfo()}
+                {storageGroupData?.BridgeMode === true && (
+                    <Disclosure
+                        key={groupId}
+                        arrowPosition="end"
+                        className={storageGroupPageCn('sync')}
+                        summary={
+                            <Flex alignItems="center" gap={2} wrap="wrap">
+                                <Text variant="subheader-2">
+                                    {storageGroupPageKeyset('title_sync')}
+                                </Text>
+                                <BridgeSyncStatusLabel status={storageGroupData.BridgeSyncStatus} />
+                            </Flex>
+                        }
+                    >
+                        <div className={storageGroupPageCn('sync-content')}>
+                            <StorageGroupSyncDetails group={storageGroupData} layout="page" />
+                        </div>
+                    </Disclosure>
+                )}
             </div>
             {renderStorage()}
         </div>

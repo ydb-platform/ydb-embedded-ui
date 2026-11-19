@@ -9,47 +9,4 @@
 
         min-width: 0;
     }
-
-    &__metrics {
-        --g-definition-list-item-gap: var(--g-spacing-2);
-    }
-
-    &__section-title {
-        font-weight: 500;
-    }
-
-    &__partners {
-        border-radius: var(--g-border-radius-m);
-        box-shadow: inset 0 0 0 1px var(--g-color-line-generic);
-    }
-
-    & &__partner-cell {
-        box-sizing: border-box;
-        height: 32px;
-        padding: var(--g-spacing-1) var(--g-spacing-2);
-
-        &_id {
-            width: 1px;
-
-            white-space: nowrap;
-        }
-
-        &_pile {
-            max-width: 0;
-        }
-    }
-
-    & &__partner-id {
-        width: max-content;
-        min-width: calc(80px - 2 * var(--g-spacing-2));
-        max-width: calc(120px - 2 * var(--g-spacing-2));
-    }
-
-    &__message.g-alert {
-        padding: var(--g-spacing-3);
-
-        border-radius: var(--g-border-radius-m);
-
-        overflow-wrap: anywhere;
-    }
 }

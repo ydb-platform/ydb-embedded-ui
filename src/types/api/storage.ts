@@ -50,6 +50,7 @@ export interface TBridgeGroupLink {
 export interface TBridgeGroupSyncInfo {
     BridgeMode?: boolean;
     BridgeSyncStatus?: BridgeSyncStatus;
+    BridgeSyncStage?: string;
     BridgeGroups?: TBridgeGroupLink[];
     BridgeSyncLastError?: string;
     /** Unix microseconds. */
