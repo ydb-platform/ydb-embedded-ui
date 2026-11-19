@@ -24,26 +24,17 @@ import {shouldSyncSettingToLS, stringifySettingValue} from './utils';
 const REMOTE_WRITE_DEBOUNCE_MS = 200;
 const REMOTE_WRITE_IN_FLIGHT_TIMEOUT_MS = 10_000;
 
-export const REMOTE_SETTINGS_WRITE_TIMEOUT_ERROR = 'RemoteSettingsWriteTimeoutError';
+export const SUPERSEDED_SETTINGS_WRITE_ERROR = 'SupersededSettingsWriteError';
 
-async function withTimeout<T>(promise: Promise<T>, ms: number): Promise<T> {
-    return new Promise<T>((resolve, reject) => {
-        const timeoutId = window.setTimeout(() => {
-            // Release the queue even if the HTTP write is still pending.
-            const error = new Error('Remote settings write timed out');
-            error.name = REMOTE_SETTINGS_WRITE_TIMEOUT_ERROR;
-            reject(error);
-        }, ms);
-
-        promise
-            .then((value) => {
-                clearTimeout(timeoutId);
-                resolve(value);
-            })
-            .catch((error) => {
-                clearTimeout(timeoutId);
-                reject(error);
-            });
+function waitForRemoteWrite(completion: Promise<void>): Promise<void> {
+    return new Promise((resolve) => {
+        // Bound the queue wait independently of the outcome reported to callers.
+        const timeoutId = window.setTimeout(resolve, REMOTE_WRITE_IN_FLIGHT_TIMEOUT_MS);
+        const release = () => {
+            window.clearTimeout(timeoutId);
+            resolve();
+        };
+        completion.then(release, release);
     });
 }
 
@@ -55,6 +46,7 @@ type DebounceEntry<T> = {
 };
 
 const debouncedRemoteWrites = new Map<string, DebounceEntry<unknown>>();
+const latestRemoteWrites = new Map<string, symbol>();
 const inFlightLocalStorageMigrations = new Map<string, Promise<void>>();
 
 function triggerFlushDebouncedRemoteWrite(key: string) {
@@ -76,11 +68,15 @@ async function flushDebouncedRemoteWrite(key: string) {
     const pending = entry.pending;
     entry.pending = [];
 
+    const completion = Promise.resolve()
+        .then(entry.latestRequest)
+        .then(
+            (result) => pending.forEach((p) => p.resolve(result)),
+            (error: unknown) => pending.forEach((p) => p.reject(error)),
+        );
+
     try {
-        const result = await withTimeout(entry.latestRequest(), REMOTE_WRITE_IN_FLIGHT_TIMEOUT_MS);
-        pending.forEach((p) => p.resolve(result));
-    } catch (error) {
-        pending.forEach((p) => p.reject(error));
+        await waitForRemoteWrite(completion);
     } finally {
         entry.inFlight = false;
 
@@ -238,6 +234,9 @@ export const settingsApi = api.injectEndpoints({
                 name,
                 value,
             }: Omit<SetSingleSettingParams, 'value'> & {value: unknown}) => {
+                const write = Symbol();
+                latestRemoteWrites.set(name, write);
+
                 try {
                     const resolved = resolveRemoteSettingsClient();
                     if (!resolved) {
@@ -263,7 +262,17 @@ export const settingsApi = api.injectEndpoints({
 
                     return {data};
                 } catch (error) {
-                    return {error: serializeReduxError(error)};
+                    // Each write replaces the whole setting. Only the latest value needs a warning.
+                    return {
+                        error:
+                            latestRemoteWrites.get(name) === write
+                                ? serializeReduxError(error)
+                                : {name: SUPERSEDED_SETTINGS_WRITE_ERROR},
+                    };
+                } finally {
+                    if (latestRemoteWrites.get(name) === write) {
+                        latestRemoteWrites.delete(name);
+                    }
                 }
             },
             async onQueryStarted(args, {dispatch, queryFulfilled}) {

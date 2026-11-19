@@ -5,7 +5,7 @@ import {skipToken} from '@reduxjs/toolkit/query';
 import {useTypedDispatch} from '../../../utils/hooks/useTypedDispatch';
 import {useTypedSelector} from '../../../utils/hooks/useTypedSelector';
 
-import {REMOTE_SETTINGS_WRITE_TIMEOUT_ERROR, settingsApi} from './api';
+import {SUPERSEDED_SETTINGS_WRITE_ERROR, settingsApi} from './api';
 import {getSettingValue, setSettingValue} from './settings';
 import type {SettingSaveTarget} from './types';
 
@@ -46,7 +46,7 @@ export function useSetting<T>(
                             error &&
                             typeof error === 'object' &&
                             'name' in error &&
-                            error.name === REMOTE_SETTINGS_WRITE_TIMEOUT_ERROR
+                            error.name === SUPERSEDED_SETTINGS_WRITE_ERROR
                         ) {
                             return;
                         }

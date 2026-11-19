@@ -5,6 +5,7 @@ import {database} from '../../../utils/constants';
 import {executeQueryWithKeybinding} from '../../../utils/queryHotkeys';
 import {QueryEditorMode, TenantPage, VISIBILITY_TIMEOUT} from '../TenantPage';
 import {QueryEditor, QueryTabs} from '../queryEditor/models/QueryEditor';
+import {SaveChangesDialog} from '../queryEditor/models/SaveChangesDialog';
 import {SaveQueryDialog} from '../queryEditor/models/SaveQueryDialog';
 import {SavedQueriesTable} from '../savedQueries/models/SavedQueriesTable';
 
@@ -46,7 +47,8 @@ test.describe('Query History', () => {
         await expect(queryRow).toBeVisible({timeout: VISIBILITY_TIMEOUT});
     });
 
-    test('Executes an oversized query without adding it to history', async ({page}) => {
+    test('Keeps an oversized query unsaved after execution', async ({page}) => {
+        await openQueryEditorInMode(tenantPage, QueryEditorMode.MultiTab);
         await page.evaluate(() => {
             const setItem = Storage.prototype.setItem;
             Storage.prototype.setItem = function (key, value) {
@@ -73,6 +75,14 @@ test.describe('Query History', () => {
         await expect(localSaveWarning).toBeHidden();
         await queryEditor.waitForStatus('Completed');
         expect(await queryEditor.resultTable.getCellValue(1, 2)).toBe('72');
+
+        const activeTabTitle = await queryEditor.editorTabs.getActiveTabTitle();
+        await queryEditor.editorTabs.hoverTab(activeTabTitle);
+        await queryEditor.editorTabs.closeTab(activeTabTitle);
+        const saveChangesDialog = new SaveChangesDialog(page);
+        await expect(saveChangesDialog.isVisible()).resolves.toBe(true);
+        await saveChangesDialog.clickCancel();
+        await expect(queryEditor.getEditorContent()).resolves.toBe(largeQuery);
 
         await queryEditor.queryTabs.selectTab(QueryTabs.History);
         await expect(await queryEditor.historyQueries.getQueryRow(previousQuery)).toBeVisible();

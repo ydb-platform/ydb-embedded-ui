@@ -104,7 +104,7 @@ export function useQueriesHistory({
     const saveQueryToHistory = useEventHandler(
         (queryText: string, queryId: string, startTime: number) => {
             if (!queryText) {
-                return;
+                return false;
             }
             const newQueries = appendQueryToHistory(preparedQueries, {
                 queryText,
@@ -113,13 +113,14 @@ export function useQueriesHistory({
             });
             if (!newQueries) {
                 onQueryTooLarge();
-                return;
+                return false;
             }
 
             saveHistoryQueries(newQueries);
 
             // Update currentQueryId to point to the newly added query
             dispatch(setHistoryCurrentQueryId(queryId));
+            return true;
         },
     );
 

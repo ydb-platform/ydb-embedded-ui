@@ -82,3 +82,44 @@ test('keeps the queue moving without notifying on its timeout', async () => {
     await act(async () => finishSlowWrite?.({status: 'SUCCESS'}));
     expect(onSaveError).toHaveBeenCalledTimes(1);
 });
+
+test.each([
+    {description: 'shows a failure from the current write after the timeout', newerWrite: false},
+    {description: 'ignores a late failure after a newer write succeeds', newerWrite: true},
+])('$description', async ({newerWrite}) => {
+    jest.useFakeTimers();
+    let rejectSlowWrite: ((error: unknown) => void) | undefined;
+    const slowWrite = new Promise<SetSettingResponse>((_resolve, reject) => {
+        rejectSlowWrite = reject;
+    });
+    const setSingleSetting = jest
+        .fn()
+        .mockReturnValueOnce(slowWrite)
+        .mockResolvedValueOnce({status: 'SUCCESS'});
+    window.api = {
+        metaSettings: {getSingleSetting: async () => '[]', setSingleSetting},
+    } as unknown as YdbEmbeddedAPI;
+
+    const onSaveError = jest.fn();
+    const {result} = renderSetting(onSaveError);
+    await act(() => jest.advanceTimersByTimeAsync(0));
+
+    act(() => result.current.saveValue(['SELECT 1;']));
+    await act(() => jest.advanceTimersByTimeAsync(10_200));
+    expect(setSingleSetting).toHaveBeenCalledTimes(1);
+    expect(onSaveError).not.toHaveBeenCalled();
+
+    if (newerWrite) {
+        act(() => result.current.saveValue(['SELECT 2;']));
+        await act(() => jest.advanceTimersByTimeAsync(200));
+        expect(setSingleSetting).toHaveBeenCalledTimes(2);
+    }
+
+    await act(async () => rejectSlowWrite?.({status: 413}));
+    if (newerWrite) {
+        expect(onSaveError).not.toHaveBeenCalled();
+    } else {
+        expect(onSaveError).toHaveBeenCalledTimes(1);
+        expect(onSaveError).toHaveBeenCalledWith('remote');
+    }
+});

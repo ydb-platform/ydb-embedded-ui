@@ -385,7 +385,6 @@ export default function QueryEditor({
                     historyQueryId = queryId;
                     shouldSaveHistoryEntry = true;
                 }
-                dispatch(setIsDirty(false));
             }
 
             // Only reset pane to default size if it's currently collapsed.
@@ -517,10 +516,11 @@ export default function QueryEditor({
     );
 
     const handleSendExecuteClick = useEventHandler((queryExecution: QueryExecution) => {
+        const saveToHistory = !queryExecution.range;
         const execution = prepareExecuteQueryAction({
             execution: queryExecution,
             actionType: QUERY_ACTIONS.execute,
-            saveToHistory: !queryExecution.range,
+            saveToHistory,
         });
         if (!execution) {
             return;
@@ -591,8 +591,11 @@ export default function QueryEditor({
             });
         }
 
-        if (shouldSaveHistoryEntry) {
-            saveQueryToHistory(text, queryId, startTime);
+        if (
+            saveToHistory &&
+            (!shouldSaveHistoryEntry || saveQueryToHistory(text, queryId, startTime))
+        ) {
+            dispatch(setIsDirty(false));
         }
     });
 
