@@ -1,10 +1,10 @@
 import {randomUUID} from 'node:crypto';
 
-import {expect, request as playwrightRequest, test} from '@playwright/test';
+import {expect, test} from '@playwright/test';
 
 import type {ExecuteQueryResponse} from '../../../../../src/types/api/query';
 import {getClipboardContent} from '../../../../utils/clipboard';
-import {backend, database} from '../../../../utils/constants';
+import {database} from '../../../../utils/constants';
 import {TenantPage} from '../../TenantPage';
 import {longRunningStreamQuery} from '../../constants';
 import {QueryEditor} from '../../queryEditor/models/QueryEditor';
@@ -74,49 +74,86 @@ FROM (SELECT NodeId FROM \`.sys/nodes\` LIMIT 1) AS n
 CROSS JOIN AS_TABLE(AsList(AsStruct($data AS x))) AS r
 FLATTEN BY x;`,
         );
-        const runningQuery = `-- ${runningQueryMarker}
+        const queryText = `-- ${runningQueryMarker}
 $data = ListFromRange(1, 50000);
 ${queryStatements.join('\n')}`;
-        const storageState = await page.context().storageState();
-        const queryRequestContext = await playwrightRequest.newContext({storageState});
-        const csrfToken = (await page.context().cookies(backend)).find(
-            ({name}) => name === 'csrf_token',
-        )?.value;
-        let runningQueryRequestError: unknown;
-        const runningQueryRequest = queryRequestContext
-            .post(`${backend}/viewer/query`, {
-                params: {database, schema: 'multipart'},
-                headers: {
-                    Accept: 'multipart/form-data',
-                    ...(csrfToken ? {'X-CSRF-Token': csrfToken} : {}),
-                },
-                data: {
-                    query: runningQuery,
-                    database,
-                    action: 'execute-query',
-                    query_id: runningQueryId,
-                    syntax: 'yql_v1',
-                    schema: 'multipart',
-                },
-                timeout: 20_000,
-            })
-            .then(async (response) => {
-                if (!response.ok()) {
-                    throw new Error(
-                        `Running query request failed with ${response.status()}: ${await response.text()}`,
-                    );
-                }
-                return response.text();
-            })
-            .catch((error: unknown) => {
-                runningQueryRequestError = error;
-            });
+        // APIRequestContext buffers the whole response, so use the app's streaming transport.
+        const runningQuery = await page.evaluateHandle(
+            ({query, queryId, database: databasePath}) => {
+                const controller = new AbortController();
+                const state: {
+                    error?: string;
+                    queryId?: string;
+                    stopping: boolean;
+                    completed: boolean;
+                } = {queryId, stopping: false, completed: false};
+                const completion = window.api.streaming
+                    .streamQuery(
+                        {
+                            database: databasePath,
+                            query,
+                            query_id: queryId,
+                            action: 'execute-query',
+                            syntax: 'yql_v1',
+                            // Keep result batches small so the running query remains cancellable.
+                            limit_rows: 50_000,
+                            output_chunk_max_size: 1_024,
+                        },
+                        {
+                            signal: controller.signal,
+                            // Cancellation uses the server's ID from the first chunk.
+                            onSessionChunk: (chunk) => {
+                                state.queryId = chunk.meta.query_id;
+                            },
+                            onStreamDataChunk: () => undefined,
+                            onQueryResponseChunk: () => {
+                                state.completed = true;
+                            },
+                        },
+                    )
+                    .catch((error: unknown) => {
+                        if (!state.stopping) {
+                            state.error = error instanceof Error ? error.message : String(error);
+                        }
+                    });
+                return {
+                    state,
+                    async stop() {
+                        state.stopping = true;
+                        let cancellationError: string | undefined;
+                        try {
+                            if (state.queryId && !state.completed) {
+                                await window.api.viewer.sendQuery({
+                                    database: databasePath,
+                                    action: 'cancel-query',
+                                    query_id: state.queryId,
+                                    internal_call: true,
+                                    timeout: 5_000,
+                                });
+                            }
+                        } catch {
+                            // The query can finish while cancellation is in flight.
+                            cancellationError = 'Cancellation failed; query must still disappear';
+                        } finally {
+                            controller.abort();
+                            await completion;
+                        }
+                        return cancellationError;
+                    },
+                };
+            },
+            {query: queryText, queryId: runningQueryId, database},
+        );
 
-        const deadline = Date.now() + 10_000;
+        let deadline = Date.now() + 10_000;
         let pendingPoll: Promise<boolean> | undefined;
         const refreshRunningQueries = async () => {
-            if (runningQueryRequestError) {
-                throw runningQueryRequestError;
+            const queryState = await runningQuery.evaluate(({state}) => state);
+            if (queryState.error) {
+                throw new Error(queryState.error);
+            }
+            if (!queryState.queryId) {
+                return false;
             }
 
             const timeout = Math.max(1, deadline - Date.now());
@@ -164,55 +201,35 @@ ${queryStatements.join('\n')}`;
             );
         };
 
+        let cancellationError: string | undefined;
         try {
-            await expect
-                .poll(
-                    () => {
-                        pendingPoll = refreshRunningQueries();
-                        return pendingPoll;
-                    },
-                    {timeout: 10_000},
-                )
-                .toBe(true);
-            await expect(
-                page.locator('.ydb-fixed-height-query').filter({hasText: runningQueryMarker}),
-            ).toBeVisible();
-        } finally {
-            await pendingPoll?.catch(() => undefined);
             try {
-                // Closing the HTTP context alone can leave the server query running.
-                const cancelResponse = await queryRequestContext.post(
-                    `${backend}/viewer/json/query`,
-                    {
-                        params: {database},
-                        headers: csrfToken ? {'X-CSRF-Token': csrfToken} : undefined,
-                        data: {
-                            database,
-                            action: 'cancel-query',
-                            query_id: runningQueryId,
+                await expect
+                    .poll(
+                        () => {
+                            pendingPoll = refreshRunningQueries();
+                            return pendingPoll;
                         },
-                        timeout: 5_000,
-                    },
-                );
-                const cancelResponseBody = await cancelResponse.text();
-                const alreadyFinished =
-                    cancelResponse.status() === 400 && cancelResponseBody === 'Query not found';
-                expect(cancelResponse.ok() || alreadyFinished, cancelResponseBody).toBe(true);
-                const responseBody = await runningQueryRequest;
-                if (!runningQueryRequestError) {
-                    expect(responseBody).toBeDefined();
-                    const cancelled = /"event"\s*:\s*"Aborted"/.test(responseBody || '');
-                    const completedSuccessfully =
-                        /"event"\s*:\s*"QueryResponse"/.test(responseBody || '') &&
-                        /"status"\s*:\s*"SUCCESS"/.test(responseBody || '');
-                    expect(cancelled || completedSuccessfully).toBe(true);
-                }
+                        {timeout: 10_000},
+                    )
+                    .toBe(true);
+                await expect(
+                    page.locator('.ydb-fixed-height-query').filter({hasText: runningQueryMarker}),
+                ).toBeVisible();
             } finally {
-                await queryRequestContext.dispose();
+                await pendingPoll?.catch(() => undefined);
+                cancellationError = await runningQuery.evaluate(({stop}) => stop());
             }
-        }
-        if (runningQueryRequestError) {
-            throw runningQueryRequestError;
+
+            deadline = Date.now() + 10_000;
+            await expect
+                .poll(refreshRunningQueries, {
+                    timeout: 10_000,
+                    message: cancellationError || 'Test query must disappear after completion',
+                })
+                .toBe(false);
+        } finally {
+            await runningQuery.dispose();
         }
     });
 

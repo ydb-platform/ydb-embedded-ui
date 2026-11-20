@@ -287,31 +287,27 @@ test.describe('Diagnostics Info tab', async () => {
 
     test('Info tab shows resource utilization', async ({page}) => {
         await setupMetricTabsTenantInfoMock(page);
+        const diagnostics = await openInfoTab(page);
 
-        const pageQueryParams = {
-            schema: database,
-            database,
-            databasePage: 'database',
-            diagnosticsTab: 'database',
-        };
-        const tenantPage = new TenantPage(page);
-        await tenantPage.goto(pageQueryParams);
-
-        const diagnostics = new Diagnostics(page);
-
-        const utilization = await diagnostics.getResourceUtilization();
-
-        expect(utilization.cpu.title).toBe('CPU');
-        expect(utilization.cpu.percentage).toMatch(/\d+(\.\d+)?%/);
-        expect(utilization.cpu.description).toBe('Load across all actor system pools');
-
-        expect(utilization.storage.title).toBe('Storage');
-        expect(utilization.storage.percentage).toMatch(/\d+(\.\d+)?%/);
-        expect(utilization.storage.description).toBe('Total usage including user data');
-
-        expect(utilization.memory.title).toBe('Memory');
-        expect(utilization.memory.percentage).toMatch(/\d+(\.\d+)?%/);
-        expect(utilization.memory.description).toBe('Total consumed by DB processes');
+        await expect
+            .poll(() => diagnostics.getResourceUtilization())
+            .toEqual({
+                cpu: {
+                    title: 'CPU',
+                    percentage: '7%',
+                    description: 'Load across all actor system pools',
+                },
+                storage: {
+                    title: 'Storage',
+                    percentage: '90%',
+                    description: 'Total usage including user data',
+                },
+                memory: {
+                    title: 'Memory',
+                    percentage: '50%',
+                    description: 'Total consumed by DB processes',
+                },
+            });
     });
 
     test('Info metric tabs match visual baseline', async ({page}) => {
@@ -327,6 +323,13 @@ test.describe('Diagnostics Info tab', async () => {
         await setupTenantInfoWithoutMetricsMock(page);
         const diagnostics = await openInfoTab(page);
         await expect(diagnostics.areInfoCardsVisible()).resolves.toBe(true);
+        await expect
+            .poll(() => diagnostics.getResourceUtilization())
+            .toMatchObject({
+                cpu: {percentage: 'N/A'},
+                storage: {percentage: 'N/A'},
+                memory: {percentage: 'N/A'},
+            });
 
         const metricTabs = diagnostics.getMetricTabs();
         await expectMetricTabsScreenshot(metricTabs, 'info-empty-tenant-metric-tabs.png');
