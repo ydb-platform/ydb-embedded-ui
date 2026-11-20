@@ -10,6 +10,7 @@ import {setDiagnosticsTab, useTenantBaseInfo} from '../../../store/reducers/tena
 import type {AdditionalTenantsProps} from '../../../types/additionalProps';
 import type {EPathSubType, EPathType} from '../../../types/api/schema';
 import {useScrollPosition, useTypedDispatch, useTypedSelector} from '../../../utils/hooks';
+import {useDatabaseRuntimeState} from '../DatabaseAvailability/useDatabaseAvailability';
 import i18n from '../i18n';
 import {useNavigationV2Enabled} from '../utils/useNavigationV2Enabled';
 
@@ -70,11 +71,14 @@ function Diagnostics({
         return activeTab;
     }, [diagnosticsTab, pages]);
 
+    // At a cold start the requested tab may be hidden; it is kept in the URL and opens
+    // once the runtime responds.
+    const {coldStart} = useDatabaseRuntimeState();
     React.useEffect(() => {
-        if (activeTab && activeTab.id !== diagnosticsTab) {
+        if (!coldStart && activeTab && activeTab.id !== diagnosticsTab) {
             dispatch(setDiagnosticsTab(activeTab.id));
         }
-    }, [activeTab, diagnosticsTab, dispatch]);
+    }, [activeTab, coldStart, diagnosticsTab, dispatch]);
 
     const renderTabContent = () => {
         return renderDiagnosticsTabContent({

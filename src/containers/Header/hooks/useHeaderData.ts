@@ -38,13 +38,14 @@ export function useHeaderData({
         isClustersHomePage,
     });
 
-    const {databaseData, isDatabaseDataLoading, monitoringLinkUrl} = useDatabaseData({
-        metaCapabilitiesLoaded,
-        database,
-        clusterName,
-        isDatabasePage,
-        monitoring,
-    });
+    const {databaseData, isDatabaseDataLoading, isRuntimeUnavailable, monitoringLinkUrl} =
+        useDatabaseData({
+            metaCapabilitiesLoaded,
+            database,
+            clusterName,
+            isDatabasePage,
+            monitoring,
+        });
 
     const clusterLinks = useHeaderClusterLinks();
 
@@ -80,6 +81,7 @@ export function useHeaderData({
         handleDeleteCluster,
         databaseData,
         isDatabaseDataLoading,
+        isRuntimeUnavailable,
         clusterLinks,
         databaseLinks,
         prepareTenantBackend: additionalTenantProps.prepareTenantBackend,

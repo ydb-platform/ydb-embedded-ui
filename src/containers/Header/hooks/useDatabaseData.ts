@@ -1,11 +1,11 @@
-import {skipToken} from '@reduxjs/toolkit/query';
-
-import {tenantApi} from '../../../store/reducers/tenant/tenant';
-import {backend, environment} from '../../../store/runtimeParams';
+import {isRuntimeTenant} from '../../../store/reducers/tenant/availability';
+import type {RuntimeTenant} from '../../../store/reducers/tenant/availability';
+import {useTenantBaseInfo} from '../../../store/reducers/tenant/tenant';
 import type {MetaBaseClusterInfo} from '../../../types/api/meta';
 import {uiFactory} from '../../../uiFactory/uiFactory';
-import {useDatabasesV2} from '../../../utils/hooks/useDatabasesV2';
 import {canShowTenantMonitoring} from '../../../utils/monitoringVisibility';
+import {isAccessError} from '../../../utils/response';
+import {useDatabaseAvailability} from '../../Tenant/DatabaseAvailability/useDatabaseAvailability';
 
 interface UseDatabaseDataParams {
     metaCapabilitiesLoaded: boolean;
@@ -22,18 +22,28 @@ export function useDatabaseData({
     isDatabasePage,
     monitoring,
 }: UseDatabaseDataParams) {
-    const isMetaDatabasesAvailable = useDatabasesV2();
+    const {availability} = useDatabaseAvailability({skip: !database || !isDatabasePage});
+    const legacy = availability.status === 'legacy';
+    const legacyTenant = useTenantBaseInfo(database ?? '', clusterName, {
+        skip: !legacy || !database || !isDatabasePage || !metaCapabilitiesLoaded,
+    });
 
-    const shouldRequestTenantData = database && isDatabasePage;
-
-    const params = shouldRequestTenantData
-        ? {database, clusterName, isMetaDatabasesAvailable, environment, backend}
-        : skipToken;
-
-    const {currentData: databaseData, isLoading: isDatabaseDataLoading} =
-        tenantApi.useGetTenantInfoQuery(params, {
-            skip: !metaCapabilitiesLoaded,
-        });
+    // Runtime actions (copy path, edit, delete, monitoring links) need confirmed runtime data
+    let databaseData: RuntimeTenant | undefined;
+    if (legacy) {
+        databaseData =
+            isRuntimeTenant(legacyTenant.databaseData) && !isAccessError(legacyTenant.error)
+                ? legacyTenant.databaseData
+                : undefined;
+    } else if (availability.status === 'runtime') {
+        databaseData = availability.tenant;
+    }
+    const isDatabaseDataLoading = legacy
+        ? legacyTenant.isLoading
+        : availability.status === 'loading';
+    // Runtime requests (e.g. healthcheck) are pointless when only the control plane responds
+    const isRuntimeUnavailable =
+        availability.status === 'control-plane' || availability.status === 'unavailable';
 
     // Show Monitoring only when:
     // - ControlPlane exists AND has a non-empty id
@@ -55,6 +65,7 @@ export function useDatabaseData({
     return {
         databaseData,
         isDatabaseDataLoading,
+        isRuntimeUnavailable,
         monitoringLinkUrl,
     };
 }

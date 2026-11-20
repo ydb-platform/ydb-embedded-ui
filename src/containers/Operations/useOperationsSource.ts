@@ -14,23 +14,32 @@ import {backend, environment} from '../../store/runtimeParams';
 
 const operationSourceSchema = z.enum(['database', 'control-plane']).catch('control-plane');
 
-export function useOperationsSource(database: string, controlPlaneOnly: boolean) {
+/** Whether operations of the database can be listed through the control plane */
+export function useControlPlaneOperationsAvailable(database: string) {
     const {name: clusterName} = useClusterBaseInfo();
-    const {controlPlane, databaseData, isError: tenantError} = useTenantBaseInfo(database);
+    const {controlPlane} = useTenantBaseInfo(database);
     const emMetaAvailable = useEmMetaAvailable();
     const listOperationsAvailable = useGetMetaFeatureVersion('/meta/list_operations') >= 1;
-    const metaCapabilitiesLoaded = useMetaCapabilitiesLoaded();
-    const [rawSource, setSource] = useQueryParam('operationSource', StringParam);
-    const [{kind, search}] = useQueryParams({kind: StringParam, search: StringParam});
-    const defaultSource = kind !== undefined || search !== undefined ? 'database' : 'control-plane';
-    const requestedSource = operationSourceSchema.parse(rawSource ?? defaultSource);
-    const cpAvailable = Boolean(
+
+    return Boolean(
         emMetaAvailable &&
             listOperationsAvailable &&
             clusterName &&
             controlPlane?.id &&
             controlPlane?.folder_id,
     );
+}
+
+export function useOperationsSource(database: string, controlPlaneOnly: boolean) {
+    const {name: clusterName} = useClusterBaseInfo();
+    const {controlPlane, databaseData, isError: tenantError} = useTenantBaseInfo(database);
+    const emMetaAvailable = useEmMetaAvailable();
+    const metaCapabilitiesLoaded = useMetaCapabilitiesLoaded();
+    const [rawSource, setSource] = useQueryParam('operationSource', StringParam);
+    const [{kind, search}] = useQueryParams({kind: StringParam, search: StringParam});
+    const defaultSource = kind !== undefined || search !== undefined ? 'database' : 'control-plane';
+    const requestedSource = operationSourceSchema.parse(rawSource ?? defaultSource);
+    const cpAvailable = useControlPlaneOperationsAvailable(database);
     const source =
         cpAvailable && (controlPlaneOnly || requestedSource === 'control-plane')
             ? 'control-plane'

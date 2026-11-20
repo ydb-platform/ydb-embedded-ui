@@ -2,13 +2,18 @@ import {createSlice} from '@reduxjs/toolkit';
 import type {PayloadAction} from '@reduxjs/toolkit';
 
 import type {TTenantInfo} from '../../../types/api/tenant';
-import {useClusterNameFromQuery} from '../../../utils/hooks/useDatabaseFromQuery';
+import {
+    useClusterNameFromQuery,
+    useDatabaseIdFromQuery,
+} from '../../../utils/hooks/useDatabaseFromQuery';
 import {useDatabasesV2} from '../../../utils/hooks/useDatabasesV2';
 import {backend, environment} from '../../runtimeParams';
 import {api} from '../api';
 import {getDatabaseDataTag} from '../entityDataTags';
 import {prepareTenants} from '../tenants/utils';
 
+import {getTenantName, hasMetaError, matchesDatabase} from './availability';
+import type {TenantInfoData} from './availability';
 import {TENANT_DIAGNOSTICS_TABS_IDS, TENANT_METRICS_TABS_IDS} from './constants';
 import type {
     TenantDiagnosticsTab,
@@ -42,34 +47,41 @@ const slice = createSlice({
             const isValidTab = action.payload && validTabs.includes(action.payload);
             state.metricsTab = isValidTab ? action.payload : TENANT_METRICS_TABS_IDS.cpu;
         },
+        setRuntimeSeenScope: (state, action: PayloadAction<string | undefined>) => {
+            state.runtimeSeenScope = action.payload;
+        },
     },
 });
 
 export default slice.reducer;
-export const {setQueryTab, setDiagnosticsTab, setSummaryTab, setMetricsTab} = slice.actions;
+export const {setQueryTab, setDiagnosticsTab, setSummaryTab, setMetricsTab, setRuntimeSeenScope} =
+    slice.actions;
+
+interface TenantInfoQueryArgs {
+    database: string;
+    /** Control plane id of the database, sent to the composite meta API only */
+    databaseId?: string;
+    clusterName?: string;
+    isMetaDatabasesAvailable: boolean;
+    environment?: string;
+    backend?: string;
+}
 
 export const tenantApi = api.injectEndpoints({
     endpoints: (builder) => ({
-        getTenantInfo: builder.query({
+        getTenantInfo: builder.query<TenantInfoData, TenantInfoQueryArgs>({
             queryFn: async (
-                {
-                    database,
-                    clusterName,
-                    isMetaDatabasesAvailable,
-                }: {
-                    database: string;
-                    clusterName?: string;
-                    isMetaDatabasesAvailable: boolean;
-                    environment?: string;
-                    backend?: string;
-                },
+                {database, databaseId, clusterName, isMetaDatabasesAvailable}: TenantInfoQueryArgs,
                 {signal},
             ) => {
                 try {
                     let tenantData: TTenantInfo;
+                    const composite = Boolean(
+                        window.api.meta && clusterName && isMetaDatabasesAvailable,
+                    );
                     if (window.api.meta && clusterName && isMetaDatabasesAvailable) {
                         tenantData = await window.api.meta.getTenantsV2(
-                            {database, clusterName},
+                            {database, databaseId, clusterName},
                             {signal},
                         );
                     } else if (window.api.meta && clusterName) {
@@ -80,28 +92,35 @@ export const tenantApi = api.injectEndpoints({
                     } else {
                         tenantData = await window.api.viewer.getTenantInfo({database}, {signal});
                     }
-                    const databases = prepareTenants(
-                        tenantData.TenantInfo || [],
-                        tenantData.errors,
-                    );
-                    // previous meta versions do not support filtering databases by name
-                    const data =
-                        databases.find(
-                            (tenant) =>
-                                tenant.Name === database ||
-                                tenant.Id === database ||
-                                tenant.ControlPlane?.id === database,
-                        ) ?? databases[0];
-                    if (!data) {
+                    const tenants = tenantData.TenantInfo || [];
+                    const metaErrors = tenantData.errors;
+                    // Only the composite API reports that the runtime part of the response is missing
+                    const runtimeUnavailable = composite && hasMetaError(metaErrors?.viewer);
+                    // Previous meta versions do not support filtering databases by name, so the first
+                    // item is a fallback. Control plane data of another database is never selected.
+                    const tenant =
+                        tenants.find((item) => matchesDatabase(item, database, databaseId)) ??
+                        (runtimeUnavailable ? undefined : tenants[0]);
+                    if (!tenant) {
                         return {
                             error: {
                                 code: 'EMPTY_TENANT_INFO',
-                                ...(tenantData.errors !== undefined
-                                    ? {metaErrors: tenantData.errors}
-                                    : {}),
+                                ...(metaErrors !== undefined ? {metaErrors} : {}),
                             },
                         };
                     }
+                    if (runtimeUnavailable) {
+                        const data: TenantInfoData = {
+                            ...tenant,
+                            metaErrors,
+                            availability: 'control-plane',
+                        };
+                        return {data};
+                    }
+                    const data: TenantInfoData = {
+                        ...prepareTenants(tenants, metaErrors)[tenants.indexOf(tenant)],
+                        availability: 'runtime',
+                    };
                     return {data};
                 } catch (error) {
                     return {error};
@@ -127,8 +146,11 @@ export const tenantApi = api.injectEndpoints({
                 return {
                     clusterName: queryArgs.clusterName,
                     database: queryArgs.database,
+                    databaseId: queryArgs.databaseId,
                     environment: queryArgs.environment,
                     backend: queryArgs.backend,
+                    // V1 and V2 meta APIs return different data for the same database
+                    isMetaDatabasesAvailable: queryArgs.isMetaDatabasesAvailable,
                 };
             },
         }),
@@ -144,10 +166,12 @@ export function useTenantBaseInfo(
     const clusterNameFromQuery = useClusterNameFromQuery();
     const clusterName = clusterNameOverride ?? clusterNameFromQuery;
     const isMetaDatabasesAvailable = useDatabasesV2();
+    const databaseId = useDatabaseIdFromQuery(database);
 
-    const {currentData, isLoading, isError, error} = tenantApi.useGetTenantInfoQuery(
+    const {currentData, isLoading, isError, error, refetch} = tenantApi.useGetTenantInfoQuery(
         {
             database,
+            databaseId,
             clusterName,
             isMetaDatabasesAvailable,
             environment,
@@ -156,13 +180,14 @@ export function useTenantBaseInfo(
         {skip: skip || !database},
     );
 
-    const {ControlPlane, Name, Id, Type} = currentData || {};
+    const {ControlPlane, Id, Type} = currentData || {};
 
     return {
         databaseData: currentData,
+        refetch,
         controlPlane: ControlPlane,
         metaErrors: currentData?.metaErrors,
-        name: Name,
+        name: getTenantName(currentData),
         id: Id,
         databaseType: Type,
         isLoading,

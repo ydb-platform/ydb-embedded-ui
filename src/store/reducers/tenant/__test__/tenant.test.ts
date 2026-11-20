@@ -2,6 +2,7 @@ import {configureStore} from '@reduxjs/toolkit';
 
 import type {YdbEmbeddedAPI} from '../../../../services/api';
 import {parseMetaTenants} from '../../../../services/parsers/parseMetaTenants';
+import type {MetaTenants} from '../../../../types/api/meta';
 import type {TTenant} from '../../../../types/api/tenant';
 import {api} from '../../api';
 import {tenantApi} from '../tenant';
@@ -257,4 +258,182 @@ describe('tenantApi.getTenantInfo', () => {
             data: expect.objectContaining({Id: firstTenant.Id, Name: firstTenant.Name}),
         });
     });
+    const compositeArgs = {...queryArgs, clusterName: 'cluster', isMetaDatabasesAvailable: true};
+    const cpTenant: TTenant = {
+        Id: 'cp-id',
+        Name: queryArgs.database,
+        ControlPlane: {id: 'cp-id', name: 'Display'},
+    };
+
+    test('keeps CP-only data raw without fabricated runtime counters and preserves partial errors', async () => {
+        const getTenantsV2 = jest
+            .fn()
+            .mockResolvedValue({TenantInfo: [cpTenant], errors: {viewer: 'Unavailable'}});
+        window.api = {meta: {getTenantsV2}} as unknown as YdbEmbeddedAPI;
+        const store = createTestStore();
+        const result = await store.dispatch(
+            tenantApi.endpoints.getTenantInfo.initiate(compositeArgs),
+        );
+        expect(result.data).toEqual({
+            ...cpTenant,
+            availability: 'control-plane',
+            metaErrors: {viewer: 'Unavailable'},
+        });
+        expect(result.data).not.toHaveProperty('nodesCount');
+        expect(result.data).not.toHaveProperty('cpu');
+        expect(getTenantsV2).toHaveBeenCalledTimes(1);
+    });
+
+    test('sends the database id to the composite API and caches it separately', async () => {
+        const getTenantsV2 = jest.fn().mockResolvedValue({TenantInfo: [cpTenant]});
+        window.api = {meta: {getTenantsV2}} as unknown as YdbEmbeddedAPI;
+        const store = createTestStore();
+        const endpoint = tenantApi.endpoints.getTenantInfo;
+
+        await store.dispatch(endpoint.initiate({...compositeArgs, databaseId: 'cp-id'}));
+        expect(getTenantsV2).toHaveBeenLastCalledWith(
+            expect.objectContaining({database: compositeArgs.database, databaseId: 'cp-id'}),
+            expect.anything(),
+        );
+
+        await store.dispatch(endpoint.initiate(compositeArgs));
+        expect(getTenantsV2).toHaveBeenCalledTimes(2);
+        expect(getTenantsV2.mock.calls[1][0].databaseId).toBeUndefined();
+    });
+
+    test('selects a CP-only record by the database id when its path differs', async () => {
+        const response = {TenantInfo: [cpTenant], errors: {viewer: 'Unavailable'}};
+        window.api = {
+            meta: {getTenantsV2: jest.fn().mockResolvedValue(response)},
+        } as unknown as YdbEmbeddedAPI;
+        const store = createTestStore();
+        const endpoint = tenantApi.endpoints.getTenantInfo;
+        const args = {...compositeArgs, database: '/alias'};
+
+        expect((await store.dispatch(endpoint.initiate(args))).error).toMatchObject({
+            code: 'EMPTY_TENANT_INFO',
+        });
+        const result = await store.dispatch(endpoint.initiate({...args, databaseId: 'cp-id'}));
+        expect(result.data).toMatchObject({Name: cpTenant.Name, availability: 'control-plane'});
+    });
+
+    test('rejects unrelated CP-only records instead of selecting the first item', async () => {
+        window.api = {
+            meta: {
+                getTenantsV2: jest.fn().mockResolvedValue({
+                    TenantInfo: [{...cpTenant, Name: '/other', Id: 'other-id'}],
+                    errors: {viewer: 'Unavailable'},
+                }),
+            },
+        } as unknown as YdbEmbeddedAPI;
+        const result = await createTestStore().dispatch(
+            tenantApi.endpoints.getTenantInfo.initiate(compositeArgs),
+        );
+        expect(result).toMatchObject({status: 'rejected', error: {code: 'EMPTY_TENANT_INFO'}});
+    });
+
+    test('retains runtime data when only CP fails and supports recovery from CP-only', async () => {
+        window.api = {
+            meta: {
+                getTenantsV2: jest
+                    .fn()
+                    .mockResolvedValueOnce({
+                        TenantInfo: [cpTenant],
+                        errors: {viewer: 'Unavailable'},
+                    })
+                    .mockResolvedValueOnce({
+                        TenantInfo: [{...cpTenant, NodeIds: [1, 2]}],
+                        errors: {control_plane: 'Unavailable'},
+                    }),
+            },
+        } as unknown as YdbEmbeddedAPI;
+        const store = createTestStore();
+        await store.dispatch(tenantApi.endpoints.getTenantInfo.initiate(compositeArgs));
+        const result = await store.dispatch(
+            tenantApi.endpoints.getTenantInfo.initiate(compositeArgs, {forceRefetch: true}),
+        );
+        expect(result.data).toMatchObject({
+            availability: 'runtime',
+            nodesCount: 2,
+            metaErrors: {control_plane: 'Unavailable'},
+        });
+    });
+
+    test('deduplicates direct extension subscribers with existing arguments', async () => {
+        const getTenantsV2 = jest
+            .fn()
+            .mockResolvedValue({TenantInfo: [cpTenant], errors: {viewer: 'Unavailable'}});
+        window.api = {meta: {getTenantsV2}} as unknown as YdbEmbeddedAPI;
+        const store = createTestStore();
+        await Promise.all([
+            store.dispatch(tenantApi.endpoints.getTenantInfo.initiate(compositeArgs)),
+            store.dispatch(tenantApi.endpoints.getTenantInfo.initiate({...compositeArgs})),
+        ]);
+        expect(getTenantsV2).toHaveBeenCalledTimes(1);
+    });
+
+    test('late pre-reset responses cannot overwrite a new scope with the same database', async () => {
+        let resolvePrevious: (value: unknown) => void = () => undefined;
+        const pending = new Promise((resolve) => {
+            resolvePrevious = resolve;
+        });
+        window.api = {
+            meta: {
+                getTenantsV2: jest
+                    .fn()
+                    .mockReturnValueOnce(pending)
+                    .mockResolvedValueOnce({
+                        TenantInfo: [{...cpTenant, ControlPlane: {id: 'new-scope'}}],
+                        errors: {viewer: 'Unavailable'},
+                    }),
+            },
+        } as unknown as YdbEmbeddedAPI;
+        const store = createTestStore();
+        const previous = store.dispatch(tenantApi.endpoints.getTenantInfo.initiate(compositeArgs));
+        store.dispatch(api.util.resetApiState());
+        const current = store.dispatch(tenantApi.endpoints.getTenantInfo.initiate(compositeArgs));
+        resolvePrevious({TenantInfo: [cpTenant], errors: {viewer: 'Unavailable'}});
+        await Promise.all([previous, current]);
+        expect(
+            tenantApi.endpoints.getTenantInfo.select(compositeArgs)(store.getState()).data
+                ?.ControlPlane?.id,
+        ).toBe('new-scope');
+    });
+    test('only the composite API can mark the runtime as unavailable', async () => {
+        window.api = {
+            meta: {
+                getTenants: jest.fn().mockResolvedValue({
+                    TenantInfo: [cpTenant],
+                    errors: {viewer: 'Unavailable'},
+                }),
+            },
+        } as unknown as YdbEmbeddedAPI;
+        const result = await createTestStore().dispatch(
+            tenantApi.endpoints.getTenantInfo.initiate({
+                ...compositeArgs,
+                isMetaDatabasesAvailable: false,
+            }),
+        );
+        expect(result.data?.availability).toBe('runtime');
+    });
+
+    test.each([undefined, null, '', '   ', 'Viewer failed'])(
+        'only a nonempty viewer error selects CP: %p',
+        async (viewer) => {
+            // Older meta versions may send null or an empty string for a source without errors
+            const errors = {viewer} as MetaTenants['errors'];
+            const response = parseMetaTenants({databases: [cpTenant], errors});
+            window.api = {
+                meta: {getTenantsV2: jest.fn().mockResolvedValue(response)},
+            } as unknown as YdbEmbeddedAPI;
+            const result = await createTestStore().dispatch(
+                tenantApi.endpoints.getTenantInfo.initiate(compositeArgs),
+            );
+            const hasError = viewer === 'Viewer failed';
+            expect(result.data?.availability).toBe(hasError ? 'control-plane' : 'runtime');
+            if (hasError) {
+                expect(result.data).not.toHaveProperty('nodesCount');
+            }
+        },
+    );
 });

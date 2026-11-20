@@ -11,7 +11,12 @@ const b = cn('ydb-tenant-navigation');
 
 type MenuItem = ReturnType<typeof useTenantNavigation>[0];
 
-const transformItemToOption = ({id, title, icon}: MenuItem): SegmentedRadioGroupOptionProps => {
+const transformItemToOption = ({
+    id,
+    title,
+    icon,
+    disabled,
+}: MenuItem): SegmentedRadioGroupOptionProps => {
     const content = (
         <span className={b('item')}>
             {icon ? <Icon data={icon} size={16} className={b('icon')} /> : null}
@@ -19,7 +24,7 @@ const transformItemToOption = ({id, title, icon}: MenuItem): SegmentedRadioGroup
         </span>
     );
 
-    return {value: id, content};
+    return {value: id, content, disabled};
 };
 
 export const TenantNavigation = () => {

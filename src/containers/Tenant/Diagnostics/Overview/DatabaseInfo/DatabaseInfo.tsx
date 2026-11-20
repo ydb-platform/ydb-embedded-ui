@@ -4,6 +4,7 @@ import {Alert, Card, Flex, Text} from '@gravity-ui/uikit';
 
 import {SegmentedProgress} from '../../../../../components/SegmentedProgress/SegmentedProgress';
 import {selectNodesMap} from '../../../../../store/reducers/nodesList';
+import {isRuntimeTenant} from '../../../../../store/reducers/tenant/availability';
 import {useTenantBaseInfo} from '../../../../../store/reducers/tenant/tenant';
 import type {TEvDescribeSchemeResult} from '../../../../../types/api/schema';
 import {cn} from '../../../../../utils/cn';
@@ -29,9 +30,11 @@ export function DatabaseInfo({data, path, database}: DBInfoProps) {
     const nodes = useTypedSelector((state) => selectNodesMap(state, database));
     const datacenters = React.useMemo(() => countDatacenterNodes(nodes?.values() ?? []), [nodes]);
     const {databaseData} = useTenantBaseInfo(database);
+    // Runtime details are not shown for control plane only data
+    const runtimeData = isRuntimeTenant(databaseData) ? databaseData : undefined;
     const additionalItems = React.useMemo(
         () => [
-            ...(databaseData && databaseData.Type !== 'Serverless'
+            ...(runtimeData && runtimeData.Type !== 'Serverless'
                 ? [
                       {
                           name: dbInfoKeyset('field_datacenters'),
@@ -39,9 +42,9 @@ export function DatabaseInfo({data, path, database}: DBInfoProps) {
                       },
                   ]
                 : []),
-            ...(prepareAdditionalDatabaseInfoItems(databaseData) ?? []),
+            ...(prepareAdditionalDatabaseInfoItems(runtimeData) ?? []),
         ],
-        [databaseData, datacenters],
+        [runtimeData, datacenters],
     );
 
     const {PathsInside, PathsLimit, ShardsInside, ShardsLimit} =

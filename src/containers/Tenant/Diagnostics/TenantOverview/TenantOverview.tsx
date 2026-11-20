@@ -31,7 +31,10 @@ import type {ETenantType, TTenant, TTenantResource} from '../../../../types/api/
 import {getInfoTabLinks} from '../../../../utils/additionalProps';
 import {TENANT_DEFAULT_TITLE} from '../../../../utils/constants';
 import {useAutoRefreshInterval, useTypedDispatch, useTypedSelector} from '../../../../utils/hooks';
-import {useClusterNameFromQuery} from '../../../../utils/hooks/useDatabaseFromQuery';
+import {
+    useClusterNameFromQuery,
+    useDatabaseIdFromQuery,
+} from '../../../../utils/hooks/useDatabaseFromQuery';
 import {useDatabaseHealthcheckAvailable} from '../../../../utils/hooks/useDatabaseHealthcheckAvailable';
 import {useDatabasesV2} from '../../../../utils/hooks/useDatabasesV2';
 import {canShowTenantMonitoringTab} from '../../../../utils/monitoringVisibility';
@@ -271,13 +274,14 @@ export function TenantOverview({
     const {handleTenantPageChange} = useTenantPage();
 
     const isMetaDatabasesAvailable = useDatabasesV2();
+    const databaseId = useDatabaseIdFromQuery(database);
 
     const {
         currentData: tenant,
         isFetching,
         error,
     } = tenantApi.useGetTenantInfoQuery(
-        {database, clusterName, isMetaDatabasesAvailable, environment, backend},
+        {database, databaseId, clusterName, isMetaDatabasesAvailable, environment, backend},
         {pollingInterval: autoRefreshInterval},
     );
 

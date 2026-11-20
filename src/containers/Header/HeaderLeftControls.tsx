@@ -5,6 +5,7 @@ import {getConnectToDBDialog} from '../../components/ConnectToDB/ConnectToDBDial
 import {ServerlessDBLabel} from '../../components/ServerlessDBLabel/ServerlessDBLabel';
 import type {PreparedTenant} from '../../store/reducers/tenants/types';
 import {useDatabaseHealthcheckAvailable} from '../../utils/hooks/useDatabaseHealthcheckAvailable';
+import {RuntimeUnavailableLabel} from '../Tenant/DatabaseAvailability/RuntimeUnavailableLabel';
 import {HealthcheckPreview} from '../Tenant/Diagnostics/TenantOverview/Healthcheck/HealthcheckPreview';
 
 import {b} from './constants';
@@ -14,17 +15,19 @@ interface HeaderLeftControlsProps {
     database: string;
     databaseData?: PreparedTenant;
     isDatabaseDataLoading: boolean;
+    isRuntimeUnavailable?: boolean;
 }
 
 export function HeaderLeftControls({
     database,
     databaseData,
     isDatabaseDataLoading,
+    isRuntimeUnavailable,
 }: HeaderLeftControlsProps) {
     const healthcheckAvailable = useDatabaseHealthcheckAvailable(databaseData?.Type);
     const showCopyButton = Boolean(databaseData?.Name);
     const isServerless = databaseData?.Type === 'Serverless';
-    const showHealthcheck = healthcheckAvailable && !isDatabaseDataLoading;
+    const showHealthcheck = healthcheckAvailable && !isDatabaseDataLoading && !isRuntimeUnavailable;
 
     return (
         <Flex direction="row" alignItems={'center'} gap={2} className={b('left-controls')}>
@@ -51,6 +54,7 @@ export function HeaderLeftControls({
             <Flex direction="row" alignItems={'center'} gap={2}>
                 {isServerless ? <ServerlessDBLabel /> : null}
                 {showHealthcheck ? <HealthcheckPreview database={database} compact /> : null}
+                {isRuntimeUnavailable ? <RuntimeUnavailableLabel /> : null}
             </Flex>
         </Flex>
     );

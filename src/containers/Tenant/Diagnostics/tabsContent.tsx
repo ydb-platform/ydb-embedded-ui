@@ -9,6 +9,8 @@ import {Nodes} from '../../Nodes/Nodes';
 import {Operations} from '../../Operations/Operations';
 import {PaginatedStorage} from '../../Storage/PaginatedStorage';
 import {Tablets} from '../../Tablets/Tablets';
+import {ControlPlaneInfo} from '../DatabaseAvailability/ControlPlaneInfo';
+import {useDatabaseRuntimeState} from '../DatabaseAvailability/useDatabaseAvailability';
 import {SchemaViewer} from '../Schema/SchemaViewer/SchemaViewer';
 
 import {AccessRights} from './AccessRights/AccessRights';
@@ -42,13 +44,27 @@ type DiagnosticsTabRenderer = (
     options: Omit<DiagnosticsTabContentOptions, 'activeTabId'>,
 ) => React.ReactNode;
 
+function DatabaseOverview(props: React.ComponentProps<typeof TenantOverview>) {
+    const {coldStart} = useDatabaseRuntimeState();
+    return coldStart ? (
+        <ControlPlaneInfo database={props.database} />
+    ) : (
+        <TenantOverview {...props} />
+    );
+}
+
+function DatabaseOperations(props: React.ComponentProps<typeof Operations>) {
+    const {coldStart} = useDatabaseRuntimeState();
+    return <Operations {...props} controlPlaneOnly={coldStart} />;
+}
+
 const diagnosticsTabRenderers: Record<TenantDiagnosticsTab, DiagnosticsTabRenderer> = {
     [TENANT_DIAGNOSTICS_TABS_IDS.database]: ({
         database,
         databaseFullPath,
         additionalTenantProps,
     }) => (
-        <TenantOverview
+        <DatabaseOverview
             database={database}
             databaseFullPath={databaseFullPath}
             additionalTenantProps={additionalTenantProps}
@@ -176,7 +192,7 @@ const diagnosticsTabRenderers: Record<TenantDiagnosticsTab, DiagnosticsTabRender
         <Configs database={database} scrollContainerRef={scrollContainerRef} />
     ),
     [TENANT_DIAGNOSTICS_TABS_IDS.operations]: ({database, scrollContainerRef}) => (
-        <Operations database={database} scrollContainerRef={scrollContainerRef} />
+        <DatabaseOperations database={database} scrollContainerRef={scrollContainerRef} />
     ),
     [TENANT_DIAGNOSTICS_TABS_IDS.backups]: ({database, scrollContainerRef}) =>
         uiFactory.renderBackups?.({

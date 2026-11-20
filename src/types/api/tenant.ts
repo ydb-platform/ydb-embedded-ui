@@ -142,10 +142,16 @@ export interface ControlPlane {
     name?: string;
     id?: string;
     endpoint?: string;
+    status?: string;
+    type?: string;
 
     folder_id?: string;
     location_id?: string;
     resource_preset_id?: string;
+    labels?: {
+        database_path?: string;
+        [key: string]: string | undefined;
+    };
 
     scale_policy?: {
         fixed_scale: {

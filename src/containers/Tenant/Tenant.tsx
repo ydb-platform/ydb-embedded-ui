@@ -20,6 +20,7 @@ import {useSetting} from '../../utils/hooks/useSetting';
 import {isAccessError} from '../../utils/response';
 import {useAppTitle} from '../App/AppTitleContext';
 
+import {useDatabaseRuntimeState} from './DatabaseAvailability/useDatabaseAvailability';
 import Diagnostics from './Diagnostics/Diagnostics';
 import ObjectGeneral from './ObjectGeneral/ObjectGeneral';
 import {ObjectSummary} from './ObjectSummary/ObjectSummary';
@@ -70,7 +71,9 @@ export function Tenant({additionalTenantProps}: TenantProps) {
 
     const databaseName = name ?? '';
 
-    const path = schema ?? databaseName;
+    // Without the runtime only the database itself can be shown, see `useTenantPage`
+    const {coldStart} = useDatabaseRuntimeState();
+    const path = coldStart ? databaseName : (schema ?? databaseName);
 
     const dispatch = useTypedDispatch();
     React.useEffect(() => {
@@ -82,7 +85,8 @@ export function Tenant({additionalTenantProps}: TenantProps) {
 
     const isV2Enabled = useNavigationV2Enabled();
     const {tenantPage} = useTenantPage();
-    const showDatabaseDiagnostics = isV2Enabled && tenantPage === TENANT_PAGES_IDS.database;
+    const showDatabaseDiagnostics =
+        coldStart || (isV2Enabled && tenantPage === TENANT_PAGES_IDS.database);
 
     const title = path || i18n('title_database');
     const {appTitle} = useAppTitle();

@@ -156,6 +156,12 @@
             width: 100%;
         }
 
+        &_disabled {
+            cursor: not-allowed;
+
+            opacity: 0.4;
+        }
+
         &:hover {
             border-radius: var(--ydb-nav-button-border-radius);
             background: var(--ydb-nav-button-hover-bg);

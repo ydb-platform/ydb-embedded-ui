@@ -39,6 +39,7 @@ export function Header() {
         handleDeleteCluster,
         databaseData,
         isDatabaseDataLoading,
+        isRuntimeUnavailable,
         clusterLinks,
         databaseLinks,
         prepareTenantBackend,
@@ -84,6 +85,7 @@ export function Header() {
                 database={database}
                 databaseData={databaseData}
                 isDatabaseDataLoading={isDatabaseDataLoading}
+                isRuntimeUnavailable={isRuntimeUnavailable}
             />
         ) : null;
     };

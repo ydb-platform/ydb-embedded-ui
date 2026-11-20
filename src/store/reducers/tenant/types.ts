@@ -23,4 +23,6 @@ export interface TenantState {
     diagnosticsTab: TenantDiagnosticsTab;
     summaryTab?: TenantSummaryTab;
     metricsTab: TenantMetricsTab;
+    /** `cluster/database` whose runtime responded at least once since the page was opened */
+    runtimeSeenScope?: string;
 }

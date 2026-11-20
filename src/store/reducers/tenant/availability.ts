@@ -1,0 +1,150 @@
+import type {TTenant} from '../../../types/api/tenant';
+import type {TUserToken} from '../../../types/api/whoami';
+import {isAccessError} from '../../../utils/response';
+import type {PreparedTenant} from '../tenants/types';
+
+/** Runtime (Viewer) data is available, the tenant is prepared with runtime metrics. */
+export type RuntimeTenant = PreparedTenant & {availability: 'runtime'};
+/** Only control plane data is available: runtime fields are absent rather than zeroed. */
+export type ControlPlaneTenant = TTenant & {
+    availability: 'control-plane';
+    metaErrors?: PreparedTenant['metaErrors'];
+};
+export type TenantInfoData = RuntimeTenant | ControlPlaneTenant;
+
+/** Older meta versions may return `null` or an empty string for a source without errors. */
+export function hasMetaError(error: unknown): error is string {
+    return typeof error === 'string' && error.trim() !== '';
+}
+
+export function isRuntimeTenant(tenant?: TenantInfoData): tenant is RuntimeTenant {
+    return tenant?.availability === 'runtime';
+}
+
+/**
+ * Database name to show. A response without runtime data may lack `Name`,
+ * the control plane then names the database itself.
+ */
+export function getTenantName(tenant?: TTenant) {
+    const controlPlane = tenant?.ControlPlane;
+    return tenant?.Name || controlPlane?.labels?.database_path || controlPlane?.name || undefined;
+}
+
+/**
+ * Whether the record describes the requested database. The path can be compared with the
+ * runtime name or the control plane path, the id with the runtime or the control plane id.
+ * The control plane display name is never an identity.
+ */
+export function matchesDatabase(tenant: TTenant, database: string, databaseId?: string) {
+    const controlPlane = tenant.ControlPlane;
+    const ids = [tenant.Id, controlPlane?.id];
+    const paths = [tenant.Name, controlPlane?.labels?.database_path];
+    return Boolean(
+        (databaseId && ids.includes(databaseId)) ||
+            (database && (ids.includes(database) || paths.includes(database))),
+    );
+}
+
+export function hasUsableControlPlane(tenant?: TTenant) {
+    return Boolean(tenant?.ControlPlane?.id?.trim());
+}
+
+export type DatabaseAvailability =
+    /** The composite meta API is not used for this database, the regular data flow applies. */
+    | {status: 'legacy'}
+    | {status: 'loading'}
+    | {status: 'access-error'; error: unknown}
+    /** The regular database page. `tenant` is set only when runtime access is confirmed. */
+    | {status: 'runtime'; tenant?: RuntimeTenant}
+    | {status: 'control-plane'; tenant: TTenant}
+    /** Runtime is unavailable and control plane data cannot be shown either. */
+    | {status: 'unavailable'; error: unknown};
+
+export function isTenantRequestReady({
+    whoamiData,
+    whoamiError,
+    clusterInfoResolved,
+}: {
+    whoamiData?: TUserToken;
+    whoamiError?: unknown;
+    clusterInfoResolved: boolean;
+}) {
+    if (isAccessError(whoamiError)) {
+        return false;
+    }
+    if (!whoamiData && !whoamiError) {
+        return false;
+    }
+    // Only Viewer users can load the protected cluster settings that select the tenant API.
+    // An operational whoami failure or a non-Viewer role keeps the default API policy.
+    return whoamiData?.IsViewerAllowed !== true || clusterInfoResolved;
+}
+
+interface DatabaseAvailabilityParams {
+    database: string;
+    /** Control plane id of the database when the link provides it */
+    databaseId?: string;
+    /** Whether the composite (runtime + control plane) tenant API is used */
+    composite: boolean;
+    whoamiData?: TUserToken;
+    whoamiError?: unknown;
+    capabilitiesError?: unknown;
+    clusterInfoResolved: boolean;
+    tenantData?: TenantInfoData;
+    tenantError?: unknown;
+}
+
+export function getDatabaseAvailability({
+    database,
+    databaseId,
+    composite,
+    whoamiData,
+    whoamiError,
+    capabilitiesError,
+    clusterInfoResolved,
+    tenantData,
+    tenantError,
+}: DatabaseAvailabilityParams): DatabaseAvailability {
+    // An authorization failure from any source wins over data retained from earlier requests.
+    const accessError = [tenantError, whoamiError, capabilitiesError].find(isAccessError);
+    if (accessError) {
+        return {status: 'access-error', error: accessError};
+    }
+    if (!isTenantRequestReady({whoamiData, whoamiError, clusterInfoResolved})) {
+        return {status: 'loading'};
+    }
+    if (!composite) {
+        return {status: 'legacy'};
+    }
+
+    const runtimeAuthorized = Boolean(whoamiData && !whoamiError);
+    const getRuntime = (tenant?: RuntimeTenant): DatabaseAvailability => ({
+        status: 'runtime',
+        tenant: runtimeAuthorized ? tenant : undefined,
+    });
+
+    if (!tenantData) {
+        // A cold composite failure keeps the regular page and its own error handling.
+        return tenantError ? getRuntime() : {status: 'loading'};
+    }
+    if (tenantError) {
+        // Retained data from a failed request never authorizes control plane mode.
+        return isRuntimeTenant(tenantData)
+            ? getRuntime(tenantData)
+            : {status: 'unavailable', error: tenantError};
+    }
+
+    const controlPlaneUsable =
+        matchesDatabase(tenantData, database, databaseId) && hasUsableControlPlane(tenantData);
+
+    if (!isRuntimeTenant(tenantData)) {
+        return controlPlaneUsable
+            ? {status: 'control-plane', tenant: tenantData}
+            : {status: 'unavailable', error: {status: 503, data: tenantData.metaErrors?.viewer}};
+    }
+    // The composite request reached the runtime, but the runtime cannot serve this user.
+    if (whoamiError && controlPlaneUsable) {
+        return {status: 'control-plane', tenant: tenantData};
+    }
+    return getRuntime(tenantData);
+}

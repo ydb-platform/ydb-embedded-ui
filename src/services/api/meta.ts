@@ -85,9 +85,15 @@ export class MetaAPI extends BaseMetaAPI {
     getTenantsV2(
         {
             database,
+            databaseId,
             clusterName,
             environmentName,
-        }: {clusterName?: string; database?: string; environmentName?: string},
+        }: {
+            clusterName?: string;
+            database?: string;
+            databaseId?: string;
+            environmentName?: string;
+        },
         {signal}: AxiosOptions = {},
     ) {
         return this.get<MetaTenants>(
@@ -96,6 +102,7 @@ export class MetaAPI extends BaseMetaAPI {
                 cluster_name: clusterName,
                 environment_name: environmentName,
                 database,
+                database_id: databaseId,
             },
             {requestConfig: {signal}},
         ).then(parseMetaTenants);
