@@ -14,7 +14,7 @@ test('uses inline slot details and authoritative health without a disk inventory
         MonitoredQuorum: 'NoQuorum',
     };
     const slots = [
-        {...id(1), DDiskPath: 'actors/ddisks/ddisk_p000000001_s000001010'},
+        id(1),
         {...id(2), AllocatedSize: '1000', PersistentBufferId: '[2:5893148750:1010]'},
     ];
     const getNbsTablet = jest.fn().mockResolvedValue({Status: 'OK', Groups: [group], Slots: slots});

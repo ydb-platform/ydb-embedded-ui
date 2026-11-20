@@ -17,7 +17,6 @@ test('links to the selected DDisk and Persistent Buffer instead of a VDisk', () 
                 NodeId: 3,
                 PDiskId: 1000,
                 DDiskSlotId: 1010,
-                DDiskPath: 'actors/ddisks/ddisk_p000001000_s000001010',
                 PersistentBufferId: '[3:5893148750:1010]',
                 DDiskOccupancy: 0.25,
                 PersistentBufferOccupancy: 0.5,
@@ -40,6 +39,23 @@ test('links to the selected DDisk and Persistent Buffer instead of a VDisk', () 
     expect(screen.getByText('25.0%')).toBeInTheDocument();
     expect(screen.getByText('50.0%')).toBeInTheDocument();
     expect(screen.queryByText(/VDisk/)).not.toBeInTheDocument();
+});
+
+test('preserves the explicit DDisk path when slot coordinates are available', () => {
+    render(
+        <DDiskInfo
+            data={{
+                NodeId: 3,
+                PDiskId: 1000,
+                DDiskSlotId: 1010,
+                DDiskPath: 'actors/ddisks/legacy_slot',
+            }}
+        />,
+    );
+    expect(screen.getByRole('link', {name: 'Open DDisk'})).toHaveAttribute(
+        'href',
+        'http://cluster/node/3/actors/ddisks/legacy_slot',
+    );
 });
 
 test.each([false, true])('missing samples are not failures (compact=%s)', (compact) => {

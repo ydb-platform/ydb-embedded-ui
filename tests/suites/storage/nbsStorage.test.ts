@@ -10,10 +10,6 @@ const TABLETS = [
         GroupsCount: 2,
         DiskUsage: 1.2,
         Degrade: 2,
-        UnavailableDDiskGroups: [{Missing: 2, Count: 1}],
-        UnavailablePersistentBufferGroups: [{Missing: 1, Count: 2}],
-        GroupsWithUnknownDDiskStatus: 1,
-        GroupsWithUnknownPersistentBufferStatus: 0,
     },
     {
         TabletId: '72075186224037902',
@@ -100,9 +96,8 @@ test('NBS tablets group by usage and degrade and keep unknown monitoring separat
     await expect(page).toHaveURL(/nbsGroupBy=degrade/);
     await page.getByRole('button', {name: /Degrade: 2/}).click();
     await expect(page.getByRole('link', {name: TABLETS[0].TabletId, exact: true})).toBeVisible();
-    await expect(page.getByText('−1: 0 · −2: 1 · −3: 0', {exact: true})).toBeVisible();
-    await expect(page.getByText('−1: 2 · −2: 0 · −3: 0', {exact: true})).toBeVisible();
-    await expect(page.getByText('Groups with unknown status: 1', {exact: true})).toBeVisible();
+    await expect(page.getByText('Groups by missing DDisks', {exact: true})).toHaveCount(0);
+    await expect(page.getByText('Groups by missing buffers', {exact: true})).toHaveCount(0);
 });
 
 test('DDisk sorting sends the selected role and direction to CMS and survives reload', async ({
@@ -120,7 +115,6 @@ test('DDisk sorting sends the selected role and direction to CMS and survives re
                     {
                         DiskId: {NodeId: 42, PDiskId: 1000, DDiskSlotId: 1010},
                         StoragePoolName: 'pool-a',
-                        DDiskPath: 'actors/ddisks/ddisk_p000001000_s000001010',
                         PersistentBufferId: '[42:5893148750:1010]',
                         State: 'Normal',
                         Available: true,
@@ -387,7 +381,6 @@ test('tablet groups load on click, filter degraded groups and restore the mode',
                     {
                         ...failed,
                         PersistentBufferId: '[2:5893148750:1010]',
-                        DDiskPath: 'actors/ddisks/ddisk_p000000001_s000001010',
                     },
                 ],
                 Groups: [

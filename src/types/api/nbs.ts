@@ -1,10 +1,5 @@
 import type {DDiskComponentStatus, TDDiskStateInfo} from './ddisk';
 
-export interface NbsMissingGroups {
-    Missing: number;
-    Count: number;
-}
-
 export interface NbsTablet {
     TabletId: string;
     DiskId?: string;
@@ -13,10 +8,6 @@ export interface NbsTablet {
     LastChangedAt?: string | number;
     UnavailableDDiskCount?: number;
     UnavailablePersistentBufferCount?: number;
-    UnavailableDDiskGroups?: NbsMissingGroups[];
-    UnavailablePersistentBufferGroups?: NbsMissingGroups[];
-    GroupsWithUnknownDDiskStatus?: number;
-    GroupsWithUnknownPersistentBufferStatus?: number;
     Degrade?: number;
     DiskUsage?: number;
 }
@@ -24,7 +15,6 @@ export interface NbsTablet {
 export interface NbsDisk {
     DiskId: {NodeId: number; PDiskId: number; DDiskSlotId: number};
     StoragePoolName?: string;
-    DDiskPath?: string;
     PersistentBufferId?: string;
     DDiskTabletCount?: number;
     PersistentBufferTabletCount?: number;
