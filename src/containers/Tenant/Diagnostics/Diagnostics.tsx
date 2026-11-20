@@ -5,10 +5,12 @@ import {Helmet} from 'react-helmet-async';
 
 import {CopyableValue} from '../../../components/CopyableValue/CopyableValue';
 import {DrawerContextProvider} from '../../../components/Drawer/DrawerContext';
+import {selectDatabaseCapabilities} from '../../../store/reducers/capabilities/capabilities';
 import {TENANT_DIAGNOSTICS_TABS_IDS} from '../../../store/reducers/tenant/constants';
 import {setDiagnosticsTab, useTenantBaseInfo} from '../../../store/reducers/tenant/tenant';
 import type {AdditionalTenantsProps} from '../../../types/additionalProps';
 import type {EPathSubType, EPathType} from '../../../types/api/schema';
+import {uiFactory} from '../../../uiFactory/uiFactory';
 import {useScrollPosition, useTypedDispatch, useTypedSelector} from '../../../utils/hooks';
 import i18n from '../i18n';
 import {useNavigationV2Enabled} from '../utils/useNavigationV2Enabled';
@@ -48,6 +50,9 @@ function Diagnostics({
     );
 
     const isV2NavigationEnabled = useNavigationV2Enabled();
+    const capabilities = useTypedSelector(
+        (state) => selectDatabaseCapabilities(state, database).data,
+    );
 
     const {name, id, controlPlane, metaErrors} = useTenantBaseInfo(database);
     const showDatabaseId = Boolean(id && (controlPlane || metaErrors?.control_plane));
@@ -59,6 +64,7 @@ function Diagnostics({
         type,
         subType,
         databasePagesDisplay,
+        accessTitle: uiFactory.access?.getTabTitle?.({capabilities}),
     });
 
     const activeTab = React.useMemo(() => {

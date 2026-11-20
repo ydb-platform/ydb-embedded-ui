@@ -1,19 +1,16 @@
-import type {Settings} from '@gravity-ui/react-data-table';
-
-import {ResizeableDataTable} from '../../../../../../components/ResizeableDataTable/ResizeableDataTable';
+import {AccessTable} from '../../../../../../components/AccessTable/AccessTable';
+import type {AccessTableRow} from '../../../../../../components/AccessTable/AccessTable';
 import {useClusterWithProxy} from '../../../../../../store/reducers/cluster/cluster';
 import {selectPreparedRights} from '../../../../../../store/reducers/schemaAcl/schemaAcl';
-import {DEFAULT_TABLE_SETTINGS} from '../../../../../../utils/constants';
 import {useAclSyntax, useTypedSelector} from '../../../../../../utils/hooks';
 import {useCurrentSchema} from '../../../../TenantContext';
-import i18n from '../../i18n';
 import {block} from '../../shared';
 
-import {columns} from './columns';
+import {SubjectActions} from './Actions';
 
 const RIGHT_TABLE_COLUMNS_WIDTH_LS_KEY = 'right-table-columns-width';
 
-const AccessRightsTableSettings: Settings = {...DEFAULT_TABLE_SETTINGS, dynamicRender: false};
+const renderExplicitActions = ({subject}: AccessTableRow) => <SubjectActions subject={subject} />;
 
 export function RightsTable() {
     const {path, database, databaseFullPath} = useCurrentSchema();
@@ -23,13 +20,11 @@ export function RightsTable() {
         selectPreparedRights(state, path, database, databaseFullPath, dialect, useMetaProxy),
     );
     return (
-        <ResizeableDataTable
+        <AccessTable
             columnsWidthLSKey={RIGHT_TABLE_COLUMNS_WIDTH_LS_KEY}
-            columns={columns}
             data={data ?? []}
-            settings={AccessRightsTableSettings}
-            emptyDataMessage={i18n('descrtiption_empty-rights')}
-            wrapperClassName={block('rights-table')}
+            renderExplicitActions={renderExplicitActions}
+            className={block('rights-table')}
         />
     );
 }

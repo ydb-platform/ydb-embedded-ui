@@ -8,6 +8,7 @@ export {AsideNavigation} from './containers/AsideNavigation/AsideNavigation';
 export {useOpenExternalQueryInEditor} from './containers/Tenant/Query/hooks/useOpenExternalQueryInEditor';
 export {getQueryTextTabTitle} from './containers/Tenant/Query/utils/queryTabTitles';
 export {useDrawerContext} from './components/Drawer';
+export {AccessTable} from './components/AccessTable/AccessTable';
 
 export {configureStore, rootReducer} from './store';
 export {default as appRoutes} from './routes';
@@ -24,6 +25,7 @@ export {parseMonitoringField} from './store/reducers/cluster/parseFields';
 export {i18n, Lang, registerKeysets} from './utils/i18n';
 export {toaster} from './utils/createToast';
 export {cn} from './utils/cn';
+export {prepareAccessRights} from './utils/prepareAccessRights';
 export * from './utils/constants';
 
 export {default as reportWebVitals} from './reportWebVitals';
@@ -38,8 +40,11 @@ export type {SettingProps, SettingsInfoFieldProps} from './containers/UserSettin
 export type {AsideNavigationProps} from './containers/AsideNavigation/AsideNavigation';
 export type {ExternalQueryToOpen} from './containers/Tenant/Query/hooks/useOpenExternalQueryInEditor';
 export type {DrawerContextType} from './components/Drawer';
+export type {AccessTableProps, AccessTableRow} from './components/AccessTable/AccessTable';
 export type {GetMonitoringLink, GetMonitoringClusterLink} from './utils/monitoring';
 export type {
+    AccessPageContext,
+    AccessUIConfig,
     CreateGraphLayoutWorker,
     GetAdditionalDatabaseInfoItems,
     GetReportProblemUrl,

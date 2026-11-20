@@ -1,5 +1,4 @@
 .ydb-access-rights {
-    $block: &;
     &__header {
         position: sticky;
         left: 0;
@@ -45,30 +44,5 @@
 
         white-space: nowrap;
         text-overflow: ellipsis;
-    }
-
-    &__rights-wrapper {
-        position: relative;
-
-        width: 100%;
-        height: 100%;
-    }
-    &__rights-actions {
-        position: absolute;
-        right: 0;
-
-        visibility: hidden;
-
-        height: 100%;
-        padding-left: var(--g-spacing-2);
-
-        background-color: var(--ydb-data-table-color-hover);
-    }
-    &__rights-table {
-        .data-table__row:hover {
-            #{$block}__rights-actions {
-                visibility: visible;
-            }
-        }
     }
 }

@@ -11,6 +11,22 @@ const BASE_OPTIONS = {
 };
 
 describe('DiagnosticsPages', () => {
+    test('changes the access title without changing its route or the default pages', () => {
+        const getAccessPage = (accessTitle?: string) =>
+            getPagesByType(EPathType.EPathTypeTable, undefined, {
+                ...BASE_OPTIONS,
+                accessTitle,
+            }).find((page) => page.id === TENANT_DIAGNOSTICS_TABS_IDS.access);
+
+        expect(getAccessPage('Custom access')).toMatchObject({
+            id: 'access',
+            title: 'Custom access',
+        });
+        expect(getAccessPage()).toMatchObject({id: 'access', title: 'Access'});
+        expect(getAccessPage('')).toEqual(getAccessPage());
+        expect(getAccessPage('   ')).toEqual(getAccessPage());
+    });
+
     test('hides storage usage tab for table pages when storage groups handler is unavailable', () => {
         const pages = getPagesByType(EPathType.EPathTypeTable, undefined, {
             ...BASE_OPTIONS,

@@ -1,0 +1,74 @@
+.ydb-access-table {
+    $block: &;
+
+    &__explicit {
+        position: relative;
+
+        width: 100%;
+        height: 100%;
+    }
+
+    &__actions {
+        pointer-events: none;
+
+        opacity: 0;
+
+        &:empty {
+            display: none;
+        }
+
+        &:has([aria-expanded='true']) {
+            pointer-events: auto;
+
+            opacity: 1;
+        }
+
+        &_explicit {
+            position: absolute;
+            right: 0;
+
+            height: 100%;
+            padding-left: var(--g-spacing-2);
+
+            background-color: var(--ydb-data-table-color-hover);
+        }
+    }
+
+    .data-table__row:hover,
+    .data-table__row:focus-within {
+        #{$block}__actions {
+            pointer-events: auto;
+
+            opacity: 1;
+        }
+    }
+
+    &__actions-title {
+        position: absolute;
+
+        overflow: hidden;
+
+        width: 1px;
+        height: 1px;
+
+        white-space: nowrap;
+
+        clip-path: inset(50%);
+    }
+
+    @media (hover: none) {
+        &__actions {
+            pointer-events: auto;
+
+            opacity: 1;
+
+            &_explicit {
+                position: static;
+
+                margin-left: auto;
+
+                background-color: transparent;
+            }
+        }
+    }
+}
