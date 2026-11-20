@@ -1,0 +1,169 @@
+# Page snapshot
+
+```yaml
+- generic [ref=e5]:
+  - generic [ref=e8]:
+    - img [ref=e13] [cursor=pointer]:
+      - img [ref=e14]
+    - list [ref=e21]:
+      - generic [ref=e22]:
+        - listitem [ref=e23]:
+          - link "Database" [ref=e28] [cursor=pointer]:
+            - /url: /database?diagnosticsTab=nodes&database=%2Flocal&schema=%2Flocal&databasePage=database
+            - img [ref=e31]:
+              - img [ref=e32]
+            - generic "Database":
+              - generic: Database
+        - listitem [ref=e34]:
+          - link "Diagnostics" [ref=e39] [cursor=pointer]:
+            - /url: /database?diagnosticsTab=nodes&database=%2Flocal&schema=%2Flocal&databasePage=diagnostics
+            - img [ref=e42]:
+              - img [ref=e43]
+            - generic "Diagnostics":
+              - generic: Diagnostics
+        - listitem [ref=e45]:
+          - link "SQL Editor" [ref=e50] [cursor=pointer]:
+            - /url: /database?diagnosticsTab=nodes&database=%2Flocal&schema=%2Flocal&databasePage=query
+            - img [ref=e53]:
+              - img [ref=e54]
+            - generic "SQL Editor":
+              - generic: SQL Editor
+    - generic [ref=e56]:
+      - button "Information" [ref=e57] [cursor=pointer]:
+        - img [ref=e60]:
+          - img [ref=e61]
+        - generic "Information":
+          - generic: Information
+      - button "Settings" [ref=e63] [cursor=pointer]:
+        - img [ref=e66]:
+          - img [ref=e67]
+        - generic "Settings":
+          - generic: Settings
+      - button "Account" [ref=e69] [cursor=pointer]:
+        - img [ref=e72]:
+          - img [ref=e73]
+        - generic "Account":
+          - generic: Account
+    - button "Expand" [ref=e75] [cursor=pointer]:
+      - img [ref=e76]:
+        - img [ref=e77]
+  - generic [ref=e80]:
+    - banner [ref=e81]:
+      - list [ref=e82]:
+        - listitem [ref=e83]:
+          - link "Cluster" [ref=e84] [cursor=pointer]:
+            - link "Cluster" [ref=e85]:
+              - /url: /cluster
+              - generic [ref=e86]: Cluster
+          - generic [ref=e87]: /
+        - listitem [ref=e88]:
+          - link "local" [disabled] [ref=e89]:
+            - generic [ref=e91]: local
+        - listitem [ref=e92]:
+          - generic [ref=e93]:
+            - generic [ref=e94]:
+              - button "Copy path" [ref=e95] [cursor=pointer]:
+                - generic:
+                  - generic:
+                    - img:
+                      - img
+              - button [ref=e96] [cursor=pointer]:
+                - img [ref=e99]:
+                  - img [ref=e100]
+            - generic [ref=e103] [cursor=pointer]:
+              - img [ref=e105]:
+                - img [ref=e106]
+              - 'button "Unspecified: 0 issues" [ref=e108]':
+                - generic [ref=e111]:
+                  - text: "Unspecified: 0 issues"
+                  - img [ref=e112]:
+                    - img [ref=e113]
+      - generic [ref=e115]:
+        - link "Developer UI" [ref=e116] [cursor=pointer]:
+          - /url: http://localhost:8765/internal
+          - img [ref=e119]:
+            - img [ref=e120]
+          - generic [ref=e122]: Developer UI
+        - button [ref=e125] [cursor=pointer]:
+          - img [ref=e128]:
+            - img [ref=e129]
+    - main [ref=e131]:
+      - generic [ref=e134]:
+        - generic [ref=e135]:
+          - generic [ref=e138]:
+            - generic [ref=e139]: Navigation
+            - generic [ref=e148] [cursor=pointer]:
+              - img [ref=e150]
+              - generic [ref=e152]: /local
+          - generic [ref=e153]:
+            - button [ref=e154] [cursor=pointer]:
+              - img [ref=e157]:
+                - img [ref=e158]
+            - button [ref=e160] [cursor=pointer]:
+              - img [ref=e163]:
+                - img [ref=e164]
+        - generic [ref=e169]:
+          - generic [ref=e171]:
+            - tablist [ref=e172]:
+              - tab "Info" [ref=e173] [cursor=pointer]:
+                - link "Info" [ref=e176]:
+                  - /url: /database?diagnosticsTab=overview&database=%2Flocal&schema=%2Flocal&databasePage=diagnostics
+              - tab "Top shards" [ref=e177] [cursor=pointer]:
+                - link "Top shards" [ref=e180]:
+                  - /url: /database?diagnosticsTab=topShards&database=%2Flocal&schema=%2Flocal&databasePage=diagnostics
+              - tab "Nodes" [selected] [ref=e181] [cursor=pointer]:
+                - link "Nodes" [ref=e184]:
+                  - /url: /database?diagnosticsTab=nodes&database=%2Flocal&schema=%2Flocal&databasePage=diagnostics
+              - tab "Tablets" [ref=e185] [cursor=pointer]:
+                - link "Tablets" [ref=e188]:
+                  - /url: /database?diagnosticsTab=tablets&database=%2Flocal&schema=%2Flocal&databasePage=diagnostics
+              - tab "Describe" [ref=e189] [cursor=pointer]:
+                - link "Describe" [ref=e192]:
+                  - /url: /database?diagnosticsTab=describe&database=%2Flocal&schema=%2Flocal&databasePage=diagnostics
+              - tab "Access" [ref=e193] [cursor=pointer]:
+                - link "Access" [ref=e196]:
+                  - /url: /database?diagnosticsTab=access&database=%2Flocal&schema=%2Flocal&databasePage=diagnostics
+            - generic [ref=e197]:
+              - button "Refresh" [ref=e198] [cursor=pointer]:
+                - img [ref=e201]
+              - group [ref=e204] [cursor=pointer]:
+                - combobox [ref=e205]:
+                  - generic [ref=e206]: None
+                - img [ref=e207]:
+                  - img [ref=e208]
+          - generic [ref=e211]:
+            - generic [ref=e212]:
+              - generic [ref=e213]:
+                - generic [ref=e214]:
+                  - textbox "Host name" [active] [ref=e217]
+                  - generic [ref=e218]: "Group by:"
+                  - group [ref=e220] [cursor=pointer]:
+                    - combobox [ref=e221]:
+                      - generic [ref=e222]: "-"
+                    - img [ref=e223]:
+                      - img [ref=e224]
+                  - generic [ref=e226] [cursor=pointer]:
+                    - switch "Hide unavailable" [ref=e228]
+                    - generic [ref=e230]: Hide unavailable
+                  - generic [ref=e233]: "Nodes: ..."
+                - button "2/15" [ref=e236] [cursor=pointer]:
+                  - img [ref=e239]:
+                    - img [ref=e240]
+                  - generic [ref=e243]: 2/15
+              - table [ref=e246]:
+                - rowgroup [ref=e247]:
+                  - row "# Host" [ref=e248]:
+                    - columnheader "#" [ref=e249]:
+                      - generic [ref=e250] [cursor=pointer]:
+                        - generic [ref=e252]: "#"
+                        - img [ref=e254]
+                    - columnheader "Host" [ref=e256]:
+                      - generic [ref=e257] [cursor=pointer]:
+                        - generic [ref=e259]: Host
+                        - img [ref=e261]
+                - rowgroup [ref=e263]:
+                  - row [ref=e264]:
+                    - cell [ref=e265]
+                    - cell [ref=e267]
+            - status [ref=e269]
+```

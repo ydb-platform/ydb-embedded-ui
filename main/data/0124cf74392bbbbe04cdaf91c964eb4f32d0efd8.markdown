@@ -1,0 +1,1183 @@
+# Page snapshot
+
+```yaml
+- generic [ref=e5]:
+  - generic [ref=e8]:
+    - img [ref=e13] [cursor=pointer]:
+      - img [ref=e14]
+    - generic [ref=e18]:
+      - button "Information" [ref=e19] [cursor=pointer]:
+        - img [ref=e22]:
+          - img [ref=e23]
+        - generic "Information":
+          - generic: Information
+      - button "Settings" [ref=e25] [cursor=pointer]:
+        - img [ref=e28]:
+          - img [ref=e29]
+        - generic "Settings":
+          - generic: Settings
+      - button "Account" [ref=e31] [cursor=pointer]:
+        - img [ref=e34]:
+          - img [ref=e35]
+        - generic "Account":
+          - generic: Account
+    - button "Expand" [ref=e37] [cursor=pointer]:
+      - img [ref=e38]:
+        - img [ref=e39]
+  - generic [ref=e42]:
+    - banner [ref=e43]:
+      - list [ref=e44]:
+        - listitem [ref=e45]:
+          - link "Cluster" [disabled] [ref=e46]:
+            - generic [ref=e48]: Cluster
+      - link "Developer UI" [ref=e50] [cursor=pointer]:
+        - /url: http://localhost:8765/internal
+        - img [ref=e53]:
+          - img [ref=e54]
+        - generic [ref=e56]: Developer UI
+    - main [ref=e57]:
+      - generic [ref=e59]:
+        - generic [ref=e61]:
+          - text: LOCAL
+          - generic [ref=e62] [cursor=pointer]:
+            - img [ref=e64]:
+              - img [ref=e65]
+            - button "Good" [ref=e67]:
+              - generic [ref=e70]: Good
+        - generic [ref=e71]:
+          - button "Refresh" [ref=e72] [cursor=pointer]:
+            - img [ref=e75]
+          - group [ref=e78] [cursor=pointer]:
+            - combobox [ref=e79]:
+              - generic [ref=e80]: None
+            - img [ref=e81]:
+              - img [ref=e82]
+        - tablist [ref=e85]:
+          - tab "Databases" [ref=e86] [cursor=pointer]:
+            - link "Databases" [ref=e89]:
+              - /url: /cluster/databases
+          - tab "Nodes" [ref=e90] [cursor=pointer]:
+            - link "Nodes" [ref=e93]:
+              - /url: /cluster/nodes
+          - tab "Storage" [selected] [ref=e94] [cursor=pointer]:
+            - link "Storage" [ref=e97]:
+              - /url: /cluster/storage
+          - tab "Network" [ref=e98] [cursor=pointer]:
+            - link "Network" [ref=e101]:
+              - /url: /cluster/network
+          - tab "Tablets" [ref=e102] [cursor=pointer]:
+            - link "Tablets" [ref=e105]:
+              - /url: /cluster/tablets
+          - tab "Versions" [ref=e106] [cursor=pointer]:
+            - link "Versions" [ref=e109]:
+              - /url: /cluster/versions
+        - generic [ref=e110]:
+          - generic [ref=e111]:
+            - generic [ref=e112]:
+              - generic [ref=e114]:
+                - generic [ref=e115]:
+                  - textbox "Node ID, FQDN" [active] [ref=e118]
+                  - radiogroup [ref=e119]:
+                    - generic [ref=e120] [cursor=pointer]:
+                      - radio "Groups" [ref=e121]
+                      - generic [ref=e122]: Groups
+                    - generic [ref=e123]:
+                      - radio "Nodes" [checked] [ref=e124]
+                      - generic [ref=e125]: Nodes
+                  - generic [ref=e126]: "Group by:"
+                  - group [ref=e128] [cursor=pointer]:
+                    - combobox [ref=e129]:
+                      - generic [ref=e130]: "-"
+                    - img [ref=e131]:
+                      - img [ref=e132]
+                  - generic [ref=e136]: "Nodes: 3"
+                  - button "Expert mode" [pressed] [ref=e137] [cursor=pointer]:
+                    - img [ref=e140]:
+                      - img [ref=e141]
+                    - generic [ref=e143]: Expert mode
+                - generic [ref=e144]:
+                  - generic [ref=e145]:
+                    - generic [ref=e146]: "VDisks:"
+                    - radiogroup "VDisks:" [ref=e147]:
+                      - generic [ref=e148] [cursor=pointer]:
+                        - radio "State" [ref=e149]
+                        - generic [ref=e150]: State
+                      - generic [ref=e151]:
+                        - radio "Space" [checked] [ref=e152]
+                        - generic [ref=e153]: Space
+                      - generic [ref=e154] [cursor=pointer]:
+                        - radio "Front queues" [ref=e155]
+                        - generic [ref=e156]: Front queues
+                      - generic [ref=e157] [cursor=pointer]:
+                        - radio "Compaction" [ref=e158]
+                        - generic [ref=e159]: Compaction
+                      - generic [ref=e160] [cursor=pointer]:
+                        - radio "All" [ref=e161]
+                        - generic [ref=e162]: All
+                    - generic [ref=e163]:
+                      - generic [ref=e164]:
+                        - button "G" [ref=e168] [cursor=pointer]:
+                          - generic [ref=e170]: G
+                        - button "C" [ref=e174] [cursor=pointer]:
+                          - generic [ref=e176]: C
+                        - generic [ref=e177] [cursor=pointer]:
+                          - img [ref=e180]:
+                            - img [ref=e181]
+                          - button "LY" [ref=e183]:
+                            - generic [ref=e185]: LY
+                        - generic [ref=e186] [cursor=pointer]:
+                          - img [ref=e189]:
+                            - img [ref=e190]
+                          - button "Y" [ref=e192]:
+                            - generic [ref=e194]: "Y"
+                        - generic [ref=e195] [cursor=pointer]:
+                          - img [ref=e198]:
+                            - img [ref=e199]
+                          - button "LO" [ref=e201]:
+                            - generic [ref=e203]: LO
+                        - generic [ref=e204] [cursor=pointer]:
+                          - img [ref=e207]:
+                            - img [ref=e208]
+                          - button "PO" [ref=e210]:
+                            - generic [ref=e212]: PO
+                        - generic [ref=e213] [cursor=pointer]:
+                          - img [ref=e216]:
+                            - img [ref=e217]
+                          - button "O" [ref=e219]:
+                            - generic [ref=e221]: O
+                        - generic [ref=e222] [cursor=pointer]:
+                          - img [ref=e225]:
+                            - img [ref=e226]
+                          - button "R" [ref=e228]:
+                            - generic [ref=e230]: R
+                        - generic [ref=e231] [cursor=pointer]:
+                          - img [ref=e234]:
+                            - img [ref=e235]
+                          - button "B" [ref=e237]:
+                            - generic [ref=e239]: B
+                        - generic [ref=e242]: No data
+                      - generic [ref=e243]: No statistics available
+                  - generic [ref=e244]:
+                    - generic [ref=e245]: "PDisks:"
+                    - radiogroup "PDisks:" [ref=e246]:
+                      - generic [ref=e247] [cursor=pointer]:
+                        - radio "State" [ref=e248]
+                        - generic [ref=e249]: State
+                      - generic [ref=e250] [cursor=pointer]:
+                        - radio "Space" [ref=e251]
+                        - generic [ref=e252]: Space
+                      - generic [ref=e253] [cursor=pointer]:
+                        - radio "Drive" [ref=e254]
+                        - generic [ref=e255]: Drive
+                      - generic [ref=e256] [cursor=pointer]:
+                        - radio "Decommit" [ref=e257]
+                        - generic [ref=e258]: Decommit
+                      - generic [ref=e259] [cursor=pointer]:
+                        - radio "Maintenance" [ref=e260]
+                        - generic [ref=e261]: Maintenance
+                      - generic [ref=e262] [cursor=pointer]:
+                        - radio "Device" [ref=e263]
+                        - generic [ref=e264]: Device
+                      - generic [ref=e265]:
+                        - radio "All" [checked] [ref=e266]
+                        - generic [ref=e267]: All
+                    - group [ref=e270] [cursor=pointer]:
+                      - combobox [ref=e271]:
+                        - generic [ref=e272]: "Capacity alerts:"
+                        - generic [ref=e273]: Except Green & Cyan
+                      - img [ref=e274]:
+                        - img [ref=e275]
+              - button "2/16" [ref=e279] [cursor=pointer]:
+                - img [ref=e282]:
+                  - img [ref=e283]
+                - generic [ref=e286]: 2/16
+            - table [ref=e289]:
+              - rowgroup [ref=e293]:
+                - row "# PDisks & VDisks" [ref=e294]:
+                  - columnheader "#" [ref=e295]:
+                    - generic [ref=e296] [cursor=pointer]:
+                      - generic [ref=e298]: "#"
+                      - img [ref=e300]
+                  - columnheader "PDisks & VDisks" [ref=e302]:
+                    - generic [ref=e305]: PDisks & VDisks
+              - rowgroup [ref=e306]:
+                - row [ref=e307]:
+                  - cell "7000" [ref=e308]
+                  - cell [ref=e309]:
+                    - generic [ref=e310]:
+                      - generic [ref=e312]:
+                        - generic [ref=e314]:
+                          - 'link "VDisk 7000-100-200 on node 7000. Whiteboard: N/D. Capacity alert: N/D." [ref=e318] [cursor=pointer]':
+                            - /url: /vDisk?nodeId=7000&vDiskId=7000-100-200&database=%2FRoot
+                            - meter "Disk allocated space" [ref=e319]
+                          - 'link "VDisk 9000000000-1-0-0-1 on node 7000. Capacity alert: YELLOW." [ref=e323] [cursor=pointer]':
+                            - /url: /vDisk?nodeId=7000&vDiskId=9000000000-1-0-0-1&database=%2FRoot
+                            - meter "Disk allocated space" [ref=e324]:
+                              - generic [ref=e325]: "Y"
+                          - 'link "VDisk 9000000000-1-0-0-2 on node 7000. Capacity alert: ORANGE." [ref=e329] [cursor=pointer]':
+                            - /url: /vDisk?nodeId=7000&vDiskId=9000000000-1-0-0-2&database=%2FRoot
+                            - meter "Disk allocated space" [ref=e330]:
+                              - generic [ref=e331]: O
+                          - 'link "VDisk 9000000000-1-0-0-3 on node 7000. Capacity alert: RED." [ref=e335] [cursor=pointer]':
+                            - /url: /vDisk?nodeId=7000&vDiskId=9000000000-1-0-0-3&database=%2FRoot
+                            - meter "Disk allocated space" [ref=e336]:
+                              - generic [ref=e337]: R
+                          - 'link "VDisk 9000000000-1-0-0-4 on node 7000. Capacity alert: LIGHT_YELLOW." [ref=e341] [cursor=pointer]':
+                            - /url: /vDisk?nodeId=7000&vDiskId=9000000000-1-0-0-4&database=%2FRoot
+                            - meter "Disk allocated space" [ref=e342]:
+                              - generic [ref=e343]: LY
+                          - 'link "VDisk 9000000000-1-0-0-5 on node 7000. Capacity alert: LIGHT_ORANGE." [ref=e347] [cursor=pointer]':
+                            - /url: /vDisk?nodeId=7000&vDiskId=9000000000-1-0-0-5&database=%2FRoot
+                            - meter "Disk allocated space" [ref=e348]:
+                              - generic [ref=e349]: LO
+                          - 'link "VDisk 9000000000-1-0-0-6 on node 7000. Capacity alert: PRE_ORANGE." [ref=e353] [cursor=pointer]':
+                            - /url: /vDisk?nodeId=7000&vDiskId=9000000000-1-0-0-6&database=%2FRoot
+                            - meter "Disk allocated space" [ref=e354]:
+                              - generic [ref=e355]: PO
+                          - 'link "VDisk 9000000000-1-0-0-7 on node 7000. Capacity alert: BLACK." [ref=e359] [cursor=pointer]':
+                            - /url: /vDisk?nodeId=7000&vDiskId=9000000000-1-0-0-7&database=%2FRoot
+                            - meter "Disk allocated space" [ref=e360]:
+                              - generic [ref=e361]: B
+                        - 'link "PDisk 7000-100. Health: N/D. State: N/D. Capacity alert: N/D. Drive: N/D. Decommit: N/D. Maintenance: N/D. Device: N/D. Realtime: N/D. Allocated: 20%." [ref=e363] [cursor=pointer]':
+                          - /url: /pDisk?nodeId=7000&pDiskId=100
+                          - meter "Disk allocated space" [ref=e364]:
+                            - generic [ref=e367]:
+                              - generic [ref=e368]: N/D
+                              - generic [ref=e369]: SSD
+                      - generic [ref=e371]:
+                        - generic [ref=e372]:
+                          - generic [ref=e373]:
+                            - 'link "VDisk 7000-101-300 on node 7000. Whiteboard: N/D. Capacity alert: N/D." [ref=e377] [cursor=pointer]':
+                              - /url: /vDisk?nodeId=7000&vDiskId=7000-101-300&database=%2FRoot
+                              - meter "Disk allocated space" [ref=e378]
+                            - 'link "VDisk 9000000000-1-1-0-1 on node 7000. Capacity alert: GREEN." [ref=e382] [cursor=pointer]':
+                              - /url: /vDisk?nodeId=7000&vDiskId=9000000000-1-1-0-1&database=%2FRoot
+                              - meter "Disk allocated space" [ref=e383]
+                            - 'link "VDisk 9000000000-1-1-0-2 on node 7000. Capacity alert: CYAN." [ref=e387] [cursor=pointer]':
+                              - /url: /vDisk?nodeId=7000&vDiskId=9000000000-1-1-0-2&database=%2FRoot
+                              - meter "Disk allocated space" [ref=e388]
+                            - 'link "VDisk 9000000000-1-1-0-3 on node 7000. Capacity alert: YELLOW." [ref=e392] [cursor=pointer]':
+                              - /url: /vDisk?nodeId=7000&vDiskId=9000000000-1-1-0-3&database=%2FRoot
+                              - meter "Disk allocated space" [ref=e393]:
+                                - generic [ref=e394]: "Y"
+                            - 'link "VDisk 9000000000-1-1-0-4 on node 7000. Capacity alert: ORANGE." [ref=e398] [cursor=pointer]':
+                              - /url: /vDisk?nodeId=7000&vDiskId=9000000000-1-1-0-4&database=%2FRoot
+                              - meter "Disk allocated space" [ref=e399]:
+                                - generic [ref=e400]: O
+                            - 'link "VDisk 9000000000-1-1-0-5 on node 7000. Capacity alert: RED." [ref=e404] [cursor=pointer]':
+                              - /url: /vDisk?nodeId=7000&vDiskId=9000000000-1-1-0-5&database=%2FRoot
+                              - meter "Disk allocated space" [ref=e405]:
+                                - generic [ref=e406]: R
+                            - 'link "VDisk 9000000000-1-1-0-6 on node 7000. Capacity alert: LIGHT_YELLOW." [ref=e410] [cursor=pointer]':
+                              - /url: /vDisk?nodeId=7000&vDiskId=9000000000-1-1-0-6&database=%2FRoot
+                              - meter "Disk allocated space" [ref=e411]:
+                                - generic [ref=e412]: LY
+                            - 'link "VDisk 9000000000-1-1-0-7 on node 7000. Capacity alert: LIGHT_ORANGE." [ref=e416] [cursor=pointer]':
+                              - /url: /vDisk?nodeId=7000&vDiskId=9000000000-1-1-0-7&database=%2FRoot
+                              - meter "Disk allocated space" [ref=e417]:
+                                - generic [ref=e418]: LO
+                          - generic [ref=e419]:
+                            - 'link "VDisk 9000000000-1-1-0-8 on node 7000. Capacity alert: PRE_ORANGE." [ref=e423] [cursor=pointer]':
+                              - /url: /vDisk?nodeId=7000&vDiskId=9000000000-1-1-0-8&database=%2FRoot
+                              - meter "Disk allocated space" [ref=e424]:
+                                - generic [ref=e425]: PO
+                            - 'link "VDisk 9000000000-1-1-0-9 on node 7000. Capacity alert: BLACK." [ref=e429] [cursor=pointer]':
+                              - /url: /vDisk?nodeId=7000&vDiskId=9000000000-1-1-0-9&database=%2FRoot
+                              - meter "Disk allocated space" [ref=e430]:
+                                - generic [ref=e431]: B
+                            - 'link "VDisk 9000000000-1-1-0-10 on node 7000. Capacity alert: GREEN." [ref=e435] [cursor=pointer]':
+                              - /url: /vDisk?nodeId=7000&vDiskId=9000000000-1-1-0-10&database=%2FRoot
+                              - meter "Disk allocated space" [ref=e436]
+                            - 'link "VDisk 9000000000-1-1-0-11 on node 7000. Capacity alert: CYAN." [ref=e440] [cursor=pointer]':
+                              - /url: /vDisk?nodeId=7000&vDiskId=9000000000-1-1-0-11&database=%2FRoot
+                              - meter "Disk allocated space" [ref=e441]
+                            - 'link "VDisk 9000000000-1-1-0-12 on node 7000. Capacity alert: YELLOW." [ref=e445] [cursor=pointer]':
+                              - /url: /vDisk?nodeId=7000&vDiskId=9000000000-1-1-0-12&database=%2FRoot
+                              - meter "Disk allocated space" [ref=e446]:
+                                - generic [ref=e447]: "Y"
+                            - 'link "VDisk 9000000000-1-1-0-13 on node 7000. Capacity alert: ORANGE." [ref=e451] [cursor=pointer]':
+                              - /url: /vDisk?nodeId=7000&vDiskId=9000000000-1-1-0-13&database=%2FRoot
+                              - meter "Disk allocated space" [ref=e452]:
+                                - generic [ref=e453]: O
+                            - 'link "VDisk 9000000000-1-1-0-14 on node 7000. Capacity alert: RED." [ref=e457] [cursor=pointer]':
+                              - /url: /vDisk?nodeId=7000&vDiskId=9000000000-1-1-0-14&database=%2FRoot
+                              - meter "Disk allocated space" [ref=e458]:
+                                - generic [ref=e459]: R
+                            - 'link "VDisk 9000000000-1-1-0-15 on node 7000. Capacity alert: LIGHT_YELLOW." [ref=e463] [cursor=pointer]':
+                              - /url: /vDisk?nodeId=7000&vDiskId=9000000000-1-1-0-15&database=%2FRoot
+                              - meter "Disk allocated space" [ref=e464]:
+                                - generic [ref=e465]: LY
+                        - 'link "PDisk 7000-101. Health: N/D. State: N/D. Capacity alert: N/D. Drive: TO_BE_REMOVED. Decommit: DECOMMIT_PENDING. Maintenance: NO_NEW_VDISKS. Device: N/D. Realtime: N/D. Allocated: 30%." [ref=e467] [cursor=pointer]':
+                          - /url: /pDisk?nodeId=7000&pDiskId=101
+                          - meter "Disk allocated space" [ref=e468]:
+                            - generic [ref=e471]:
+                              - generic [ref=e472]: N/D
+                              - generic [ref=e473]: HDD
+                            - generic:
+                              - generic:
+                                - img:
+                                  - img
+                              - generic:
+                                - img:
+                                  - img
+                              - generic:
+                                - img:
+                                  - img
+                      - generic [ref=e475]:
+                        - generic [ref=e476]:
+                          - generic [ref=e477]:
+                            - 'link "VDisk 9000000000-1-2-0-0 on node 7000. Capacity alert: PRE_ORANGE." [ref=e481] [cursor=pointer]':
+                              - /url: /vDisk?nodeId=7000&vDiskId=9000000000-1-2-0-0&database=%2FRoot
+                              - meter "Disk allocated space" [ref=e482]:
+                                - generic [ref=e483]: PO
+                            - 'link "VDisk 9000000000-1-2-0-1 on node 7000. Capacity alert: BLACK." [ref=e487] [cursor=pointer]':
+                              - /url: /vDisk?nodeId=7000&vDiskId=9000000000-1-2-0-1&database=%2FRoot
+                              - meter "Disk allocated space" [ref=e488]:
+                                - generic [ref=e489]: B
+                            - 'link "VDisk 9000000000-1-2-0-2 on node 7000. Capacity alert: GREEN." [ref=e493] [cursor=pointer]':
+                              - /url: /vDisk?nodeId=7000&vDiskId=9000000000-1-2-0-2&database=%2FRoot
+                              - meter "Disk allocated space" [ref=e494]
+                            - 'link "VDisk 9000000000-1-2-0-3 on node 7000. Capacity alert: CYAN." [ref=e498] [cursor=pointer]':
+                              - /url: /vDisk?nodeId=7000&vDiskId=9000000000-1-2-0-3&database=%2FRoot
+                              - meter "Disk allocated space" [ref=e499]
+                            - 'link "VDisk 9000000000-1-2-0-4 on node 7000. Capacity alert: YELLOW." [ref=e503] [cursor=pointer]':
+                              - /url: /vDisk?nodeId=7000&vDiskId=9000000000-1-2-0-4&database=%2FRoot
+                              - meter "Disk allocated space" [ref=e504]:
+                                - generic [ref=e505]: "Y"
+                            - 'link "VDisk 9000000000-1-2-0-5 on node 7000. Capacity alert: ORANGE." [ref=e509] [cursor=pointer]':
+                              - /url: /vDisk?nodeId=7000&vDiskId=9000000000-1-2-0-5&database=%2FRoot
+                              - meter "Disk allocated space" [ref=e510]:
+                                - generic [ref=e511]: O
+                            - 'link "VDisk 9000000000-1-2-0-6 on node 7000. Capacity alert: RED." [ref=e515] [cursor=pointer]':
+                              - /url: /vDisk?nodeId=7000&vDiskId=9000000000-1-2-0-6&database=%2FRoot
+                              - meter "Disk allocated space" [ref=e516]:
+                                - generic [ref=e517]: R
+                            - 'link "VDisk 9000000000-1-2-0-7 on node 7000. Capacity alert: LIGHT_YELLOW." [ref=e521] [cursor=pointer]':
+                              - /url: /vDisk?nodeId=7000&vDiskId=9000000000-1-2-0-7&database=%2FRoot
+                              - meter "Disk allocated space" [ref=e522]:
+                                - generic [ref=e523]: LY
+                          - generic [ref=e524]:
+                            - 'link "VDisk 9000000000-1-2-0-8 on node 7000. Capacity alert: LIGHT_ORANGE." [ref=e528] [cursor=pointer]':
+                              - /url: /vDisk?nodeId=7000&vDiskId=9000000000-1-2-0-8&database=%2FRoot
+                              - meter "Disk allocated space" [ref=e529]:
+                                - generic [ref=e530]: LO
+                            - 'link "VDisk 9000000000-1-2-0-9 on node 7000. Capacity alert: PRE_ORANGE." [ref=e534] [cursor=pointer]':
+                              - /url: /vDisk?nodeId=7000&vDiskId=9000000000-1-2-0-9&database=%2FRoot
+                              - meter "Disk allocated space" [ref=e535]:
+                                - generic [ref=e536]: PO
+                            - 'link "VDisk 9000000000-1-2-0-10 on node 7000. Capacity alert: BLACK." [ref=e540] [cursor=pointer]':
+                              - /url: /vDisk?nodeId=7000&vDiskId=9000000000-1-2-0-10&database=%2FRoot
+                              - meter "Disk allocated space" [ref=e541]:
+                                - generic [ref=e542]: B
+                            - 'link "VDisk 9000000000-1-2-0-11 on node 7000. Capacity alert: GREEN." [ref=e546] [cursor=pointer]':
+                              - /url: /vDisk?nodeId=7000&vDiskId=9000000000-1-2-0-11&database=%2FRoot
+                              - meter "Disk allocated space" [ref=e547]
+                            - 'link "VDisk 9000000000-1-2-0-12 on node 7000. Capacity alert: GREEN." [ref=e551] [cursor=pointer]':
+                              - /url: /vDisk?nodeId=7000&vDiskId=9000000000-1-2-0-12&database=%2FRoot
+                              - meter "Disk allocated space" [ref=e552]
+                            - 'link "VDisk 9000000000-1-2-0-13 on node 7000. Capacity alert: CYAN." [ref=e556] [cursor=pointer]':
+                              - /url: /vDisk?nodeId=7000&vDiskId=9000000000-1-2-0-13&database=%2FRoot
+                              - meter "Disk allocated space" [ref=e557]
+                            - 'link "VDisk 9000000000-1-2-0-14 on node 7000. Capacity alert: YELLOW." [ref=e561] [cursor=pointer]':
+                              - /url: /vDisk?nodeId=7000&vDiskId=9000000000-1-2-0-14&database=%2FRoot
+                              - meter "Disk allocated space" [ref=e562]:
+                                - generic [ref=e563]: "Y"
+                            - 'link "VDisk 9000000000-1-2-0-15 on node 7000. Capacity alert: ORANGE." [ref=e567] [cursor=pointer]':
+                              - /url: /vDisk?nodeId=7000&vDiskId=9000000000-1-2-0-15&database=%2FRoot
+                              - meter "Disk allocated space" [ref=e568]:
+                                - generic [ref=e569]: O
+                          - generic [ref=e570]:
+                            - 'link "VDisk 9000000000-1-2-0-16 on node 7000. Capacity alert: RED." [ref=e574] [cursor=pointer]':
+                              - /url: /vDisk?nodeId=7000&vDiskId=9000000000-1-2-0-16&database=%2FRoot
+                              - meter "Disk allocated space" [ref=e575]:
+                                - generic [ref=e576]: R
+                            - 'link "VDisk 9000000000-1-2-0-17 on node 7000. Capacity alert: LIGHT_YELLOW." [ref=e580] [cursor=pointer]':
+                              - /url: /vDisk?nodeId=7000&vDiskId=9000000000-1-2-0-17&database=%2FRoot
+                              - meter "Disk allocated space" [ref=e581]:
+                                - generic [ref=e582]: LY
+                            - 'link "VDisk 9000000000-1-2-0-18 on node 7000. Capacity alert: LIGHT_ORANGE." [ref=e586] [cursor=pointer]':
+                              - /url: /vDisk?nodeId=7000&vDiskId=9000000000-1-2-0-18&database=%2FRoot
+                              - meter "Disk allocated space" [ref=e587]:
+                                - generic [ref=e588]: LO
+                            - 'link "VDisk 9000000000-1-2-0-19 on node 7000. Capacity alert: PRE_ORANGE." [ref=e592] [cursor=pointer]':
+                              - /url: /vDisk?nodeId=7000&vDiskId=9000000000-1-2-0-19&database=%2FRoot
+                              - meter "Disk allocated space" [ref=e593]:
+                                - generic [ref=e594]: PO
+                            - 'link "VDisk 9000000000-1-2-0-20 on node 7000. Capacity alert: BLACK." [ref=e598] [cursor=pointer]':
+                              - /url: /vDisk?nodeId=7000&vDiskId=9000000000-1-2-0-20&database=%2FRoot
+                              - meter "Disk allocated space" [ref=e599]:
+                                - generic [ref=e600]: B
+                            - 'link "VDisk 9000000000-1-2-0-21 on node 7000. Capacity alert: GREEN." [ref=e604] [cursor=pointer]':
+                              - /url: /vDisk?nodeId=7000&vDiskId=9000000000-1-2-0-21&database=%2FRoot
+                              - meter "Disk allocated space" [ref=e605]
+                            - 'link "VDisk 9000000000-1-2-0-22 on node 7000. Capacity alert: CYAN." [ref=e609] [cursor=pointer]':
+                              - /url: /vDisk?nodeId=7000&vDiskId=9000000000-1-2-0-22&database=%2FRoot
+                              - meter "Disk allocated space" [ref=e610]
+                            - 'link "VDisk 9000000000-1-2-0-23 on node 7000. Capacity alert: YELLOW." [ref=e614] [cursor=pointer]':
+                              - /url: /vDisk?nodeId=7000&vDiskId=9000000000-1-2-0-23&database=%2FRoot
+                              - meter "Disk allocated space" [ref=e615]:
+                                - generic [ref=e616]: "Y"
+                        - 'link "PDisk 7000-102. Health: issues detected. State: Stopped. Capacity alert: ORANGE. Drive: FAULTY. Decommit: DECOMMIT_REJECTED. Maintenance: NO_REQUEST. Device: Red. Realtime: Orange. Allocated: 40%." [ref=e618] [cursor=pointer]':
+                          - /url: /pDisk?nodeId=7000&pDiskId=102
+                          - meter "Disk allocated space" [ref=e619]:
+                            - img [ref=e620]:
+                              - img [ref=e621]
+                            - generic [ref=e626]: —
+                            - generic:
+                              - generic: O
+                              - generic:
+                                - img:
+                                  - img
+                              - generic:
+                                - img:
+                                  - img
+                              - generic:
+                                - generic:
+                                  - img:
+                                    - img
+                                  - img:
+                                    - img
+                      - generic [ref=e628]:
+                        - generic [ref=e630]:
+                          - 'link "VDisk 9000000000-1-3-0-0 on node 7000. Capacity alert: LIGHT_ORANGE." [ref=e634] [cursor=pointer]':
+                            - /url: /vDisk?nodeId=7000&vDiskId=9000000000-1-3-0-0&database=%2FRoot
+                            - meter "Disk allocated space" [ref=e635]:
+                              - generic [ref=e636]: LO
+                          - 'link "VDisk 9000000000-1-3-0-1 on node 7000. Capacity alert: PRE_ORANGE." [ref=e640] [cursor=pointer]':
+                            - /url: /vDisk?nodeId=7000&vDiskId=9000000000-1-3-0-1&database=%2FRoot
+                            - meter "Disk allocated space" [ref=e641]:
+                              - generic [ref=e642]: PO
+                          - 'link "VDisk 9000000000-1-3-0-2 on node 7000. Capacity alert: BLACK." [ref=e646] [cursor=pointer]':
+                            - /url: /vDisk?nodeId=7000&vDiskId=9000000000-1-3-0-2&database=%2FRoot
+                            - meter "Disk allocated space" [ref=e647]:
+                              - generic [ref=e648]: B
+                          - 'link "VDisk 9000000000-1-3-0-3 on node 7000. Capacity alert: GREEN." [ref=e652] [cursor=pointer]':
+                            - /url: /vDisk?nodeId=7000&vDiskId=9000000000-1-3-0-3&database=%2FRoot
+                            - meter "Disk allocated space" [ref=e653]
+                          - 'link "VDisk 9000000000-1-3-0-4 on node 7000. Capacity alert: GREEN." [ref=e657] [cursor=pointer]':
+                            - /url: /vDisk?nodeId=7000&vDiskId=9000000000-1-3-0-4&database=%2FRoot
+                            - meter "Disk allocated space" [ref=e658]
+                          - 'link "VDisk 9000000000-1-3-0-5 on node 7000. Capacity alert: CYAN." [ref=e662] [cursor=pointer]':
+                            - /url: /vDisk?nodeId=7000&vDiskId=9000000000-1-3-0-5&database=%2FRoot
+                            - meter "Disk allocated space" [ref=e663]
+                          - 'link "VDisk 9000000000-1-3-0-6 on node 7000. Capacity alert: YELLOW." [ref=e667] [cursor=pointer]':
+                            - /url: /vDisk?nodeId=7000&vDiskId=9000000000-1-3-0-6&database=%2FRoot
+                            - meter "Disk allocated space" [ref=e668]:
+                              - generic [ref=e669]: "Y"
+                          - 'link "VDisk 9000000000-1-3-0-7 on node 7000. Capacity alert: ORANGE." [ref=e673] [cursor=pointer]':
+                            - /url: /vDisk?nodeId=7000&vDiskId=9000000000-1-3-0-7&database=%2FRoot
+                            - meter "Disk allocated space" [ref=e674]:
+                              - generic [ref=e675]: O
+                        - 'link "PDisk 7000-103. Health: issues detected. State: InitialFormatReadError. Capacity alert: RED. Drive: BROKEN. Decommit: DECOMMIT_NONE. Maintenance: LONG_TERM_MAINTENANCE_PLANNED. Device: Red. Realtime: Red. Allocated: 50%." [ref=e677] [cursor=pointer]':
+                          - /url: /pDisk?nodeId=7000&pDiskId=103
+                          - meter "Disk allocated space" [ref=e678]:
+                            - img [ref=e679]:
+                              - img [ref=e680]
+                            - generic [ref=e685]: SSD
+                            - generic:
+                              - generic: R
+                              - generic:
+                                - img:
+                                  - img
+                              - generic:
+                                - img:
+                                  - img
+                              - generic:
+                                - generic:
+                                  - img:
+                                    - img
+                                  - img:
+                                    - img
+                - row [ref=e686]:
+                  - cell "7001" [ref=e687]
+                  - cell [ref=e688]:
+                    - generic [ref=e689]:
+                      - generic [ref=e691]:
+                        - generic [ref=e692]:
+                          - generic [ref=e693]:
+                            - 'link "VDisk 9000000001-1-0-0-0 on node 7001. Capacity alert: LIGHT_ORANGE." [ref=e697] [cursor=pointer]':
+                              - /url: /vDisk?nodeId=7001&vDiskId=9000000001-1-0-0-0&database=%2FRoot
+                              - meter "Disk allocated space" [ref=e698]:
+                                - generic [ref=e699]: LO
+                            - 'link "VDisk 9000000001-1-0-0-1 on node 7001. Capacity alert: PRE_ORANGE." [ref=e703] [cursor=pointer]':
+                              - /url: /vDisk?nodeId=7001&vDiskId=9000000001-1-0-0-1&database=%2FRoot
+                              - meter "Disk allocated space" [ref=e704]:
+                                - generic [ref=e705]: PO
+                            - 'link "VDisk 9000000001-1-0-0-2 on node 7001. Capacity alert: BLACK." [ref=e709] [cursor=pointer]':
+                              - /url: /vDisk?nodeId=7001&vDiskId=9000000001-1-0-0-2&database=%2FRoot
+                              - meter "Disk allocated space" [ref=e710]:
+                                - generic [ref=e711]: B
+                            - 'link "VDisk 9000000001-1-0-0-3 on node 7001. Capacity alert: GREEN." [ref=e715] [cursor=pointer]':
+                              - /url: /vDisk?nodeId=7001&vDiskId=9000000001-1-0-0-3&database=%2FRoot
+                              - meter "Disk allocated space" [ref=e716]
+                            - 'link "VDisk 9000000001-1-0-0-4 on node 7001. Capacity alert: GREEN." [ref=e720] [cursor=pointer]':
+                              - /url: /vDisk?nodeId=7001&vDiskId=9000000001-1-0-0-4&database=%2FRoot
+                              - meter "Disk allocated space" [ref=e721]
+                            - 'link "VDisk 9000000001-1-0-0-5 on node 7001. Capacity alert: CYAN." [ref=e725] [cursor=pointer]':
+                              - /url: /vDisk?nodeId=7001&vDiskId=9000000001-1-0-0-5&database=%2FRoot
+                              - meter "Disk allocated space" [ref=e726]
+                            - 'link "VDisk 9000000001-1-0-0-6 on node 7001. Capacity alert: YELLOW." [ref=e730] [cursor=pointer]':
+                              - /url: /vDisk?nodeId=7001&vDiskId=9000000001-1-0-0-6&database=%2FRoot
+                              - meter "Disk allocated space" [ref=e731]:
+                                - generic [ref=e732]: "Y"
+                            - 'link "VDisk 9000000001-1-0-0-7 on node 7001. Capacity alert: ORANGE." [ref=e736] [cursor=pointer]':
+                              - /url: /vDisk?nodeId=7001&vDiskId=9000000001-1-0-0-7&database=%2FRoot
+                              - meter "Disk allocated space" [ref=e737]:
+                                - generic [ref=e738]: O
+                          - generic [ref=e739]:
+                            - 'link "VDisk 9000000001-1-0-0-8 on node 7001. Capacity alert: RED." [ref=e743] [cursor=pointer]':
+                              - /url: /vDisk?nodeId=7001&vDiskId=9000000001-1-0-0-8&database=%2FRoot
+                              - meter "Disk allocated space" [ref=e744]:
+                                - generic [ref=e745]: R
+                            - 'link "VDisk 9000000001-1-0-0-9 on node 7001. Capacity alert: LIGHT_YELLOW." [ref=e749] [cursor=pointer]':
+                              - /url: /vDisk?nodeId=7001&vDiskId=9000000001-1-0-0-9&database=%2FRoot
+                              - meter "Disk allocated space" [ref=e750]:
+                                - generic [ref=e751]: LY
+                            - 'link "VDisk 9000000001-1-0-0-10 on node 7001. Capacity alert: LIGHT_ORANGE." [ref=e755] [cursor=pointer]':
+                              - /url: /vDisk?nodeId=7001&vDiskId=9000000001-1-0-0-10&database=%2FRoot
+                              - meter "Disk allocated space" [ref=e756]:
+                                - generic [ref=e757]: LO
+                            - 'link "VDisk 9000000001-1-0-0-11 on node 7001. Capacity alert: PRE_ORANGE." [ref=e761] [cursor=pointer]':
+                              - /url: /vDisk?nodeId=7001&vDiskId=9000000001-1-0-0-11&database=%2FRoot
+                              - meter "Disk allocated space" [ref=e762]:
+                                - generic [ref=e763]: PO
+                            - 'link "VDisk 9000000001-1-0-0-12 on node 7001. Capacity alert: BLACK." [ref=e767] [cursor=pointer]':
+                              - /url: /vDisk?nodeId=7001&vDiskId=9000000001-1-0-0-12&database=%2FRoot
+                              - meter "Disk allocated space" [ref=e768]:
+                                - generic [ref=e769]: B
+                            - 'link "VDisk 9000000001-1-0-0-13 on node 7001. Capacity alert: GREEN." [ref=e773] [cursor=pointer]':
+                              - /url: /vDisk?nodeId=7001&vDiskId=9000000001-1-0-0-13&database=%2FRoot
+                              - meter "Disk allocated space" [ref=e774]
+                            - 'link "VDisk 9000000001-1-0-0-14 on node 7001. Capacity alert: CYAN." [ref=e778] [cursor=pointer]':
+                              - /url: /vDisk?nodeId=7001&vDiskId=9000000001-1-0-0-14&database=%2FRoot
+                              - meter "Disk allocated space" [ref=e779]
+                            - 'link "VDisk 9000000001-1-0-0-15 on node 7001. Capacity alert: YELLOW." [ref=e783] [cursor=pointer]':
+                              - /url: /vDisk?nodeId=7001&vDiskId=9000000001-1-0-0-15&database=%2FRoot
+                              - meter "Disk allocated space" [ref=e784]:
+                                - generic [ref=e785]: "Y"
+                        - 'link "PDisk 7001-104. Health: issues detected. State: InitialFormatRead. Capacity alert: LIGHT_YELLOW. Drive: UNKNOWN. Decommit: DECOMMIT_NONE. Maintenance: NO_NEW_VDISKS. Device: Green. Realtime: Red. Allocated: 60%." [ref=e787] [cursor=pointer]':
+                          - /url: /pDisk?nodeId=7001&pDiskId=104
+                          - meter "Disk allocated space" [ref=e788]:
+                            - img [ref=e789]:
+                              - img [ref=e790]
+                            - generic [ref=e795]: HDD
+                            - generic:
+                              - generic: LY
+                              - generic:
+                                - img:
+                                  - img
+                              - generic:
+                                - img:
+                                  - img
+                              - generic:
+                                - generic:
+                                  - img:
+                                    - img
+                                  - img:
+                                    - img
+                      - generic [ref=e797]:
+                        - generic [ref=e798]:
+                          - generic [ref=e799]:
+                            - 'link "VDisk 9000000001-1-1-0-0 on node 7001. Capacity alert: RED." [ref=e803] [cursor=pointer]':
+                              - /url: /vDisk?nodeId=7001&vDiskId=9000000001-1-1-0-0&database=%2FRoot
+                              - meter "Disk allocated space" [ref=e804]:
+                                - generic [ref=e805]: R
+                            - 'link "VDisk 9000000001-1-1-0-1 on node 7001. Capacity alert: LIGHT_YELLOW." [ref=e809] [cursor=pointer]':
+                              - /url: /vDisk?nodeId=7001&vDiskId=9000000001-1-1-0-1&database=%2FRoot
+                              - meter "Disk allocated space" [ref=e810]:
+                                - generic [ref=e811]: LY
+                            - 'link "VDisk 9000000001-1-1-0-2 on node 7001. Capacity alert: LIGHT_ORANGE." [ref=e815] [cursor=pointer]':
+                              - /url: /vDisk?nodeId=7001&vDiskId=9000000001-1-1-0-2&database=%2FRoot
+                              - meter "Disk allocated space" [ref=e816]:
+                                - generic [ref=e817]: LO
+                            - 'link "VDisk 9000000001-1-1-0-3 on node 7001. Capacity alert: PRE_ORANGE." [ref=e821] [cursor=pointer]':
+                              - /url: /vDisk?nodeId=7001&vDiskId=9000000001-1-1-0-3&database=%2FRoot
+                              - meter "Disk allocated space" [ref=e822]:
+                                - generic [ref=e823]: PO
+                            - 'link "VDisk 9000000001-1-1-0-4 on node 7001. Capacity alert: BLACK." [ref=e827] [cursor=pointer]':
+                              - /url: /vDisk?nodeId=7001&vDiskId=9000000001-1-1-0-4&database=%2FRoot
+                              - meter "Disk allocated space" [ref=e828]:
+                                - generic [ref=e829]: B
+                            - 'link "VDisk 9000000001-1-1-0-5 on node 7001. Capacity alert: GREEN." [ref=e833] [cursor=pointer]':
+                              - /url: /vDisk?nodeId=7001&vDiskId=9000000001-1-1-0-5&database=%2FRoot
+                              - meter "Disk allocated space" [ref=e834]
+                            - 'link "VDisk 9000000001-1-1-0-6 on node 7001. Capacity alert: CYAN." [ref=e838] [cursor=pointer]':
+                              - /url: /vDisk?nodeId=7001&vDiskId=9000000001-1-1-0-6&database=%2FRoot
+                              - meter "Disk allocated space" [ref=e839]
+                            - 'link "VDisk 9000000001-1-1-0-7 on node 7001. Capacity alert: YELLOW." [ref=e843] [cursor=pointer]':
+                              - /url: /vDisk?nodeId=7001&vDiskId=9000000001-1-1-0-7&database=%2FRoot
+                              - meter "Disk allocated space" [ref=e844]:
+                                - generic [ref=e845]: "Y"
+                          - generic [ref=e846]:
+                            - 'link "VDisk 9000000001-1-1-0-8 on node 7001. Capacity alert: ORANGE." [ref=e850] [cursor=pointer]':
+                              - /url: /vDisk?nodeId=7001&vDiskId=9000000001-1-1-0-8&database=%2FRoot
+                              - meter "Disk allocated space" [ref=e851]:
+                                - generic [ref=e852]: O
+                            - 'link "VDisk 9000000001-1-1-0-9 on node 7001. Capacity alert: RED." [ref=e856] [cursor=pointer]':
+                              - /url: /vDisk?nodeId=7001&vDiskId=9000000001-1-1-0-9&database=%2FRoot
+                              - meter "Disk allocated space" [ref=e857]:
+                                - generic [ref=e858]: R
+                            - 'link "VDisk 9000000001-1-1-0-10 on node 7001. Capacity alert: LIGHT_YELLOW." [ref=e862] [cursor=pointer]':
+                              - /url: /vDisk?nodeId=7001&vDiskId=9000000001-1-1-0-10&database=%2FRoot
+                              - meter "Disk allocated space" [ref=e863]:
+                                - generic [ref=e864]: LY
+                            - 'link "VDisk 9000000001-1-1-0-11 on node 7001. Capacity alert: LIGHT_ORANGE." [ref=e868] [cursor=pointer]':
+                              - /url: /vDisk?nodeId=7001&vDiskId=9000000001-1-1-0-11&database=%2FRoot
+                              - meter "Disk allocated space" [ref=e869]:
+                                - generic [ref=e870]: LO
+                            - 'link "VDisk 9000000001-1-1-0-12 on node 7001. Capacity alert: PRE_ORANGE." [ref=e874] [cursor=pointer]':
+                              - /url: /vDisk?nodeId=7001&vDiskId=9000000001-1-1-0-12&database=%2FRoot
+                              - meter "Disk allocated space" [ref=e875]:
+                                - generic [ref=e876]: PO
+                            - 'link "VDisk 9000000001-1-1-0-13 on node 7001. Capacity alert: BLACK." [ref=e880] [cursor=pointer]':
+                              - /url: /vDisk?nodeId=7001&vDiskId=9000000001-1-1-0-13&database=%2FRoot
+                              - meter "Disk allocated space" [ref=e881]:
+                                - generic [ref=e882]: B
+                            - 'link "VDisk 9000000001-1-1-0-14 on node 7001. Capacity alert: GREEN." [ref=e886] [cursor=pointer]':
+                              - /url: /vDisk?nodeId=7001&vDiskId=9000000001-1-1-0-14&database=%2FRoot
+                              - meter "Disk allocated space" [ref=e887]
+                            - 'link "VDisk 9000000001-1-1-0-15 on node 7001. Capacity alert: GREEN." [ref=e891] [cursor=pointer]':
+                              - /url: /vDisk?nodeId=7001&vDiskId=9000000001-1-1-0-15&database=%2FRoot
+                              - meter "Disk allocated space" [ref=e892]
+                          - generic [ref=e893]:
+                            - 'link "VDisk 9000000001-1-1-0-16 on node 7001. Capacity alert: CYAN." [ref=e897] [cursor=pointer]':
+                              - /url: /vDisk?nodeId=7001&vDiskId=9000000001-1-1-0-16&database=%2FRoot
+                              - meter "Disk allocated space" [ref=e898]
+                            - 'link "VDisk 9000000001-1-1-0-17 on node 7001. Capacity alert: YELLOW." [ref=e902] [cursor=pointer]':
+                              - /url: /vDisk?nodeId=7001&vDiskId=9000000001-1-1-0-17&database=%2FRoot
+                              - meter "Disk allocated space" [ref=e903]:
+                                - generic [ref=e904]: "Y"
+                            - 'link "VDisk 9000000001-1-1-0-18 on node 7001. Capacity alert: ORANGE." [ref=e908] [cursor=pointer]':
+                              - /url: /vDisk?nodeId=7001&vDiskId=9000000001-1-1-0-18&database=%2FRoot
+                              - meter "Disk allocated space" [ref=e909]:
+                                - generic [ref=e910]: O
+                            - 'link "VDisk 9000000001-1-1-0-19 on node 7001. Capacity alert: RED." [ref=e914] [cursor=pointer]':
+                              - /url: /vDisk?nodeId=7001&vDiskId=9000000001-1-1-0-19&database=%2FRoot
+                              - meter "Disk allocated space" [ref=e915]:
+                                - generic [ref=e916]: R
+                            - 'link "VDisk 9000000001-1-1-0-20 on node 7001. Capacity alert: LIGHT_YELLOW." [ref=e920] [cursor=pointer]':
+                              - /url: /vDisk?nodeId=7001&vDiskId=9000000001-1-1-0-20&database=%2FRoot
+                              - meter "Disk allocated space" [ref=e921]:
+                                - generic [ref=e922]: LY
+                            - 'link "VDisk 9000000001-1-1-0-21 on node 7001. Capacity alert: LIGHT_ORANGE." [ref=e926] [cursor=pointer]':
+                              - /url: /vDisk?nodeId=7001&vDiskId=9000000001-1-1-0-21&database=%2FRoot
+                              - meter "Disk allocated space" [ref=e927]:
+                                - generic [ref=e928]: LO
+                            - 'link "VDisk 9000000001-1-1-0-22 on node 7001. Capacity alert: PRE_ORANGE." [ref=e932] [cursor=pointer]':
+                              - /url: /vDisk?nodeId=7001&vDiskId=9000000001-1-1-0-22&database=%2FRoot
+                              - meter "Disk allocated space" [ref=e933]:
+                                - generic [ref=e934]: PO
+                            - 'link "VDisk 9000000001-1-1-0-23 on node 7001. Capacity alert: BLACK." [ref=e938] [cursor=pointer]':
+                              - /url: /vDisk?nodeId=7001&vDiskId=9000000001-1-1-0-23&database=%2FRoot
+                              - meter "Disk allocated space" [ref=e939]:
+                                - generic [ref=e940]: B
+                        - 'link "PDisk 7001-105. Health: issues detected. State: N/D. Capacity alert: LIGHT_ORANGE. Drive: ACTIVE. Decommit: N/D. Maintenance: N/D. Device: N/D. Realtime: Green. Allocated: 70%." [ref=e942] [cursor=pointer]':
+                          - /url: /pDisk?nodeId=7001&pDiskId=105
+                          - meter "Disk allocated space" [ref=e943]:
+                            - img [ref=e944]:
+                              - img [ref=e945]
+                            - generic [ref=e950]: HDD
+                            - generic:
+                              - generic: LO
+                              - generic:
+                                - img:
+                                  - img
+                              - generic:
+                                - img:
+                                  - img
+                              - generic:
+                                - generic:
+                                  - img:
+                                    - img
+                                  - img:
+                                    - img
+                      - generic [ref=e952]:
+                        - generic [ref=e954]:
+                          - 'link "VDisk 9000000001-1-2-0-0 on node 7001. Capacity alert: ORANGE." [ref=e958] [cursor=pointer]':
+                            - /url: /vDisk?nodeId=7001&vDiskId=9000000001-1-2-0-0&database=%2FRoot
+                            - meter "Disk allocated space" [ref=e959]:
+                              - generic [ref=e960]: O
+                          - 'link "VDisk 9000000001-1-2-0-1 on node 7001. Capacity alert: RED." [ref=e964] [cursor=pointer]':
+                            - /url: /vDisk?nodeId=7001&vDiskId=9000000001-1-2-0-1&database=%2FRoot
+                            - meter "Disk allocated space" [ref=e965]:
+                              - generic [ref=e966]: R
+                          - 'link "VDisk 9000000001-1-2-0-2 on node 7001. Capacity alert: LIGHT_YELLOW." [ref=e970] [cursor=pointer]':
+                            - /url: /vDisk?nodeId=7001&vDiskId=9000000001-1-2-0-2&database=%2FRoot
+                            - meter "Disk allocated space" [ref=e971]:
+                              - generic [ref=e972]: LY
+                          - 'link "VDisk 9000000001-1-2-0-3 on node 7001. Capacity alert: LIGHT_ORANGE." [ref=e976] [cursor=pointer]':
+                            - /url: /vDisk?nodeId=7001&vDiskId=9000000001-1-2-0-3&database=%2FRoot
+                            - meter "Disk allocated space" [ref=e977]:
+                              - generic [ref=e978]: LO
+                          - 'link "VDisk 9000000001-1-2-0-4 on node 7001. Capacity alert: PRE_ORANGE." [ref=e982] [cursor=pointer]':
+                            - /url: /vDisk?nodeId=7001&vDiskId=9000000001-1-2-0-4&database=%2FRoot
+                            - meter "Disk allocated space" [ref=e983]:
+                              - generic [ref=e984]: PO
+                          - 'link "VDisk 9000000001-1-2-0-5 on node 7001. Capacity alert: BLACK." [ref=e988] [cursor=pointer]':
+                            - /url: /vDisk?nodeId=7001&vDiskId=9000000001-1-2-0-5&database=%2FRoot
+                            - meter "Disk allocated space" [ref=e989]:
+                              - generic [ref=e990]: B
+                          - 'link "VDisk 9000000001-1-2-0-6 on node 7001. Capacity alert: GREEN." [ref=e994] [cursor=pointer]':
+                            - /url: /vDisk?nodeId=7001&vDiskId=9000000001-1-2-0-6&database=%2FRoot
+                            - meter "Disk allocated space" [ref=e995]
+                          - 'link "VDisk 9000000001-1-2-0-7 on node 7001. Capacity alert: GREEN." [ref=e999] [cursor=pointer]':
+                            - /url: /vDisk?nodeId=7001&vDiskId=9000000001-1-2-0-7&database=%2FRoot
+                            - meter "Disk allocated space" [ref=e1000]
+                        - 'link "PDisk 7001-106. Health: issues detected. State: ChunkQuotaError. Capacity alert: PRE_ORANGE. Drive: ACTIVE. Decommit: DECOMMIT_IMMINENT. Maintenance: LONG_TERM_MAINTENANCE_PLANNED. Device: Green. Realtime: Orange. Allocated: 80%." [ref=e1002] [cursor=pointer]':
+                          - /url: /pDisk?nodeId=7001&pDiskId=106
+                          - meter "Disk allocated space" [ref=e1003]:
+                            - img [ref=e1004]:
+                              - img [ref=e1005]
+                            - generic [ref=e1010]: SSD
+                            - generic:
+                              - generic: PO
+                              - generic:
+                                - img:
+                                  - img
+                              - generic:
+                                - img:
+                                  - img
+                              - generic:
+                                - generic:
+                                  - img:
+                                    - img
+                                  - img:
+                                    - img
+                      - generic [ref=e1012]:
+                        - generic [ref=e1013]:
+                          - generic [ref=e1014]:
+                            - 'link "VDisk 9000000001-1-3-0-0 on node 7001. Capacity alert: CYAN." [ref=e1018] [cursor=pointer]':
+                              - /url: /vDisk?nodeId=7001&vDiskId=9000000001-1-3-0-0&database=%2FRoot
+                              - meter "Disk allocated space" [ref=e1019]
+                            - 'link "VDisk 9000000001-1-3-0-1 on node 7001. Capacity alert: YELLOW." [ref=e1023] [cursor=pointer]':
+                              - /url: /vDisk?nodeId=7001&vDiskId=9000000001-1-3-0-1&database=%2FRoot
+                              - meter "Disk allocated space" [ref=e1024]:
+                                - generic [ref=e1025]: "Y"
+                            - 'link "VDisk 9000000001-1-3-0-2 on node 7001. Capacity alert: ORANGE." [ref=e1029] [cursor=pointer]':
+                              - /url: /vDisk?nodeId=7001&vDiskId=9000000001-1-3-0-2&database=%2FRoot
+                              - meter "Disk allocated space" [ref=e1030]:
+                                - generic [ref=e1031]: O
+                            - 'link "VDisk 9000000001-1-3-0-3 on node 7001. Capacity alert: RED." [ref=e1035] [cursor=pointer]':
+                              - /url: /vDisk?nodeId=7001&vDiskId=9000000001-1-3-0-3&database=%2FRoot
+                              - meter "Disk allocated space" [ref=e1036]:
+                                - generic [ref=e1037]: R
+                            - 'link "VDisk 9000000001-1-3-0-4 on node 7001. Capacity alert: LIGHT_YELLOW." [ref=e1041] [cursor=pointer]':
+                              - /url: /vDisk?nodeId=7001&vDiskId=9000000001-1-3-0-4&database=%2FRoot
+                              - meter "Disk allocated space" [ref=e1042]:
+                                - generic [ref=e1043]: LY
+                            - 'link "VDisk 9000000001-1-3-0-5 on node 7001. Capacity alert: LIGHT_ORANGE." [ref=e1047] [cursor=pointer]':
+                              - /url: /vDisk?nodeId=7001&vDiskId=9000000001-1-3-0-5&database=%2FRoot
+                              - meter "Disk allocated space" [ref=e1048]:
+                                - generic [ref=e1049]: LO
+                            - 'link "VDisk 9000000001-1-3-0-6 on node 7001. Capacity alert: PRE_ORANGE." [ref=e1053] [cursor=pointer]':
+                              - /url: /vDisk?nodeId=7001&vDiskId=9000000001-1-3-0-6&database=%2FRoot
+                              - meter "Disk allocated space" [ref=e1054]:
+                                - generic [ref=e1055]: PO
+                            - 'link "VDisk 9000000001-1-3-0-7 on node 7001. Capacity alert: BLACK." [ref=e1059] [cursor=pointer]':
+                              - /url: /vDisk?nodeId=7001&vDiskId=9000000001-1-3-0-7&database=%2FRoot
+                              - meter "Disk allocated space" [ref=e1060]:
+                                - generic [ref=e1061]: B
+                          - generic [ref=e1062]:
+                            - 'link "VDisk 9000000001-1-3-0-8 on node 7001. Capacity alert: GREEN." [ref=e1066] [cursor=pointer]':
+                              - /url: /vDisk?nodeId=7001&vDiskId=9000000001-1-3-0-8&database=%2FRoot
+                              - meter "Disk allocated space" [ref=e1067]
+                            - 'link "VDisk 9000000001-1-3-0-9 on node 7001. Capacity alert: CYAN." [ref=e1071] [cursor=pointer]':
+                              - /url: /vDisk?nodeId=7001&vDiskId=9000000001-1-3-0-9&database=%2FRoot
+                              - meter "Disk allocated space" [ref=e1072]
+                            - 'link "VDisk 9000000001-1-3-0-10 on node 7001. Capacity alert: YELLOW." [ref=e1076] [cursor=pointer]':
+                              - /url: /vDisk?nodeId=7001&vDiskId=9000000001-1-3-0-10&database=%2FRoot
+                              - meter "Disk allocated space" [ref=e1077]:
+                                - generic [ref=e1078]: "Y"
+                            - 'link "VDisk 9000000001-1-3-0-11 on node 7001. Capacity alert: ORANGE." [ref=e1082] [cursor=pointer]':
+                              - /url: /vDisk?nodeId=7001&vDiskId=9000000001-1-3-0-11&database=%2FRoot
+                              - meter "Disk allocated space" [ref=e1083]:
+                                - generic [ref=e1084]: O
+                            - 'link "VDisk 9000000001-1-3-0-12 on node 7001. Capacity alert: RED." [ref=e1088] [cursor=pointer]':
+                              - /url: /vDisk?nodeId=7001&vDiskId=9000000001-1-3-0-12&database=%2FRoot
+                              - meter "Disk allocated space" [ref=e1089]:
+                                - generic [ref=e1090]: R
+                            - 'link "VDisk 9000000001-1-3-0-13 on node 7001. Capacity alert: LIGHT_YELLOW." [ref=e1094] [cursor=pointer]':
+                              - /url: /vDisk?nodeId=7001&vDiskId=9000000001-1-3-0-13&database=%2FRoot
+                              - meter "Disk allocated space" [ref=e1095]:
+                                - generic [ref=e1096]: LY
+                            - 'link "VDisk 9000000001-1-3-0-14 on node 7001. Capacity alert: LIGHT_ORANGE." [ref=e1100] [cursor=pointer]':
+                              - /url: /vDisk?nodeId=7001&vDiskId=9000000001-1-3-0-14&database=%2FRoot
+                              - meter "Disk allocated space" [ref=e1101]:
+                                - generic [ref=e1102]: LO
+                            - 'link "VDisk 9000000001-1-3-0-15 on node 7001. Capacity alert: PRE_ORANGE." [ref=e1106] [cursor=pointer]':
+                              - /url: /vDisk?nodeId=7001&vDiskId=9000000001-1-3-0-15&database=%2FRoot
+                              - meter "Disk allocated space" [ref=e1107]:
+                                - generic [ref=e1108]: PO
+                        - 'link "PDisk 7001-107. Health: issues detected. State: InitialSysLogParseError. Capacity alert: BLACK. Drive: INACTIVE. Decommit: DECOMMIT_PENDING. Maintenance: NO_NEW_VDISKS. Device: Grey. Realtime: Green. Allocated: 90%." [ref=e1110] [cursor=pointer]':
+                          - /url: /pDisk?nodeId=7001&pDiskId=107
+                          - meter "Disk allocated space" [ref=e1111]:
+                            - img [ref=e1112]:
+                              - img [ref=e1113]
+                            - generic [ref=e1118]: HDD
+                            - generic:
+                              - generic: B
+                              - generic:
+                                - img:
+                                  - img
+                              - generic:
+                                - img:
+                                  - img
+                              - generic:
+                                - img:
+                                  - img
+                              - generic:
+                                - generic:
+                                  - img:
+                                    - img
+                                  - img:
+                                    - img
+                - row [ref=e1119]:
+                  - cell "7002" [ref=e1120]
+                  - cell [ref=e1121]:
+                    - generic [ref=e1122]:
+                      - generic [ref=e1124]:
+                        - generic [ref=e1125]:
+                          - generic [ref=e1126]:
+                            - 'link "VDisk 9000000002-1-0-0-0 on node 7002. Capacity alert: CYAN." [ref=e1130] [cursor=pointer]':
+                              - /url: /vDisk?nodeId=7002&vDiskId=9000000002-1-0-0-0&database=%2FRoot
+                              - meter "Disk allocated space" [ref=e1131]
+                            - 'link "VDisk 9000000002-1-0-0-1 on node 7002. Capacity alert: YELLOW." [ref=e1135] [cursor=pointer]':
+                              - /url: /vDisk?nodeId=7002&vDiskId=9000000002-1-0-0-1&database=%2FRoot
+                              - meter "Disk allocated space" [ref=e1136]:
+                                - generic [ref=e1137]: "Y"
+                            - 'link "VDisk 9000000002-1-0-0-2 on node 7002. Capacity alert: ORANGE." [ref=e1141] [cursor=pointer]':
+                              - /url: /vDisk?nodeId=7002&vDiskId=9000000002-1-0-0-2&database=%2FRoot
+                              - meter "Disk allocated space" [ref=e1142]:
+                                - generic [ref=e1143]: O
+                            - 'link "VDisk 9000000002-1-0-0-3 on node 7002. Capacity alert: RED." [ref=e1147] [cursor=pointer]':
+                              - /url: /vDisk?nodeId=7002&vDiskId=9000000002-1-0-0-3&database=%2FRoot
+                              - meter "Disk allocated space" [ref=e1148]:
+                                - generic [ref=e1149]: R
+                            - 'link "VDisk 9000000002-1-0-0-4 on node 7002. Capacity alert: LIGHT_YELLOW." [ref=e1153] [cursor=pointer]':
+                              - /url: /vDisk?nodeId=7002&vDiskId=9000000002-1-0-0-4&database=%2FRoot
+                              - meter "Disk allocated space" [ref=e1154]:
+                                - generic [ref=e1155]: LY
+                            - 'link "VDisk 9000000002-1-0-0-5 on node 7002. Capacity alert: LIGHT_ORANGE." [ref=e1159] [cursor=pointer]':
+                              - /url: /vDisk?nodeId=7002&vDiskId=9000000002-1-0-0-5&database=%2FRoot
+                              - meter "Disk allocated space" [ref=e1160]:
+                                - generic [ref=e1161]: LO
+                            - 'link "VDisk 9000000002-1-0-0-6 on node 7002. Capacity alert: PRE_ORANGE." [ref=e1165] [cursor=pointer]':
+                              - /url: /vDisk?nodeId=7002&vDiskId=9000000002-1-0-0-6&database=%2FRoot
+                              - meter "Disk allocated space" [ref=e1166]:
+                                - generic [ref=e1167]: PO
+                            - 'link "VDisk 9000000002-1-0-0-7 on node 7002. Capacity alert: BLACK." [ref=e1171] [cursor=pointer]':
+                              - /url: /vDisk?nodeId=7002&vDiskId=9000000002-1-0-0-7&database=%2FRoot
+                              - meter "Disk allocated space" [ref=e1172]:
+                                - generic [ref=e1173]: B
+                          - generic [ref=e1174]:
+                            - 'link "VDisk 9000000002-1-0-0-8 on node 7002. Capacity alert: GREEN." [ref=e1178] [cursor=pointer]':
+                              - /url: /vDisk?nodeId=7002&vDiskId=9000000002-1-0-0-8&database=%2FRoot
+                              - meter "Disk allocated space" [ref=e1179]
+                            - 'link "VDisk 9000000002-1-0-0-9 on node 7002. Capacity alert: CYAN." [ref=e1183] [cursor=pointer]':
+                              - /url: /vDisk?nodeId=7002&vDiskId=9000000002-1-0-0-9&database=%2FRoot
+                              - meter "Disk allocated space" [ref=e1184]
+                            - 'link "VDisk 9000000002-1-0-0-10 on node 7002. Capacity alert: YELLOW." [ref=e1188] [cursor=pointer]':
+                              - /url: /vDisk?nodeId=7002&vDiskId=9000000002-1-0-0-10&database=%2FRoot
+                              - meter "Disk allocated space" [ref=e1189]:
+                                - generic [ref=e1190]: "Y"
+                            - 'link "VDisk 9000000002-1-0-0-11 on node 7002. Capacity alert: ORANGE." [ref=e1194] [cursor=pointer]':
+                              - /url: /vDisk?nodeId=7002&vDiskId=9000000002-1-0-0-11&database=%2FRoot
+                              - meter "Disk allocated space" [ref=e1195]:
+                                - generic [ref=e1196]: O
+                            - 'link "VDisk 9000000002-1-0-0-12 on node 7002. Capacity alert: RED." [ref=e1200] [cursor=pointer]':
+                              - /url: /vDisk?nodeId=7002&vDiskId=9000000002-1-0-0-12&database=%2FRoot
+                              - meter "Disk allocated space" [ref=e1201]:
+                                - generic [ref=e1202]: R
+                            - 'link "VDisk 9000000002-1-0-0-13 on node 7002. Capacity alert: LIGHT_YELLOW." [ref=e1206] [cursor=pointer]':
+                              - /url: /vDisk?nodeId=7002&vDiskId=9000000002-1-0-0-13&database=%2FRoot
+                              - meter "Disk allocated space" [ref=e1207]:
+                                - generic [ref=e1208]: LY
+                            - 'link "VDisk 9000000002-1-0-0-14 on node 7002. Capacity alert: LIGHT_ORANGE." [ref=e1212] [cursor=pointer]':
+                              - /url: /vDisk?nodeId=7002&vDiskId=9000000002-1-0-0-14&database=%2FRoot
+                              - meter "Disk allocated space" [ref=e1213]:
+                                - generic [ref=e1214]: LO
+                            - 'link "VDisk 9000000002-1-0-0-15 on node 7002. Capacity alert: PRE_ORANGE." [ref=e1218] [cursor=pointer]':
+                              - /url: /vDisk?nodeId=7002&vDiskId=9000000002-1-0-0-15&database=%2FRoot
+                              - meter "Disk allocated space" [ref=e1219]:
+                                - generic [ref=e1220]: PO
+                          - generic [ref=e1221]:
+                            - 'link "VDisk 9000000002-1-0-0-16 on node 7002. Capacity alert: BLACK." [ref=e1225] [cursor=pointer]':
+                              - /url: /vDisk?nodeId=7002&vDiskId=9000000002-1-0-0-16&database=%2FRoot
+                              - meter "Disk allocated space" [ref=e1226]:
+                                - generic [ref=e1227]: B
+                            - 'link "VDisk 9000000002-1-0-0-17 on node 7002. Capacity alert: GREEN." [ref=e1231] [cursor=pointer]':
+                              - /url: /vDisk?nodeId=7002&vDiskId=9000000002-1-0-0-17&database=%2FRoot
+                              - meter "Disk allocated space" [ref=e1232]
+                            - 'link "VDisk 9000000002-1-0-0-18 on node 7002. Capacity alert: GREEN." [ref=e1236] [cursor=pointer]':
+                              - /url: /vDisk?nodeId=7002&vDiskId=9000000002-1-0-0-18&database=%2FRoot
+                              - meter "Disk allocated space" [ref=e1237]
+                            - 'link "VDisk 9000000002-1-0-0-19 on node 7002. Capacity alert: CYAN." [ref=e1241] [cursor=pointer]':
+                              - /url: /vDisk?nodeId=7002&vDiskId=9000000002-1-0-0-19&database=%2FRoot
+                              - meter "Disk allocated space" [ref=e1242]
+                            - 'link "VDisk 9000000002-1-0-0-20 on node 7002. Capacity alert: YELLOW." [ref=e1246] [cursor=pointer]':
+                              - /url: /vDisk?nodeId=7002&vDiskId=9000000002-1-0-0-20&database=%2FRoot
+                              - meter "Disk allocated space" [ref=e1247]:
+                                - generic [ref=e1248]: "Y"
+                            - 'link "VDisk 9000000002-1-0-0-21 on node 7002. Capacity alert: ORANGE." [ref=e1252] [cursor=pointer]':
+                              - /url: /vDisk?nodeId=7002&vDiskId=9000000002-1-0-0-21&database=%2FRoot
+                              - meter "Disk allocated space" [ref=e1253]:
+                                - generic [ref=e1254]: O
+                            - 'link "VDisk 9000000002-1-0-0-22 on node 7002. Capacity alert: RED." [ref=e1258] [cursor=pointer]':
+                              - /url: /vDisk?nodeId=7002&vDiskId=9000000002-1-0-0-22&database=%2FRoot
+                              - meter "Disk allocated space" [ref=e1259]:
+                                - generic [ref=e1260]: R
+                            - 'link "VDisk 9000000002-1-0-0-23 on node 7002. Capacity alert: LIGHT_YELLOW." [ref=e1264] [cursor=pointer]':
+                              - /url: /vDisk?nodeId=7002&vDiskId=9000000002-1-0-0-23&database=%2FRoot
+                              - meter "Disk allocated space" [ref=e1265]:
+                                - generic [ref=e1266]: LY
+                        - 'link "PDisk 7002-108. Health: healthy. State: Normal. Capacity alert: GREEN. Drive: ACTIVE. Decommit: DECOMMIT_NONE. Maintenance: NO_REQUEST. Device: Green. Realtime: Green. Allocated: 75%." [ref=e1268] [cursor=pointer]':
+                          - /url: /pDisk?nodeId=7002&pDiskId=108
+                          - meter "Disk allocated space" [ref=e1269]:
+                            - generic [ref=e1273]: SSD
+                      - generic [ref=e1275]:
+                        - generic [ref=e1277]:
+                          - 'link "VDisk 9000000002-1-1-0-0 on node 7002. Capacity alert: GREEN." [ref=e1281] [cursor=pointer]':
+                            - /url: /vDisk?nodeId=7002&vDiskId=9000000002-1-1-0-0&database=%2FRoot
+                            - meter "Disk allocated space" [ref=e1282]
+                          - 'link "VDisk 9000000002-1-1-0-1 on node 7002. Capacity alert: CYAN." [ref=e1286] [cursor=pointer]':
+                            - /url: /vDisk?nodeId=7002&vDiskId=9000000002-1-1-0-1&database=%2FRoot
+                            - meter "Disk allocated space" [ref=e1287]
+                          - 'link "VDisk 9000000002-1-1-0-2 on node 7002. Capacity alert: YELLOW." [ref=e1291] [cursor=pointer]':
+                            - /url: /vDisk?nodeId=7002&vDiskId=9000000002-1-1-0-2&database=%2FRoot
+                            - meter "Disk allocated space" [ref=e1292]:
+                              - generic [ref=e1293]: "Y"
+                          - 'link "VDisk 9000000002-1-1-0-3 on node 7002. Capacity alert: ORANGE." [ref=e1297] [cursor=pointer]':
+                            - /url: /vDisk?nodeId=7002&vDiskId=9000000002-1-1-0-3&database=%2FRoot
+                            - meter "Disk allocated space" [ref=e1298]:
+                              - generic [ref=e1299]: O
+                          - 'link "VDisk 9000000002-1-1-0-4 on node 7002. Capacity alert: RED." [ref=e1303] [cursor=pointer]':
+                            - /url: /vDisk?nodeId=7002&vDiskId=9000000002-1-1-0-4&database=%2FRoot
+                            - meter "Disk allocated space" [ref=e1304]:
+                              - generic [ref=e1305]: R
+                          - 'link "VDisk 9000000002-1-1-0-5 on node 7002. Capacity alert: LIGHT_YELLOW." [ref=e1309] [cursor=pointer]':
+                            - /url: /vDisk?nodeId=7002&vDiskId=9000000002-1-1-0-5&database=%2FRoot
+                            - meter "Disk allocated space" [ref=e1310]:
+                              - generic [ref=e1311]: LY
+                          - 'link "VDisk 9000000002-1-1-0-6 on node 7002. Capacity alert: LIGHT_ORANGE." [ref=e1315] [cursor=pointer]':
+                            - /url: /vDisk?nodeId=7002&vDiskId=9000000002-1-1-0-6&database=%2FRoot
+                            - meter "Disk allocated space" [ref=e1316]:
+                              - generic [ref=e1317]: LO
+                          - 'link "VDisk 9000000002-1-1-0-7 on node 7002. Capacity alert: PRE_ORANGE." [ref=e1321] [cursor=pointer]':
+                            - /url: /vDisk?nodeId=7002&vDiskId=9000000002-1-1-0-7&database=%2FRoot
+                            - meter "Disk allocated space" [ref=e1322]:
+                              - generic [ref=e1323]: PO
+                        - 'link "PDisk 7002-109. Health: issues detected. State: Normal. Capacity alert: GREEN. Drive: ACTIVE. Decommit: DECOMMIT_NONE. Maintenance: NO_REQUEST. Device: N/D. Realtime: N/D. Allocated: 10%." [ref=e1325] [cursor=pointer]':
+                          - /url: /pDisk?nodeId=7002&pDiskId=109
+                          - meter "Disk allocated space" [ref=e1326]:
+                            - generic [ref=e1330]: HDD
+                            - generic:
+                              - generic:
+                                - generic:
+                                  - img:
+                                    - img
+                                  - img:
+                                    - img
+                      - generic [ref=e1332]:
+                        - generic [ref=e1333]:
+                          - generic [ref=e1334]:
+                            - 'link "VDisk 9000000002-1-2-0-0 on node 7002. Capacity alert: BLACK." [ref=e1338] [cursor=pointer]':
+                              - /url: /vDisk?nodeId=7002&vDiskId=9000000002-1-2-0-0&database=%2FRoot
+                              - meter "Disk allocated space" [ref=e1339]:
+                                - generic [ref=e1340]: B
+                            - 'link "VDisk 9000000002-1-2-0-1 on node 7002. Capacity alert: GREEN." [ref=e1344] [cursor=pointer]':
+                              - /url: /vDisk?nodeId=7002&vDiskId=9000000002-1-2-0-1&database=%2FRoot
+                              - meter "Disk allocated space" [ref=e1345]
+                            - 'link "VDisk 9000000002-1-2-0-2 on node 7002. Capacity alert: GREEN." [ref=e1349] [cursor=pointer]':
+                              - /url: /vDisk?nodeId=7002&vDiskId=9000000002-1-2-0-2&database=%2FRoot
+                              - meter "Disk allocated space" [ref=e1350]
+                            - 'link "VDisk 9000000002-1-2-0-3 on node 7002. Capacity alert: CYAN." [ref=e1354] [cursor=pointer]':
+                              - /url: /vDisk?nodeId=7002&vDiskId=9000000002-1-2-0-3&database=%2FRoot
+                              - meter "Disk allocated space" [ref=e1355]
+                            - 'link "VDisk 9000000002-1-2-0-4 on node 7002. Capacity alert: YELLOW." [ref=e1359] [cursor=pointer]':
+                              - /url: /vDisk?nodeId=7002&vDiskId=9000000002-1-2-0-4&database=%2FRoot
+                              - meter "Disk allocated space" [ref=e1360]:
+                                - generic [ref=e1361]: "Y"
+                            - 'link "VDisk 9000000002-1-2-0-5 on node 7002. Capacity alert: ORANGE." [ref=e1365] [cursor=pointer]':
+                              - /url: /vDisk?nodeId=7002&vDiskId=9000000002-1-2-0-5&database=%2FRoot
+                              - meter "Disk allocated space" [ref=e1366]:
+                                - generic [ref=e1367]: O
+                            - 'link "VDisk 9000000002-1-2-0-6 on node 7002. Capacity alert: RED." [ref=e1371] [cursor=pointer]':
+                              - /url: /vDisk?nodeId=7002&vDiskId=9000000002-1-2-0-6&database=%2FRoot
+                              - meter "Disk allocated space" [ref=e1372]:
+                                - generic [ref=e1373]: R
+                            - 'link "VDisk 9000000002-1-2-0-7 on node 7002. Capacity alert: LIGHT_YELLOW." [ref=e1377] [cursor=pointer]':
+                              - /url: /vDisk?nodeId=7002&vDiskId=9000000002-1-2-0-7&database=%2FRoot
+                              - meter "Disk allocated space" [ref=e1378]:
+                                - generic [ref=e1379]: LY
+                          - generic [ref=e1380]:
+                            - 'link "VDisk 9000000002-1-2-0-8 on node 7002. Capacity alert: LIGHT_ORANGE." [ref=e1384] [cursor=pointer]':
+                              - /url: /vDisk?nodeId=7002&vDiskId=9000000002-1-2-0-8&database=%2FRoot
+                              - meter "Disk allocated space" [ref=e1385]:
+                                - generic [ref=e1386]: LO
+                            - 'link "VDisk 9000000002-1-2-0-9 on node 7002. Capacity alert: PRE_ORANGE." [ref=e1390] [cursor=pointer]':
+                              - /url: /vDisk?nodeId=7002&vDiskId=9000000002-1-2-0-9&database=%2FRoot
+                              - meter "Disk allocated space" [ref=e1391]:
+                                - generic [ref=e1392]: PO
+                            - 'link "VDisk 9000000002-1-2-0-10 on node 7002. Capacity alert: BLACK." [ref=e1396] [cursor=pointer]':
+                              - /url: /vDisk?nodeId=7002&vDiskId=9000000002-1-2-0-10&database=%2FRoot
+                              - meter "Disk allocated space" [ref=e1397]:
+                                - generic [ref=e1398]: B
+                            - 'link "VDisk 9000000002-1-2-0-11 on node 7002. Capacity alert: GREEN." [ref=e1402] [cursor=pointer]':
+                              - /url: /vDisk?nodeId=7002&vDiskId=9000000002-1-2-0-11&database=%2FRoot
+                              - meter "Disk allocated space" [ref=e1403]
+                            - 'link "VDisk 9000000002-1-2-0-12 on node 7002. Capacity alert: CYAN." [ref=e1407] [cursor=pointer]':
+                              - /url: /vDisk?nodeId=7002&vDiskId=9000000002-1-2-0-12&database=%2FRoot
+                              - meter "Disk allocated space" [ref=e1408]
+                            - 'link "VDisk 9000000002-1-2-0-13 on node 7002. Capacity alert: YELLOW." [ref=e1412] [cursor=pointer]':
+                              - /url: /vDisk?nodeId=7002&vDiskId=9000000002-1-2-0-13&database=%2FRoot
+                              - meter "Disk allocated space" [ref=e1413]:
+                                - generic [ref=e1414]: "Y"
+                            - 'link "VDisk 9000000002-1-2-0-14 on node 7002. Capacity alert: ORANGE." [ref=e1418] [cursor=pointer]':
+                              - /url: /vDisk?nodeId=7002&vDiskId=9000000002-1-2-0-14&database=%2FRoot
+                              - meter "Disk allocated space" [ref=e1419]:
+                                - generic [ref=e1420]: O
+                            - 'link "VDisk 9000000002-1-2-0-15 on node 7002. Capacity alert: RED." [ref=e1424] [cursor=pointer]':
+                              - /url: /vDisk?nodeId=7002&vDiskId=9000000002-1-2-0-15&database=%2FRoot
+                              - meter "Disk allocated space" [ref=e1425]:
+                                - generic [ref=e1426]: R
+                        - 'link "PDisk 7002-110. Health: issues detected. State: Initial. Capacity alert: CYAN. Drive: INACTIVE. Decommit: DECOMMIT_IMMINENT. Maintenance: LONG_TERM_MAINTENANCE_PLANNED. Device: Yellow. Realtime: Green. Allocated: 20%." [ref=e1428] [cursor=pointer]':
+                          - /url: /pDisk?nodeId=7002&pDiskId=110
+                          - meter "Disk allocated space" [ref=e1429]:
+                            - img [ref=e1430]:
+                              - img [ref=e1431]
+                            - generic [ref=e1436]: SSD
+                            - generic:
+                              - generic:
+                                - img:
+                                  - img
+                              - generic:
+                                - img:
+                                  - img
+                              - generic:
+                                - img:
+                                  - img
+                              - generic:
+                                - generic:
+                                  - img:
+                                    - img
+                                  - img:
+                                    - img
+                      - generic [ref=e1438]:
+                        - generic [ref=e1439]:
+                          - generic [ref=e1440]:
+                            - 'link "VDisk 9000000002-1-3-0-0 on node 7002. Capacity alert: LIGHT_ORANGE." [ref=e1444] [cursor=pointer]':
+                              - /url: /vDisk?nodeId=7002&vDiskId=9000000002-1-3-0-0&database=%2FRoot
+                              - meter "Disk allocated space" [ref=e1445]:
+                                - generic [ref=e1446]: LO
+                            - 'link "VDisk 9000000002-1-3-0-1 on node 7002. Capacity alert: PRE_ORANGE." [ref=e1450] [cursor=pointer]':
+                              - /url: /vDisk?nodeId=7002&vDiskId=9000000002-1-3-0-1&database=%2FRoot
+                              - meter "Disk allocated space" [ref=e1451]:
+                                - generic [ref=e1452]: PO
+                            - 'link "VDisk 9000000002-1-3-0-2 on node 7002. Capacity alert: BLACK." [ref=e1456] [cursor=pointer]':
+                              - /url: /vDisk?nodeId=7002&vDiskId=9000000002-1-3-0-2&database=%2FRoot
+                              - meter "Disk allocated space" [ref=e1457]:
+                                - generic [ref=e1458]: B
+                            - 'link "VDisk 9000000002-1-3-0-3 on node 7002. Capacity alert: GREEN." [ref=e1462] [cursor=pointer]':
+                              - /url: /vDisk?nodeId=7002&vDiskId=9000000002-1-3-0-3&database=%2FRoot
+                              - meter "Disk allocated space" [ref=e1463]
+                            - 'link "VDisk 9000000002-1-3-0-4 on node 7002. Capacity alert: CYAN." [ref=e1467] [cursor=pointer]':
+                              - /url: /vDisk?nodeId=7002&vDiskId=9000000002-1-3-0-4&database=%2FRoot
+                              - meter "Disk allocated space" [ref=e1468]
+                            - 'link "VDisk 9000000002-1-3-0-5 on node 7002. Capacity alert: YELLOW." [ref=e1472] [cursor=pointer]':
+                              - /url: /vDisk?nodeId=7002&vDiskId=9000000002-1-3-0-5&database=%2FRoot
+                              - meter "Disk allocated space" [ref=e1473]:
+                                - generic [ref=e1474]: "Y"
+                            - 'link "VDisk 9000000002-1-3-0-6 on node 7002. Capacity alert: ORANGE." [ref=e1478] [cursor=pointer]':
+                              - /url: /vDisk?nodeId=7002&vDiskId=9000000002-1-3-0-6&database=%2FRoot
+                              - meter "Disk allocated space" [ref=e1479]:
+                                - generic [ref=e1480]: O
+                            - 'link "VDisk 9000000002-1-3-0-7 on node 7002. Capacity alert: RED." [ref=e1484] [cursor=pointer]':
+                              - /url: /vDisk?nodeId=7002&vDiskId=9000000002-1-3-0-7&database=%2FRoot
+                              - meter "Disk allocated space" [ref=e1485]:
+                                - generic [ref=e1486]: R
+                          - generic [ref=e1487]:
+                            - 'link "VDisk 9000000002-1-3-0-8 on node 7002. Capacity alert: LIGHT_YELLOW." [ref=e1491] [cursor=pointer]':
+                              - /url: /vDisk?nodeId=7002&vDiskId=9000000002-1-3-0-8&database=%2FRoot
+                              - meter "Disk allocated space" [ref=e1492]:
+                                - generic [ref=e1493]: LY
+                            - 'link "VDisk 9000000002-1-3-0-9 on node 7002. Capacity alert: LIGHT_ORANGE." [ref=e1497] [cursor=pointer]':
+                              - /url: /vDisk?nodeId=7002&vDiskId=9000000002-1-3-0-9&database=%2FRoot
+                              - meter "Disk allocated space" [ref=e1498]:
+                                - generic [ref=e1499]: LO
+                            - 'link "VDisk 9000000002-1-3-0-10 on node 7002. Capacity alert: PRE_ORANGE." [ref=e1503] [cursor=pointer]':
+                              - /url: /vDisk?nodeId=7002&vDiskId=9000000002-1-3-0-10&database=%2FRoot
+                              - meter "Disk allocated space" [ref=e1504]:
+                                - generic [ref=e1505]: PO
+                            - 'link "VDisk 9000000002-1-3-0-11 on node 7002. Capacity alert: BLACK." [ref=e1509] [cursor=pointer]':
+                              - /url: /vDisk?nodeId=7002&vDiskId=9000000002-1-3-0-11&database=%2FRoot
+                              - meter "Disk allocated space" [ref=e1510]:
+                                - generic [ref=e1511]: B
+                            - 'link "VDisk 9000000002-1-3-0-12 on node 7002. Capacity alert: GREEN." [ref=e1515] [cursor=pointer]':
+                              - /url: /vDisk?nodeId=7002&vDiskId=9000000002-1-3-0-12&database=%2FRoot
+                              - meter "Disk allocated space" [ref=e1516]
+                            - 'link "VDisk 9000000002-1-3-0-13 on node 7002. Capacity alert: GREEN." [ref=e1520] [cursor=pointer]':
+                              - /url: /vDisk?nodeId=7002&vDiskId=9000000002-1-3-0-13&database=%2FRoot
+                              - meter "Disk allocated space" [ref=e1521]
+                            - 'link "VDisk 9000000002-1-3-0-14 on node 7002. Capacity alert: CYAN." [ref=e1525] [cursor=pointer]':
+                              - /url: /vDisk?nodeId=7002&vDiskId=9000000002-1-3-0-14&database=%2FRoot
+                              - meter "Disk allocated space" [ref=e1526]
+                            - 'link "VDisk 9000000002-1-3-0-15 on node 7002. Capacity alert: YELLOW." [ref=e1530] [cursor=pointer]':
+                              - /url: /vDisk?nodeId=7002&vDiskId=9000000002-1-3-0-15&database=%2FRoot
+                              - meter "Disk allocated space" [ref=e1531]:
+                                - generic [ref=e1532]: "Y"
+                          - generic [ref=e1533]:
+                            - 'link "VDisk 9000000002-1-3-0-16 on node 7002. Capacity alert: ORANGE." [ref=e1537] [cursor=pointer]':
+                              - /url: /vDisk?nodeId=7002&vDiskId=9000000002-1-3-0-16&database=%2FRoot
+                              - meter "Disk allocated space" [ref=e1538]:
+                                - generic [ref=e1539]: O
+                            - 'link "VDisk 9000000002-1-3-0-17 on node 7002. Capacity alert: RED." [ref=e1543] [cursor=pointer]':
+                              - /url: /vDisk?nodeId=7002&vDiskId=9000000002-1-3-0-17&database=%2FRoot
+                              - meter "Disk allocated space" [ref=e1544]:
+                                - generic [ref=e1545]: R
+                            - 'link "VDisk 9000000002-1-3-0-18 on node 7002. Capacity alert: LIGHT_YELLOW." [ref=e1549] [cursor=pointer]':
+                              - /url: /vDisk?nodeId=7002&vDiskId=9000000002-1-3-0-18&database=%2FRoot
+                              - meter "Disk allocated space" [ref=e1550]:
+                                - generic [ref=e1551]: LY
+                            - 'link "VDisk 9000000002-1-3-0-19 on node 7002. Capacity alert: LIGHT_ORANGE." [ref=e1555] [cursor=pointer]':
+                              - /url: /vDisk?nodeId=7002&vDiskId=9000000002-1-3-0-19&database=%2FRoot
+                              - meter "Disk allocated space" [ref=e1556]:
+                                - generic [ref=e1557]: LO
+                            - 'link "VDisk 9000000002-1-3-0-20 on node 7002. Capacity alert: PRE_ORANGE." [ref=e1561] [cursor=pointer]':
+                              - /url: /vDisk?nodeId=7002&vDiskId=9000000002-1-3-0-20&database=%2FRoot
+                              - meter "Disk allocated space" [ref=e1562]:
+                                - generic [ref=e1563]: PO
+                            - 'link "VDisk 9000000002-1-3-0-21 on node 7002. Capacity alert: BLACK." [ref=e1567] [cursor=pointer]':
+                              - /url: /vDisk?nodeId=7002&vDiskId=9000000002-1-3-0-21&database=%2FRoot
+                              - meter "Disk allocated space" [ref=e1568]:
+                                - generic [ref=e1569]: B
+                            - 'link "VDisk 9000000002-1-3-0-22 on node 7002. Capacity alert: GREEN." [ref=e1573] [cursor=pointer]':
+                              - /url: /vDisk?nodeId=7002&vDiskId=9000000002-1-3-0-22&database=%2FRoot
+                              - meter "Disk allocated space" [ref=e1574]
+                            - 'link "VDisk 9000000002-1-3-0-23 on node 7002. Capacity alert: CYAN." [ref=e1578] [cursor=pointer]':
+                              - /url: /vDisk?nodeId=7002&vDiskId=9000000002-1-3-0-23&database=%2FRoot
+                              - meter "Disk allocated space" [ref=e1579]
+                        - 'link "PDisk 7002-111. Health: issues detected. State: OpenFileError. Capacity alert: YELLOW. Drive: TO_BE_REMOVED. Decommit: DECOMMIT_PENDING. Maintenance: NO_NEW_VDISKS. Device: Orange. Realtime: Yellow. Allocated: 30%." [ref=e1581] [cursor=pointer]':
+                          - /url: /pDisk?nodeId=7002&pDiskId=111
+                          - meter "Disk allocated space" [ref=e1582]:
+                            - img [ref=e1583]:
+                              - img [ref=e1584]
+                            - generic [ref=e1589]: HDD
+                            - generic:
+                              - generic: "Y"
+                              - generic:
+                                - img:
+                                  - img
+                              - generic:
+                                - img:
+                                  - img
+                              - generic:
+                                - img:
+                                  - img
+                              - generic:
+                                - generic:
+                                  - img:
+                                    - img
+                                  - img:
+                                    - img
+          - status [ref=e1590]
+```

@@ -1,0 +1,236 @@
+# Page snapshot
+
+```yaml
+- generic [ref=e5]:
+  - generic [ref=e8]:
+    - img [ref=e13] [cursor=pointer]:
+      - img [ref=e14]
+    - list [ref=e21]:
+      - generic [ref=e22]:
+        - listitem [ref=e23]:
+          - link "Database" [ref=e28] [cursor=pointer]:
+            - /url: /database?diagnosticsTab=describe&database=%2Flocal&schema=%2Flocal%2Ffirst&databasePage=database
+            - img [ref=e31]:
+              - img [ref=e32]
+            - generic "Database":
+              - generic: Database
+        - listitem [ref=e34]:
+          - link "Diagnostics" [ref=e39] [cursor=pointer]:
+            - /url: /database?diagnosticsTab=describe&database=%2Flocal&schema=%2Flocal%2Ffirst&databasePage=diagnostics
+            - img [ref=e42]:
+              - img [ref=e43]
+            - generic "Diagnostics":
+              - generic: Diagnostics
+        - listitem [ref=e45]:
+          - link "SQL Editor" [ref=e50] [cursor=pointer]:
+            - /url: /database?diagnosticsTab=describe&database=%2Flocal&schema=%2Flocal%2Ffirst&databasePage=query
+            - img [ref=e53]:
+              - img [ref=e54]
+            - generic "SQL Editor":
+              - generic: SQL Editor
+    - generic [ref=e56]:
+      - button "Information" [ref=e57] [cursor=pointer]:
+        - img [ref=e60]:
+          - img [ref=e61]
+        - generic "Information":
+          - generic: Information
+      - button "Settings" [ref=e63] [cursor=pointer]:
+        - img [ref=e66]:
+          - img [ref=e67]
+        - generic "Settings":
+          - generic: Settings
+      - button "Account" [ref=e69] [cursor=pointer]:
+        - img [ref=e72]:
+          - img [ref=e73]
+        - generic "Account":
+          - generic: Account
+    - button "Expand" [ref=e75] [cursor=pointer]:
+      - img [ref=e76]:
+        - img [ref=e77]
+  - generic [ref=e80]:
+    - banner [ref=e81]:
+      - list [ref=e82]:
+        - listitem [ref=e83]:
+          - link "Cluster" [ref=e84] [cursor=pointer]:
+            - link "Cluster" [ref=e85]:
+              - /url: /cluster
+              - generic [ref=e86]: Cluster
+          - generic [ref=e87]: /
+        - listitem [ref=e88]:
+          - link "local" [disabled] [ref=e89]:
+            - generic [ref=e91]: local
+        - listitem [ref=e92]:
+          - generic [ref=e93]:
+            - generic [ref=e94]:
+              - button "Copy path" [ref=e95] [cursor=pointer]:
+                - generic:
+                  - generic:
+                    - img:
+                      - img
+              - button [ref=e96] [cursor=pointer]:
+                - img [ref=e99]:
+                  - img [ref=e100]
+            - generic [ref=e103] [cursor=pointer]:
+              - img [ref=e105]:
+                - img [ref=e106]
+              - 'button "Unspecified: 0 issues" [ref=e108]':
+                - generic [ref=e111]:
+                  - text: "Unspecified: 0 issues"
+                  - img [ref=e112]:
+                    - img [ref=e113]
+      - generic [ref=e115]:
+        - link "Developer UI" [ref=e116] [cursor=pointer]:
+          - /url: http://localhost:8765/internal
+          - img [ref=e119]:
+            - img [ref=e120]
+          - generic [ref=e122]: Developer UI
+        - button [ref=e125] [cursor=pointer]:
+          - img [ref=e128]:
+            - img [ref=e129]
+    - main [ref=e131]:
+      - generic [ref=e134]:
+        - generic [ref=e135]:
+          - generic [ref=e138]:
+            - generic [ref=e139]: Navigation
+            - generic [ref=e143]:
+              - generic [ref=e146] [cursor=pointer]:
+                - button [ref=e147]
+                - generic [ref=e149]:
+                  - img [ref=e151]
+                  - generic [ref=e153]: /local
+              - generic [ref=e156] [cursor=pointer]:
+                - button [ref=e157]
+                - generic [ref=e159]:
+                  - img [ref=e161]
+                  - generic [ref=e163]: first
+              - generic [ref=e166] [cursor=pointer]:
+                - button [ref=e167]
+                - generic [ref=e169]:
+                  - img [ref=e171]
+                  - generic [ref=e173]: second
+          - generic [ref=e174]:
+            - button [ref=e175] [cursor=pointer]:
+              - img [ref=e178]:
+                - img [ref=e179]
+            - button [ref=e181] [cursor=pointer]:
+              - img [ref=e184]:
+                - img [ref=e185]
+        - generic [ref=e190]:
+          - generic [ref=e192]:
+            - tablist [ref=e193]:
+              - tab "Info" [ref=e194] [cursor=pointer]:
+                - link "Info" [ref=e197]:
+                  - /url: /database?diagnosticsTab=overview&database=%2Flocal&schema=%2Flocal%2Ffirst&databasePage=diagnostics
+              - tab "Top shards" [ref=e198] [cursor=pointer]:
+                - link "Top shards" [ref=e201]:
+                  - /url: /database?diagnosticsTab=topShards&database=%2Flocal&schema=%2Flocal%2Ffirst&databasePage=diagnostics
+              - tab "Nodes" [ref=e202] [cursor=pointer]:
+                - link "Nodes" [ref=e205]:
+                  - /url: /database?diagnosticsTab=nodes&database=%2Flocal&schema=%2Flocal%2Ffirst&databasePage=diagnostics
+              - tab "Describe" [selected] [ref=e206] [cursor=pointer]:
+                - link "Describe" [ref=e209]:
+                  - /url: /database?diagnosticsTab=describe&database=%2Flocal&schema=%2Flocal%2Ffirst&databasePage=diagnostics
+              - tab "Access" [ref=e210] [cursor=pointer]:
+                - link "Access" [ref=e213]:
+                  - /url: /database?diagnosticsTab=access&database=%2Flocal&schema=%2Flocal%2Ffirst&databasePage=diagnostics
+            - generic [ref=e214]:
+              - button "Refresh" [ref=e215] [cursor=pointer]:
+                - img [ref=e218]
+              - group [ref=e221] [cursor=pointer]:
+                - combobox [ref=e222]:
+                  - generic [ref=e223]: None
+                - img [ref=e224]:
+                  - img [ref=e225]
+          - generic [ref=e234]:
+            - generic [ref=e235]:
+              - generic [ref=e236]:
+                - generic [ref=e238]:
+                  - textbox "Search..." [ref=e239]
+                  - button [ref=e241] [cursor=pointer]:
+                    - img [ref=e244]:
+                      - img [ref=e245]
+                - generic [ref=e249]:
+                  - button [disabled]:
+                    - generic:
+                      - generic:
+                        - img:
+                          - img
+                  - button [disabled]:
+                    - generic:
+                      - generic:
+                        - img:
+                          - img
+              - generic [ref=e250]:
+                - button [ref=e251] [cursor=pointer]:
+                  - img [ref=e254]:
+                    - img [ref=e255]
+                - button [ref=e259] [cursor=pointer]:
+                  - img [ref=e262]:
+                    - img [ref=e263]
+                - button "Copy" [ref=e265] [cursor=pointer]:
+                  - generic:
+                    - generic:
+                      - img:
+                        - img
+            - table [ref=e267]:
+              - rowgroup:
+                - row
+              - rowgroup [ref=e268]:
+                - 'row "{ 4 items" [ref=e269]':
+                  - 'cell "{ 4 items" [ref=e270]':
+                    - generic [ref=e271]: "{ 4 items"
+                - 'row "\"Status\": \"StatusSuccess\"," [ref=e272]':
+                  - 'cell "\"Status\": \"StatusSuccess\"," [ref=e273]':
+                    - generic [ref=e274]:
+                      - generic [ref=e275]: "\"Status\""
+                      - text: ":"
+                      - generic [ref=e276]: "\"StatusSuccess\""
+                      - text: ","
+                - 'row "\"Path\": \"/local/first\"," [ref=e277]':
+                  - 'cell "\"Path\": \"/local/first\"," [ref=e278]':
+                    - generic [ref=e279]:
+                      - generic [ref=e280]: "\"Path\""
+                      - text: ":"
+                      - generic [ref=e281]: "\"/local/first\""
+                      - text: ","
+                - 'row "\"Description\": \"first object description first object description first object description first object description …\"," [ref=e282]':
+                  - 'cell "\"Description\": \"first object description first object description first object description first object description …\"," [ref=e283]':
+                    - generic [ref=e284]:
+                      - generic [ref=e285]: "\"Description\""
+                      - text: ":"
+                      - generic [ref=e286]:
+                        - text: "\"first object description first object description first object description first object description"
+                        - button "…" [ref=e287]:
+                          - text: …
+                          - img [ref=e288]:
+                            - img [ref=e289]
+                        - text: "\""
+                      - text: ","
+                - 'row "[-] \"PathDescription\": { 2 items" [ref=e291]':
+                  - 'cell "[-] \"PathDescription\": { 2 items" [ref=e292]':
+                    - generic [ref=e293]:
+                      - generic "PathDescription" [ref=e294]:
+                        - button "[-]" [ref=e295] [cursor=pointer]:
+                          - generic [ref=e296]: "[-]"
+                      - generic [ref=e297]: "\"PathDescription\""
+                      - text: ": { 2 items"
+                - 'row "[+] \"Self\": { 2 items }," [ref=e298]':
+                  - 'cell "[+] \"Self\": { 2 items }," [ref=e299]':
+                    - generic [ref=e300]:
+                      - generic "PathDescription/Self" [ref=e301]:
+                        - button "[+]" [ref=e302] [cursor=pointer]:
+                          - generic [ref=e303]: "[+]"
+                      - generic [ref=e304]: "\"Self\""
+                      - text: ": { 2 items },"
+                - 'row "\"Children\": []" [ref=e305]':
+                  - 'cell "\"Children\": []" [ref=e306]':
+                    - generic [ref=e307]:
+                      - generic [ref=e308]: "\"Children\""
+                      - text: ": []"
+                - 'row "}" [ref=e309]':
+                  - 'cell "}" [ref=e310]':
+                    - generic [ref=e311]: "}"
+                - 'row "}" [ref=e312]':
+                  - 'cell "}" [ref=e313]':
+                    - generic [ref=e314]: "}"
+```

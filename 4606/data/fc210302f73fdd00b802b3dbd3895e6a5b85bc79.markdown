@@ -1,0 +1,607 @@
+# Page snapshot
+
+```yaml
+- generic [ref=e5]:
+  - generic [ref=e8]:
+    - img [ref=e13] [cursor=pointer]:
+      - img [ref=e14]
+    - generic [ref=e18]:
+      - button "Information" [ref=e19] [cursor=pointer]:
+        - img [ref=e22]:
+          - img [ref=e23]
+        - generic "Information":
+          - generic: Information
+      - button "Settings" [ref=e25] [cursor=pointer]:
+        - img [ref=e28]:
+          - img [ref=e29]
+        - generic "Settings":
+          - generic: Settings
+      - button "Account" [ref=e31] [cursor=pointer]:
+        - img [ref=e34]:
+          - img [ref=e35]
+        - generic "Account":
+          - generic: Account
+    - button "Expand" [ref=e37] [cursor=pointer]:
+      - img [ref=e38]:
+        - img [ref=e39]
+  - generic [ref=e42]:
+    - banner [ref=e43]:
+      - list [ref=e44]:
+        - listitem [ref=e45]:
+          - link "Cluster" [disabled] [ref=e46]:
+            - generic [ref=e48]: Cluster
+      - link "Developer UI" [ref=e50] [cursor=pointer]:
+        - /url: http://localhost:8765/internal
+        - img [ref=e53]:
+          - img [ref=e54]
+        - generic [ref=e56]: Developer UI
+    - main [ref=e57]:
+      - generic [ref=e59]:
+        - generic [ref=e61]:
+          - text: LOCAL
+          - generic [ref=e62] [cursor=pointer]:
+            - img [ref=e64]:
+              - img [ref=e65]
+            - button "Good" [ref=e67]:
+              - generic [ref=e70]: Good
+        - generic [ref=e71]:
+          - button "Refresh" [ref=e72] [cursor=pointer]:
+            - img [ref=e75]
+          - group [ref=e78] [cursor=pointer]:
+            - combobox [ref=e79]:
+              - generic [ref=e80]: None
+            - img [ref=e81]:
+              - img [ref=e82]
+        - tablist [ref=e85]:
+          - tab "Databases" [ref=e86] [cursor=pointer]:
+            - link "Databases" [ref=e89]:
+              - /url: /cluster/databases
+          - tab "Nodes" [ref=e90] [cursor=pointer]:
+            - link "Nodes" [ref=e93]:
+              - /url: /cluster/nodes
+          - tab "Storage" [selected] [ref=e94] [cursor=pointer]:
+            - link "Storage" [ref=e97]:
+              - /url: /cluster/storage
+          - tab "Network" [ref=e98] [cursor=pointer]:
+            - link "Network" [ref=e101]:
+              - /url: /cluster/network
+          - tab "Tablets" [ref=e102] [cursor=pointer]:
+            - link "Tablets" [ref=e105]:
+              - /url: /cluster/tablets
+          - tab "Versions" [ref=e106] [cursor=pointer]:
+            - link "Versions" [ref=e109]:
+              - /url: /cluster/versions
+        - generic [ref=e110]:
+          - generic [ref=e111]:
+            - generic [ref=e112]:
+              - generic [ref=e115]:
+                - textbox "Group ID, Pool name" [active] [ref=e118]
+                - radiogroup [ref=e119]:
+                  - generic [ref=e120]:
+                    - radio "Groups" [checked] [ref=e121]
+                    - generic [ref=e122]: Groups
+                  - generic [ref=e123] [cursor=pointer]:
+                    - radio "Nodes" [ref=e124]
+                    - generic [ref=e125]: Nodes
+                - generic [ref=e126]: "Group by:"
+                - group [ref=e128] [cursor=pointer]:
+                  - combobox [ref=e129]:
+                    - generic [ref=e130]: "-"
+                  - img [ref=e131]:
+                    - img [ref=e132]
+                - generic [ref=e136]: "Groups: 245"
+                - button "Expert mode" [ref=e137] [cursor=pointer]:
+                  - img [ref=e140]:
+                    - img [ref=e141]
+                  - generic [ref=e143]: Expert mode
+              - button "1/17" [ref=e146] [cursor=pointer]:
+                - img [ref=e149]:
+                  - img [ref=e150]
+                - generic [ref=e153]: 1/17
+            - table [ref=e156]:
+              - rowgroup [ref=e157]:
+                - row "Group ID" [ref=e158]:
+                  - columnheader "Group ID" [ref=e159]:
+                    - generic [ref=e160] [cursor=pointer]:
+                      - generic [ref=e162]: Group ID
+                      - img [ref=e164]
+              - rowgroup [ref=e166]:
+                - row [ref=e167]:
+                  - cell [ref=e168]
+                - row "9000000200 Copy" [ref=e169]:
+                  - cell "9000000200 Copy" [ref=e170]:
+                    - generic [ref=e172]:
+                      - generic "9000000200" [ref=e173]:
+                        - link "9000000200" [ref=e174] [cursor=pointer]:
+                          - /url: /storageGroup?groupId=9000000200&database=%2FRoot
+                      - button "Copy" [ref=e175] [cursor=pointer]:
+                        - generic:
+                          - generic:
+                            - img:
+                              - img
+                - row "9000000201 Copy" [ref=e176]:
+                  - cell "9000000201 Copy" [ref=e177]:
+                    - generic [ref=e179]:
+                      - generic "9000000201" [ref=e180]:
+                        - link "9000000201" [ref=e181] [cursor=pointer]:
+                          - /url: /storageGroup?groupId=9000000201&database=%2FRoot
+                      - button "Copy" [ref=e182] [cursor=pointer]:
+                        - generic:
+                          - generic:
+                            - img:
+                              - img
+                - row "9000000202 Copy" [ref=e183]:
+                  - cell "9000000202 Copy" [ref=e184]:
+                    - generic [ref=e186]:
+                      - generic "9000000202" [ref=e187]:
+                        - link "9000000202" [ref=e188] [cursor=pointer]:
+                          - /url: /storageGroup?groupId=9000000202&database=%2FRoot
+                      - button "Copy" [ref=e189] [cursor=pointer]:
+                        - generic:
+                          - generic:
+                            - img:
+                              - img
+                - row "9000000203 Copy" [ref=e190]:
+                  - cell "9000000203 Copy" [ref=e191]:
+                    - generic [ref=e193]:
+                      - generic "9000000203" [ref=e194]:
+                        - link "9000000203" [ref=e195] [cursor=pointer]:
+                          - /url: /storageGroup?groupId=9000000203&database=%2FRoot
+                      - button "Copy" [ref=e196] [cursor=pointer]:
+                        - generic:
+                          - generic:
+                            - img:
+                              - img
+                - row "9000000204 Copy" [ref=e197]:
+                  - cell "9000000204 Copy" [ref=e198]:
+                    - generic [ref=e200]:
+                      - generic "9000000204" [ref=e201]:
+                        - link "9000000204" [ref=e202] [cursor=pointer]:
+                          - /url: /storageGroup?groupId=9000000204&database=%2FRoot
+                      - button "Copy" [ref=e203] [cursor=pointer]:
+                        - generic:
+                          - generic:
+                            - img:
+                              - img
+                - row "9000000205 Copy" [ref=e204]:
+                  - cell "9000000205 Copy" [ref=e205]:
+                    - generic [ref=e207]:
+                      - generic "9000000205" [ref=e208]:
+                        - link "9000000205" [ref=e209] [cursor=pointer]:
+                          - /url: /storageGroup?groupId=9000000205&database=%2FRoot
+                      - button "Copy" [ref=e210] [cursor=pointer]:
+                        - generic:
+                          - generic:
+                            - img:
+                              - img
+                - row "9000000206 Copy" [ref=e211]:
+                  - cell "9000000206 Copy" [ref=e212]:
+                    - generic [ref=e214]:
+                      - generic "9000000206" [ref=e215]:
+                        - link "9000000206" [ref=e216] [cursor=pointer]:
+                          - /url: /storageGroup?groupId=9000000206&database=%2FRoot
+                      - button "Copy" [ref=e217] [cursor=pointer]:
+                        - generic:
+                          - generic:
+                            - img:
+                              - img
+                - row "9000000207 Copy" [ref=e218]:
+                  - cell "9000000207 Copy" [ref=e219]:
+                    - generic [ref=e221]:
+                      - generic "9000000207" [ref=e222]:
+                        - link "9000000207" [ref=e223] [cursor=pointer]:
+                          - /url: /storageGroup?groupId=9000000207&database=%2FRoot
+                      - button "Copy" [ref=e224] [cursor=pointer]:
+                        - generic:
+                          - generic:
+                            - img:
+                              - img
+                - row "9000000208 Copy" [ref=e225]:
+                  - cell "9000000208 Copy" [ref=e226]:
+                    - generic [ref=e228]:
+                      - generic "9000000208" [ref=e229]:
+                        - link "9000000208" [ref=e230] [cursor=pointer]:
+                          - /url: /storageGroup?groupId=9000000208&database=%2FRoot
+                      - button "Copy" [ref=e231] [cursor=pointer]:
+                        - generic:
+                          - generic:
+                            - img:
+                              - img
+                - row "9000000209 Copy" [ref=e232]:
+                  - cell "9000000209 Copy" [ref=e233]:
+                    - generic [ref=e235]:
+                      - generic "9000000209" [ref=e236]:
+                        - link "9000000209" [ref=e237] [cursor=pointer]:
+                          - /url: /storageGroup?groupId=9000000209&database=%2FRoot
+                      - button "Copy" [ref=e238] [cursor=pointer]:
+                        - generic:
+                          - generic:
+                            - img:
+                              - img
+                - row "9000000210 Copy" [ref=e239]:
+                  - cell "9000000210 Copy" [ref=e240]:
+                    - generic [ref=e242]:
+                      - generic "9000000210" [ref=e243]:
+                        - link "9000000210" [ref=e244] [cursor=pointer]:
+                          - /url: /storageGroup?groupId=9000000210&database=%2FRoot
+                      - button "Copy" [ref=e245] [cursor=pointer]:
+                        - generic:
+                          - generic:
+                            - img:
+                              - img
+                - row "9000000211 Copy" [ref=e246]:
+                  - cell "9000000211 Copy" [ref=e247]:
+                    - generic [ref=e249]:
+                      - generic "9000000211" [ref=e250]:
+                        - link "9000000211" [ref=e251] [cursor=pointer]:
+                          - /url: /storageGroup?groupId=9000000211&database=%2FRoot
+                      - button "Copy" [ref=e252] [cursor=pointer]:
+                        - generic:
+                          - generic:
+                            - img:
+                              - img
+                - row "9000000212 Copy" [ref=e253]:
+                  - cell "9000000212 Copy" [ref=e254]:
+                    - generic [ref=e256]:
+                      - generic "9000000212" [ref=e257]:
+                        - link "9000000212" [ref=e258] [cursor=pointer]:
+                          - /url: /storageGroup?groupId=9000000212&database=%2FRoot
+                      - button "Copy" [ref=e259] [cursor=pointer]:
+                        - generic:
+                          - generic:
+                            - img:
+                              - img
+                - row "9000000213 Copy" [ref=e260]:
+                  - cell "9000000213 Copy" [ref=e261]:
+                    - generic [ref=e263]:
+                      - generic "9000000213" [ref=e264]:
+                        - link "9000000213" [ref=e265] [cursor=pointer]:
+                          - /url: /storageGroup?groupId=9000000213&database=%2FRoot
+                      - button "Copy" [ref=e266] [cursor=pointer]:
+                        - generic:
+                          - generic:
+                            - img:
+                              - img
+                - row "9000000214 Copy" [ref=e267]:
+                  - cell "9000000214 Copy" [ref=e268]:
+                    - generic [ref=e270]:
+                      - generic "9000000214" [ref=e271]:
+                        - link "9000000214" [ref=e272] [cursor=pointer]:
+                          - /url: /storageGroup?groupId=9000000214&database=%2FRoot
+                      - button "Copy" [ref=e273] [cursor=pointer]:
+                        - generic:
+                          - generic:
+                            - img:
+                              - img
+                - row "9000000215 Copy" [ref=e274]:
+                  - cell "9000000215 Copy" [ref=e275]:
+                    - generic [ref=e277]:
+                      - generic "9000000215" [ref=e278]:
+                        - link "9000000215" [ref=e279] [cursor=pointer]:
+                          - /url: /storageGroup?groupId=9000000215&database=%2FRoot
+                      - button "Copy" [ref=e280] [cursor=pointer]:
+                        - generic:
+                          - generic:
+                            - img:
+                              - img
+                - row "9000000216 Copy" [ref=e281]:
+                  - cell "9000000216 Copy" [ref=e282]:
+                    - generic [ref=e284]:
+                      - generic "9000000216" [ref=e285]:
+                        - link "9000000216" [ref=e286] [cursor=pointer]:
+                          - /url: /storageGroup?groupId=9000000216&database=%2FRoot
+                      - button "Copy" [ref=e287] [cursor=pointer]:
+                        - generic:
+                          - generic:
+                            - img:
+                              - img
+                - row "9000000217 Copy" [ref=e288]:
+                  - cell "9000000217 Copy" [ref=e289]:
+                    - generic [ref=e291]:
+                      - generic "9000000217" [ref=e292]:
+                        - link "9000000217" [ref=e293] [cursor=pointer]:
+                          - /url: /storageGroup?groupId=9000000217&database=%2FRoot
+                      - button "Copy" [ref=e294] [cursor=pointer]:
+                        - generic:
+                          - generic:
+                            - img:
+                              - img
+                - row "9000000218 Copy" [ref=e295]:
+                  - cell "9000000218 Copy" [ref=e296]:
+                    - generic [ref=e298]:
+                      - generic "9000000218" [ref=e299]:
+                        - link "9000000218" [ref=e300] [cursor=pointer]:
+                          - /url: /storageGroup?groupId=9000000218&database=%2FRoot
+                      - button "Copy" [ref=e301] [cursor=pointer]:
+                        - generic:
+                          - generic:
+                            - img:
+                              - img
+                - row "9000000219 Copy" [ref=e302]:
+                  - cell "9000000219 Copy" [ref=e303]:
+                    - generic [ref=e305]:
+                      - generic "9000000219" [ref=e306]:
+                        - link "9000000219" [ref=e307] [cursor=pointer]:
+                          - /url: /storageGroup?groupId=9000000219&database=%2FRoot
+                      - button "Copy" [ref=e308] [cursor=pointer]:
+                        - generic:
+                          - generic:
+                            - img:
+                              - img
+                - row "9000000220 Copy" [ref=e309]:
+                  - cell "9000000220 Copy" [ref=e310]:
+                    - generic [ref=e312]:
+                      - generic "9000000220" [ref=e313]:
+                        - link "9000000220" [ref=e314] [cursor=pointer]:
+                          - /url: /storageGroup?groupId=9000000220&database=%2FRoot
+                      - button "Copy" [ref=e315] [cursor=pointer]:
+                        - generic:
+                          - generic:
+                            - img:
+                              - img
+                - row "9000000221 Copy" [ref=e316]:
+                  - cell "9000000221 Copy" [ref=e317]:
+                    - generic [ref=e319]:
+                      - generic "9000000221" [ref=e320]:
+                        - link "9000000221" [ref=e321] [cursor=pointer]:
+                          - /url: /storageGroup?groupId=9000000221&database=%2FRoot
+                      - button "Copy" [ref=e322] [cursor=pointer]:
+                        - generic:
+                          - generic:
+                            - img:
+                              - img
+                - row "9000000222 Copy" [ref=e323]:
+                  - cell "9000000222 Copy" [ref=e324]:
+                    - generic [ref=e326]:
+                      - generic "9000000222" [ref=e327]:
+                        - link "9000000222" [ref=e328] [cursor=pointer]:
+                          - /url: /storageGroup?groupId=9000000222&database=%2FRoot
+                      - button "Copy" [ref=e329] [cursor=pointer]:
+                        - generic:
+                          - generic:
+                            - img:
+                              - img
+                - row "9000000223 Copy" [ref=e330]:
+                  - cell "9000000223 Copy" [ref=e331]:
+                    - generic [ref=e333]:
+                      - generic "9000000223" [ref=e334]:
+                        - link "9000000223" [ref=e335] [cursor=pointer]:
+                          - /url: /storageGroup?groupId=9000000223&database=%2FRoot
+                      - button "Copy" [ref=e336] [cursor=pointer]:
+                        - generic:
+                          - generic:
+                            - img:
+                              - img
+                - row "9000000224 Copy" [ref=e337]:
+                  - cell "9000000224 Copy" [ref=e338]:
+                    - generic [ref=e340]:
+                      - generic "9000000224" [ref=e341]:
+                        - link "9000000224" [ref=e342] [cursor=pointer]:
+                          - /url: /storageGroup?groupId=9000000224&database=%2FRoot
+                      - button "Copy" [ref=e343] [cursor=pointer]:
+                        - generic:
+                          - generic:
+                            - img:
+                              - img
+                - row "9000000225 Copy" [ref=e344]:
+                  - cell "9000000225 Copy" [ref=e345]:
+                    - generic [ref=e347]:
+                      - generic "9000000225" [ref=e348]:
+                        - link "9000000225" [ref=e349] [cursor=pointer]:
+                          - /url: /storageGroup?groupId=9000000225&database=%2FRoot
+                      - button "Copy" [ref=e350] [cursor=pointer]:
+                        - generic:
+                          - generic:
+                            - img:
+                              - img
+                - row "9000000226 Copy" [ref=e351]:
+                  - cell "9000000226 Copy" [ref=e352]:
+                    - generic [ref=e354]:
+                      - generic "9000000226" [ref=e355]:
+                        - link "9000000226" [ref=e356] [cursor=pointer]:
+                          - /url: /storageGroup?groupId=9000000226&database=%2FRoot
+                      - button "Copy" [ref=e357] [cursor=pointer]:
+                        - generic:
+                          - generic:
+                            - img:
+                              - img
+                - row "9000000227 Copy" [ref=e358]:
+                  - cell "9000000227 Copy" [ref=e359]:
+                    - generic [ref=e361]:
+                      - generic "9000000227" [ref=e362]:
+                        - link "9000000227" [ref=e363] [cursor=pointer]:
+                          - /url: /storageGroup?groupId=9000000227&database=%2FRoot
+                      - button "Copy" [ref=e364] [cursor=pointer]:
+                        - generic:
+                          - generic:
+                            - img:
+                              - img
+                - row "9000000228 Copy" [ref=e365]:
+                  - cell "9000000228 Copy" [ref=e366]:
+                    - generic [ref=e368]:
+                      - generic "9000000228" [ref=e369]:
+                        - link "9000000228" [ref=e370] [cursor=pointer]:
+                          - /url: /storageGroup?groupId=9000000228&database=%2FRoot
+                      - button "Copy" [ref=e371] [cursor=pointer]:
+                        - generic:
+                          - generic:
+                            - img:
+                              - img
+                - row "9000000229 Copy" [ref=e372]:
+                  - cell "9000000229 Copy" [ref=e373]:
+                    - generic [ref=e375]:
+                      - generic "9000000229" [ref=e376]:
+                        - link "9000000229" [ref=e377] [cursor=pointer]:
+                          - /url: /storageGroup?groupId=9000000229&database=%2FRoot
+                      - button "Copy" [ref=e378] [cursor=pointer]:
+                        - generic:
+                          - generic:
+                            - img:
+                              - img
+                - row "9000000230 Copy" [ref=e379]:
+                  - cell "9000000230 Copy" [ref=e380]:
+                    - generic [ref=e382]:
+                      - generic "9000000230" [ref=e383]:
+                        - link "9000000230" [ref=e384] [cursor=pointer]:
+                          - /url: /storageGroup?groupId=9000000230&database=%2FRoot
+                      - button "Copy" [ref=e385] [cursor=pointer]:
+                        - generic:
+                          - generic:
+                            - img:
+                              - img
+                - row "9000000231 Copy" [ref=e386]:
+                  - cell "9000000231 Copy" [ref=e387]:
+                    - generic [ref=e389]:
+                      - generic "9000000231" [ref=e390]:
+                        - link "9000000231" [ref=e391] [cursor=pointer]:
+                          - /url: /storageGroup?groupId=9000000231&database=%2FRoot
+                      - button "Copy" [ref=e392] [cursor=pointer]:
+                        - generic:
+                          - generic:
+                            - img:
+                              - img
+                - row "9000000232 Copy" [ref=e393]:
+                  - cell "9000000232 Copy" [ref=e394]:
+                    - generic [ref=e396]:
+                      - generic "9000000232" [ref=e397]:
+                        - link "9000000232" [ref=e398] [cursor=pointer]:
+                          - /url: /storageGroup?groupId=9000000232&database=%2FRoot
+                      - button "Copy" [ref=e399] [cursor=pointer]:
+                        - generic:
+                          - generic:
+                            - img:
+                              - img
+                - row "9000000233 Copy" [ref=e400]:
+                  - cell "9000000233 Copy" [ref=e401]:
+                    - generic [ref=e403]:
+                      - generic "9000000233" [ref=e404]:
+                        - link "9000000233" [ref=e405] [cursor=pointer]:
+                          - /url: /storageGroup?groupId=9000000233&database=%2FRoot
+                      - button "Copy" [ref=e406] [cursor=pointer]:
+                        - generic:
+                          - generic:
+                            - img:
+                              - img
+                - row "9000000234 Copy" [ref=e407]:
+                  - cell "9000000234 Copy" [ref=e408]:
+                    - generic [ref=e410]:
+                      - generic "9000000234" [ref=e411]:
+                        - link "9000000234" [ref=e412] [cursor=pointer]:
+                          - /url: /storageGroup?groupId=9000000234&database=%2FRoot
+                      - button "Copy" [ref=e413] [cursor=pointer]:
+                        - generic:
+                          - generic:
+                            - img:
+                              - img
+                - row "9000000235 Copy" [ref=e414]:
+                  - cell "9000000235 Copy" [ref=e415]:
+                    - generic [ref=e417]:
+                      - generic "9000000235" [ref=e418]:
+                        - link "9000000235" [ref=e419] [cursor=pointer]:
+                          - /url: /storageGroup?groupId=9000000235&database=%2FRoot
+                      - button "Copy" [ref=e420] [cursor=pointer]:
+                        - generic:
+                          - generic:
+                            - img:
+                              - img
+                - row "9000000236 Copy" [ref=e421]:
+                  - cell "9000000236 Copy" [ref=e422]:
+                    - generic [ref=e424]:
+                      - generic "9000000236" [ref=e425]:
+                        - link "9000000236" [ref=e426] [cursor=pointer]:
+                          - /url: /storageGroup?groupId=9000000236&database=%2FRoot
+                      - button "Copy" [ref=e427] [cursor=pointer]:
+                        - generic:
+                          - generic:
+                            - img:
+                              - img
+                - row "9000000237 Copy" [ref=e428]:
+                  - cell "9000000237 Copy" [ref=e429]:
+                    - generic [ref=e431]:
+                      - generic "9000000237" [ref=e432]:
+                        - link "9000000237" [ref=e433] [cursor=pointer]:
+                          - /url: /storageGroup?groupId=9000000237&database=%2FRoot
+                      - button "Copy" [ref=e434] [cursor=pointer]:
+                        - generic:
+                          - generic:
+                            - img:
+                              - img
+                - row "9000000238 Copy" [ref=e435]:
+                  - cell "9000000238 Copy" [ref=e436]:
+                    - generic [ref=e438]:
+                      - generic "9000000238" [ref=e439]:
+                        - link "9000000238" [ref=e440] [cursor=pointer]:
+                          - /url: /storageGroup?groupId=9000000238&database=%2FRoot
+                      - button "Copy" [ref=e441] [cursor=pointer]:
+                        - generic:
+                          - generic:
+                            - img:
+                              - img
+                - row "9000000239 Copy" [ref=e442]:
+                  - cell "9000000239 Copy" [ref=e443]:
+                    - generic [ref=e445]:
+                      - generic "9000000239" [ref=e446]:
+                        - link "9000000239" [ref=e447] [cursor=pointer]:
+                          - /url: /storageGroup?groupId=9000000239&database=%2FRoot
+                      - button "Copy" [ref=e448] [cursor=pointer]:
+                        - generic:
+                          - generic:
+                            - img:
+                              - img
+                - row "9000000240 Copy" [ref=e449]:
+                  - cell "9000000240 Copy" [ref=e450]:
+                    - generic [ref=e452]:
+                      - generic "9000000240" [ref=e453]:
+                        - link "9000000240" [ref=e454] [cursor=pointer]:
+                          - /url: /storageGroup?groupId=9000000240&database=%2FRoot
+                      - button "Copy" [ref=e455] [cursor=pointer]:
+                        - generic:
+                          - generic:
+                            - img:
+                              - img
+                - row "9000000241 Copy" [ref=e456]:
+                  - cell "9000000241 Copy" [ref=e457]:
+                    - generic [ref=e459]:
+                      - generic "9000000241" [ref=e460]:
+                        - link "9000000241" [ref=e461] [cursor=pointer]:
+                          - /url: /storageGroup?groupId=9000000241&database=%2FRoot
+                      - button "Copy" [ref=e462] [cursor=pointer]:
+                        - generic:
+                          - generic:
+                            - img:
+                              - img
+                - row "9000000242 Copy" [ref=e463]:
+                  - cell "9000000242 Copy" [ref=e464]:
+                    - generic [ref=e466]:
+                      - generic "9000000242" [ref=e467]:
+                        - link "9000000242" [ref=e468] [cursor=pointer]:
+                          - /url: /storageGroup?groupId=9000000242&database=%2FRoot
+                      - button "Copy" [ref=e469] [cursor=pointer]:
+                        - generic:
+                          - generic:
+                            - img:
+                              - img
+                - row "9000000243 Copy" [ref=e470]:
+                  - cell "9000000243 Copy" [ref=e471]:
+                    - generic [ref=e473]:
+                      - generic "9000000243" [ref=e474]:
+                        - link "9000000243" [ref=e475] [cursor=pointer]:
+                          - /url: /storageGroup?groupId=9000000243&database=%2FRoot
+                      - button "Copy" [ref=e476] [cursor=pointer]:
+                        - generic:
+                          - generic:
+                            - img:
+                              - img
+                - row "9000000244 Copy" [ref=e477]:
+                  - cell "9000000244 Copy" [ref=e478]:
+                    - generic [ref=e480]:
+                      - generic "9000000244" [ref=e481]:
+                        - link "9000000244" [ref=e482] [cursor=pointer]:
+                          - /url: /storageGroup?groupId=9000000244&database=%2FRoot
+                      - button "Copy" [ref=e483] [cursor=pointer]:
+                        - generic:
+                          - generic:
+                            - img:
+                              - img
+          - status [ref=e484]
+```
