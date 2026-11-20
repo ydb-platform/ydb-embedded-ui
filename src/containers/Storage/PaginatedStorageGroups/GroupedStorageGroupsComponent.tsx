@@ -1,16 +1,21 @@
 import React from 'react';
 
+import {Flex} from '@gravity-ui/uikit';
+
+import {BridgeSyncStatusLabel} from '../../../components/BridgeSyncStatusLabel';
 import {DataIssuesIndicator} from '../../../components/DataIssuesAlert/DataIssuesIndicator';
 import {EmptyTableGroups} from '../../../components/DataIssuesAlert/EmptyTableGroups';
 import {ResponseError} from '../../../components/Errors/ResponseError/ResponseError';
 import {PaginatedTableWithLayout} from '../../../components/PaginatedTable/PaginatedTableWithLayout';
 import {TableColumnSetup} from '../../../components/TableColumnSetup/TableColumnSetup';
 import {storageApi} from '../../../store/reducers/storage/storage';
+import {BridgeSyncStatus} from '../../../types/api/cluster';
 import type {GroupsGroupByField} from '../../../types/api/storage';
 import {useGroupedTableDataIssues} from '../../../utils/dataIssues/useTableDataIssues';
 import type {ChunkDataChangeHandler} from '../../../utils/dataIssues/useTableDataQuality';
 import {useAutoRefreshInterval} from '../../../utils/hooks';
 import {renderPaginatedTableErrorMessage} from '../../../utils/renderPaginatedTableErrorMessage';
+import {isEnumMember} from '../../../utils/typecheckers';
 import type {PaginatedStorageProps} from '../PaginatedStorage';
 import {PaginatedStorageGroupsTable} from '../PaginatedStorageGroupsTable';
 import {useStorageGroupsSelectedColumns} from '../PaginatedStorageGroupsTable/columns/hooks';
@@ -59,10 +64,23 @@ export const StorageGroupGroup = React.memo(function StorageGroupGroup({
     onChunkDataChange,
     rowsMayBeMissing,
 }: StorageGroupGroupProps) {
+    const syncStatus = isEnumMember(BridgeSyncStatus, name) ? name : undefined;
+
     return (
         <TableGroup
             key={name}
             title={name}
+            titleContent={
+                filterGroupBy === 'BridgeSyncStatus' ? (
+                    <Flex as="span" alignItems="center">
+                        <BridgeSyncStatusLabel
+                            status={syncStatus}
+                            size="s"
+                            plainTextColor="primary"
+                        />
+                    </Flex>
+                ) : undefined
+            }
             count={count}
             entityName={i18n('groups')}
             expanded={isExpanded}
