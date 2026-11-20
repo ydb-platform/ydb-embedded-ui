@@ -34,28 +34,33 @@ describe('query history size limits', () => {
         expect(requestBodyBytes(nextHistory ?? [])).toBeLessThanOrEqual(16 * 1024 * 1024);
     });
 
-    it('keeps a recently rerun query when updated statistics overflow the history', () => {
-        const queryText = 'a'.repeat(838_000);
-        const history = Array.from({length: 20}, (_, index) => ({
-            queryText,
-            queryId: String(index),
-            startTime: 1000 + index,
-        }));
-        const lastQuery = history[19];
-        const remainingBytes = 16 * 1024 * 1024 - requestBodyBytes(history) - 13;
-        lastQuery.queryText += ' '.repeat(remainingBytes);
+    it.each([2000, 900])(
+        'keeps a rerun with start time %i when updated statistics overflow the history',
+        (startTime) => {
+            const queryText = 'a'.repeat(838_000);
+            const history = Array.from({length: 20}, (_, index) => ({
+                queryText,
+                queryId: String(index),
+                startTime: 1000 + index,
+            }));
+            const lastQuery = history[19];
+            const remainingBytes = 16 * 1024 * 1024 - requestBodyBytes(history) - 13;
+            lastQuery.queryText += ' '.repeat(remainingBytes);
 
-        expect(requestBodyBytes(history)).toBe(16 * 1024 * 1024 - 13);
+            expect(requestBodyBytes(history)).toBe(16 * 1024 * 1024 - 13);
 
-        const rerun = {...history[0], startTime: 2000, durationUs: 123456, status: 'completed'};
-        const limited = limitQueryHistory([rerun, ...history.slice(1)]);
+            const rerun = {...history[0], startTime, durationUs: 123456, status: 'completed'};
+            const limited = limitQueryHistory([rerun, ...history.slice(1)], rerun);
 
-        expect(limited.map(({queryId}) => queryId)).toEqual([
-            ...history.slice(2).map(({queryId}) => queryId),
-            rerun.queryId,
-        ]);
-        expect(requestBodyBytes(limited)).toBeLessThanOrEqual(16 * 1024 * 1024);
-    });
+            const keptQueryIds = history.slice(2).map(({queryId}) => queryId);
+            expect(limited.map(({queryId}) => queryId)).toEqual(
+                startTime === 900
+                    ? [rerun.queryId, ...keptQueryIds]
+                    : [...keptQueryIds, rerun.queryId],
+            );
+            expect(requestBodyBytes(limited)).toBeLessThanOrEqual(16 * 1024 * 1024);
+        },
+    );
 
     it('evicts the oldest entries when legacy history exceeds the total limit', () => {
         const legacyQuery = 'a'.repeat(16 * 1024 * 1024 - 1000);

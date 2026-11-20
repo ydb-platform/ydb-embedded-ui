@@ -136,7 +136,7 @@ export function useQueriesHistory({
                 const newQueries = [...preparedQueries];
                 const {startTime, durationUs, status} = stats;
 
-                newQueries[index] = {
+                const updatedQuery = {
                     ...preparedQueries[index],
                     queryId,
                     startTime,
@@ -145,7 +145,11 @@ export function useQueriesHistory({
                     realQueryId,
                     status,
                 };
-                saveHistoryQueries(limitQueryHistory(newQueries));
+                newQueries[index] = updatedQuery;
+                const retained = limitQueryHistory(newQueries, updatedQuery);
+                if (retained.includes(updatedQuery)) {
+                    saveHistoryQueries(retained);
+                }
             }
         },
     );

@@ -47,6 +47,47 @@ test.describe('Query History', () => {
         await expect(queryRow).toBeVisible({timeout: VISIBILITY_TIMEOUT});
     });
 
+    test('Keeps a new query in full history after the clock moves back', async ({page}) => {
+        const initialTime = await page.evaluate(() => {
+            const now = Date.now();
+            const history = Array.from({length: 20}, (_, index) => ({
+                queryId: `before-clock-change-${index}`,
+                queryText: `SELECT ${index} AS before_clock_change_${index};`,
+                startTime: now - 20 + index,
+            }));
+            localStorage.setItem('queries_history', JSON.stringify(history));
+            return now;
+        });
+        await openQueryEditorInMode(tenantPage, QueryEditorMode.MultiTab);
+
+        const {editorTabs} = queryEditor;
+        await editorTabs.clickAddTab();
+        const sql = 'SELECT 77 AS after_clock_change;';
+        await queryEditor.setQuery(sql);
+        await page.clock.setFixedTime(initialTime - 120_000);
+        await queryEditor.clickRunButton();
+        await queryEditor.waitForStatus('Completed');
+        expect(await queryEditor.resultTable.getCellValue(1, 2)).toBe('77');
+
+        const tabTitle = await editorTabs.getActiveTabTitle();
+        await editorTabs.hoverTab(tabTitle);
+        await editorTabs.closeTab(tabTitle);
+        await expect(editorTabs.waitForTabCount(1)).resolves.toBe(true);
+
+        await page.reload();
+        await queryEditor.queryTabs.selectTab(QueryTabs.History);
+        await queryEditor.historyQueries.search('after_clock_change');
+        await expect(await queryEditor.historyQueries.getQueryRow(sql)).toBeVisible();
+
+        const history = await page.evaluate(() =>
+            JSON.parse(localStorage.getItem('queries_history') ?? '[]').map(
+                ({queryId}: {queryId: string}) => queryId,
+            ),
+        );
+        expect(history).toHaveLength(20);
+        expect(history).not.toContain('before-clock-change-0');
+    });
+
     test('Keeps an oversized query unsaved after execution', async ({page}) => {
         await openQueryEditorInMode(tenantPage, QueryEditorMode.MultiTab);
         await page.evaluate(() => {

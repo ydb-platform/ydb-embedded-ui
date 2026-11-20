@@ -28,12 +28,18 @@ function getEntryStartTime(entry: unknown): number | undefined {
     return undefined;
 }
 
-export function limitQueryHistory<T>(history: readonly T[]): T[] {
+export function limitQueryHistory<T>(history: readonly T[], preferredQuery?: T): T[] {
     const encoder = new TextEncoder();
     const newestEntries: T[] = [];
     let bytes = EMPTY_HISTORY_BYTES;
 
     const sorted = sortByTimestampDescending(history, getEntryStartTime);
+    const preferredIndex = preferredQuery === undefined ? -1 : sorted.indexOf(preferredQuery);
+    if (preferredIndex > 0) {
+        // The active run gets space even if the wall clock moved backwards.
+        sorted.unshift(...sorted.splice(preferredIndex, 1));
+    }
+
     for (const entry of sorted.slice(0, MAX_QUERIES_IN_HISTORY)) {
         const entryBytes = getEntryBytes(entry, encoder);
         if (entryBytes + EMPTY_HISTORY_BYTES > MAX_USER_SETTING_BYTES) {
@@ -49,7 +55,10 @@ export function limitQueryHistory<T>(history: readonly T[]): T[] {
         bytes = nextBytes;
     }
 
-    return newestEntries.reverse();
+    const retained = newestEntries.reverse();
+    return preferredIndex > 0
+        ? sortByTimestampDescending(retained, getEntryStartTime).reverse()
+        : retained;
 }
 
 export function appendQueryToHistory(
@@ -63,5 +72,6 @@ export function appendQueryToHistory(
         return undefined;
     }
 
-    return limitQueryHistory([...history, query]);
+    const retained = limitQueryHistory([...history, query], query);
+    return retained.includes(query) ? retained : undefined;
 }
