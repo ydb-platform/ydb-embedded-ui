@@ -1,3 +1,4 @@
+import type {BridgeSyncStatus} from './cluster';
 import type {EFlag} from './enums';
 import type {TMemoryStats, TPoolStats} from './nodes';
 import type {TTabletStateInfo} from './tablet';
@@ -26,6 +27,8 @@ export interface TTenant {
     Id?: string;
     Cluster?: string;
     Type?: ETenantType;
+    BridgeMode?: boolean;
+    BridgeSyncStatus?: BridgeSyncStatus;
     State?: State;
     StateStats?: THiveDomainStatsStateCount[];
     Metrics?: TMetrics;

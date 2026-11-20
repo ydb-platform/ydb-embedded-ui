@@ -10,6 +10,7 @@ import {useStorageQueryParams} from '../useStorageQueryParams';
 
 import {GroupedStorageGroupsComponent} from './GroupedStorageGroupsComponent';
 import {StorageGroupsComponent} from './StorageGroupsComponent';
+import {useStorageGroupsBridgeGrouping} from './useStorageGroupsBridgeGrouping';
 
 import '../Storage.scss';
 
@@ -19,6 +20,10 @@ export function PaginatedStorageGroups(props: PaginatedStorageProps) {
 
     const capabilitiesLoaded = useCapabilitiesLoaded();
     const storageGroupsHandlerHasGrouping = useStorageGroupsHandlerHasGrouping();
+    const {bridgeModeEnabled, bridgeSyncGroupingAvailable} = useStorageGroupsBridgeGrouping();
+    const groupingUnavailable =
+        (storageGroupsGroupByParam === 'PileName' && !bridgeModeEnabled) ||
+        (storageGroupsGroupByParam === 'BridgeSyncStatus' && !bridgeSyncGroupingAvailable);
 
     // Other filters do not fit with grouping
     // Reset them if grouping available
@@ -29,7 +34,7 @@ export function PaginatedStorageGroups(props: PaginatedStorageProps) {
     }, [handleShowAllGroups, storageGroupsHandlerHasGrouping, visibleEntities]);
 
     const renderContent = () => {
-        if (storageGroupsHandlerHasGrouping && storageGroupsGroupByParam) {
+        if (storageGroupsHandlerHasGrouping && storageGroupsGroupByParam && !groupingUnavailable) {
             return <GroupedStorageGroupsComponent {...props} />;
         }
 

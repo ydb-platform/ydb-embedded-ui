@@ -30,7 +30,10 @@ export function useGroupsGetter(shouldUseGroupsHandler: boolean) {
             } = filters ?? {};
 
             const sortField = getStorageGroupsColumnSortField(columnId);
-            const sort = sortField ? prepareSortValue(sortField, sortOrder) : undefined;
+            const sortOptions =
+                sortField === 'PileName' || sortField === 'BridgeSyncStatus'
+                    ? {groupsSort: prepareSortValue(sortField, sortOrder)}
+                    : {sort: sortField ? prepareSortValue(sortField, sortOrder) : undefined};
             const dataFieldsRequired = getRequiredDataFields(
                 columnsIds,
                 GROUPS_COLUMNS_TO_DATA_FIELDS,
@@ -39,7 +42,7 @@ export function useGroupsGetter(shouldUseGroupsHandler: boolean) {
             const {groups, found, total} = await requestStorageData({
                 limit,
                 offset,
-                sort,
+                ...sortOptions,
                 filter: searchValue?.trim(),
                 with: visibleEntities,
                 database,

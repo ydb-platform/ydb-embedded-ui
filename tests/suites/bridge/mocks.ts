@@ -2,10 +2,15 @@ import type {Page, Route} from '@playwright/test';
 
 import {BridgePileGroupStatus, BridgePileState} from '../../../src/types/api/cluster';
 import {SelfCheckResult, StatusFlag} from '../../../src/types/api/healthcheck';
+import type {TGroupsStorageGroupInfo} from '../../../src/types/api/storage';
 
 import {bridgeVisualCluster, bridgeVisualHealthcheck} from './fixtures/bridgeVisualScenario';
 
-export const mockCapabilities = (page: Page, enabled: boolean) => {
+export const mockCapabilities = (
+    page: Page,
+    enabled: boolean,
+    capabilities: Record<string, number> = {},
+) => {
     return page.route(`**/viewer/capabilities`, async (route: Route) => {
         await route.fulfill({
             status: 200,
@@ -15,6 +20,7 @@ export const mockCapabilities = (page: Page, enabled: boolean) => {
                 Settings: {Cluster: {BridgeModeEnabled: enabled}},
                 Capabilities: {
                     '/viewer/cluster': 5, // > 4 to enable cluster dashboard
+                    ...capabilities,
                 },
             }),
         });
@@ -47,18 +53,16 @@ export const mockNodesWithPile = (page: Page) => {
     });
 };
 
-export const mockStorageGroupsWithPile = (page: Page) => {
-    return page.route(`**/storage/groups?*`, async (route: Route) => {
-        await route.fulfill({
-            status: 200,
-            contentType: 'application/json',
-            body: JSON.stringify({
+export const mockStorageGroup = (page: Page, group: TGroupsStorageGroupInfo) => {
+    return page.route('**/storage/groups?*', (route) =>
+        route.fulfill({
+            json: {
                 FoundGroups: 1,
                 TotalGroups: 1,
-                StorageGroups: [{GroupId: '1', PoolName: 'p', MediaType: 'NVME', PileName: 'r1'}],
-            }),
-        });
-    });
+                StorageGroups: [group],
+            },
+        }),
+    );
 };
 
 export const mockBridgeHealthcheck = (page: Page, currentPileName: string | null = 'r2') => {

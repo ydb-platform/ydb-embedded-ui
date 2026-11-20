@@ -8,6 +8,7 @@ import {Skeleton} from '../../../components/Skeleton/Skeleton';
 import type {ClusterGroupsStats} from '../../../store/reducers/cluster/types';
 import type {AdditionalClusterProps} from '../../../types/additionalProps';
 import type {TBridgePile, TClusterInfo} from '../../../types/api/cluster';
+import {isClusterInfoV5} from '../../../types/api/cluster';
 import type {IResponseError} from '../../../types/api/error';
 import {useClusterLinks} from '../../../utils/clusterLinks/useClusterLinks';
 import {formatNumber} from '../../../utils/dataFormatters/dataFormatters';
@@ -135,6 +136,7 @@ export const ClusterInfo = ({
                 </Text>
                 <BridgeInfoTable
                     piles={bridgePiles}
+                    bridgeInfo={isClusterInfoV5(cluster) ? cluster.BridgeInfo : undefined}
                     database={cluster?.Domain}
                     clusterName={clusterName}
                 />

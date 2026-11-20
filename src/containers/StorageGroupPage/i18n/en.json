@@ -1,5 +1,7 @@
 {
   "storage-group": "Storage Group",
   "storage": "Storage",
+  "label_bridge-mode": "Bridge mode",
+  "title_sync": "Synchronisation details",
   "pool-name": "Pool Name"
 }

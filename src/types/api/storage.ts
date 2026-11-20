@@ -1,3 +1,4 @@
+import type {BridgeSyncStatus} from './cluster';
 import type {BackendSortParam, SchemaPathParam} from './common';
 import type {ECapacityAlert, EFlag} from './enums';
 import type {EDecommitStatus, EDriveStatus, TPDiskStateInfo} from './pdisk';
@@ -133,7 +134,29 @@ export interface StorageGroupGroups {
     GroupCount?: string;
 }
 
-export interface TGroupsStorageGroupInfo {
+export interface TBridgeGroupLink {
+    GroupId?: string;
+    PileName?: string;
+}
+
+export interface TBridgeGroupSyncInfo {
+    BridgeMode?: boolean;
+    BridgeSyncStatus?: BridgeSyncStatus;
+    BridgeSyncStage?: string;
+    BridgeGroups?: TBridgeGroupLink[];
+    BridgeSyncLastError?: string;
+    /** Unix microseconds. */
+    BridgeSyncLastErrorTimestamp?: string;
+    /** Unix microseconds. */
+    BridgeSyncLastProgressTimestamp?: string;
+    /** uint64, blob bytes per second. */
+    BridgeSyncCopyBytesPerSecond?: string;
+    /** uint64, a lower bound until the estimate is complete. */
+    BridgeSyncRemainingBytes?: string;
+    BridgeSyncRemainingBytesComplete?: boolean;
+}
+
+export interface TGroupsStorageGroupInfo extends TBridgeGroupSyncInfo {
     GroupId?: string;
     /** uint64 */
     GroupGeneration?: string;
@@ -286,7 +309,14 @@ export type StorageV2SortValue =
 /**
  * Values to sort /storage/groups response
  */
-export type GroupsSortField = StorageV2SortValue | 'MissingDisks' | 'Available' | 'Encryption';
+export type GroupsSortField =
+    | StorageV2SortValue
+    | 'MissingDisks'
+    | 'Available'
+    | 'Encryption'
+    | 'PileName'
+    | 'BridgeMode'
+    | 'BridgeSyncStatus';
 
 export type StorageV2Sort = BackendSortParam<StorageV2SortValue>;
 export type GroupsSort = BackendSortParam<GroupsSortField>;
@@ -301,6 +331,7 @@ export type GroupsGroupByField =
     | 'DiskSpaceUsage'
     | 'PoolName'
     | 'PileName'
+    | 'BridgeSyncStatus'
     | 'Kind'
     | 'Encryption'
     | 'MediaType'
@@ -313,6 +344,15 @@ export type GroupsRequiredField =
     | 'GroupId' // always required
     | 'PoolName'
     | 'PileName'
+    | 'BridgeMode'
+    | 'BridgeSyncStatus'
+    | 'BridgeGroups'
+    | 'BridgeSyncLastError'
+    | 'BridgeSyncLastErrorTimestamp'
+    | 'BridgeSyncLastProgressTimestamp'
+    | 'BridgeSyncCopyBytesPerSecond'
+    | 'BridgeSyncRemainingBytes'
+    | 'BridgeSyncRemainingBytesComplete'
     | 'Kind'
     | 'MediaType'
     | 'Erasure'

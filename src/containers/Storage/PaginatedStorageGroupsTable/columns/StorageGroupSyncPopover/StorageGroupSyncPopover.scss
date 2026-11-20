@@ -1,0 +1,12 @@
+.ydb-storage-group-sync-popover {
+    display: flex;
+
+    box-sizing: border-box;
+    max-width: min(338px, calc(100vw - 64px));
+
+    &__body {
+        flex: 1;
+
+        min-width: 0;
+    }
+}

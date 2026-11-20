@@ -1,6 +1,6 @@
 import React from 'react';
 
-import {ShieldKeyhole} from '@gravity-ui/icons';
+import {NodesRight, ShieldKeyhole} from '@gravity-ui/icons';
 import DataTable from '@gravity-ui/react-data-table';
 import {Flex, Icon, Label, Popover} from '@gravity-ui/uikit';
 import {isNil} from 'lodash';
@@ -29,12 +29,14 @@ import {VDisks} from '../../VDisks/VDisks';
 import {getDegradedSeverity} from '../../utils';
 import i18n from '../i18n';
 
+import {StorageGroupSyncPopover} from './StorageGroupSyncPopover/StorageGroupSyncPopover';
 import {
     STORAGE_GROUPS_COLUMNS_IDS,
     STORAGE_GROUPS_COLUMNS_TITLES,
     STORAGE_GROUPS_DISKS_COLUMN_TITLES,
     isSortableStorageGroupsColumn,
 } from './constants';
+import columnsI18n from './i18n';
 import type {GetStorageColumnsData, StorageColumnsGetter, StorageGroupsColumn} from './types';
 
 import './StorageGroupsColumns.scss';
@@ -67,6 +69,31 @@ const pileNameColumn: StorageGroupsColumn = {
     header: STORAGE_GROUPS_COLUMNS_TITLES.PileName,
     width: 120,
     render: ({row}) => row.PileName || EMPTY_DATA_PLACEHOLDER,
+    align: DataTable.LEFT,
+};
+
+const bridgeModeColumn: StorageGroupsColumn = {
+    name: STORAGE_GROUPS_COLUMNS_IDS.BridgeMode,
+    header: STORAGE_GROUPS_COLUMNS_TITLES.BridgeMode,
+    width: 100,
+    render: ({row}) => {
+        if (row.BridgeMode === true) {
+            return (
+                <Label theme="utility" size="xs" icon={<Icon data={NodesRight} size={12} />}>
+                    {columnsI18n('value_bridge')}
+                </Label>
+            );
+        }
+        return row.BridgeMode === false ? columnsI18n('value_non-bridge') : EMPTY_DATA_PLACEHOLDER;
+    },
+    align: DataTable.LEFT,
+};
+
+const bridgeSyncStatusColumn: StorageGroupsColumn = {
+    name: STORAGE_GROUPS_COLUMNS_IDS.BridgeSyncStatus,
+    header: STORAGE_GROUPS_COLUMNS_TITLES.BridgeSyncStatus,
+    width: 170,
+    render: ({row}) => <StorageGroupSyncPopover group={row} />,
     align: DataTable.LEFT,
 };
 
@@ -309,9 +336,11 @@ export const getStorageGroupsColumns: StorageColumnsGetter = (data) => {
     const columns = [
         groupIdColumn,
         poolNameColumn,
-        pileNameColumn,
         typeColumn,
         erasureColumn,
+        bridgeModeColumn,
+        pileNameColumn,
+        bridgeSyncStatusColumn,
         degradedColumn,
         stateColumn,
         usageColumn,
