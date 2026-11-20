@@ -1,5 +1,12 @@
 # Changelog
 
+## [22.11.1](https://github.com/ydb-platform/ydb-embedded-ui/compare/v22.11.0...v22.11.1) (2026-11-20)
+
+
+### Bug Fixes
+
+* **query:** enforce saved query and history size limits ([#4615](https://github.com/ydb-platform/ydb-embedded-ui/issues/4615)) ([e7b1a2f](https://github.com/ydb-platform/ydb-embedded-ui/commit/e7b1a2f4c6f75becb4dabbf50c8788a9684f350a))
+
 ## [22.11.0](https://github.com/ydb-platform/ydb-embedded-ui/compare/v22.10.0...v22.11.0) (2026-11-19)
 
 
