@@ -230,34 +230,25 @@ export const STORAGE_GROUPS_GROUP_BY_OPTIONS: SelectOption[] = STORAGE_GROUPS_GR
     },
 );
 
-export const BRIDGE_STORAGE_GROUP_BY_FIELDS = ['PileName', 'BridgeSyncStatus'] as const;
-
 export function getStorageGroupsGroupByOptions(
     blobMetricsEnabled: boolean,
     bridgeModeEnabled: boolean,
-    bridgeSyncGroupingAvailable = true,
+    bridgeSyncGroupingAvailable: boolean,
 ) {
-    const skippedValues = new Set<string>();
-
-    if (!bridgeModeEnabled) {
-        BRIDGE_STORAGE_GROUP_BY_FIELDS.forEach((field) => skippedValues.add(field));
-    }
-
-    if (!bridgeSyncGroupingAvailable) {
-        skippedValues.add('BridgeSyncStatus');
-    }
-
-    if (blobMetricsEnabled) {
-        STORAGE_GROUPS_LEGACY_CAPACITY_GROUP_BY_FIELDS.forEach((field) => {
-            skippedValues.add(field);
-        });
-    } else {
-        skippedValues.add('CapacityAlert');
-    }
-
-    return STORAGE_GROUPS_GROUP_BY_OPTIONS.filter(
-        (option) => !skippedValues.has(String(option.value)),
-    );
+    return STORAGE_GROUPS_GROUP_BY_OPTIONS.filter(({value}) => {
+        switch (value) {
+            case 'PileName':
+                return bridgeModeEnabled;
+            case 'BridgeSyncStatus':
+                return bridgeSyncGroupingAvailable;
+            case 'CapacityAlert':
+                return blobMetricsEnabled;
+            case 'Usage':
+                return !blobMetricsEnabled;
+            default:
+                return true;
+        }
+    });
 }
 
 export const storageGroupsGroupByParamSchema = z
@@ -309,7 +300,7 @@ export const GROUPS_COLUMNS_TO_DATA_FIELDS: Record<StorageGroupsColumnId, Groups
 
 const STORAGE_GROUPS_COLUMNS_TO_SORT_FIELDS: Record<
     StorageGroupsColumnId,
-    StorageV2SortValue | undefined
+    StorageV2SortValue | 'PileName' | 'BridgeSyncStatus' | undefined
 > = {
     GroupId: 'GroupId',
     PoolName: 'PoolName',

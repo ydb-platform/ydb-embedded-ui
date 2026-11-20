@@ -34,10 +34,10 @@ export function useStorageGroupsSelectedColumns({
 }: GetStorageGroupsColumnsParams) {
     const isUserAllowedToMakeChanges = useIsUserAllowedToMakeChanges();
     const isViewerUser = useIsViewerUser();
-    const blobMetricsEnabled = useBlobStorageCapacityMetricsEnabled();
     const bridgeModeEnabled = useBridgeModeEnabled();
     const handlerHasBridgeMode = useStorageGroupsHandlerHasBridgeMode();
     const handlerHasBridgeSyncStatus = useStorageGroupsHandlerHasBridgeSyncStatus();
+    const blobMetricsEnabled = useBlobStorageCapacityMetricsEnabled();
     const isStorageExpertMode = useIsStorageExpertMode();
     const isVDisksPDisksColumnAvailable = Boolean(isUserAllowedToMakeChanges);
 
@@ -78,7 +78,7 @@ export function useStorageGroupsSelectedColumns({
         }
 
         return skipped;
-    }, [bridgeColumns, isUserAllowedToMakeChanges, isViewerUser]);
+    }, [bridgeColumns, blobMetricsEnabled, isUserAllowedToMakeChanges, isViewerUser]);
 
     const columns = React.useMemo(() => {
         const allColumns = getStorageGroupsColumns({viewContext});

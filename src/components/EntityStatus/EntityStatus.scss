@@ -18,26 +18,32 @@
         margin-right: var(--g-spacing-2);
     }
 
-    &__compact-button {
-        display: flex;
+    &__info-icon,
+    &__clipboard-button {
+        // Default button height is 20px. When focused it has 24px height because of outline
+        // Negative offset is needed to prevent button to have bigger size when focused
+        --g-button-focus-outline-offset: -2px;
+        --g-button-focus-outline-width: 2px;
 
-        padding: 0;
+        opacity: 0;
+        color: var(--g-color-text-secondary);
 
-        cursor: pointer;
+        &_visible,
+        &:focus-visible,
+        &:hover,
+        .entity-status__wrapper:focus-within &,
+        .data-table__row:hover &,
+        .ydb-paginated-table__row:hover & {
+            opacity: 1;
+        }
 
-        border: 0;
-        border-radius: var(--g-border-radius-xs);
-        background: none;
-    }
-
-    &__compact:focus-visible,
-    &__compact-button:focus-visible {
-        outline: 2px solid var(--g-color-line-focus);
-        outline-offset: 2px;
-    }
-
-    &__note {
-        color: inherit;
+        &:focus-visible,
+        .entity-status__wrapper:focus-within {
+            background-color: var(--g-color-base-float);
+        }
+        &:hover {
+            color: var(--g-color-text-primary);
+        }
     }
 
     &__wrapper {

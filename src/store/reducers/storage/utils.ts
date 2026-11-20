@@ -256,7 +256,6 @@ const prepareStorageNodeData = (
         ...restNodeParams,
         ...prepareNodeSystemState(SystemState),
         PileName: node.PileName || SystemState?.Location?.BridgePileName,
-        DCKey: getNodeDatacenterKey(node),
         // There is NodeId both in node and its system state
         // We should use only NodeId from node, since it's always present (there may be no SystemState)
         NodeId,

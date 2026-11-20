@@ -23,7 +23,7 @@ import {
 } from '@gravity-ui/uikit';
 import type {LabelProps} from '@gravity-ui/uikit';
 
-import {EFlagToStatusName, EntityStatus} from '../../../../components/EntityStatus/EntityStatus';
+import {EFlagToStatusName, EntityStatus} from '../../../../components/EntityStatusNew/EntityStatus';
 import {LabelWithHelpMark} from '../../../../components/LabelWithHelpMark/LabelWithHelpMark';
 import {Skeleton} from '../../../../components/Skeleton/Skeleton';
 import {
@@ -37,7 +37,6 @@ import {cn} from '../../../../utils/cn';
 import {EMPTY_DATA_PLACEHOLDER} from '../../../../utils/constants';
 import {formatNumber} from '../../../../utils/dataFormatters/dataFormatters';
 import {useAutoRefreshInterval, useTypedSelector} from '../../../../utils/hooks';
-import {useIsUserAllowedToMakeChanges} from '../../../../utils/hooks/useIsUserAllowedToMakeChanges';
 import {parseOptionalNonNegativeNumber} from '../../../../utils/utils';
 import {useClusterHealthcheckQueryParams} from '../../ClusterDrawerHealthcheck';
 import i18n from '../../i18n';
@@ -256,11 +255,11 @@ const BridgePileCard = React.memo(function BridgePileCard({
                                     wrap
                                     qa={'bridge-pile-' + kind + '-nodes'}
                                 >
-                                    {progress !== undefined ? (
+                                    {progress === undefined ? null : (
                                         <span className={b('nodes-progress')} aria-hidden="true">
                                             <Progress value={progress} size="xs" theme="info" />
                                         </span>
-                                    ) : null}
+                                    )}
                                     <Text whiteSpace="nowrap">
                                         {i18n('value_nodes-alive', {
                                             alive: formatCount(alive),
@@ -274,34 +273,30 @@ const BridgePileCard = React.memo(function BridgePileCard({
                 ) : (
                     <DefinitionList.Item name={i18n('field_nodes')}>{nodes}</DefinitionList.Item>
                 )}
-                {healthcheckAllowed && (
-                    <DefinitionList.Item name={i18n('field_healthcheck')}>
-                        {healthcheckLoading ? (
-                            <Skeleton className={b('healthcheck-skeleton')} />
-                        ) : (
-                            <Flex shrink={0}>
-                                <EntityStatus.Label
-                                    view="compact"
-                                    status={pileHealthcheck.status}
-                                    checkIcon="check"
-                                    tooltipTitle={
-                                        pileHealthcheck.status === EFlag.Green
-                                            ? i18n('context_bridge-pile-no-issues')
-                                            : undefined
-                                    }
-                                    size="xxs"
-                                    iconSize={12}
-                                    onClick={
-                                        pileHealthcheck.target ? handleHealthcheckClick : undefined
-                                    }
-                                    aria-label={healthcheckAccessibleName}
-                                    tabIndex={pileHealthcheck.target ? undefined : 0}
-                                    qa="bridge-pile-healthcheck"
-                                />
-                            </Flex>
-                        )}
-                    </DefinitionList.Item>
-                )}
+                <DefinitionList.Item name={i18n('field_healthcheck')}>
+                    {healthcheckLoading ? (
+                        <Skeleton className={b('healthcheck-skeleton')} />
+                    ) : (
+                        <Flex shrink={0}>
+                            <EntityStatus.CompactLabel
+                                status={pileHealthcheck.status}
+                                tooltipTitle={
+                                    pileHealthcheck.status === EFlag.Green
+                                        ? i18n('context_bridge-pile-no-issues')
+                                        : undefined
+                                }
+                                size="xxs"
+                                iconSize={12}
+                                onClick={
+                                    pileHealthcheck.target ? handleHealthcheckClick : undefined
+                                }
+                                aria-label={healthcheckAccessibleName}
+                                tabIndex={pileHealthcheck.target ? undefined : 0}
+                                qa="bridge-pile-healthcheck"
+                            />
+                        </Flex>
+                    )}
+                </DefinitionList.Item>
             </DefinitionList>
         </Flex>
     );
@@ -364,7 +359,6 @@ export const BridgeInfoTable = React.memo(function BridgeInfoTable({
                         key={pile.PileId ?? pile.Name ?? index}
                         pile={pile}
                         current={current}
-                        healthcheckAllowed={Boolean(isMonitoringAllowed)}
                         healthcheckAvailable={healthcheckAvailable}
                         healthcheckSupportsPiles={healthcheckSupportsPiles}
                         healthcheckLoading={healthcheckLoading}

@@ -3,5 +3,5 @@
   "storage": "Storage",
   "label_bridge-mode": "Bridge mode",
   "title_sync": "Synchronisation details",
-  "action_copy-group-id-from-title": "Copy Storage Group ID from page title"
+  "pool-name": "Pool Name"
 }

@@ -115,10 +115,6 @@ export const useViewerTenantInfoHasBridgeFields = () => {
     return useGetFeatureVersion('/viewer/tenantinfo') >= 7;
 };
 
-export const useViewerNodesAliveFilterAvailable = () => {
-    return useGetFeatureVersion('/viewer/nodes/alive') >= 1;
-};
-
 export const useViewerNodesHandlerHasGrouping = () => {
     return useGetFeatureVersion('/viewer/nodes') > 6;
 };

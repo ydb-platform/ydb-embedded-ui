@@ -18,6 +18,7 @@ import {
     mockCapabilities,
     mockClusterWithBridgePiles,
     mockNodesWithPile,
+    mockStateStorageReasons,
     mockStorageGroup,
 } from './mocks';
 
@@ -169,7 +170,9 @@ test.describe('Bridge mode - Storage group page', () => {
         await new PageModel(page, 'storageGroup', {groupId}).goto();
 
         await expect(
-            page.locator('.ydb-storage-group-page__info').getByText(poolName, {exact: true}),
+            page
+                .locator('.ydb-storage-group-page__meta')
+                .getByText(`Pool Name: ${poolName}`, {exact: true}),
         ).toBeVisible();
         await expect(page.getByText('Synchronisation details', {exact: true})).toHaveCount(0);
     });

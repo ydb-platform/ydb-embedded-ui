@@ -134,18 +134,6 @@ export interface StorageGroupGroups {
     GroupCount?: string;
 }
 
-export type TStorageGroupStateCount =
-    | {Disks: {Value?: number}; FailRealms?: never}
-    | {Disks?: never; FailRealms: {Value?: number}};
-
-export interface TStorageGroupStateInfo {
-    Status?: string;
-    /** Disks for none/block-4-2; affected fail realms for mirror-3-dc. Omitted for ok. */
-    Count?: TStorageGroupStateCount;
-    /** Non-zero failed-domain counts per affected realm, in descending order. */
-    FailedDomainsPerRealm?: number[];
-}
-
 export interface TBridgeGroupLink {
     GroupId?: string;
     PileName?: string;
@@ -294,9 +282,6 @@ export type EVersion = 'v1' | 'v2'; // only v2 versions works with sorting
  */
 export type StorageV2SortValue =
     | 'PoolName'
-    | 'PileName'
-    | 'BridgeMode'
-    | 'BridgeSyncStatus'
     | 'Kind'
     | 'MediaType'
     | 'Erasure'
@@ -324,7 +309,14 @@ export type StorageV2SortValue =
 /**
  * Values to sort /storage/groups response
  */
-export type GroupsSortField = StorageV2SortValue | 'MissingDisks' | 'Available' | 'Encryption';
+export type GroupsSortField =
+    | StorageV2SortValue
+    | 'MissingDisks'
+    | 'Available'
+    | 'Encryption'
+    | 'PileName'
+    | 'BridgeMode'
+    | 'BridgeSyncStatus';
 
 export type StorageV2Sort = BackendSortParam<StorageV2SortValue>;
 export type GroupsSort = BackendSortParam<GroupsSortField>;

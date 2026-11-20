@@ -3,8 +3,6 @@ import React from 'react';
 import {Flex} from '@gravity-ui/uikit';
 
 import {BridgeSyncStatusLabel} from '../../../components/BridgeSyncStatusLabel';
-import {DataIssuesIndicator} from '../../../components/DataIssuesAlert/DataIssuesIndicator';
-import {EmptyTableGroups} from '../../../components/DataIssuesAlert/EmptyTableGroups';
 import {ResponseError} from '../../../components/Errors/ResponseError/ResponseError';
 import {PaginatedTableWithLayout} from '../../../components/PaginatedTable/PaginatedTableWithLayout';
 import {TableColumnSetup} from '../../../components/TableColumnSetup/TableColumnSetup';

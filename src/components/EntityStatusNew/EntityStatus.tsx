@@ -1,7 +1,15 @@
 import React from 'react';
 
-import type {LabelProps} from '@gravity-ui/uikit';
-import {ActionTooltip, Flex, HelpMark, Label} from '@gravity-ui/uikit';
+import {
+    ArrowsRotateRight,
+    Check,
+    CircleExclamation,
+    Flame,
+    Ghost,
+    TriangleExclamation,
+} from '@gravity-ui/icons';
+import type {IconData, LabelProps} from '@gravity-ui/uikit';
+import {ActionTooltip, Flex, HelpMark, Icon, Label} from '@gravity-ui/uikit';
 
 import {EFlag} from '../../types/api/enums';
 import {cn} from '../../utils/cn';
@@ -23,7 +31,7 @@ const EFlagToLabelTheme: Record<EFlag, LabelProps['theme'] | 'orange'> = {
     [EFlag.Yellow]: 'warning',
 };
 
-const EFlagToStatusName: Record<EFlag, string> = {
+export const EFlagToStatusName: Record<EFlag, string> = {
     get [EFlag.Red]() {
         return i18n('title_red');
     },
@@ -93,6 +101,74 @@ function EntityStatusLabel({
     );
 }
 
+const compactStatusIcons: Record<EFlag, IconData> = {
+    [EFlag.Blue]: ArrowsRotateRight,
+    [EFlag.Yellow]: TriangleExclamation,
+    [EFlag.Orange]: Flame,
+    [EFlag.Red]: CircleExclamation,
+    [EFlag.Green]: Check,
+    [EFlag.Grey]: Ghost,
+};
+
+interface CompactEntityStatusLabelProps {
+    status: EFlag;
+    size?: LabelProps['size'];
+    iconSize?: number;
+    onClick?: () => void;
+    qa?: string;
+    tooltipTitle?: string;
+    'aria-label'?: string;
+    tabIndex?: number;
+}
+
+function CompactEntityStatusLabel({
+    status,
+    size,
+    iconSize,
+    onClick,
+    qa,
+    tooltipTitle,
+    'aria-label': ariaLabel,
+    tabIndex,
+}: CompactEntityStatusLabelProps) {
+    const statusName = EFlagToStatusName[status];
+    const accessibleName = ariaLabel ?? statusName;
+    const theme = EFlagToLabelTheme[status];
+    const label = (
+        <Label
+            theme={theme === 'orange' ? 'danger' : theme}
+            icon={<Icon size={iconSize} data={compactStatusIcons[status]} />}
+            size={size}
+            interactive={Boolean(onClick)}
+        />
+    );
+
+    return (
+        <ActionTooltip title={tooltipTitle ?? statusName}>
+            <span
+                className={b('compact')}
+                role={onClick ? undefined : 'img'}
+                aria-label={onClick ? undefined : accessibleName}
+                tabIndex={onClick ? undefined : tabIndex}
+                data-qa={qa}
+            >
+                {onClick ? (
+                    <button
+                        type="button"
+                        className={b('compact-button')}
+                        onClick={onClick}
+                        aria-label={accessibleName}
+                    >
+                        {label}
+                    </button>
+                ) : (
+                    label
+                )}
+            </span>
+        </ActionTooltip>
+    );
+}
+
 interface EntityStatusProps {
     children?: React.ReactNode;
     className?: string;
@@ -107,4 +183,5 @@ export function EntityStatus({className, children}: EntityStatusProps) {
 }
 
 EntityStatus.Label = EntityStatusLabel;
+EntityStatus.CompactLabel = CompactEntityStatusLabel;
 EntityStatus.displayName = 'EntityStatus';

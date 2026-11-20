@@ -15,7 +15,6 @@ import {Search} from '../../components/Search';
 import {TableColumnSetup} from '../../components/TableColumnSetup/TableColumnSetup';
 import {TableWithControlsLayout} from '../../components/TableWithControlsLayout/TableWithControlsLayout';
 import {TenantNameWrapper} from '../../components/TenantNameWrapper/TenantNameWrapper';
-import {getTenantLink} from '../../components/TenantNameWrapper/utils';
 import {
     useBridgeModeEnabled,
     useEmMetaAvailable,
@@ -46,8 +45,6 @@ import {useSelectedColumns} from '../../utils/hooks/useSelectedColumns';
 import {getIllustration} from '../../utils/illustrations';
 import {isNumeric} from '../../utils/utils';
 
-import type {DatabaseStatusClickHandler} from './DatabaseDrawerHealthcheck';
-import {DatabaseDrawerHealthcheck} from './DatabaseDrawerHealthcheck';
 import {getDatabaseBridgeColumns} from './bridgeColumns';
 import {
     DATABASES_COLUMNS_IDS,

@@ -6,15 +6,13 @@ import {Button, Flex, Icon, Select, Text} from '@gravity-ui/uikit';
 import {EntitiesCount} from '../../../components/EntitiesCount/EntitiesCount';
 import {usePaginatedTableState} from '../../../components/PaginatedTable/PaginatedTableContext';
 import {Search} from '../../../components/Search/Search';
-import {
-    useBlobStorageCapacityMetricsEnabled,
-} from '../../../store/reducers/capabilities/hooks';
+import {useBlobStorageCapacityMetricsEnabled} from '../../../store/reducers/capabilities/hooks';
 import {SETTING_KEYS} from '../../../store/reducers/settings/constants';
 import {useSetting} from '../../../utils/hooks';
 import {useIsUserAllowedToMakeChanges} from '../../../utils/hooks/useIsUserAllowedToMakeChanges';
 import {
     STORAGE_GROUPS_COLUMNS_IDS,
-    STORAGE_GROUPS_GROUP_BY_OPTIONS,
+    getStorageGroupsGroupByOptions,
 } from '../PaginatedStorageGroupsTable/columns/constants';
 import type {StorageGroupsColumn} from '../PaginatedStorageGroupsTable/columns/types';
 import {StorageExpertModePanel} from '../StorageExpertModePanel/StorageExpertModePanel';
@@ -64,9 +62,8 @@ export function StorageGroupsControls({
         SETTING_KEYS.ENABLE_STORAGE_EXPERT_MODE,
     );
     const isStorageExpertMode = useIsStorageExpertMode();
-    const storageExpertModeAvailable = useBlobStorageCapacityMetricsAvailable();
-    const blobMetricsEnabled = useBlobStorageCapacityMetricsEnabled();
     const {bridgeModeEnabled, bridgeSyncGroupingAvailable} = useStorageGroupsBridgeGrouping();
+    const blobMetricsEnabled = useBlobStorageCapacityMetricsEnabled();
 
     const isVDisksPDisksColumnVisible = React.useMemo(() => {
         return columns.some((column) => column.name === STORAGE_GROUPS_COLUMNS_IDS.VDisksPDisks);
@@ -117,6 +114,7 @@ export function StorageGroupsControls({
                         <Text variant="body-2">{i18n('controls_group-by-placeholder')}</Text>
                         <Select
                             hasClear
+                            qa="storage-groups-group-by"
                             placeholder={'-'}
                             width={150}
                             value={groupByValue}
