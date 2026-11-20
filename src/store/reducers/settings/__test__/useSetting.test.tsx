@@ -14,7 +14,7 @@ import {useSetting} from '../useSetting';
 const originalApi = window.api;
 const settingName = SETTING_KEYS.SAVED_QUERIES;
 
-function renderSetting(onSaveError: jest.Mock) {
+function renderSetting(onSaveError: jest.Mock, name: string = settingName) {
     const store = configureStore({
         reducer: {settings, [settingsApi.reducerPath]: settingsApi.reducer},
         middleware: (getDefaultMiddleware) => getDefaultMiddleware().concat(settingsApi.middleware),
@@ -23,7 +23,7 @@ function renderSetting(onSaveError: jest.Mock) {
         <Provider store={store}>{children}</Provider>
     );
 
-    return renderHook(() => useSetting<string[]>(settingName, onSaveError), {wrapper});
+    return renderHook(() => useSetting<string[]>(name, onSaveError), {wrapper});
 }
 
 afterEach(() => {
@@ -33,20 +33,33 @@ afterEach(() => {
     localStorage.clear();
 });
 
-test('reports storage failure while keeping the setting in memory', () => {
+test.each([
+    {
+        name: SETTING_KEYS.QUERIES_HISTORY,
+        keepsUnsavedValue: true,
+    },
+    {
+        name: SETTING_KEYS.SAVED_QUERIES,
+        keepsUnsavedValue: false,
+    },
+])('reports local storage failure for $name', ({name, keepsUnsavedValue}) => {
     window.api = {} as YdbEmbeddedAPI;
+    const previousValue = ['SELECT 1;'];
+    localStorage.setItem(name, JSON.stringify(previousValue));
     jest.spyOn(Storage.prototype, 'setItem').mockImplementation(() => {
         throw new DOMException('Storage is full', 'QuotaExceededError');
     });
 
     const onSaveError = jest.fn();
-    const {result} = renderSetting(onSaveError);
-    const value = ['SELECT 1;'];
-    act(() => result.current.saveValue(value));
+    const {result} = renderSetting(onSaveError, name);
+    const value = ['SELECT 2;'];
+    act(() => {
+        expect(result.current.saveValue(value)).toBe(false);
+    });
 
     expect(onSaveError).toHaveBeenCalledWith('local');
-    expect(result.current.value).toBe(value);
-    expect(localStorage.getItem(settingName)).toBeNull();
+    expect(result.current.value).toEqual(keepsUnsavedValue ? value : previousValue);
+    expect(localStorage.getItem(name)).toBe(JSON.stringify(previousValue));
 });
 
 test('keeps the queue moving without notifying on its timeout', async () => {

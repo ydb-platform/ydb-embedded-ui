@@ -1,15 +1,22 @@
+import {v4 as uuidv4} from 'uuid';
+
 import createToast, {toaster} from '../../../../utils/createToast';
 
-const TOAST_NAME = 'query-settings-warning';
+let currentWarning: {name: string; title: string} | undefined;
 
 export function showQuerySettingsWarning(title: string) {
-    if (toaster.has(TOAST_NAME)) {
-        toaster.update(TOAST_NAME, {title});
-        return;
+    if (currentWarning && toaster.has(currentWarning.name)) {
+        if (currentWarning.title === title) {
+            return;
+        }
+        toaster.remove(currentWarning.name);
     }
 
+    // A toast fading out can still close itself by name.
+    const name = `query-settings-warning-${uuidv4()}`;
+    currentWarning = {name, title};
     createToast({
-        name: TOAST_NAME,
+        name,
         title,
         theme: 'warning',
         autoHiding: 5000,

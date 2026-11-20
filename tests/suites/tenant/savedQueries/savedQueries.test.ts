@@ -101,6 +101,42 @@ test.describe('Saved Queries', () => {
         expect(row?.query.trim()).toBe(testQuery.trim());
     });
 
+    test('Keeps a draft open when local storage rejects Save changes', async ({page}) => {
+        const draft = 'SELECT 31 AS keep_draft_after_save_error;';
+        const queryName = 'Draft retry';
+        const {editorTabs} = tenantPage.queryEditor;
+
+        await editorTabs.clickAddTab();
+        const tabTitle = await editorTabs.getActiveTabTitle();
+        await tenantPage.queryEditor.setQuery(draft);
+        await editorTabs.hoverTab(tabTitle);
+        await editorTabs.closeTab(tabTitle);
+
+        const dialog = new SaveChangesDialog(page);
+        await dialog.setQueryName(queryName);
+        await page.evaluate(() => {
+            const setItem = Storage.prototype.setItem;
+            Storage.prototype.setItem = function (key, value) {
+                if (this === localStorage && key === 'saved_queries') {
+                    Storage.prototype.setItem = setItem;
+                    throw new DOMException('Storage is full', 'QuotaExceededError');
+                }
+                setItem.call(this, key, value);
+            };
+        });
+        await dialog.clickSave();
+
+        await expect(page.getByText('Could not save settings in this browser.')).toBeVisible();
+        await expect(dialog.isVisible()).resolves.toBe(true);
+        expect(await page.evaluate(() => localStorage.getItem('saved_queries'))).toBeNull();
+
+        await dialog.clickSave();
+        await expect(editorTabs.waitForTabCount(1)).resolves.toBe(true);
+        await tenantPage.queryEditor.queryTabs.selectTab(QueryTabs.Saved);
+        const row = await tenantPage.savedQueriesTable.getRowByName(queryName);
+        expect(row?.query.trim()).toBe(draft);
+    });
+
     test('Rejects an oversized query saved from legacy history', async ({page}) => {
         const prefix = 'SELECT 83 AS legacy_history;';
         await page.evaluate((sql) => {

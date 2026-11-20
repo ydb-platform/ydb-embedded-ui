@@ -100,6 +100,9 @@ export const SETTINGS_OPTIONS: Record<string, SettingOptions | undefined> = {
     [SETTING_KEYS.THEME]: {
         preventBatching: true,
     },
+    [SETTING_KEYS.SAVED_QUERIES]: {
+        requireLocalPersistence: true,
+    },
     [SETTING_KEYS.QUERIES_HISTORY]: {
         normalizeForMigration: (value) => (Array.isArray(value) ? limitQueryHistory(value) : value),
     },

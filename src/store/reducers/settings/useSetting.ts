@@ -9,7 +9,7 @@ import {SUPERSEDED_SETTINGS_WRITE_ERROR, settingsApi} from './api';
 import {getSettingValue, setSettingValue} from './settings';
 import type {SettingSaveTarget} from './types';
 
-type SaveSettingValue<T> = (value: T | undefined) => void;
+type SaveSettingValue<T> = (value: T | undefined) => boolean;
 
 export function useSetting<T>(
     name?: string,
@@ -36,7 +36,7 @@ export function useSetting<T>(
     const saveValue = React.useCallback<SaveSettingValue<T>>(
         (value) => {
             if (!name) {
-                return;
+                return false;
             }
             if (remoteAvailable) {
                 const saveRequest = setMetaSetting({name, value});
@@ -53,11 +53,13 @@ export function useSetting<T>(
                         onSaveError('remote');
                     });
                 }
-                return;
+                return true;
             }
-            if (!dispatch(setSettingValue(name, value))) {
+            const saved = dispatch(setSettingValue(name, value));
+            if (!saved) {
                 onSaveError?.('local');
             }
+            return saved;
         },
         [dispatch, remoteAvailable, name, onSaveError, setMetaSetting],
     );

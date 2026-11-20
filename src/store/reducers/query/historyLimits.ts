@@ -1,3 +1,4 @@
+import {sortByTimestampDescending} from '../../../utils/sortByTimestamp';
 import {MAX_USER_SETTING_BYTES, serializeUserSettingBody} from '../../../utils/userSettingBody';
 
 import type {RawQueryInHistory} from './types';
@@ -16,12 +17,24 @@ function getEntryBytes(entry: unknown, encoder: TextEncoder) {
     return encoder.encode(serializeUserSettingBody(serialized)).byteLength - 2;
 }
 
+function getEntryStartTime(entry: unknown): number | undefined {
+    if (entry && typeof entry === 'object' && 'startTime' in entry) {
+        const {startTime} = entry;
+        if (typeof startTime === 'number' && Number.isFinite(startTime)) {
+            return startTime;
+        }
+    }
+
+    return undefined;
+}
+
 export function limitQueryHistory<T>(history: readonly T[]): T[] {
     const encoder = new TextEncoder();
     const newestEntries: T[] = [];
     let bytes = EMPTY_HISTORY_BYTES;
 
-    for (const entry of history.slice(-MAX_QUERIES_IN_HISTORY).reverse()) {
+    const sorted = sortByTimestampDescending(history, getEntryStartTime);
+    for (const entry of sorted.slice(0, MAX_QUERIES_IN_HISTORY)) {
         const entryBytes = getEntryBytes(entry, encoder);
         if (entryBytes + EMPTY_HISTORY_BYTES > MAX_USER_SETTING_BYTES) {
             continue;

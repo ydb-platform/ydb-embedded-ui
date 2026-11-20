@@ -16,9 +16,9 @@ import type {RenameSavedQueryStatus} from './savedQueries';
 import {getSavedQueriesSizeError, renameSavedQueryInList, upsertSavedQuery} from './savedQueries';
 import {showQuerySettingsWarning} from './showQuerySettingsWarning';
 
-export type RenameSavedQueryResult = RenameSavedQueryStatus | 'size-limit';
+export type RenameSavedQueryResult = RenameSavedQueryStatus | 'save-failed';
 
-type UpdateSavedQueryResult = 'updated' | 'duplicate' | 'not-found' | 'size-limit';
+type UpdateSavedQueryResult = 'updated' | 'duplicate' | 'not-found' | 'save-failed';
 
 function notifySavedQueriesSaveError(target: SettingSaveTarget) {
     showQuerySettingsWarning(
@@ -38,7 +38,7 @@ export function useSavedQueries() {
 
     const dispatch = useTypedDispatch();
 
-    const saveQueriesWithinLimit = React.useCallback(
+    const trySaveQueries = React.useCallback(
         (queries: SavedQuery[], changedQueryName: string) => {
             const error = getSavedQueriesSizeError(queries, changedQueryName);
             if (error) {
@@ -52,8 +52,7 @@ export function useSavedQueries() {
                 return false;
             }
 
-            saveQueries(queries);
-            return true;
+            return saveQueries(queries);
         },
         [saveQueries],
     );
@@ -63,8 +62,9 @@ export function useSavedQueries() {
             const queries = savedQueries ?? [];
             const nextSavedQueries = queries.filter((el) => !findQueryByName(el, queryName));
 
-            saveQueries(nextSavedQueries);
-            dispatch(detachSavedQueryTabs({savedQueryName: queryName}));
+            if (saveQueries(nextSavedQueries)) {
+                dispatch(detachSavedQueryTabs({savedQueryName: queryName}));
+            }
         },
         [dispatch, savedQueries, saveQueries],
     );
@@ -76,9 +76,9 @@ export function useSavedQueries() {
             }
 
             const queries = upsertSavedQuery(savedQueries ?? [], queryName, queryBody, Date.now());
-            return saveQueriesWithinLimit(queries, queryName);
+            return trySaveQueries(queries, queryName);
         },
-        [savedQueries, saveQueriesWithinLimit],
+        [savedQueries, trySaveQueries],
     );
 
     const renameSavedQuery = React.useCallback(
@@ -92,14 +92,14 @@ export function useSavedQueries() {
             if (result.status !== 'renamed') {
                 return result.status;
             }
-            if (!saveQueriesWithinLimit(result.queries, nextName)) {
-                return 'size-limit';
+            if (!trySaveQueries(result.queries, nextName)) {
+                return 'save-failed';
             }
 
             dispatch(renameSavedQueryTabs({previousName, nextName}));
             return 'renamed';
         },
-        [dispatch, savedQueries, saveQueriesWithinLimit],
+        [dispatch, savedQueries, trySaveQueries],
     );
 
     const updateSavedQuery = React.useCallback(
@@ -134,8 +134,8 @@ export function useSavedQueries() {
                 queryBody,
                 updatedAt,
             );
-            if (!saveQueriesWithinLimit(nextQueries, nameToSave)) {
-                return 'size-limit';
+            if (!trySaveQueries(nextQueries, nameToSave)) {
+                return 'save-failed';
             }
             dispatch(
                 syncSavedQueryTabsAfterUpdate({
@@ -149,7 +149,7 @@ export function useSavedQueries() {
 
             return 'updated';
         },
-        [dispatch, savedQueries, saveQueriesWithinLimit],
+        [dispatch, savedQueries, trySaveQueries],
     );
 
     return {

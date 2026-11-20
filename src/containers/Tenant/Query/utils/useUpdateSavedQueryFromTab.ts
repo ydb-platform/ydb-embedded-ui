@@ -25,7 +25,7 @@ export function useUpdateSavedQueryFromTab() {
                 return true;
             }
 
-            if (result === 'size-limit') {
+            if (result === 'save-failed') {
                 return false;
             }
 
