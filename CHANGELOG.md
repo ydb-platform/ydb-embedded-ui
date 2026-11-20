@@ -1,5 +1,14 @@
 # Changelog
 
+## [22.11.0-hotfix.1](https://github.com/ydb-platform/ydb-embedded-ui/compare/v22.11.0...v22.11.0-hotfix.1) (2026-11-20)
+
+
+### Bug Fixes
+
+* **nodes:** fall back to system state for pile name ([#4622](https://github.com/ydb-platform/ydb-embedded-ui/issues/4622)) ([55b5ac4](https://github.com/ydb-platform/ydb-embedded-ui/commit/55b5ac4eb16187c4fb590babcc4cea36515de306))
+* **storage:** preserve unrecognised sync status group names ([#4620](https://github.com/ydb-platform/ydb-embedded-ui/issues/4620)) ([0de176a](https://github.com/ydb-platform/ydb-embedded-ui/commit/0de176a1efeea20ba57293541fc0714ca8b2b125))
+* **storage:** render sync status labels in group headers ([#4618](https://github.com/ydb-platform/ydb-embedded-ui/issues/4618)) ([7b84010](https://github.com/ydb-platform/ydb-embedded-ui/commit/7b84010852738611ae2cb6d5725f7cb0690ecc43))
+
 ## [22.11.0](https://github.com/ydb-platform/ydb-embedded-ui/compare/v22.10.0...v22.11.0) (2026-11-19)
 
 
