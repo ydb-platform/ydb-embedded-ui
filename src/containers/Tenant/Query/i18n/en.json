@@ -5,12 +5,18 @@
 
   "context_query-history-empty": "History is empty",
   "context_query-history-search-empty": "Search result is empty",
+  "alert_query-too-large-for-history": "The query is too large to be added to query history automatically.",
+  "alert_query-history-save-error": "Could not save query history to the server.",
+  "alert_query-settings-local-save-error": "Could not save settings in this browser.",
   "context_saved-queries-empty": "There are no saved queries",
   "field_saved-query-search": "Search by name or query text...",
   "field_saved-query-name": "Name",
   "field_saved-query-edited-at": "Edited",
   "alert_saved-query-name-exists": "This name already exists",
   "alert_saved-query-not-found": "Saved query no longer exists",
+  "alert_saved-query-too-large": "This query exceeds the limit and cannot be saved.",
+  "alert_saved-queries-list-full": "Saving this query would exceed the limit. Delete some saved queries and try again.",
+  "alert_saved-queries-sync-error": "Could not sync saved queries to the server.",
 
   "title_delete-query": "Delete query",
   "confirm_delete-query": "Are you sure you want to delete query",

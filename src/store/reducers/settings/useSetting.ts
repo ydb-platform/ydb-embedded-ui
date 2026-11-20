@@ -5,12 +5,16 @@ import {skipToken} from '@reduxjs/toolkit/query';
 import {useTypedDispatch} from '../../../utils/hooks/useTypedDispatch';
 import {useTypedSelector} from '../../../utils/hooks/useTypedSelector';
 
-import {settingsApi} from './api';
+import {SUPERSEDED_SETTINGS_WRITE_ERROR, settingsApi} from './api';
 import {getSettingValue, setSettingValue} from './settings';
+import type {SettingSaveTarget} from './types';
 
-type SaveSettingValue<T> = (value: T | undefined) => void;
+type SaveSettingValue<T> = (value: T | undefined) => boolean;
 
-export function useSetting<T>(name?: string): {
+export function useSetting<T>(
+    name?: string,
+    onSaveError?: (target: SettingSaveTarget) => void,
+): {
     value: T | undefined;
     saveValue: SaveSettingValue<T>;
     isLoading: boolean;
@@ -32,15 +36,32 @@ export function useSetting<T>(name?: string): {
     const saveValue = React.useCallback<SaveSettingValue<T>>(
         (value) => {
             if (!name) {
-                return;
+                return false;
             }
             if (remoteAvailable) {
-                setMetaSetting({name, value});
-                return;
+                const saveRequest = setMetaSetting({name, value});
+                if (onSaveError) {
+                    saveRequest.unwrap().catch((error: unknown) => {
+                        if (
+                            error &&
+                            typeof error === 'object' &&
+                            'name' in error &&
+                            error.name === SUPERSEDED_SETTINGS_WRITE_ERROR
+                        ) {
+                            return;
+                        }
+                        onSaveError('remote');
+                    });
+                }
+                return true;
             }
-            dispatch(setSettingValue(name, value));
+            const saved = dispatch(setSettingValue(name, value));
+            if (!saved) {
+                onSaveError?.('local');
+            }
+            return saved;
         },
-        [dispatch, remoteAvailable, name, setMetaSetting],
+        [dispatch, remoteAvailable, name, onSaveError, setMetaSetting],
     );
 
     return {value: settingValue, saveValue, isLoading} as const;

@@ -6,7 +6,7 @@ import {cn} from '../../../../utils/cn';
 import {BRAND_BUTTON_CLASS} from '../../../../utils/constants';
 import i18n from '../i18n';
 import {getQueryNameValidationError} from '../utils/QueryNameValidation';
-import type {RenameSavedQueryStatus} from '../utils/savedQueries';
+import type {RenameSavedQueryResult} from '../utils/useSavedQueries';
 
 import './RenameSavedQueryDialog.scss';
 
@@ -16,7 +16,7 @@ interface RenameSavedQueryDialogProps {
     currentName: string;
     open: boolean;
     onClose: VoidFunction;
-    onRename: (nextName: string) => RenameSavedQueryStatus;
+    onRename: (nextName: string) => RenameSavedQueryResult;
 }
 
 export function RenameSavedQueryDialog({
@@ -53,7 +53,9 @@ export function RenameSavedQueryDialog({
             return;
         }
 
-        onClose();
+        if (result === 'renamed') {
+            onClose();
+        }
     }, [nextName, onClose, onRename]);
 
     const handleSubmit = React.useCallback(

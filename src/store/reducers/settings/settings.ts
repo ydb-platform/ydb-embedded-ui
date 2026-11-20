@@ -5,7 +5,7 @@ import {isNil} from 'lodash';
 import {parseJson} from '../../../utils/utils';
 import type {AppDispatch, RootState} from '../../defaultStore';
 
-import {DEFAULT_USER_SETTINGS} from './constants';
+import {DEFAULT_USER_SETTINGS, SETTINGS_OPTIONS} from './constants';
 import type {SettingsState} from './types';
 import {
     getSettingDefault,
@@ -63,12 +63,15 @@ export const getSettingValue = createSelector(
 
 export const setSettingValue = (name: string | undefined, value: unknown) => {
     return (dispatch: AppDispatch) => {
-        if (name) {
-            dispatch(settingsSlice.actions.setSettingValue({name, value}));
-            if (shouldSyncSettingToLS(name)) {
-                setSettingValueToLS(name, value);
-            }
+        if (!name) {
+            return true;
         }
+
+        const saved = !shouldSyncSettingToLS(name) || setSettingValueToLS(name, value);
+        if (saved || !SETTINGS_OPTIONS[name]?.requireLocalPersistence) {
+            dispatch(setSettingValueInStore({name, value}));
+        }
+        return saved;
     };
 };
 

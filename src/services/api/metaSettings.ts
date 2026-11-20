@@ -7,6 +7,7 @@ import type {
     SettingValue,
 } from '../../types/api/settings';
 import {uiFactory} from '../../uiFactory/uiFactory';
+import {serializeUserSettingBody} from '../../utils/userSettingBody';
 
 import {BaseMetaAPI} from './baseMeta';
 
@@ -62,7 +63,7 @@ export class MetaSettingsAPI extends BaseMetaAPI {
     setSingleSetting(params: SetSingleSettingParams) {
         return this.post<SetSettingResponse>(
             this.getPath('/meta/user_settings'),
-            JSON.stringify(params.value),
+            serializeUserSettingBody(params.value),
             {name: params.name},
             {headers: {'Content-Type': 'application/json'}},
         );

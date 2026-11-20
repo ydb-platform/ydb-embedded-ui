@@ -101,6 +101,103 @@ test.describe('Saved Queries', () => {
         expect(row?.query.trim()).toBe(testQuery.trim());
     });
 
+    test('Keeps a draft open when local storage rejects Save changes', async ({page}) => {
+        const draft = 'SELECT 31 AS keep_draft_after_save_error;';
+        const queryName = 'Draft retry';
+        const {editorTabs} = tenantPage.queryEditor;
+
+        await editorTabs.clickAddTab();
+        const tabTitle = await editorTabs.getActiveTabTitle();
+        await tenantPage.queryEditor.setQuery(draft);
+        await editorTabs.hoverTab(tabTitle);
+        await editorTabs.closeTab(tabTitle);
+
+        const dialog = new SaveChangesDialog(page);
+        await dialog.setQueryName(queryName);
+        await page.evaluate(() => {
+            const setItem = Storage.prototype.setItem;
+            Storage.prototype.setItem = function (key, value) {
+                if (this === localStorage && key === 'saved_queries') {
+                    Storage.prototype.setItem = setItem;
+                    throw new DOMException('Storage is full', 'QuotaExceededError');
+                }
+                setItem.call(this, key, value);
+            };
+        });
+        await dialog.clickSave();
+
+        await expect(page.getByText('Could not save settings in this browser.')).toBeVisible();
+        await expect(dialog.isVisible()).resolves.toBe(true);
+        expect(await page.evaluate(() => localStorage.getItem('saved_queries'))).toBeNull();
+
+        await dialog.clickSave();
+        await expect(editorTabs.waitForTabCount(1)).resolves.toBe(true);
+        await tenantPage.queryEditor.queryTabs.selectTab(QueryTabs.Saved);
+        const row = await tenantPage.savedQueriesTable.getRowByName(queryName);
+        expect(row?.query.trim()).toBe(draft);
+    });
+
+    test('Rejects an oversized query saved from legacy history', async ({page}) => {
+        const prefix = 'SELECT 83 AS legacy_history;';
+        await page.evaluate((sql) => {
+            const history = JSON.stringify([
+                {
+                    queryId: 'legacy-history',
+                    queryText: `${sql} /* ${'\\'.repeat(4 * 1024 * 1024)} */`,
+                    startTime: 100,
+                },
+            ]);
+            Object.assign(window.api, {
+                metaSettings: {
+                    getSingleSetting: async ({name}: {name: string}) =>
+                        name === 'queries_history' ? history : undefined,
+                },
+            });
+        }, prefix);
+        await tenantPage.queryEditor.queryTabs.selectTab(QueryTabs.History);
+        await tenantPage.queryEditor.historyQueries.clickSaveButton(prefix);
+
+        await tenantPage.saveQueryDialog.setQueryName('Oversized query');
+        await tenantPage.saveQueryDialog.clickSave();
+
+        await expect(
+            page.getByText('This query exceeds the limit and cannot be saved.'),
+        ).toBeVisible();
+        await expect(tenantPage.saveQueryDialog.isVisible()).resolves.toBe(true);
+        await tenantPage.saveQueryDialog.clickCancel();
+        await expect(await tenantPage.queryEditor.historyQueries.getQueryRow(prefix)).toBeVisible();
+    });
+
+    test('Asks to delete saved queries when only the combined list exceeds the size limit', async ({
+        page,
+    }) => {
+        await page.evaluate(() => {
+            const existingQueries = JSON.stringify([
+                {name: 'Existing large query', body: '\\'.repeat(4_193_000), updatedAt: 100},
+            ]);
+            Object.assign(window.api, {
+                metaSettings: {
+                    getSingleSetting: async ({name}: {name: string}) =>
+                        name === 'saved_queries' ? existingQueries : undefined,
+                },
+            });
+        });
+        await tenantPage.queryEditor.queryTabs.selectTab(QueryTabs.History);
+        await tenantPage.queryEditor.queryTabs.selectTab(QueryTabs.Editor);
+
+        const sql = `/* ${'\\'.repeat(2000)} */ SELECT 1;`;
+        await tenantPage.saveQuery(sql, 'Fits individually');
+
+        await expect(
+            page.getByText(
+                'Saving this query would exceed the limit. Delete some saved queries and try again.',
+            ),
+        ).toBeVisible();
+        await expect(tenantPage.saveQueryDialog.isVisible()).resolves.toBe(true);
+        await tenantPage.saveQueryDialog.clickCancel();
+        await expect(tenantPage.queryEditor.getEditorContent()).resolves.toBe(sql);
+    });
+
     test('Saving a query updates the active tab title and action button state', async () => {
         const testQuery = 'SELECT 3 AS titled_query;';
         const queryName = await tenantPage.saveQuery(testQuery, `Saved Title ${uuidv4()}`);

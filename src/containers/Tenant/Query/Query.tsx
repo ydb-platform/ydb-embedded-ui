@@ -4,6 +4,7 @@ import {Helmet} from 'react-helmet-async';
 
 import {useQueriesHistory} from '../../../store/reducers/query/hooks';
 import {changeUserInput} from '../../../store/reducers/query/query';
+import type {SettingSaveTarget} from '../../../store/reducers/settings/types';
 import {TENANT_QUERY_TABS_ID} from '../../../store/reducers/tenant/constants';
 import type {EPathSubType, EPathType} from '../../../types/api/schema';
 import {cn} from '../../../utils/cn';
@@ -14,10 +15,27 @@ import QueriesHistory from './QueriesHistory/QueriesHistory';
 import QueryEditor from './QueryEditor/QueryEditor';
 import {QueryTabs, queryEditorTabs} from './QueryTabs/QueryTabs';
 import {SavedQueries} from './SavedQueries/SavedQueries';
+import i18n from './i18n';
+import {showQuerySettingsWarning} from './utils/showQuerySettingsWarning';
 
 import './Query.scss';
 
 const b = cn('ydb-query');
+
+const queryHistoryNotifications = {
+    onQueryTooLarge() {
+        showQuerySettingsWarning(i18n('alert_query-too-large-for-history'));
+    },
+    onSaveError(target: SettingSaveTarget) {
+        showQuerySettingsWarning(
+            i18n(
+                target === 'local'
+                    ? 'alert_query-settings-local-save-error'
+                    : 'alert_query-history-save-error',
+            ),
+        );
+    },
+};
 
 interface QueryProps {
     theme: string;
@@ -32,7 +50,7 @@ export const Query = (props: QueryProps) => {
 
     const {queryTab = TENANT_QUERY_TABS_ID.newQuery} = useTypedSelector((state) => state.tenant);
 
-    const queriesHistory = useQueriesHistory();
+    const queriesHistory = useQueriesHistory(queryHistoryNotifications);
 
     const handleUserInputChange = (value: {input: string}) => {
         dispatch(changeUserInput(value));

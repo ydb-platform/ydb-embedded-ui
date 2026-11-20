@@ -360,6 +360,7 @@ export default function QueryEditor({
             dispatch(setShowPreview(false));
 
             let historyQueryId: string | undefined;
+            let shouldSaveHistoryEntry = false;
             const queryId = uuidv4();
 
             const startTime = Date.now();
@@ -382,9 +383,8 @@ export default function QueryEditor({
                     // Queries with results stored on the server (operationId) get a separate history
                     // entry per launch, unless they match the most recent history item (handled above).
                     historyQueryId = queryId;
-                    saveQueryToHistory(text, queryId, startTime);
+                    shouldSaveHistoryEntry = true;
                 }
-                dispatch(setIsDirty(false));
             }
 
             // Only reset pane to default size if it's currently collapsed.
@@ -401,6 +401,7 @@ export default function QueryEditor({
                 queryId,
                 historyQueryId,
                 startTime,
+                shouldSaveHistoryEntry,
             };
         },
     );
@@ -515,16 +516,17 @@ export default function QueryEditor({
     );
 
     const handleSendExecuteClick = useEventHandler((queryExecution: QueryExecution) => {
+        const saveToHistory = !queryExecution.range;
         const execution = prepareExecuteQueryAction({
             execution: queryExecution,
             actionType: QUERY_ACTIONS.execute,
-            saveToHistory: !queryExecution.range,
+            saveToHistory,
         });
         if (!execution) {
             return;
         }
 
-        const {tabId, queryId, historyQueryId, startTime} = execution;
+        const {tabId, queryId, historyQueryId, startTime, shouldSaveHistoryEntry} = execution;
         const {text, range} = queryExecution;
 
         if (isStreamingEnabled) {
@@ -587,6 +589,13 @@ export default function QueryEditor({
                 historyQueryId,
                 startTime,
             });
+        }
+
+        if (
+            saveToHistory &&
+            (!shouldSaveHistoryEntry || saveQueryToHistory(text, queryId, startTime))
+        ) {
+            dispatch(setIsDirty(false));
         }
     });
 

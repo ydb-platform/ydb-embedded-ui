@@ -1,22 +1,11 @@
 import {ReadableStream as WebReadableStream} from 'stream/web';
-import {TextDecoder as NodeTextDecoder, TextEncoder as NodeTextEncoder} from 'util';
 
 import type {MultipartPart} from '@mjackson/multipart-parser';
 
 import {readPartText} from '../streamingPartReader';
 
-// jsdom does not provide Web Streams / Encoding APIs; polyfill for this test file.
-/* eslint-disable @typescript-eslint/no-explicit-any */
-if (typeof globalThis.ReadableStream === 'undefined') {
-    (globalThis as any).ReadableStream = WebReadableStream;
-}
-if (typeof globalThis.TextEncoder === 'undefined') {
-    (globalThis as any).TextEncoder = NodeTextEncoder;
-}
-if (typeof globalThis.TextDecoder === 'undefined') {
-    (globalThis as any).TextDecoder = NodeTextDecoder;
-}
-/* eslint-enable @typescript-eslint/no-explicit-any */
+// jsdom does not provide Web Streams.
+globalThis.ReadableStream ??= WebReadableStream as typeof ReadableStream;
 
 function createFakePart(bodyChunks: Uint8Array[], contentLength: number | null): MultipartPart {
     const body = new ReadableStream<Uint8Array>({

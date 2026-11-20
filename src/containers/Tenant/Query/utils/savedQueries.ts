@@ -1,6 +1,7 @@
 import type {SavedQuery} from '../../../../types/store/query';
 import {EMPTY_DATA_PLACEHOLDER} from '../../../../utils/constants';
 import {formatDateTime} from '../../../../utils/dataFormatters/dataFormatters';
+import {MAX_USER_SETTING_BYTES, serializeUserSettingBody} from '../../../../utils/userSettingBody';
 
 const normalizeSavedQueryName = (value: string) => value.trim().toLowerCase();
 
@@ -15,6 +16,27 @@ function findSavedQueryIndex(queries: SavedQuery[], name: string): number {
     const normalizedName = normalizeSavedQueryName(name);
 
     return queries.findIndex((query) => normalizeSavedQueryName(query.name) === normalizedName);
+}
+
+function exceedsSavedQueriesLimit(queries: SavedQuery[]) {
+    const body = serializeUserSettingBody(JSON.stringify(queries));
+    return new TextEncoder().encode(body).byteLength > MAX_USER_SETTING_BYTES;
+}
+
+export function getSavedQueriesSizeError(queries: SavedQuery[], changedQueryName: string) {
+    const query = queries[findSavedQueryIndex(queries, changedQueryName)];
+    if (
+        query &&
+        (query.body.length > MAX_USER_SETTING_BYTES || exceedsSavedQueriesLimit([query]))
+    ) {
+        return 'query-too-large';
+    }
+
+    if (queries.length > 1 && exceedsSavedQueriesLimit(queries)) {
+        return 'list-full';
+    }
+
+    return undefined;
 }
 
 export function hasSavedQueryName(queries: SavedQuery[], name: string): boolean {
