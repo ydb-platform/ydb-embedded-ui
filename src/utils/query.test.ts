@@ -455,6 +455,20 @@ describe('API utils', () => {
         });
     });
 
+    test('uses Full for missing or invalid stored statistics, preserving explicit choices', () => {
+        expect(querySettingsRestoreSchema.parse(undefined).statisticsMode).toBe('full');
+        expect(
+            querySettingsRestoreSchema.parse({...DEFAULT_QUERY_SETTINGS, statisticsMode: 'invalid'})
+                .statisticsMode,
+        ).toBe('full');
+        for (const statisticsMode of ['none', 'basic', 'full', 'profile']) {
+            expect(
+                querySettingsRestoreSchema.parse({...DEFAULT_QUERY_SETTINGS, statisticsMode})
+                    .statisticsMode,
+            ).toBe(statisticsMode);
+        }
+    });
+
     describe('querySettingsRestoreSchema — timeout', () => {
         const validBase = {
             limitRows: 10000,

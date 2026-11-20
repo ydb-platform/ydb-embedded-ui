@@ -1,45 +1,82 @@
 .ydb-query-settings-dialog {
+    max-width: 100%;
+
+    &__modal {
+        --g-modal-border-radius: var(--g-border-radius-l);
+    }
+
+    &__header {
+        --g-text-subheader-font-weight: var(--g-text-accent-font-weight);
+
+        padding-block: calc(var(--g-spacing-4) + var(--g-spacing-half))
+            calc(var(--g-spacing-3) + var(--g-spacing-half));
+    }
+
+    &__advanced-toggle {
+        --g-text-body-font-weight: var(--g-text-accent-font-weight);
+
+        min-height: var(--g-spacing-7);
+    }
+
+    &__dialog-body,
+    &__advanced-fields {
+        display: flex;
+        flex-direction: column;
+        gap: var(--g-spacing-3);
+    }
+
     &__dialog-row {
-        & + & {
-            margin-top: var(--g-text-body-1-line-height);
-        }
+        display: grid;
+        align-items: start;
+        grid-template-columns: calc(var(--g-spacing-10) * 4 - var(--g-spacing-2)) minmax(0, 1fr);
+        gap: var(--g-spacing-3);
     }
 
     &__field-title {
-        flex: 4;
+        display: flex;
+        align-items: center;
+        gap: var(--g-spacing-1);
 
-        margin-right: var(--g-spacing-3);
-
-        font-weight: 500;
-        line-height: var(--g-text-header-2-line-height);
-        white-space: nowrap;
-    }
-
-    .g-dialog-footer__bts-wrapper {
-        width: 100%;
-    }
-
-    &__dialog-body {
-        padding-top: var(--g-spacing-6);
+        min-height: var(--g-spacing-7);
+        // Let long labels use part of the column gap without moving the controls.
+        margin-inline-end: calc(-1 * var(--g-spacing-2));
     }
 
     &__control-wrapper {
         display: flex;
-        flex: 6;
+        flex-direction: column;
+        gap: var(--g-spacing-2);
+
+        min-width: 0;
+
+        &_statisticsMode {
+            align-items: flex-start;
+        }
     }
 
-    &__limit-rows {
-        width: 50%;
-        margin-right: var(--g-spacing-2);
+    &__description {
+        color: var(--g-color-text-secondary);
     }
 
-    &__output-chunk-max-size {
-        width: 50%;
-        margin-right: var(--g-spacing-2);
-    }
-
-    &__pragmas {
+    &__limit-rows,
+    &__output-chunk-max-size,
+    &__pragmas,
+    &__advanced {
         width: 100%;
+    }
+
+    &__advanced-fields {
+        padding-top: var(--g-spacing-3);
+
+        &[hidden] {
+            display: none;
+        }
+    }
+
+    &__tracing {
+        display: flex;
+        align-items: center;
+        gap: var(--g-spacing-3);
     }
 
     &__postfix {
@@ -48,15 +85,32 @@
         color: var(--g-color-text-secondary);
     }
 
+    .g-dialog-footer__bts-wrapper {
+        width: 100%;
+    }
+
     &__buttons-container {
         display: flex;
+        flex-wrap: wrap;
         justify-content: space-between;
+        gap: var(--g-spacing-2);
 
         width: 100%;
     }
 
     &__main-buttons {
         display: flex;
-        gap: 10px;
+        gap: var(--g-spacing-2);
+    }
+    @media (max-width: 480px) {
+        &__dialog-row {
+            grid-template-columns: minmax(0, 1fr);
+            gap: var(--g-spacing-1);
+        }
+
+        &__field-title {
+            min-height: auto;
+            margin-inline-end: 0;
+        }
     }
 }

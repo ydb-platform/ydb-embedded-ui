@@ -1,12 +1,14 @@
 .ydb-query-settings-timeout {
     &__control-wrapper {
         display: flex;
-        flex: 6;
         align-items: center;
+        gap: var(--g-spacing-3);
+
+        min-width: 0;
     }
 
     &__input {
-        width: 50%;
+        flex: 1;
     }
 
     &__postfix {

@@ -814,7 +814,7 @@ test.describe('Test Query Editor', async () => {
             await queryEditor.setQuery(longRunningQuery);
             await queryEditor.clickGearButton();
             await queryEditor.settingsDialog.changeQueryMode(QUERY_MODES.data);
-            await queryEditor.settingsDialog.clickButton(ButtonNames.Save);
+            await queryEditor.settingsDialog.clickButton(ButtonNames.Apply);
 
             await queryEditor.clickExplainButton();
             await pendingQuery.waitUntilStarted();
@@ -909,7 +909,7 @@ test.describe('Test Query Editor', async () => {
         await queryEditor.setQuery(testQuery);
         await queryEditor.clickGearButton();
         await queryEditor.settingsDialog.changeStatsLevel(STATISTICS_MODES.profile);
-        await queryEditor.settingsDialog.clickButton(ButtonNames.Save);
+        await queryEditor.settingsDialog.clickButton(ButtonNames.Apply);
         await queryEditor.clickRunButton();
         await expect(queryEditor.resultTable.isVisible()).resolves.toBe(true);
         await queryEditor.paneWrapper.selectTab(ResultTabNames.ExecutionPlan);
@@ -923,7 +923,7 @@ test.describe('Test Query Editor', async () => {
         await queryEditor.setQuery(testQuery);
         await queryEditor.clickGearButton();
         await queryEditor.settingsDialog.changeStatsLevel(STATISTICS_MODES.profile);
-        await queryEditor.settingsDialog.clickButton(ButtonNames.Save);
+        await queryEditor.settingsDialog.clickButton(ButtonNames.Apply);
         await queryEditor.clickRunButton();
         await expect(queryEditor.resultTable.isVisible()).resolves.toBe(true);
         await queryEditor.queryTabs.selectTab(QueryTabs.History);
@@ -938,7 +938,7 @@ test.describe('Test Query Editor', async () => {
         await queryEditor.setQuery(testQuery);
         await queryEditor.clickGearButton();
         await queryEditor.settingsDialog.changeStatsLevel(STATISTICS_MODES.profile);
-        await queryEditor.settingsDialog.clickButton(ButtonNames.Save);
+        await queryEditor.settingsDialog.clickButton(ButtonNames.Apply);
         await queryEditor.clickRunButton();
         await expect(queryEditor.resultTable.isVisible()).resolves.toBe(true);
         await tenantPage.selectNavigationTab(NavigationTabs.Diagnostics);
@@ -968,7 +968,7 @@ test.describe('Test Query Editor', async () => {
         await queryEditor.setQuery(longTableSelect());
         await queryEditor.clickGearButton();
         await queryEditor.settingsDialog.changeLimitRows(1);
-        await queryEditor.settingsDialog.clickButton(ButtonNames.Save);
+        await queryEditor.settingsDialog.clickButton(ButtonNames.Apply);
         await queryEditor.clickRunButton();
         await expect(queryEditor.resultTable.getResultTitleText()).resolves.toBe('Truncated');
         await expect(queryEditor.resultTable.getResultTitleCount()).resolves.toBe('1');
@@ -979,7 +979,7 @@ test.describe('Test Query Editor', async () => {
         await queryEditor.setQuery(`${longTableSelect(2)}${longTableSelect(2)}`);
         await queryEditor.clickGearButton();
         await queryEditor.settingsDialog.changeLimitRows(3);
-        await queryEditor.settingsDialog.clickButton(ButtonNames.Save);
+        await queryEditor.settingsDialog.clickButton(ButtonNames.Apply);
         await queryEditor.clickRunButton();
         await expect(queryEditor.resultTable.getResultTabsCount()).resolves.toBe(2);
         await expect(queryEditor.resultTable.getResultTabTitleText(1)).resolves.toBe(
@@ -1250,7 +1250,7 @@ test.describe('Test Query Editor', async () => {
 
         await queryEditor.clickGearButton();
         await queryEditor.settingsDialog.changePragmas('PRAGMA InvalidPragma;');
-        await queryEditor.settingsDialog.clickButton(ButtonNames.Save);
+        await queryEditor.settingsDialog.clickButton(ButtonNames.Apply);
 
         await page.route(`${backend}/viewer/json/query?*`, async (route) => {
             await route.fulfill({
@@ -1427,7 +1427,7 @@ test.describe('Test Query Editor', async () => {
             await queryEditor.setQuery(simpleQuery);
             await queryEditor.clickGearButton();
             await queryEditor.settingsDialog.changeStatsLevel(STATISTICS_MODES.none);
-            await queryEditor.settingsDialog.clickButton(ButtonNames.Save);
+            await queryEditor.settingsDialog.clickButton(ButtonNames.Apply);
 
             // Execute query
             await queryEditor.clickRunButton();
@@ -1453,7 +1453,7 @@ test.describe('Test Query Editor', async () => {
             await queryEditor.setQuery(simpleQuery);
             await queryEditor.clickGearButton();
             await queryEditor.settingsDialog.changeStatsLevel(STATISTICS_MODES.basic);
-            await queryEditor.settingsDialog.clickButton(ButtonNames.Save);
+            await queryEditor.settingsDialog.clickButton(ButtonNames.Apply);
 
             // Execute query
             await queryEditor.clickRunButton();

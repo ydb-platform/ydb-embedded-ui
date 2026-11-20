@@ -7,7 +7,7 @@ import type {QuerySettings} from '../../types/store/query';
 import {
     DEFAULT_QUERY_SETTINGS,
     TRANSACTION_MODES,
-    isStreamingSupportedForMode,
+    getEffectiveQueryTimeout,
     querySettingsRestoreSchema,
 } from '../query';
 
@@ -26,10 +26,7 @@ export const useQueryExecutionSettings = () => {
 
     const settings: QuerySettings = {
         ...validatedSettings,
-        timeout:
-            enableQueryStreaming && isStreamingSupportedForMode(validatedSettings.queryMode)
-                ? validatedSettings.timeout || null
-                : validatedSettings.timeout || undefined,
+        timeout: getEffectiveQueryTimeout(validatedSettings, enableQueryStreaming),
         tracingLevel: enableTracingLevel
             ? validatedSettings.tracingLevel
             : DEFAULT_QUERY_SETTINGS.tracingLevel,
