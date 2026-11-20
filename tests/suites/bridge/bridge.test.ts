@@ -101,6 +101,38 @@ test.describe('Bridge mode - Storage groups', () => {
         const headers = await table.getHeaders();
         expect(headers.join(' ')).not.toContain('Bridge pile');
     });
+
+    test('on: preserves unrecognised sync status group names', async ({page}) => {
+        await page.route('**/viewer/capabilities', (route) =>
+            route.fulfill({
+                json: {
+                    Settings: {Cluster: {BridgeModeEnabled: true}},
+                    Capabilities: {'/storage/groups': 17},
+                },
+            }),
+        );
+        await page.route('**/storage/groups?*', (route) =>
+            route.fulfill({
+                json: {
+                    FoundGroups: 7,
+                    TotalGroups: 7,
+                    StorageGroupGroups: [
+                        {GroupName: 'WAITING_FOR_QUORUM', GroupCount: '3'},
+                        {GroupName: 'RETRYING', GroupCount: '3'},
+                        {GroupName: 'UNKNOWN', GroupCount: '1'},
+                    ],
+                },
+            }),
+        );
+
+        await new StoragePage(page).goto({
+            type: 'groups',
+            storageGroupsGroupBy: 'BridgeSyncStatus',
+        });
+        await expect(page.getByRole('button', {name: /^WAITING_FOR_QUORUM/})).toBeVisible();
+        await expect(page.getByRole('button', {name: /^RETRYING/})).toBeVisible();
+        await expect(page.getByRole('button', {name: /^Unknown/})).toBeVisible();
+    });
 });
 
 test.describe('Bridge mode - Storage group page', () => {

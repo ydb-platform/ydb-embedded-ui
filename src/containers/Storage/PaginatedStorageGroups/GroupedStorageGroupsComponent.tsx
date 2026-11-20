@@ -65,7 +65,7 @@ export const StorageGroupGroup = React.memo(function StorageGroupGroup({
             key={name}
             title={name}
             titleContent={
-                filterGroupBy === 'BridgeSyncStatus' ? (
+                filterGroupBy === 'BridgeSyncStatus' && syncStatus !== undefined ? (
                     <Flex as="span" alignItems="center">
                         <BridgeSyncStatusLabel
                             status={syncStatus}
