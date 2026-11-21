@@ -358,6 +358,8 @@ test('tablet groups load on click, filter degraded groups and restore the mode',
     const tabletId = TABLETS[0].TabletId;
     const healthy = {NodeId: 1, PDiskId: 1, DDiskSlotId: 1010};
     const failed = {NodeId: 2, PDiskId: 1, DDiskSlotId: 1010};
+    const healthyMembers = [healthy, {...healthy, NodeId: 3}, {...healthy, NodeId: 4}];
+    const unknown = {...healthy, NodeId: 5};
     await page.route('**/cms/api/json/ddisk/tablets?*', (route) =>
         route.fulfill({
             json: {
@@ -376,35 +378,40 @@ test('tablet groups load on click, filter degraded groups and restore the mode',
                 Status: 'OK',
                 TabletId: tabletId,
                 Revision: 1,
+                RequiredReadyMembers: 3,
                 Slots: [
-                    healthy,
+                    ...healthyMembers.map((disk) => ({
+                        ...disk,
+                        DDiskStatus: 'Ready',
+                        PersistentBufferStatus: 'Ready',
+                    })),
                     {
                         ...failed,
+                        DDiskStatus: 'Ready',
                         PersistentBufferId: '[2:5893148750:1010]',
+                        PersistentBufferStatus: 'Broken',
+                        PersistentBufferStatusReason: 'PB I/O error',
                     },
+                    unknown,
                 ],
                 Groups: [
                     {
                         DirectBlockGroupId: 100,
                         NumVChunksClaimed: 1,
-                        DDiskId: [healthy],
-                        DDiskHealth: [{Status: 'Ready'}],
-                        UnavailableDDiskCount: 0,
-                        UnknownDDiskCount: 0,
-                        MonitoredQuorum: 'Quorum',
+                        DDiskId: healthyMembers,
+                        PersistentBufferDDiskId: healthyMembers,
                     },
                     {
                         DirectBlockGroupId: 101,
                         NumVChunksClaimed: 2,
-                        DDiskId: [failed],
-                        DDiskHealth: [{Status: 'Ready'}],
-                        UnavailableDDiskCount: 0,
-                        UnknownDDiskCount: 0,
-                        PersistentBufferDDiskId: [{}, failed],
-                        PersistentBufferHealth: [{}, {Status: 'Broken', Reason: 'PB I/O error'}],
-                        UnavailablePersistentBufferCount: 1,
-                        UnknownPersistentBufferCount: 0,
-                        MonitoredQuorum: 'NoQuorum',
+                        DDiskId: [failed, ...healthyMembers.slice(0, 2)],
+                        PersistentBufferDDiskId: [{}, failed, ...healthyMembers.slice(0, 2)],
+                    },
+                    {
+                        DirectBlockGroupId: 102,
+                        NumVChunksClaimed: 3,
+                        DDiskId: [unknown, ...healthyMembers.slice(0, 2)],
+                        PersistentBufferDDiskId: healthyMembers,
                     },
                 ],
             },
@@ -423,12 +430,19 @@ test('tablet groups load on click, filter degraded groups and restore the mode',
     await button.click();
     await expect(page.getByText('100', {exact: true})).toBeVisible();
     await expect(page.getByText('101', {exact: true})).toBeVisible();
+    await expect(page.getByText('Quorum', {exact: true})).toBeVisible();
+    const unknownGroup = page.getByRole('row').filter({
+        has: page.getByRole('cell', {name: '102', exact: true}),
+    });
+    await expect(unknownGroup.getByRole('cell', {name: 'No data', exact: true})).toBeVisible();
+    await expect(unknownGroup.getByText('0 unavailable · 1 unknown', {exact: true})).toBeVisible();
     expect(snapshots).toContain(tabletId);
     expect(inventoryRequests).toBe(0);
     await page.getByLabel('Show groups', {exact: true}).click();
     await page.getByRole('option', {name: 'Groups with problems', exact: true}).click();
     await expect(page.getByText('100', {exact: true})).not.toBeVisible();
     await expect(page.getByText('101', {exact: true})).toBeVisible();
+    await expect(page.getByText('102', {exact: true})).not.toBeVisible();
     await expect(page).toHaveURL(/nbsGroupsMode=degraded/);
     await page.reload();
     await expect(page.getByLabel('Show groups', {exact: true})).toContainText(
@@ -453,6 +467,7 @@ test('tablet groups load on click, filter degraded groups and restore the mode',
     );
     const buffer = page.getByRole('button', {name: 'Persistent Buffer 2:1:1010', exact: true});
     await expect(buffer).toHaveClass(/ydb-ddisk_failed/);
+    await expect(buffer).toHaveAttribute('aria-description', /PB I\/O error/);
     await page.screenshot({path: testInfo.outputPath('tablet-degraded-groups.png')});
     await buffer.hover();
     await expect(

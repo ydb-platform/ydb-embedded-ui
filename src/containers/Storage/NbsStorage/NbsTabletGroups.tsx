@@ -9,9 +9,9 @@ import {PAGINATED_TABLE_IDS, PaginatedTable} from '../../../components/Paginated
 import type {Column, FetchData} from '../../../components/PaginatedTable';
 import {PaginatedTableWithLayout} from '../../../components/PaginatedTable/PaginatedTableWithLayout';
 import {backend, clusterName, environment} from '../../../store';
-import {diskKey, isAllocated} from '../../../store/reducers/storage/getNbsTabletGroups';
+import type {NbsTabletGroup} from '../../../store/reducers/storage/getNbsTabletGroups';
+import {diskKey} from '../../../store/reducers/storage/getNbsTabletGroups';
 import {storageApi} from '../../../store/reducers/storage/storage';
-import type {NbsDirectBlockGroup, NbsDisk, NbsMemberHealth} from '../../../types/api/nbs';
 import {cn} from '../../../utils/cn';
 import {EMPTY_DATA_PLACEHOLDER} from '../../../utils/constants';
 import {useAutoRefreshInterval} from '../../../utils/hooks';
@@ -50,13 +50,13 @@ export function NbsTabletGroups({
         return mode === 'degraded'
             ? groups.filter(
                   (group) =>
-                      (group.UnavailableDDiskCount ?? 0) > 0 ||
-                      (group.UnavailablePersistentBufferCount ?? 0) > 0 ||
-                      group.MonitoredQuorum === 'NoQuorum',
+                      group.disks.unavailable > 0 ||
+                      group.buffers.unavailable > 0 ||
+                      group.quorum === 'NoQuorum',
               )
             : groups;
     }, [currentData, mode]);
-    const fetchData = React.useCallback<FetchData<NbsDirectBlockGroup, typeof filters>>(
+    const fetchData = React.useCallback<FetchData<NbsTabletGroup, typeof filters>>(
         async ({offset = 0, limit = 20}) => {
             return {
                 data: rows.slice(offset, offset + limit),
@@ -66,46 +66,27 @@ export function NbsTabletGroups({
         },
         [currentData, rows],
     );
-    const columns = React.useMemo<Column<NbsDirectBlockGroup>[]>(() => {
-        const slots = new Map((currentData?.slots ?? []).map((slot) => [diskKey(slot), slot]));
+    const slots = currentData?.slots;
+    const columns = React.useMemo<Column<NbsTabletGroup>[]>(() => {
         const renderMembers = (
             role: 'ddisk' | 'buffer',
-            unavailable?: number,
-            unknown?: number,
-            ids: NbsDisk['DiskId'][] = [],
-            health: NbsMemberHealth[] = [],
+            {ids, unavailable, unknown}: NbsTabletGroup['disks'],
         ) => {
-            const members = ids.flatMap((id, index) => {
-                const roleStatus: NbsMemberHealth = health[index] ?? {};
-                return isAllocated(id) ? [{id, roleStatus, index}] : [];
-            });
             return (
                 <Flex direction="column" gap={1}>
-                    {members.length ? (
+                    {ids.length ? (
                         <Flex gap={1}>
-                            {members.map(({id, roleStatus, index}) => {
+                            {ids.map((id, index) => {
                                 const key = diskKey(id);
-                                const disk = slots.get(key);
-                                const selectedRole =
-                                    role === 'ddisk'
-                                        ? {
-                                              DDiskStatus: roleStatus.Status,
-                                              DDiskStatusReason: roleStatus.Reason,
-                                          }
-                                        : {
-                                              PersistentBufferStatus: roleStatus.Status,
-                                              PersistentBufferStatusReason: roleStatus.Reason,
-                                          };
+                                const disk = slots?.[key];
                                 return (
                                     <div className={b('disk')} key={key + ':' + index}>
                                         <DDisk
                                             compact
                                             role={role}
-                                            roleStatus={roleStatus}
                                             data={{
-                                                ...disk,
                                                 ...id,
-                                                ...selectedRole,
+                                                ...disk,
                                                 AllocatedSize: disk?.AllocatedSize?.toString(),
                                                 AvailableSize: disk?.AvailableSize?.toString(),
                                                 TotalSize: disk?.TotalSize?.toString(),
@@ -118,11 +99,9 @@ export function NbsTabletGroups({
                     ) : (
                         EMPTY_DATA_PLACEHOLDER
                     )}
-                    {unavailable !== undefined && unknown !== undefined && (
-                        <Text variant="caption-2" color="secondary">
-                            {i18n('member-counts', {unavailable, unknown})}
-                        </Text>
-                    )}
+                    <Text variant="caption-2" color="secondary">
+                        {i18n('member-counts', {unavailable, unknown})}
+                    </Text>
                 </Flex>
             );
         };
@@ -140,7 +119,7 @@ export function NbsTabletGroups({
                 header: i18n('monitored-quorum'),
                 width: 160,
                 render: ({row}) => {
-                    switch (row.MonitoredQuorum) {
+                    switch (row.quorum) {
                         case 'Quorum':
                             return <Label theme="success">{i18n('quorum')}</Label>;
                         case 'NoQuorum':
@@ -162,31 +141,17 @@ export function NbsTabletGroups({
                 name: 'disks',
                 header: i18n('disk'),
                 width: 200,
-                render: ({row}) =>
-                    renderMembers(
-                        'ddisk',
-                        row.UnavailableDDiskCount,
-                        row.UnknownDDiskCount,
-                        row.DDiskId,
-                        row.DDiskHealth,
-                    ),
+                render: ({row}) => renderMembers('ddisk', row.disks),
             },
             {
                 align: 'left',
                 name: 'buffers',
                 header: i18n('buffer'),
                 width: 200,
-                render: ({row}) =>
-                    renderMembers(
-                        'buffer',
-                        row.UnavailablePersistentBufferCount,
-                        row.UnknownPersistentBufferCount,
-                        row.PersistentBufferDDiskId,
-                        row.PersistentBufferHealth,
-                    ),
+                render: ({row}) => renderMembers('buffer', row.buffers),
             },
         ];
-    }, [currentData]);
+    }, [slots]);
     return (
         <div className={b()}>
             <Flex alignItems="center" gap={2} className={b('controls')}>
@@ -208,7 +173,7 @@ export function NbsTabletGroups({
                     ) : currentData ? (
                         <PaginatedTableWithLayout
                             table={
-                                <PaginatedTable<NbsDirectBlockGroup, typeof filters>
+                                <PaginatedTable<NbsTabletGroup, typeof filters>
                                     tableName={PAGINATED_TABLE_IDS.NBS_TABLET_GROUPS}
                                     columns={columns}
                                     fetchData={fetchData}

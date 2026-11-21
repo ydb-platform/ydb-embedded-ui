@@ -29,8 +29,6 @@ const percent = (value?: number) =>
 const bytes = (value?: string) =>
     value === undefined ? EMPTY_DATA_PLACEHOLDER : formatBytes({value});
 
-type ComponentHealth = {Status?: DDiskComponentStatus; Reason?: string};
-
 function formatHealth(status?: DDiskComponentStatus, reason?: string) {
     const labels = {
         Ready: i18n('state_ready'),
@@ -139,7 +137,6 @@ export function DDisk({
     pDiskState,
     unavailable = false,
     role,
-    roleStatus,
     showInventoryLink,
 }: {
     data: TDDiskStateInfo;
@@ -147,7 +144,6 @@ export function DDisk({
     pDiskState?: TPDiskState;
     unavailable?: boolean;
     role?: 'ddisk' | 'buffer';
-    roleStatus?: ComponentHealth;
     showInventoryLink?: boolean;
 }) {
     const [focused, setFocused] = React.useState(false);
@@ -161,7 +157,7 @@ export function DDisk({
         Reason: data.PersistentBufferStatusReason,
     };
     const health = role
-        ? [roleStatus ?? (role === 'buffer' ? bufferHealth : ddiskHealth)]
+        ? [role === 'buffer' ? bufferHealth : ddiskHealth]
         : [ddiskHealth, bufferHealth];
     const failed =
         pDiskFailed ||

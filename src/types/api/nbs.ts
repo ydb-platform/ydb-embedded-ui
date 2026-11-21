@@ -63,24 +63,20 @@ export interface NbsListResponse {
     Groups?: {Name: string; Count: number}[];
 }
 
-export interface NbsMemberHealth {
-    Status?: DDiskComponentStatus;
-    Reason?: string;
-}
+export type NbsGroupMemberId = Partial<NbsDisk['DiskId']>;
+export type NbsMonitoredQuorum = 'Quorum' | 'NoQuorum' | 'Unknown';
 
 export interface NbsDirectBlockGroup {
     DirectBlockGroupId?: string | number;
     NumVChunksClaimed?: number;
-    DDiskId?: NbsDisk['DiskId'][];
-    PersistentBufferDDiskId?: NbsDisk['DiskId'][];
-    DDiskHealth?: NbsMemberHealth[];
-    PersistentBufferHealth?: NbsMemberHealth[];
-    UnavailableDDiskCount?: number;
-    UnavailablePersistentBufferCount?: number;
-    UnknownDDiskCount?: number;
-    UnknownPersistentBufferCount?: number;
-    MonitoredQuorum?: 'Quorum' | 'NoQuorum' | 'Unknown';
+    DDiskId?: NbsGroupMemberId[];
+    PersistentBufferDDiskId?: NbsGroupMemberId[];
+    /** Health capability marker from CMS versions before RequiredReadyMembers. */
+    MonitoredQuorum?: NbsMonitoredQuorum;
 }
+
+export type NbsTabletSlot = Omit<TDDiskStateInfo, 'AllocatedSize' | 'AvailableSize' | 'TotalSize'> &
+    Pick<NbsDisk, 'AllocatedSize' | 'AvailableSize' | 'TotalSize'>;
 
 export interface NbsTabletResponse {
     Status?: string;
@@ -88,6 +84,6 @@ export interface NbsTabletResponse {
     TabletId?: string;
     Revision?: string | number;
     Groups?: NbsDirectBlockGroup[];
-    Slots?: (Omit<TDDiskStateInfo, 'AllocatedSize' | 'AvailableSize' | 'TotalSize'> &
-        Pick<NbsDisk, 'AllocatedSize' | 'AvailableSize' | 'TotalSize'>)[];
+    Slots?: NbsTabletSlot[];
+    RequiredReadyMembers?: number;
 }

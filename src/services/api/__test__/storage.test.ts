@@ -82,14 +82,22 @@ test('tablet snapshot errors remain visible', async () => {
     await expect(api.getNbsTablet('41')).rejects.toThrow('DDisk snapshot is not available');
 });
 
-test('a legacy tablet snapshot is distinct from unknown observed quorum', async () => {
-    const group = {DirectBlockGroupId: 1};
-    const legacy = createApi({Status: 'OK', Groups: [group]});
+test('tablet health accepts a ready-member threshold or an older quorum marker', async () => {
+    const group = {DirectBlockGroupId: 1, DDiskId: [{}]};
+    const snapshot = {Status: 'OK', Groups: [group]};
+    const legacy = createApi(snapshot);
     await expect(legacy.api.getNbsTablet('41')).rejects.toThrow(
         'CMS does not support NBS tablet health',
     );
 
-    const result = {Status: 'OK', Groups: [{...group, MonitoredQuorum: 'Unknown'}]};
-    const current = createApi(result);
-    await expect(current.api.getNbsTablet('41')).resolves.toEqual(result);
+    const prerelease = {...snapshot, Groups: [{...group, MonitoredQuorum: 'Unknown'}]};
+    await expect(createApi(prerelease).api.getNbsTablet('41')).resolves.toEqual(prerelease);
+
+    const current = {...snapshot, RequiredReadyMembers: 3};
+    await expect(createApi(current).api.getNbsTablet('41')).resolves.toEqual(current);
+
+    const invalid = {...snapshot, RequiredReadyMembers: 0};
+    await expect(createApi(invalid).api.getNbsTablet('41')).rejects.toThrow(
+        'CMS does not support NBS tablet health',
+    );
 });
