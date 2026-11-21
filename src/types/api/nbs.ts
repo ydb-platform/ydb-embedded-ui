@@ -64,15 +64,12 @@ export interface NbsListResponse {
 }
 
 export type NbsGroupMemberId = Partial<NbsDisk['DiskId']>;
-export type NbsMonitoredQuorum = 'Quorum' | 'NoQuorum' | 'Unknown';
 
 export interface NbsDirectBlockGroup {
     DirectBlockGroupId?: string | number;
     NumVChunksClaimed?: number;
     DDiskId?: NbsGroupMemberId[];
     PersistentBufferDDiskId?: NbsGroupMemberId[];
-    /** Health capability marker from CMS versions before RequiredReadyMembers. */
-    MonitoredQuorum?: NbsMonitoredQuorum;
 }
 
 export type NbsTabletSlot = Omit<TDDiskStateInfo, 'AllocatedSize' | 'AvailableSize' | 'TotalSize'> &
@@ -85,5 +82,4 @@ export interface NbsTabletResponse {
     Revision?: string | number;
     Groups?: NbsDirectBlockGroup[];
     Slots?: NbsTabletSlot[];
-    RequiredReadyMembers?: number;
 }

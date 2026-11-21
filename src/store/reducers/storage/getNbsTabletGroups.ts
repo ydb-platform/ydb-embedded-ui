@@ -1,11 +1,7 @@
-import type {
-    NbsDirectBlockGroup,
-    NbsGroupMemberId,
-    NbsMonitoredQuorum,
-    NbsTabletSlot,
-} from '../../../types/api/nbs';
+import type {NbsDirectBlockGroup, NbsGroupMemberId, NbsTabletSlot} from '../../../types/api/nbs';
 
 type TabletSlots = Partial<Record<string, NbsTabletSlot>>;
+type NbsMonitoredQuorum = 'Quorum' | 'NoQuorum' | 'Unknown';
 
 interface GroupMembers {
     ids: NbsGroupMemberId[];
@@ -20,8 +16,6 @@ export interface NbsTabletGroup
     buffers: GroupMembers;
     quorum: NbsMonitoredQuorum;
 }
-
-const LEGACY_REQUIRED_READY_MEMBERS = 3;
 
 export function diskKey(id: NbsGroupMemberId) {
     return `${id.NodeId ?? 0}:${id.PDiskId ?? 0}:${id.DDiskSlotId ?? 0}`;
@@ -50,18 +44,17 @@ function countMembers(
     return members;
 }
 
-function estimateQuorum(
-    disks: GroupMembers,
-    buffers: GroupMembers,
-    requiredReady: number,
-): NbsMonitoredQuorum {
+function estimateQuorum(disks: GroupMembers, buffers: GroupMembers): NbsMonitoredQuorum {
+    // The UI estimates a majority of each allocated role independently of the NBS runtime.
+    const diskMajority = Math.floor(disks.ids.length / 2) + 1;
+    const bufferMajority = Math.floor(buffers.ids.length / 2) + 1;
     if (
-        disks.ready + disks.unknown < requiredReady ||
-        buffers.ready + buffers.unknown < requiredReady
+        disks.ready + disks.unknown < diskMajority ||
+        buffers.ready + buffers.unknown < bufferMajority
     ) {
         return 'NoQuorum';
     }
-    if (disks.ready >= requiredReady && buffers.ready >= requiredReady) {
+    if (disks.ready >= diskMajority && buffers.ready >= bufferMajority) {
         return 'Quorum';
     }
     return 'Unknown';
@@ -72,7 +65,6 @@ export async function getTabletGroups(tabletId: string, signal: AbortSignal) {
     const slots: TabletSlots = Object.fromEntries(
         (snapshot.Slots ?? []).map((slot) => [diskKey(slot), slot]),
     );
-    const requiredReady = snapshot.RequiredReadyMembers ?? LEGACY_REQUIRED_READY_MEMBERS;
     const groups = (snapshot.Groups ?? []).map((group): NbsTabletGroup => {
         const disks = countMembers(group.DDiskId, slots, 'DDiskStatus');
         const buffers = countMembers(
@@ -85,7 +77,7 @@ export async function getTabletGroups(tabletId: string, signal: AbortSignal) {
             NumVChunksClaimed: group.NumVChunksClaimed,
             disks,
             buffers,
-            quorum: estimateQuorum(disks, buffers, requiredReady),
+            quorum: estimateQuorum(disks, buffers),
         };
     });
     return {groups, slots};

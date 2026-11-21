@@ -340,7 +340,16 @@ test('old CMS tablet layouts report unavailable health during a rolling upgrade'
     );
     await page.route('**/cms/api/json/ddisk/tablet?*', (route) =>
         route.fulfill({
-            json: {Status: 'OK', TabletId: tablet.TabletId, Groups: [{DirectBlockGroupId: '100'}]},
+            json: {
+                Status: 'OK',
+                TabletId: tablet.TabletId,
+                Groups: [
+                    {
+                        DirectBlockGroupId: '100',
+                        DDiskId: [{NodeId: 1, PDiskId: 1, DDiskSlotId: 1010}],
+                    },
+                ],
+            },
         }),
     );
     await new PageModel(page, 'cluster/storage', {type: 'nbs'}).goto();
@@ -359,7 +368,10 @@ test('tablet groups load on click, filter degraded groups and restore the mode',
     const healthy = {NodeId: 1, PDiskId: 1, DDiskSlotId: 1010};
     const failed = {NodeId: 2, PDiskId: 1, DDiskSlotId: 1010};
     const healthyMembers = [healthy, {...healthy, NodeId: 3}, {...healthy, NodeId: 4}];
-    const unknown = {...healthy, NodeId: 5};
+    const unknownMembers = [
+        {...healthy, NodeId: 5},
+        {...healthy, NodeId: 6},
+    ];
     await page.route('**/cms/api/json/ddisk/tablets?*', (route) =>
         route.fulfill({
             json: {
@@ -378,7 +390,6 @@ test('tablet groups load on click, filter degraded groups and restore the mode',
                 Status: 'OK',
                 TabletId: tabletId,
                 Revision: 1,
-                RequiredReadyMembers: 3,
                 Slots: [
                     ...healthyMembers.map((disk) => ({
                         ...disk,
@@ -392,7 +403,7 @@ test('tablet groups load on click, filter degraded groups and restore the mode',
                         PersistentBufferStatus: 'Broken',
                         PersistentBufferStatusReason: 'PB I/O error',
                     },
-                    unknown,
+                    ...unknownMembers,
                 ],
                 Groups: [
                     {
@@ -405,12 +416,12 @@ test('tablet groups load on click, filter degraded groups and restore the mode',
                         DirectBlockGroupId: 101,
                         NumVChunksClaimed: 2,
                         DDiskId: [failed, ...healthyMembers.slice(0, 2)],
-                        PersistentBufferDDiskId: [{}, failed, ...healthyMembers.slice(0, 2)],
+                        PersistentBufferDDiskId: [failed, healthy],
                     },
                     {
                         DirectBlockGroupId: 102,
                         NumVChunksClaimed: 3,
-                        DDiskId: [unknown, ...healthyMembers.slice(0, 2)],
+                        DDiskId: [...unknownMembers, ...healthyMembers.slice(0, 2)],
                         PersistentBufferDDiskId: healthyMembers,
                     },
                 ],
@@ -435,7 +446,7 @@ test('tablet groups load on click, filter degraded groups and restore the mode',
         has: page.getByRole('cell', {name: '102', exact: true}),
     });
     await expect(unknownGroup.getByRole('cell', {name: 'No data', exact: true})).toBeVisible();
-    await expect(unknownGroup.getByText('0 unavailable · 1 unknown', {exact: true})).toBeVisible();
+    await expect(unknownGroup.getByText('0 unavailable · 2 unknown', {exact: true})).toBeVisible();
     expect(snapshots).toContain(tabletId);
     expect(inventoryRequests).toBe(0);
     await page.getByLabel('Show groups', {exact: true}).click();

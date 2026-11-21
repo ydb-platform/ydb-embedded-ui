@@ -82,22 +82,25 @@ test('tablet snapshot errors remain visible', async () => {
     await expect(api.getNbsTablet('41')).rejects.toThrow('DDisk snapshot is not available');
 });
 
-test('tablet health accepts a ready-member threshold or an older quorum marker', async () => {
-    const group = {DirectBlockGroupId: 1, DDiskId: [{}]};
-    const snapshot = {Status: 'OK', Groups: [group]};
-    const legacy = createApi(snapshot);
-    await expect(legacy.api.getNbsTablet('41')).rejects.toThrow(
-        'CMS does not support NBS tablet health',
-    );
+test.each(['DDiskId', 'PersistentBufferDDiskId'])(
+    'tablet health needs inline slots when %s has allocations',
+    async (role) => {
+        const id = {NodeId: 1, PDiskId: 1, DDiskSlotId: 1010};
+        const group = {DirectBlockGroupId: 1, [role]: [id]};
+        const snapshot = {Status: 'OK', Groups: [group]};
+        await expect(createApi(snapshot).api.getNbsTablet('41')).rejects.toThrow(
+            'CMS does not support NBS tablet health',
+        );
 
-    const prerelease = {...snapshot, Groups: [{...group, MonitoredQuorum: 'Unknown'}]};
-    await expect(createApi(prerelease).api.getNbsTablet('41')).resolves.toEqual(prerelease);
+        const current = {...snapshot, Slots: [{...id, HasWhiteboardData: false}]};
+        await expect(createApi(current).api.getNbsTablet('41')).resolves.toEqual(current);
+    },
+);
 
-    const current = {...snapshot, RequiredReadyMembers: 3};
-    await expect(createApi(current).api.getNbsTablet('41')).resolves.toEqual(current);
-
-    const invalid = {...snapshot, RequiredReadyMembers: 0};
-    await expect(createApi(invalid).api.getNbsTablet('41')).rejects.toThrow(
-        'CMS does not support NBS tablet health',
-    );
+test('tablet health omits slots when there are no allocated members', async () => {
+    const snapshot = {
+        Status: 'OK',
+        Groups: [{DirectBlockGroupId: 1, DDiskId: [{}, {}], PersistentBufferDDiskId: [{}]}],
+    };
+    await expect(createApi(snapshot).api.getNbsTablet('41')).resolves.toEqual(snapshot);
 });
