@@ -15,6 +15,7 @@ import type {
 import {PAGINATED_TABLE_IDS, ResizeablePaginatedTable} from '../../../components/PaginatedTable';
 import {NODES_COLUMNS_IDS} from '../../../components/nodesColumns/constants';
 import type {NodesColumn} from '../../../components/nodesColumns/types';
+import {useViewerNodesHasDDisks} from '../../../store/reducers/capabilities/hooks';
 import {VISIBLE_ENTITIES} from '../../../store/reducers/storage/constants';
 import type {PreparedStorageNode, VisibleEntities} from '../../../store/reducers/storage/types';
 import type {NodesGroupByField} from '../../../types/api/nodes';
@@ -84,10 +85,12 @@ export const PaginatedStorageNodesTable = ({
     const history = useHistory();
     const fetchNodes = useDatacenterNodesFetcher(getStorageNodes);
     const {hideUnavailable} = useHideUnavailableNodes();
+    const includeDDisks = useViewerNodesHasDDisks();
     const tableFilters = React.useMemo(() => {
         return {
             searchValue,
             hideUnavailable,
+            includeDDisks,
             visibleEntities,
             nodesUptimeFilter,
             database,
@@ -98,6 +101,7 @@ export const PaginatedStorageNodesTable = ({
         };
     }, [
         hideUnavailable,
+        includeDDisks,
         searchValue,
         visibleEntities,
         nodesUptimeFilter,

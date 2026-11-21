@@ -32,6 +32,7 @@ export const getStorageNodes: FetchData<
     const {
         searchValue,
         hideUnavailable,
+        includeDDisks,
         nodesUptimeFilter,
         visibleEntities,
         database,
@@ -50,6 +51,7 @@ export const getStorageNodes: FetchData<
     const response = await window.api.viewer.getNodes({
         type,
         storage,
+        includeDDisks,
         limit,
         offset,
         sort,

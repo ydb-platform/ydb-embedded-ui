@@ -23,6 +23,7 @@ export type StorageType = z.infer<typeof storageTypeSchema>;
 export interface PreparedStorageNodeFilters {
     searchValue: string;
     hideUnavailable?: boolean;
+    includeDDisks?: boolean;
     nodesUptimeFilter: NodesUptimeFilterValues;
     visibleEntities: VisibleEntities;
 
@@ -44,6 +45,7 @@ export interface PreparedStorageNode
     Tablets?: TTabletStateInfo[];
 
     Missing: number;
+    MissingDDiskSlots?: number;
     MaximumSlotsPerDisk: number;
     MaximumDisksPerNode: number;
 

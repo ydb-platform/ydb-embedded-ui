@@ -1,3 +1,4 @@
+import type {TDDiskStateInfo} from './ddisk';
 import type {ECapacityAlert, EFlag} from './enums';
 import type {TVDiskStateInfo, TVSlotEntry} from './vdisk';
 
@@ -97,6 +98,7 @@ export interface TPDiskInfoResponse {
 interface TPDiskInfoWhiteboard {
     PDisk?: TPDiskStateInfo;
     VDisks?: TVDiskStateInfo[];
+    DDisks?: TDDiskStateInfo[];
 }
 
 interface TPDiskInfoBSC {

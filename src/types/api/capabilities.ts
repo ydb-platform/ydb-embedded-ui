@@ -18,8 +18,13 @@ export interface CapabilitiesResponse {
 // Add feature name before using it
 export type Capability =
     | '/pdisk/info'
+    | '/pdisk/info/ddisks'
     | '/scheme/directory'
     | '/storage/groups'
+    | '/storage/nbs'
+    | '/cms/api/json/ddisk/tablets'
+    | '/cms/api/json/ddisk/tablet'
+    | '/cms/api/json/ddisk/disks'
     | '/viewer/storage_stats'
     | '/viewer/query'
     | '/viewer/feature_flags'
@@ -29,6 +34,7 @@ export type Capability =
     | '/vdisk/blobindexstat'
     | '/viewer/nodes'
     | '/viewer/nodes/alive'
+    | '/viewer/nodes/ddisks'
     | '/viewer/peers'
     | '/viewer/acl'
     | '/viewer/topic_data'
