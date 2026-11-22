@@ -21,6 +21,8 @@ export const STORAGE_GROUPS_COLUMNS_IDS = {
     GroupId: 'GroupId',
     PoolName: 'PoolName',
     PileName: 'PileName',
+    BridgeMode: 'BridgeMode',
+    BridgeSyncStatus: 'BridgeSyncStatus',
     MediaType: 'MediaType',
     Erasure: 'Erasure',
     Used: 'Used',
@@ -80,7 +82,13 @@ export const STORAGE_GROUPS_COLUMNS_TITLES = {
         return i18n('type');
     },
     get PileName() {
-        return i18n('pile-name');
+        return i18n('field_bridge-pile');
+    },
+    get BridgeMode() {
+        return i18n('field_bridge-mode');
+    },
+    get BridgeSyncStatus() {
+        return i18n('field_bridge-sync-status');
     },
     get Erasure() {
         return i18n('erasure');
@@ -170,7 +178,10 @@ const STORAGE_GROUPS_COLUMNS_GROUP_BY_TITLES = {
         return i18n('pool-name');
     },
     get PileName() {
-        return i18n('pile-name');
+        return i18n('field_bridge-pile');
+    },
+    get BridgeSyncStatus() {
+        return i18n('field_bridge-sync-status');
     },
     get Kind() {
         return i18n('type');
@@ -198,6 +209,7 @@ const STORAGE_GROUPS_COLUMNS_GROUP_BY_TITLES = {
 const STORAGE_GROUPS_GROUP_BY_PARAMS = [
     'PoolName',
     'PileName',
+    'BridgeSyncStatus',
     'MediaType',
     'Encryption',
     'Erasure',
@@ -218,6 +230,27 @@ export const STORAGE_GROUPS_GROUP_BY_OPTIONS: SelectOption[] = STORAGE_GROUPS_GR
     },
 );
 
+export function getStorageGroupsGroupByOptions(
+    blobMetricsEnabled: boolean,
+    bridgeModeEnabled: boolean,
+    bridgeSyncGroupingAvailable: boolean,
+) {
+    return STORAGE_GROUPS_GROUP_BY_OPTIONS.filter(({value}) => {
+        switch (value) {
+            case 'PileName':
+                return bridgeModeEnabled;
+            case 'BridgeSyncStatus':
+                return bridgeSyncGroupingAvailable;
+            case 'CapacityAlert':
+                return blobMetricsEnabled;
+            case 'Usage':
+                return !blobMetricsEnabled;
+            default:
+                return true;
+        }
+    });
+}
+
 export const storageGroupsGroupByParamSchema = z
     .custom<
         GroupsGroupByField | undefined
@@ -230,6 +263,17 @@ export const GROUPS_COLUMNS_TO_DATA_FIELDS: Record<StorageGroupsColumnId, Groups
     GroupId: ['GroupId'],
     PoolName: ['PoolName'],
     PileName: ['PileName'],
+    BridgeMode: ['BridgeMode'],
+    BridgeSyncStatus: [
+        'BridgeSyncStatus',
+        'BridgeMode',
+        'BridgeGroups',
+        'BridgeSyncLastError',
+        'BridgeSyncLastErrorTimestamp',
+        'BridgeSyncLastProgressTimestamp',
+        'BridgeSyncCopyBytesPerSecond',
+        'BridgeSyncRemainingBytes',
+    ],
     // We display MediaType and Encryption in one Type column
     MediaType: ['MediaType', 'Encryption'],
     Erasure: ['Erasure'],
@@ -256,11 +300,13 @@ export const GROUPS_COLUMNS_TO_DATA_FIELDS: Record<StorageGroupsColumnId, Groups
 
 const STORAGE_GROUPS_COLUMNS_TO_SORT_FIELDS: Record<
     StorageGroupsColumnId,
-    StorageV2SortValue | undefined
+    StorageV2SortValue | 'PileName' | 'BridgeSyncStatus' | undefined
 > = {
     GroupId: 'GroupId',
     PoolName: 'PoolName',
-    PileName: undefined,
+    PileName: 'PileName',
+    BridgeMode: undefined,
+    BridgeSyncStatus: 'BridgeSyncStatus',
     MediaType: 'MediaType',
     Erasure: 'Erasure',
     Used: 'Used',

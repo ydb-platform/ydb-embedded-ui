@@ -12,6 +12,7 @@ interface TableGroupProps {
     children?: React.ReactNode;
 
     title: string;
+    titleContent?: React.ReactNode;
     entityName: string;
     count: string | number;
     expanded: boolean;
@@ -21,6 +22,7 @@ interface TableGroupProps {
 export const TableGroup = ({
     children,
     title,
+    titleContent,
     entityName,
     count,
     expanded = false,
@@ -36,7 +38,7 @@ export const TableGroup = ({
                 <div className={b('title-wrapper')}>
                     <ArrowToggle direction={expanded ? 'top' : 'bottom'} />
                     <div className={b('title')}>
-                        <Text variant="subheader-2">{title}</Text>
+                        {titleContent ?? <Text variant="subheader-2">{title}</Text>}
                         <Text variant="body-2" color="secondary" className={b('count')}>
                             {entityName}: <Label theme="normal">{count}</Label>
                         </Text>

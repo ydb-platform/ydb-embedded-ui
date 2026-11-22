@@ -1,11 +1,14 @@
 import {expect, test} from '@playwright/test';
 
+import {BridgeSyncStatus} from '../../../src/types/api/cluster';
+import {PageModel} from '../../models/PageModel';
 import {backend, nodesPage} from '../../utils/constants';
 import {ClusterPage} from '../cluster/ClusterPage';
 import {ClusterNodesTable, ClusterStorageTable} from '../paginatedTable/paginatedTable';
 import {StoragePage} from '../storage/StoragePage';
 import {VISIBILITY_TIMEOUT} from '../tenant/TenantPage';
 
+import {bridgeVisualCluster} from './fixtures/bridgeVisualScenario';
 import {
     mockBridgeHealthcheck,
     mockBridgeHealthcheckUnavailable,
@@ -16,7 +19,7 @@ import {
     mockClusterWithBridgePiles,
     mockNodesWithPile,
     mockStateStorageReasons,
-    mockStorageGroupsWithPile,
+    mockStorageGroup,
 } from './mocks';
 
 test.describe('Bridge mode - Nodes table', () => {
@@ -51,7 +54,7 @@ test.describe('Bridge mode - Storage nodes', () => {
         await mockCapabilities(page, true);
         await mockNodesWithPile(page);
         const storage = new StoragePage(page);
-        await storage.goto({visible: 'all'}, {waitUntil: 'domcontentloaded'});
+        await storage.goto({visible: 'all', type: 'nodes'}, {waitUntil: 'domcontentloaded'});
         const table = new ClusterStorageTable(page);
         await table.getControls().openColumnSetup();
         await table.getControls().setColumnChecked('PileName');
@@ -63,7 +66,7 @@ test.describe('Bridge mode - Storage nodes', () => {
     test('off: hides Pile Name', async ({page}) => {
         await mockCapabilities(page, false);
         const storage = new StoragePage(page);
-        await storage.goto({visible: 'all'}, {waitUntil: 'domcontentloaded'});
+        await storage.goto({visible: 'all', type: 'nodes'}, {waitUntil: 'domcontentloaded'});
         const table = new ClusterStorageTable(page);
         await table.waitForTableToLoad();
         const headers = await table.getHeaders();
@@ -72,31 +75,255 @@ test.describe('Bridge mode - Storage nodes', () => {
 });
 
 test.describe('Bridge mode - Storage groups', () => {
-    test('on: shows Pile Name and group-by option', async ({page}) => {
+    test('on: shows Bridge pile without sorting on legacy storage', async ({page}) => {
         await mockCapabilities(page, true);
-        await mockStorageGroupsWithPile(page);
-        const storage = new StoragePage(page);
-        await storage.goto({visible: 'all', type: 'groups'}, {waitUntil: 'domcontentloaded'});
-        const table = new ClusterStorageTable(page);
-        await table.getControls().openColumnSetup();
-        await table.getControls().setColumnChecked('PileName');
-        await table.waitForTableToLoad();
-        const headers = await table.getHeaders();
-        expect(headers.join(' ')).toContain('Pile Name');
+        await page.route('**/viewer/json/storage?*', (route) =>
+            route.fulfill({
+                json: {StorageGroups: [{GroupID: '1', PoolName: 'p', PileName: 'r1'}]},
+            }),
+        );
+        await new StoragePage(page).goto({visible: 'all', type: 'groups'});
+
+        const header = page
+            .locator('.ydb-paginated-table__head-cell')
+            .filter({hasText: 'Bridge pile'});
+        await expect(header).toBeVisible();
+        await expect(header).not.toHaveClass(/head-cell_sortable/);
     });
 
-    test('off: hides Pile Name and group-by option', async ({page}) => {
+    test('on: sorts Bridge pile through storage groups', async ({page}) => {
+        await mockCapabilities(page, true, {'/storage/groups': 17});
+        await mockStorageGroup(page, {GroupId: '1', PoolName: 'p', PileName: 'r1'});
+        await new StoragePage(page).goto({visible: 'all', type: 'groups'});
+
+        const header = page
+            .locator('.ydb-paginated-table__head-cell')
+            .filter({hasText: 'Bridge pile'});
+        await expect(header).toHaveClass(/head-cell_sortable/);
+        const sortRequest = page.waitForRequest((request) => {
+            const url = new URL(request.url());
+            return (
+                url.pathname.endsWith('/storage/groups') &&
+                /^[-+]?PileName$/.test(url.searchParams.get('sort') ?? '')
+            );
+        });
+        await header.click();
+        await sortRequest;
+    });
+
+    test('off: hides Bridge pile column', async ({page}) => {
         await mockCapabilities(page, false);
         const storage = new StoragePage(page);
         await storage.goto({visible: 'all', type: 'groups'}, {waitUntil: 'domcontentloaded'});
         const table = new ClusterStorageTable(page);
         await table.waitForTableToLoad();
         const headers = await table.getHeaders();
-        expect(headers.join(' ')).not.toContain('Pile Name');
+        expect(headers.join(' ')).not.toContain('Bridge pile');
+    });
+
+    test('on: preserves unrecognised sync status group names', async ({page}) => {
+        await page.route('**/viewer/capabilities', (route) =>
+            route.fulfill({
+                json: {
+                    Settings: {Cluster: {BridgeModeEnabled: true}},
+                    Capabilities: {'/storage/groups': 17},
+                },
+            }),
+        );
+        await page.route('**/storage/groups?*', (route) =>
+            route.fulfill({
+                json: {
+                    FoundGroups: 7,
+                    TotalGroups: 7,
+                    StorageGroupGroups: [
+                        {GroupName: 'WAITING_FOR_QUORUM', GroupCount: '3'},
+                        {GroupName: 'RETRYING', GroupCount: '3'},
+                        {GroupName: 'UNKNOWN', GroupCount: '1'},
+                    ],
+                },
+            }),
+        );
+
+        await new StoragePage(page).goto({
+            type: 'groups',
+            storageGroupsGroupBy: 'BridgeSyncStatus',
+        });
+        await expect(page.getByRole('button', {name: /^WAITING_FOR_QUORUM/})).toBeVisible();
+        await expect(page.getByRole('button', {name: /^RETRYING/})).toBeVisible();
+        await expect(page.getByRole('button', {name: /^Unknown/})).toBeVisible();
+    });
+});
+
+test.describe('Bridge mode - Storage group page', () => {
+    const groupId = '2147483665';
+    const poolName = 'storage-group-page-test-pool';
+
+    test.beforeEach(async ({page}) => {
+        await mockCapabilities(page, true, {'/storage/groups': 18});
+    });
+
+    test('shows sync details for a Bridge group', async ({page}) => {
+        const stage = 'FUTURE_BRIDGE_STAGE';
+        await mockStorageGroup(page, {
+            GroupId: groupId,
+            PoolName: poolName,
+            BridgeMode: true,
+            BridgeSyncStatus: BridgeSyncStatus.SYNCING,
+            BridgeSyncStage: stage,
+        });
+        await new PageModel(page, 'storageGroup', {groupId}).goto();
+
+        const toggle = page.getByRole('button', {name: /Synchronisation details/});
+        await expect(toggle).toBeVisible();
+        await toggle.click();
+        await expect(page.getByTestId('storage-group-sync-stage')).toContainText(stage);
+    });
+
+    for (const {status, stage} of [
+        {status: BridgeSyncStatus.SYNCING, stage: 'BLOCKS'},
+        {status: BridgeSyncStatus.PENDING},
+        {status: BridgeSyncStatus.SYNCED, stage: 'SYNCED'},
+    ]) {
+        test(`shows sync details for a v17 group with status ${status} without BridgeMode`, async ({
+            page,
+        }) => {
+            await mockCapabilities(page, true, {'/storage/groups': 17});
+            await mockStorageGroup(page, {
+                GroupId: groupId,
+                PoolName: poolName,
+                BridgeSyncStatus: status,
+                BridgeSyncStage: stage,
+            });
+            await new PageModel(page, 'storageGroup', {groupId}).goto();
+
+            await page.getByRole('button', {name: /Synchronisation details/}).click();
+            const stageRow = page.getByTestId('storage-group-sync-stage');
+            await expect(stageRow).toBeVisible();
+            if (stage) {
+                await expect(stageRow).toContainText(stage);
+            }
+            await expect(page.getByText('Sync partners', {exact: true})).toHaveCount(0);
+        });
+    }
+
+    test('hides sync details for an ordinary group in a Bridge cluster', async ({page}) => {
+        await mockStorageGroup(page, {
+            GroupId: groupId,
+            PoolName: poolName,
+            BridgeMode: false,
+            BridgeSyncStatus: BridgeSyncStatus.SYNCING,
+        });
+        await new PageModel(page, 'storageGroup', {groupId}).goto();
+
+        await expect(
+            page
+                .locator('.ydb-storage-group-page__meta')
+                .getByText(`Pool Name: ${poolName}`, {exact: true}),
+        ).toBeVisible();
+        await expect(page.getByText('Synchronisation details', {exact: true})).toHaveCount(0);
     });
 });
 
 test.describe('Bridge mode - Cluster Overview', () => {
+    test('on: uses cluster database counts and ignores legacy per-pile counts', async ({page}) => {
+        await mockCapabilities(page, true);
+        await mockBridgeVisualScenario(page);
+        const bridgeInfo =
+            'BridgeInfo' in bridgeVisualCluster ? bridgeVisualCluster.BridgeInfo : undefined;
+        const piles = bridgeInfo?.Piles?.slice(0, 2);
+        let cluster = {...bridgeVisualCluster, BridgeInfo: {...bridgeInfo, Piles: piles}};
+        await page.route('**/viewer/json/cluster?*', (route) => route.fulfill({json: cluster}));
+        const clusterPage = new ClusterPage(page);
+        await clusterPage.goto();
+
+        await expect(page.getByTestId('bridge-databases-summary')).toHaveCount(1);
+        await expect(page.getByTestId('bridge-databases-SYNCED')).toHaveText('5');
+        await expect(page.getByTestId('bridge-databases-SYNCING')).toHaveText('1');
+        const unknown = page.getByRole('img', {name: 'Sync status: Unknown: 1'});
+        await unknown.focus();
+        await expect(page.getByRole('tooltip')).toContainText('Sync status: Unknown');
+
+        cluster = {
+            ...cluster,
+            BridgeInfo: {
+                ...cluster.BridgeInfo,
+                DatabaseCountsBySyncStatus: {SYNCED: '0', UNKNOWN: '1', NEW_BACKEND_STATUS: '7'},
+            },
+        };
+        await page.reload();
+        await expect(page.getByTestId('bridge-databases-SYNCED')).toHaveText('0');
+        await expect(page.getByTestId('bridge-databases-UNKNOWN')).toHaveText('1');
+        await expect(page.getByTestId('bridge-databases-SYNCING')).toHaveCount(0);
+        await expect(page.getByTestId('bridge-databases-NEW_BACKEND_STATUS')).toHaveCount(0);
+        await expect(page.getByTestId('bridge-databases-summary').getByRole('img')).toHaveCount(2);
+
+        cluster = {
+            ...cluster,
+            Version: 10,
+            BridgeInfo: {
+                ...cluster.BridgeInfo,
+                DatabaseCountsBySyncStatus: undefined,
+                BridgeDatabasesComplete: false,
+                Piles: piles?.map((pile) => ({
+                    ...pile,
+                    DatabaseCountsBySyncStatus: {SYNCED: '3', SYNCING: '2'},
+                })),
+            },
+        };
+        await page.reload();
+        await expect(page.getByTestId('bridge-databases-SYNCED')).toHaveCount(0);
+        await expect(page.getByTestId('bridge-databases-SYNCING')).toHaveCount(0);
+        await expect(page.getByTestId('bridge-databases-summary')).toHaveText('Bridge databases:8');
+        await expect(clusterPage.pileCards).toHaveCount(2);
+        await expect(clusterPage.pileCards.getByRole('link')).toHaveCount(0);
+        const url = page.url();
+        for (const kind of ['storage', 'compute']) {
+            const counter = clusterPage.pileCards.first().getByTestId(`bridge-pile-${kind}-nodes`);
+            await expect(counter).toHaveText('8 / 8 alive');
+            await counter.click();
+            await expect(page).toHaveURL(url);
+        }
+    });
+
+    test('on: distinguishes missing alive counts from zero', async ({page}) => {
+        await mockCapabilities(page, true);
+        await mockBridgeHealthcheck(page);
+        await page.route('**/viewer/json/cluster?*', (route) =>
+            route.fulfill({
+                json: {
+                    Version: 10,
+                    Domain: '/Root',
+                    BridgeInfo: {
+                        BridgeDatabases: '0',
+                        DatabaseCountsBySyncStatus: {SYNCED: '0'},
+                        Piles: [
+                            {Name: 'unknown-alive', StorageNodes: 8, ComputeNodes: 8},
+                            {
+                                Name: 'zero-alive',
+                                StorageNodes: 8,
+                                AliveStorageNodes: 0,
+                                ComputeNodes: 0,
+                                AliveComputeNodes: 0,
+                            },
+                        ],
+                    },
+                },
+            }),
+        );
+        const clusterPage = new ClusterPage(page);
+        await clusterPage.goto();
+        const unknown = clusterPage.pileCards.filter({hasText: 'unknown-alive'});
+        const zero = clusterPage.pileCards.filter({hasText: 'zero-alive'});
+        await expect(unknown.getByTestId('bridge-pile-storage-nodes')).toHaveText('— / 8 alive');
+        await expect(unknown.locator('.ydb-bridge-info-table__nodes-progress')).toHaveCount(0);
+        await expect(unknown.locator('.g-progress')).toHaveCount(0);
+        await expect(zero.getByTestId('bridge-pile-storage-nodes')).toHaveText('0 / 8 alive');
+        await expect(zero.getByTestId('bridge-pile-compute-nodes')).toHaveText('0 / 0 alive');
+        await expect(zero.locator('.g-progress')).toHaveCount(2);
+        await expect(page.getByTestId('bridge-databases-summary')).toHaveText('Bridge databases:0');
+        await expect(page.getByTestId('bridge-databases-SYNCED')).toHaveText('0');
+    });
+
     test('off: does not show Bridge piles section', async ({page}) => {
         await mockCapabilities(page, false);
 
@@ -120,28 +347,38 @@ test.describe('Bridge mode - Cluster Overview', () => {
 
         // Should show pile cards
         expect(await clusterPage.getPileCardsCount()).toBe(3);
+        await expect(clusterPage.pileCards.locator('.ydb-bridge-info-table__pile-name')).toHaveText(
+            ['r2', 'r1', 'all-group-statuses-pile'],
+        );
 
         await expect(
             clusterPage.pileCards.first().getByTestId('bridge-pile-healthcheck'),
-        ).toContainText('Good');
+        ).toHaveAccessibleName(/Good/);
+        await clusterPage.pileCards.first().getByTestId('bridge-pile-healthcheck').hover();
+        await expect(page.locator('.g-tooltip:visible')).toHaveText(
+            'No issues reported for this pile',
+        );
+        await page.mouse.move(0, 0);
 
         // Check first pile content
         const firstPileContent = await clusterPage.getFirstPileContent();
-        expect(firstPileContent).toContain('r1');
-        expect(firstPileContent).toContain('Primary'); // State
-        expect(firstPileContent).toContain('Nodes: 16');
+        expect(firstPileContent).toContain('r2');
+        expect(firstPileContent).toContain('Synchronised');
+        await expect(clusterPage.pileCards.first().getByText('Nodes', {exact: true})).toBeVisible();
+        await expect(clusterPage.pileCards.first().getByText('12', {exact: true})).toBeVisible();
+        await expect(clusterPage.pileCards.nth(1)).toContainText('Primary');
+        await expect(clusterPage.pileCards.nth(1).getByText('16', {exact: true})).toBeVisible();
         expect(firstPileContent).not.toContain('Full');
         await expect(
             clusterPage.pileCards.first().getByTestId('bridge-pile-healthcheck').locator('button'),
         ).toHaveCount(0);
 
         await expect(
-            clusterPage.pileCards
-                .nth(1)
-                .locator('.g-label_theme_clear')
-                .filter({hasText: 'You are here'}),
+            clusterPage.pileCards.first().getByRole('img', {name: 'You are here'}),
         ).toBeVisible();
-        await expect(clusterPage.pileCards.nth(2)).toContainText('Caution');
+        await expect(
+            clusterPage.pileCards.nth(2).getByTestId('bridge-pile-healthcheck').getByRole('button'),
+        ).toHaveAccessibleName(/Caution/);
     });
 
     test('on: shows unavailable healthcheck as non-interactive unknown', async ({page}) => {
@@ -154,9 +391,12 @@ test.describe('Bridge mode - Cluster Overview', () => {
         await expect(clusterPage.bridgeSection).toBeVisible({timeout: VISIBILITY_TIMEOUT});
 
         const healthcheck = clusterPage.pileCards.first().getByTestId('bridge-pile-healthcheck');
-        await expect(healthcheck).toContainText('Unknown');
+        await expect(clusterPage.pileCards.first()).toContainText('Primary');
+        await expect(healthcheck).toHaveAccessibleName(/Unknown/);
         await expect(healthcheck.locator('button')).toHaveCount(0);
-        await expect(clusterPage.bridgeSection).not.toContainText('You are here');
+        await expect(
+            clusterPage.bridgeSection.getByRole('img', {name: 'You are here'}),
+        ).toHaveCount(0);
     });
 
     test('on: uses scoped issues without assuming global pile support', async ({page}) => {
@@ -183,16 +423,18 @@ test.describe('Bridge mode - Cluster Overview', () => {
             const healthcheck = clusterPage.pileCards
                 .filter({hasText: pileName})
                 .getByTestId('bridge-pile-healthcheck');
-            await expect(healthcheck).toContainText('Unknown');
+            await expect(healthcheck).toHaveAccessibleName(/Unknown/);
             await expect(healthcheck.locator('button')).toHaveCount(0);
         }
 
         const scopedHealthcheck = clusterPage.pileCards
             .filter({hasText: 'all-group-statuses-pile'})
             .getByTestId('bridge-pile-healthcheck');
-        await expect(scopedHealthcheck).toContainText('Caution');
+        await expect(scopedHealthcheck.getByRole('button')).toHaveAccessibleName(/Caution/);
         await expect(scopedHealthcheck.locator('button')).toHaveCount(1);
-        await expect(clusterPage.bridgeSection).not.toContainText('You are here');
+        await expect(
+            clusterPage.bridgeSection.getByRole('img', {name: 'You are here'}),
+        ).toHaveCount(0);
 
         await page.unroute('**/viewer/json/healthcheck?*');
         await mockBridgeHealthcheck(page, null);
@@ -203,10 +445,12 @@ test.describe('Bridge mode - Cluster Overview', () => {
             const healthcheck = clusterPage.pileCards
                 .filter({hasText: pileName})
                 .getByTestId('bridge-pile-healthcheck');
-            await expect(healthcheck).toContainText('Good');
+            await expect(healthcheck).toHaveAccessibleName(/Good/);
         }
-        await expect(scopedHealthcheck).toContainText('Caution');
-        await expect(clusterPage.bridgeSection).not.toContainText('You are here');
+        await expect(scopedHealthcheck.getByRole('button')).toHaveAccessibleName(/Caution/);
+        await expect(
+            clusterPage.bridgeSection.getByRole('img', {name: 'You are here'}),
+        ).toHaveCount(0);
     });
 
     test('on: opens the source healthcheck issue from a pile badge', async ({page}) => {
@@ -227,7 +471,9 @@ test.describe('Bridge mode - Cluster Overview', () => {
         await expect(healthcheckButton).toHaveAccessibleName(
             'Health status for pile all-group-statuses-pile: Caution',
         );
-        await healthcheckButton.click();
+        await healthcheckButton.hover();
+        await expect(page.locator('.g-tooltip:visible')).toHaveText('Caution');
+        await healthcheckButton.press('Enter');
 
         const drawer = page.getByTestId('cluster-healthcheck-details');
         await expect(drawer).toBeVisible();
@@ -361,6 +607,16 @@ test.describe('Bridge mode - Cluster Overview', () => {
         const clusterPage = new ClusterPage(page);
         await clusterPage.goto(undefined, {waitUntil: 'domcontentloaded'});
         await expect(clusterPage.bridgeSection).toBeVisible();
+        await expect(clusterPage.pileCards.locator('.ydb-bridge-info-table__pile-name')).toHaveText(
+            [
+                'synchronized-pile',
+                'primary-pile',
+                'promoted-pile',
+                'not-synchronized-pile',
+                'suspended-pile',
+                'disconnected-pile',
+            ],
+        );
 
         await expect(clusterPage.bridgeSection).toHaveScreenshot('bridge-piles-states.png');
     });
@@ -369,20 +625,31 @@ test.describe('Bridge mode - Cluster Overview', () => {
         await page.setViewportSize({width: 1440, height: 900});
         await mockCapabilities(page, true);
         const releaseHealthcheck = await mockBridgeVisualLoadingScenario(page);
+        const clusterPage = new ClusterPage(page);
 
         try {
-            const clusterPage = new ClusterPage(page);
             await clusterPage.goto(undefined, {waitUntil: 'domcontentloaded'});
             await expect(clusterPage.bridgeSection).toBeVisible();
             await expect(
                 clusterPage.bridgeSection.locator('.ydb-bridge-info-table__healthcheck-skeleton'),
             ).toHaveCount(6);
-            await expect(clusterPage.bridgeSection).not.toContainText('You are here');
+            await expect(
+                clusterPage.bridgeSection.getByRole('img', {name: 'You are here'}),
+            ).toHaveCount(0);
+            await expect(
+                clusterPage.pileCards.first().locator('.ydb-bridge-info-table__pile-name'),
+            ).toHaveText('primary-pile');
             await expect(clusterPage.bridgeSection).toHaveScreenshot(
                 'bridge-piles-healthcheck-loading.png',
             );
         } finally {
             releaseHealthcheck();
         }
+        await expect(
+            clusterPage.pileCards.first().locator('.ydb-bridge-info-table__pile-name'),
+        ).toHaveText('synchronized-pile');
+        await expect(
+            clusterPage.pileCards.first().getByRole('img', {name: 'You are here'}),
+        ).toBeVisible();
     });
 });

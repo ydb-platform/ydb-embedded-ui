@@ -26,6 +26,7 @@ jest.mock('../../../../components/Search/Search', () => ({
 jest.mock('../../../../store/reducers/capabilities/hooks', () => ({
     useBlobStorageCapacityMetricsEnabled: jest.fn(),
     useBridgeModeEnabled: jest.fn(),
+    useStorageGroupsHandlerHasBridgeSyncStatus: () => false,
 }));
 
 jest.mock('../../../../utils/hooks', () => ({

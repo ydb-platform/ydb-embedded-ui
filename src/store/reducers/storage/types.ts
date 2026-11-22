@@ -2,7 +2,7 @@ import {z} from 'zod';
 
 import type {ECapacityAlert, EFlag} from '../../../types/api/enums';
 import type {NodesGroupByField, TNodeInfo} from '../../../types/api/nodes';
-import type {Erasure, GroupsGroupByField} from '../../../types/api/storage';
+import type {Erasure, GroupsGroupByField, TBridgeGroupSyncInfo} from '../../../types/api/storage';
 import type {TTabletStateInfo} from '../../../types/api/tablet';
 import type {PreparedPDisk, PreparedVDisk} from '../../../utils/disks/types';
 import type {NodesUptimeFilterValues, PreparedNodeSystemState} from '../../../utils/nodes';
@@ -58,7 +58,7 @@ export interface PreparedStorageGroupFilters {
     filterGroupBy?: GroupsGroupByField;
 }
 
-export interface PreparedStorageGroup {
+export interface PreparedStorageGroup extends TBridgeGroupSyncInfo {
     PoolName?: string;
     PileName?: string;
     MediaType?: string;

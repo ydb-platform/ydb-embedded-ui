@@ -1,5 +1,9 @@
 import type {AxiosOptions} from '../../../services/api/base';
-import type {GroupsRequestParams, StorageRequestParams} from '../../../types/api/storage';
+import type {
+    GroupsRequestParams,
+    GroupsSort,
+    StorageRequestParams,
+} from '../../../types/api/storage';
 
 import {prepareGroupsResponse, prepareStorageResponse} from './utils';
 
@@ -7,12 +11,17 @@ export async function requestStorageData(
     {
         version = 'v2',
         shouldUseGroupsHandler,
+        groupsSort,
         ...params
-    }: StorageRequestParams & GroupsRequestParams & {shouldUseGroupsHandler?: boolean},
+    }: StorageRequestParams &
+        GroupsRequestParams & {shouldUseGroupsHandler?: boolean; groupsSort?: GroupsSort},
     options?: AxiosOptions,
 ) {
     if (shouldUseGroupsHandler && version !== 'v1') {
-        const result = await window.api.storage.getStorageGroups({...params}, options);
+        const result = await window.api.storage.getStorageGroups(
+            {...params, sort: groupsSort ?? params.sort},
+            options,
+        );
         return prepareGroupsResponse(result);
     } else {
         const result = await window.api.viewer.getStorageInfo({version, ...params}, options);

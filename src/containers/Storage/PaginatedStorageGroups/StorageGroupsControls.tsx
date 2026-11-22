@@ -6,16 +6,13 @@ import {Button, Flex, Icon, Select, Text} from '@gravity-ui/uikit';
 import {EntitiesCount} from '../../../components/EntitiesCount/EntitiesCount';
 import {usePaginatedTableState} from '../../../components/PaginatedTable/PaginatedTableContext';
 import {Search} from '../../../components/Search/Search';
-import {
-    useBlobStorageCapacityMetricsEnabled,
-    useBridgeModeEnabled,
-} from '../../../store/reducers/capabilities/hooks';
+import {useBlobStorageCapacityMetricsEnabled} from '../../../store/reducers/capabilities/hooks';
 import {SETTING_KEYS} from '../../../store/reducers/settings/constants';
 import {useSetting} from '../../../utils/hooks';
 import {useIsUserAllowedToMakeChanges} from '../../../utils/hooks/useIsUserAllowedToMakeChanges';
 import {
     STORAGE_GROUPS_COLUMNS_IDS,
-    STORAGE_GROUPS_GROUP_BY_OPTIONS,
+    getStorageGroupsGroupByOptions,
 } from '../PaginatedStorageGroupsTable/columns/constants';
 import type {StorageGroupsColumn} from '../PaginatedStorageGroupsTable/columns/types';
 import {StorageExpertModePanel} from '../StorageExpertModePanel/StorageExpertModePanel';
@@ -24,6 +21,8 @@ import {StorageVisibleEntitiesFilter} from '../StorageVisibleEntitiesFilter/Stor
 import i18n from '../i18n';
 import {b} from '../shared';
 import {useIsStorageExpertMode, useStorageQueryParams} from '../useStorageQueryParams';
+
+import {useStorageGroupsBridgeGrouping} from './useStorageGroupsBridgeGrouping';
 
 interface StorageControlsProps {
     withTypeSelector?: boolean;
@@ -63,7 +62,7 @@ export function StorageGroupsControls({
         SETTING_KEYS.ENABLE_STORAGE_EXPERT_MODE,
     );
     const isStorageExpertMode = useIsStorageExpertMode();
-    const bridgeModeEnabled = useBridgeModeEnabled();
+    const {bridgeModeEnabled, bridgeSyncGroupingAvailable} = useStorageGroupsBridgeGrouping();
     const blobMetricsEnabled = useBlobStorageCapacityMetricsEnabled();
 
     const isVDisksPDisksColumnVisible = React.useMemo(() => {
@@ -71,24 +70,18 @@ export function StorageGroupsControls({
     }, [columns]);
 
     const groupByOptions = React.useMemo(() => {
-        const skippedValues: string[] = [];
-
-        if (!bridgeModeEnabled) {
-            skippedValues.push('PileName');
-        }
-
-        if (!blobMetricsEnabled) {
-            skippedValues.push('CapacityAlert');
-        }
-
-        if (blobMetricsEnabled) {
-            skippedValues.push('Usage');
-        }
-
-        return STORAGE_GROUPS_GROUP_BY_OPTIONS.filter(
-            (option) => !skippedValues.includes(option.value),
+        return getStorageGroupsGroupByOptions(
+            blobMetricsEnabled,
+            bridgeModeEnabled,
+            bridgeSyncGroupingAvailable,
         );
-    }, [bridgeModeEnabled, blobMetricsEnabled]);
+    }, [bridgeModeEnabled, blobMetricsEnabled, bridgeSyncGroupingAvailable]);
+
+    const groupByValue =
+        storageGroupsGroupByParam &&
+        groupByOptions.some(({value}) => value === storageGroupsGroupByParam)
+            ? [storageGroupsGroupByParam]
+            : [];
 
     const handleGroupBySelectUpdate = (value: string[]) => {
         handleStorageGroupsGroupByParamChange(value[0]);
@@ -121,11 +114,10 @@ export function StorageGroupsControls({
                         <Text variant="body-2">{i18n('controls_group-by-placeholder')}</Text>
                         <Select
                             hasClear
+                            qa="storage-groups-group-by"
                             placeholder={'-'}
                             width={150}
-                            defaultValue={
-                                storageGroupsGroupByParam ? [storageGroupsGroupByParam] : undefined
-                            }
+                            value={groupByValue}
                             onUpdate={handleGroupBySelectUpdate}
                             options={groupByOptions}
                         />

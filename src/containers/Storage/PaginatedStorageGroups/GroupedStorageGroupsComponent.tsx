@@ -1,12 +1,17 @@
 import React from 'react';
 
+import {Flex} from '@gravity-ui/uikit';
+
+import {BridgeSyncStatusLabel} from '../../../components/BridgeSyncStatusLabel';
 import {ResponseError} from '../../../components/Errors/ResponseError/ResponseError';
 import {PaginatedTableWithLayout} from '../../../components/PaginatedTable/PaginatedTableWithLayout';
 import {TableColumnSetup} from '../../../components/TableColumnSetup/TableColumnSetup';
 import {storageApi} from '../../../store/reducers/storage/storage';
+import {BridgeSyncStatus} from '../../../types/api/cluster';
 import type {GroupsGroupByField} from '../../../types/api/storage';
 import {useAutoRefreshInterval} from '../../../utils/hooks';
 import {renderPaginatedTableErrorMessage} from '../../../utils/renderPaginatedTableErrorMessage';
+import {isEnumMember} from '../../../utils/typecheckers';
 import type {PaginatedStorageProps} from '../PaginatedStorage';
 import {PaginatedStorageGroupsTable} from '../PaginatedStorageGroupsTable';
 import {useStorageGroupsSelectedColumns} from '../PaginatedStorageGroupsTable/columns/hooks';
@@ -51,10 +56,23 @@ export const StorageGroupGroup = React.memo(function StorageGroupGroup({
     onIsExpandedChange,
     handleShowAllGroups,
 }: StorageGroupGroupProps) {
+    const syncStatus = isEnumMember(BridgeSyncStatus, name) ? name : undefined;
+
     return (
         <TableGroup
             key={name}
             title={name}
+            titleContent={
+                filterGroupBy === 'BridgeSyncStatus' && syncStatus !== undefined ? (
+                    <Flex as="span" alignItems="center">
+                        <BridgeSyncStatusLabel
+                            status={syncStatus}
+                            size="s"
+                            plainTextColor="primary"
+                        />
+                    </Flex>
+                ) : undefined
+            }
             count={count}
             entityName={i18n('groups')}
             expanded={isExpanded}

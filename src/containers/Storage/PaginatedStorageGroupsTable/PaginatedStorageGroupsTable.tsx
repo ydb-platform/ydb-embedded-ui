@@ -68,6 +68,17 @@ export const PaginatedStorageGroupsTable = ({
     const groupsHandlerAvailable = useStorageGroupsHandlerAvailable();
 
     const fetchData = useGroupsGetter(groupsHandlerAvailable);
+    const tableColumns = React.useMemo(
+        () =>
+            groupsHandlerAvailable
+                ? columns
+                : columns.map((column) =>
+                      column.name === STORAGE_GROUPS_COLUMNS_IDS.PileName
+                          ? {...column, sortable: false}
+                          : column,
+                  ),
+        [columns, groupsHandlerAvailable],
+    );
 
     const hasVDisksColumns = React.useMemo(() => {
         return columns.some((column) => columnsWithVDisks.has(column.name));
@@ -115,7 +126,7 @@ export const PaginatedStorageGroupsTable = ({
             <ResizeablePaginatedTable
                 columnsWidthLSKey={STORAGE_GROUPS_COLUMNS_WIDTH_LS_KEY}
                 scrollContainerRef={scrollContainerRef}
-                columns={columns}
+                columns={tableColumns}
                 rowHeight={
                     hasVDisksColumns ? STORAGE_GROUPS_TABLE_ROW_HEIGHT_WITH_VDISKS : undefined
                 }

@@ -1,9 +1,11 @@
 import React from 'react';
 
+import {Disclosure, Flex, Label, Text} from '@gravity-ui/uikit';
 import {skipToken} from '@reduxjs/toolkit/query';
 import {Helmet} from 'react-helmet-async';
 import {StringParam, useQueryParams} from 'use-query-params';
 
+import {BridgeSyncStatusLabel} from '../../components/BridgeSyncStatusLabel';
 import {EntityPageTitle} from '../../components/EntityPageTitle/EntityPageTitle';
 import {ResponseError} from '../../components/Errors/ResponseError';
 import {InfoViewerSkeleton} from '../../components/InfoViewerSkeleton/InfoViewerSkeleton';
@@ -15,6 +17,7 @@ import {
 } from '../../store/reducers/capabilities/hooks';
 import {setHeaderBreadcrumbs} from '../../store/reducers/header/header';
 import {storageApi} from '../../store/reducers/storage/storage';
+import {BridgeSyncStatus} from '../../types/api/cluster';
 import {EFlag} from '../../types/api/enums';
 import {valueIsDefined} from '../../utils';
 import {cn} from '../../utils/cn';
@@ -22,6 +25,7 @@ import {useAutoRefreshInterval, useTypedDispatch} from '../../utils/hooks';
 import {useDatabaseFromQuery} from '../../utils/hooks/useDatabaseFromQuery';
 import {useAppTitle} from '../App/AppTitleContext';
 import {PaginatedStorage} from '../Storage/PaginatedStorage';
+import {StorageGroupSyncDetails} from '../Storage/StorageGroupSyncDetails/StorageGroupSyncDetails';
 
 import {storageGroupPageKeyset} from './i18n';
 
@@ -53,7 +57,14 @@ export function StorageGroupPage() {
         },
     );
 
-    const storageGroupData = groupQuery.data?.groups?.[0];
+    const storageGroupData = groupQuery.currentData?.groups?.[0];
+    const syncStatus = storageGroupData?.BridgeSyncStatus;
+    const showSyncDetails =
+        storageGroupData &&
+        (storageGroupData.BridgeMode ??
+            (syncStatus === BridgeSyncStatus.SYNCING ||
+                syncStatus === BridgeSyncStatus.PENDING ||
+                syncStatus === BridgeSyncStatus.SYNCED));
 
     const loading = groupQuery.isFetching && storageGroupData === undefined;
     const {appTitle} = useAppTitle();
@@ -94,6 +105,13 @@ export function StorageGroupPage() {
                 entityName={storageGroupPageKeyset('storage-group')}
                 status={storageGroupData?.Overall || EFlag.Grey}
                 id={groupId}
+                metaInfo={
+                    storageGroupData?.BridgeMode === true ? (
+                        <Label theme="utility" size="s">
+                            {storageGroupPageKeyset('label_bridge-mode')}
+                        </Label>
+                    ) : undefined
+                }
             />
         );
     };
@@ -140,6 +158,25 @@ export function StorageGroupPage() {
             {renderPageTitle()}
             {renderError()}
             {renderInfo()}
+            {showSyncDetails && (
+                <Disclosure
+                    key={groupId}
+                    arrowPosition="end"
+                    className={storageGroupPageCn('sync')}
+                    summary={
+                        <Flex alignItems="center" gap={2} wrap="wrap">
+                            <Text variant="subheader-2">
+                                {storageGroupPageKeyset('title_sync')}
+                            </Text>
+                            <BridgeSyncStatusLabel status={syncStatus} />
+                        </Flex>
+                    }
+                >
+                    <div className={storageGroupPageCn('sync-content')}>
+                        <StorageGroupSyncDetails group={storageGroupData} layout="page" />
+                    </div>
+                </Disclosure>
+            )}
             {renderStorage()}
         </div>
     );
