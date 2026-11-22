@@ -45,6 +45,11 @@
         padding: var(--g-spacing-1) var(--g-spacing-3) var(--g-spacing-3);
     }
 
+    &__sync ~ * {
+        // Let Storage move down when synchronization details expand.
+        overflow-anchor: none;
+    }
+
     &__storage-title {
         margin-bottom: 0;
         @include mixins.header-1-typography();
