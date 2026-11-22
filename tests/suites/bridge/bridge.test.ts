@@ -75,22 +75,40 @@ test.describe('Bridge mode - Storage nodes', () => {
 });
 
 test.describe('Bridge mode - Storage groups', () => {
-    test('on: shows Bridge pile column', async ({page}) => {
+    test('on: shows Bridge pile without sorting on legacy storage', async ({page}) => {
         await mockCapabilities(page, true);
-        await mockStorageGroup(page, {
-            GroupId: '1',
-            PoolName: 'p',
-            MediaType: 'NVME',
-            PileName: 'r1',
+        await page.route('**/viewer/json/storage?*', (route) =>
+            route.fulfill({
+                json: {StorageGroups: [{GroupID: '1', PoolName: 'p', PileName: 'r1'}]},
+            }),
+        );
+        await new StoragePage(page).goto({visible: 'all', type: 'groups'});
+
+        const header = page
+            .locator('.ydb-paginated-table__head-cell')
+            .filter({hasText: 'Bridge pile'});
+        await expect(header).toBeVisible();
+        await expect(header).not.toHaveClass(/head-cell_sortable/);
+    });
+
+    test('on: sorts Bridge pile through storage groups', async ({page}) => {
+        await mockCapabilities(page, true, {'/storage/groups': 17});
+        await mockStorageGroup(page, {GroupId: '1', PoolName: 'p', PileName: 'r1'});
+        await new StoragePage(page).goto({visible: 'all', type: 'groups'});
+
+        const header = page
+            .locator('.ydb-paginated-table__head-cell')
+            .filter({hasText: 'Bridge pile'});
+        await expect(header).toHaveClass(/head-cell_sortable/);
+        const sortRequest = page.waitForRequest((request) => {
+            const url = new URL(request.url());
+            return (
+                url.pathname.endsWith('/storage/groups') &&
+                /^[-+]?PileName$/.test(url.searchParams.get('sort') ?? '')
+            );
         });
-        const storage = new StoragePage(page);
-        await storage.goto({visible: 'all', type: 'groups'}, {waitUntil: 'domcontentloaded'});
-        const table = new ClusterStorageTable(page);
-        await table.getControls().openColumnSetup();
-        await table.getControls().setColumnChecked('PileName');
-        await table.waitForTableToLoad();
-        const headers = await table.getHeaders();
-        expect(headers.join(' ')).toContain('Bridge pile');
+        await header.click();
+        await sortRequest;
     });
 
     test('off: hides Bridge pile column', async ({page}) => {
@@ -161,11 +179,39 @@ test.describe('Bridge mode - Storage group page', () => {
         await expect(page.getByTestId('storage-group-sync-stage')).toContainText(stage);
     });
 
+    for (const {status, stage} of [
+        {status: BridgeSyncStatus.SYNCING, stage: 'BLOCKS'},
+        {status: BridgeSyncStatus.PENDING},
+        {status: BridgeSyncStatus.SYNCED, stage: 'SYNCED'},
+    ]) {
+        test(`shows sync details for a v17 group with status ${status} without BridgeMode`, async ({
+            page,
+        }) => {
+            await mockCapabilities(page, true, {'/storage/groups': 17});
+            await mockStorageGroup(page, {
+                GroupId: groupId,
+                PoolName: poolName,
+                BridgeSyncStatus: status,
+                BridgeSyncStage: stage,
+            });
+            await new PageModel(page, 'storageGroup', {groupId}).goto();
+
+            await page.getByRole('button', {name: /Synchronisation details/}).click();
+            const stageRow = page.getByTestId('storage-group-sync-stage');
+            await expect(stageRow).toBeVisible();
+            if (stage) {
+                await expect(stageRow).toContainText(stage);
+            }
+            await expect(page.getByText('Sync partners', {exact: true})).toHaveCount(0);
+        });
+    }
+
     test('hides sync details for an ordinary group in a Bridge cluster', async ({page}) => {
         await mockStorageGroup(page, {
             GroupId: groupId,
             PoolName: poolName,
             BridgeMode: false,
+            BridgeSyncStatus: BridgeSyncStatus.SYNCING,
         });
         await new PageModel(page, 'storageGroup', {groupId}).goto();
 
