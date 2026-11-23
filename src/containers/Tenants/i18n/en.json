@@ -1,5 +1,6 @@
 {
   "create-database": "Create database",
+  "label-databases": "Databases",
   "no-databases": "No such databases",
 
   "column-name": "Database",

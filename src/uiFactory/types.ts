@@ -1,5 +1,7 @@
 import type React from 'react';
 
+import type {Column} from '@gravity-ui/react-data-table';
+
 import type {DrawerWrapper} from '../components/Drawer';
 import type {EmptyStateProps} from '../components/EmptyState';
 import type {YDBDefinitionListItem} from '../components/YDBDefinitionList/YDBDefinitionList';
@@ -24,6 +26,35 @@ import type {TUserToken} from '../types/api/whoami';
 import type {DatacenterColorIndexes} from '../utils/datacenters';
 import type {GetLogsLink} from '../utils/logs';
 import type {GetMonitoringClusterLink, GetMonitoringLink} from '../utils/monitoring';
+
+export interface MyDatabasesTableColumn extends Column<PreparedTenant> {
+    settingsTitle: string;
+    visibleByDefault?: boolean;
+    /** Built-in column ID. An unavailable anchor places the column at the end. */
+    after?: string;
+}
+
+export interface MyDatabasesTableGroup {
+    /** Stable ID, unique across grouping modes. */
+    id: string;
+    title: string;
+    /** Use the original objects from the filtered rows supplied to the extension. */
+    rows: PreparedTenant[];
+}
+
+export interface MyDatabasesTableOptions {
+    controls?: React.ReactNode;
+    /** Omit for a flat table. Pass an ordered partition of the filtered rows for grouped display. */
+    groups?: readonly MyDatabasesTableGroup[];
+    additionalColumns?: readonly MyDatabasesTableColumn[];
+}
+
+export interface MyDatabasesTableExtensionProps {
+    environmentName?: string;
+    /** Filtered rows for this environment. Preserve their order and identity when deriving groups. */
+    rows: PreparedTenant[];
+    children: (options: MyDatabasesTableOptions) => React.ReactNode;
+}
 
 export type IllustrationComponent = React.ComponentType<React.SVGProps<SVGSVGElement>>;
 export type CreateGraphLayoutWorker = () => Worker;
@@ -87,6 +118,7 @@ export interface UIFactory<H extends string = CommonIssueCategory, T extends str
     onDeleteCluster?: HandleDeleteCluster;
 
     homePageTitle?: string;
+    MyDatabasesTableExtension?: React.ComponentType<MyDatabasesTableExtensionProps>;
 
     /**
      * Permanent positive indexes keyed by the full uppercase DC name.

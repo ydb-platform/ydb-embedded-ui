@@ -12,6 +12,7 @@ const b = cn('ydb-table-group');
 interface TableGroupProps {
     children?: React.ReactNode;
 
+    groupId?: string;
     title: string;
     titleContent?: React.ReactNode;
     entityName: string;
@@ -24,18 +25,19 @@ export const TableGroup = ({
     children,
     title,
     titleContent,
+    groupId = title,
     entityName,
     count,
     expanded = false,
     onIsExpandedChange,
 }: TableGroupProps) => {
     const toggleCollapsed = () => {
-        onIsExpandedChange(title, !expanded);
+        onIsExpandedChange(groupId, !expanded);
     };
 
     const renderTitle = () => {
         return (
-            <button onClick={toggleCollapsed} className={b('button')}>
+            <button aria-expanded={expanded} onClick={toggleCollapsed} className={b('button')}>
                 <div className={b('title-wrapper')}>
                     <ArrowToggle direction={expanded ? 'top' : 'bottom'} />
                     <div className={b('title')}>
@@ -52,7 +54,7 @@ export const TableGroup = ({
     const renderContent = () => {
         if (expanded) {
             return (
-                <TableKeyboardNavigationGroupContext.Provider value={title}>
+                <TableKeyboardNavigationGroupContext.Provider value={groupId}>
                     <div className={b('content')}>{children}</div>
                 </TableKeyboardNavigationGroupContext.Provider>
             );

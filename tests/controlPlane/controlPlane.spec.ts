@@ -398,3 +398,79 @@ test.describe('Operations', () => {
         await expect(page.getByText('database-error', {exact: true})).toBeVisible();
     });
 });
+
+test('My databases extension groups filtered rows and preserves additional column settings', async ({
+    page,
+}) => {
+    await mockApi(page, {});
+    await page.route('**/meta/databases?*', (route) =>
+        route.fulfill({
+            json: {
+                databases: [
+                    {Name: '/db/first', Cluster: 'alpha', Owner: 'First owner'},
+                    {Name: '/db/second', Cluster: 'beta', Owner: 'Second owner'},
+                ],
+            },
+        }),
+    );
+    const url = '/home/databases?databasesFixture&withExtension';
+    await page.goto(url);
+    const groupBy = page.getByRole('button', {name: 'Group databases in env-a'});
+    await expect(groupBy).toBeVisible();
+    const headers = page.locator('thead').first().locator('th');
+    await expect(
+        headers.filter({hasText: /^CPU$/}).locator('xpath=following-sibling::th[1]'),
+    ).toHaveText('Owner');
+    await groupBy.click();
+    const alpha = page.getByRole('button', {name: /Cluster alpha/});
+    await expect(page.getByRole('button', {name: /Cluster beta/})).toBeVisible();
+    await alpha.click();
+    await expect(page.getByText('First owner', {exact: true})).toBeVisible();
+    const search = page.getByPlaceholder('Database name');
+    await search.fill('first');
+    await expect(page.getByRole('button', {name: /Cluster beta/})).toHaveCount(0);
+    await search.press('ArrowDown');
+    const opened = page.waitForEvent('popup');
+    await search.press('Enter');
+    const database = await opened;
+    await expect(database).toHaveURL(/database=.*first/);
+    await database.close();
+    await search.fill('missing-database');
+    await expect(page.getByText('No such databases')).toBeVisible();
+    await search.fill('');
+    await page.getByRole('button', {name: 'Clear grouping'}).click();
+    await expect(alpha).toHaveCount(0);
+    await expect(page.getByText('Second owner', {exact: true})).toBeVisible();
+    await page.getByRole('button', {name: /^\d+\/\d+$/}).click();
+    await page.getByText('Test owner', {exact: true}).click();
+    await page.reload();
+    await expect(groupBy).toBeVisible();
+    await expect(headers.filter({hasText: /^Owner$/})).toHaveCount(0);
+    await page.goto('/home/databases?databasesFixture');
+    await expect(page.getByRole('link', {name: 'first', exact: true})).toBeVisible();
+    await expect(page.getByPlaceholder('Database name')).toBeVisible();
+    await expect(groupBy).toHaveCount(0);
+});
+
+test('My databases extension restores a saved column order after editing settings without the extension', async ({
+    page,
+}) => {
+    await mockApi(page, {});
+    await page.addInitScript(() => {
+        const key = 'databasesTableSelectedColumns';
+        if (!localStorage.getItem(key)) {
+            localStorage.setItem(key, JSON.stringify(['Name', 'test-owner', 'cpu', 'Type']));
+        }
+    });
+    const url = '/home/databases?databasesFixture';
+    await page.goto(url);
+    await page.getByRole('button', {name: /^\d+\/\d+$/}).click();
+    await page.locator('.g-popup').getByText('Type', {exact: true}).click();
+    await page.goto(url + '&withExtension');
+    await expect(page.getByRole('button', {name: 'Group databases in env-a'})).toBeVisible();
+    await expect(page.locator('thead').first().locator('th')).toHaveText([
+        'Database',
+        'Owner',
+        'CPU',
+    ]);
+});

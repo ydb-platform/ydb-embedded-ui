@@ -51,6 +51,7 @@ export const useSelectedColumns = <T extends {name: string}>(
     defaultColumnsIds: string[],
     requiredColumnsIds?: string[],
     stickyColumnsIds: string[] | undefined = requiredColumnsIds,
+    {preserveUnavailableColumns = false} = {},
 ) => {
     const [savedColumns, setSavedColumns] = useSetting<unknown[]>(storageKey, defaultColumnsIds);
 
@@ -143,9 +144,30 @@ export const useSelectedColumns = <T extends {name: string}>(
         (value) => {
             const preparedColumns = value.map(({id, selected}) => ({id, selected}));
 
-            setSavedColumns(preparedColumns);
+            if (!preserveUnavailableColumns || savedColumns === defaultColumnsIds) {
+                setSavedColumns(preparedColumns);
+                return;
+            }
+            // My databases shares settings with the cluster table, which may omit extension columns.
+            const available = new Set(preparedColumns.map(({id}) => id));
+            const unavailable = normalizedSavedColumns
+                .filter(({id}) => !available.has(id))
+                .map(({id}) => id);
+            setSavedColumns(
+                mergeColumnsPreservingHiddenPositions<OrderedColumn>(
+                    preparedColumns,
+                    normalizedSavedColumns,
+                    unavailable,
+                ),
+            );
         },
-        [setSavedColumns],
+        [
+            defaultColumnsIds,
+            normalizedSavedColumns,
+            preserveUnavailableColumns,
+            savedColumns,
+            setSavedColumns,
+        ],
     );
 
     // Get set of column IDs that are explicitly selected by user

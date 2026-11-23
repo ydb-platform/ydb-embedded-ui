@@ -1,13 +1,53 @@
+import React from 'react';
+
 import {Link} from '@gravity-ui/uikit';
 import ReactDOM from 'react-dom/client';
 
+import type {MyDatabasesTableExtensionProps} from '../../src/lib';
 import {MultiClusterApp} from '../../src/lib';
 import {configureStore} from '../../src/store';
 import {configureUIFactory} from '../../src/uiFactory/uiFactory';
 
 import '../../src/styles/index.scss';
 
+function TestDatabasesExtension({rows, environmentName, children}: MyDatabasesTableExtensionProps) {
+    const [grouped, setGrouped] = React.useState(false);
+    return children({
+        controls: (
+            <button onClick={() => setGrouped(!grouped)}>
+                {grouped ? 'Clear grouping' : `Group databases in ${environmentName}`}
+            </button>
+        ),
+        additionalColumns: [
+            {
+                name: 'test-owner',
+                settingsTitle: 'Test owner',
+                header: 'Owner',
+                after: 'cpu',
+                visibleByDefault: true,
+                render: ({row}) => row.Owner,
+            },
+        ],
+        groups: grouped
+            ? ['alpha', 'beta']
+                  .map((cluster) => ({
+                      id: cluster,
+                      title: `Cluster ${cluster}`,
+                      rows: rows.filter((row) => row.Cluster === cluster),
+                  }))
+                  .filter((group) => group.rows.length > 0)
+            : undefined,
+    });
+}
+
+const databasesFixture = new URLSearchParams(window.location.search);
 configureUIFactory({
+    databasesEnvironmentsConfig: databasesFixture.has('databasesFixture')
+        ? {getSupportedEnvironments: () => ['env-a'], getEnvironments: () => ['env-a']}
+        : undefined,
+    MyDatabasesTableExtension: databasesFixture.has('withExtension')
+        ? TestDatabasesExtension
+        : undefined,
     emMetaAvailable: true,
     resolveUser: new URLSearchParams(window.location.search).has('resolveUsers')
         ? ({userId}) => <Link href={`/accounts/${userId}`}>user@example.test</Link>

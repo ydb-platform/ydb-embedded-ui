@@ -32,6 +32,11 @@ import {tenantsApi} from '../../store/reducers/tenants/tenants';
 import type {PreparedTenant} from '../../store/reducers/tenants/types';
 import type {AdditionalTenantsProps} from '../../types/additionalProps';
 import {State} from '../../types/api/tenant';
+import type {
+    MyDatabasesTableGroup,
+    MyDatabasesTableOptions,
+    UIFactory,
+} from '../../uiFactory/types';
 import {uiFactory} from '../../uiFactory/uiFactory';
 import {formatBytes} from '../../utils/bytesParsers';
 import {cn} from '../../utils/cn';
@@ -49,6 +54,7 @@ import {useAutoRefreshInterval} from '../../utils/hooks';
 import {useSelectedColumns} from '../../utils/hooks/useSelectedColumns';
 import {getIllustration} from '../../utils/illustrations';
 import {isNumeric} from '../../utils/utils';
+import {TableGroup} from '../Storage/TableGroup/TableGroup';
 
 import type {DatabaseStatusClickHandler} from './DatabaseDrawerHealthcheck';
 import {DatabaseDrawerHealthcheck} from './DatabaseDrawerHealthcheck';
@@ -56,10 +62,10 @@ import {getDatabaseBridgeColumns} from './bridgeColumns';
 import {
     DATABASES_COLUMNS_IDS,
     DATABASES_COLUMNS_TITLES,
-    DATABASES_DEFAULT_COLUMNS,
     DATABASES_REQUIRED_COLUMNS,
     DATABASES_SELECTED_COLUMNS_KEY,
 } from './constants';
+import {extendDatabaseColumns} from './extendDatabaseColumns';
 import i18n from './i18n';
 import {useTenantsQueryParams} from './useTenantsQueryParams';
 
@@ -108,7 +114,30 @@ function databaseStateToLabelTheme(state?: State): LabelProps['theme'] {
     }
 }
 
+function DatabaseGroup({
+    group,
+    children,
+}: {
+    group: MyDatabasesTableGroup;
+    children: React.ReactNode;
+}) {
+    const [expanded, setExpanded] = React.useState(false);
+    return (
+        <TableGroup
+            groupId={group.id}
+            title={group.title}
+            count={group.rows.length}
+            entityName={i18n('label-databases')}
+            expanded={expanded}
+            onIsExpandedChange={(_, value) => setExpanded(value)}
+        >
+            {children}
+        </TableGroup>
+    );
+}
+
 interface TenantsTableProps {
+    extension?: UIFactory['MyDatabasesTableExtension'];
     clusterName?: string;
     environmentName?: string;
 
@@ -126,39 +155,22 @@ interface TenantsTableContentProps extends TenantsTableProps {
     onStatusClick: DatabaseStatusClickHandler;
 }
 
-const TenantsTableContent = ({
-    clusterName,
-    environmentName,
-    isMetaDatabasesAvailable,
-    scrollContainerRef,
-    additionalTenantsProps,
-    showDomainDatabase,
-    showWithProblemsFilter,
-    showPoolsColumn,
-    onStatusClick,
-}: TenantsTableContentProps) => {
-    const SuccessImage = getIllustration('SuccessOperation');
-    const history = useHistory();
-
+function TenantsTableContent(props: TenantsTableContentProps) {
+    const {
+        extension: Extension,
+        clusterName,
+        environmentName,
+        isMetaDatabasesAvailable,
+        showDomainDatabase,
+        showWithProblemsFilter,
+    } = props;
     const [autoRefreshInterval] = useAutoRefreshInterval();
     const {currentData, isFetching, error} = tenantsApi.useGetTenantsInfoQuery(
         {clusterName, environmentName, isMetaDatabasesAvailable},
         {pollingInterval: autoRefreshInterval},
     );
-
-    // Track sort state for scroll dependencies
-    const [sortParams, setSortParams] = React.useState<SortOrder | SortOrder[] | undefined>();
-
-    const isCreateDBAvailable = useEmMetaAvailable() && uiFactory.onCreateDB !== undefined;
-    const bridgeModeEnabled = useBridgeModeEnabled();
-    const tenantInfoHasBridgeFields = useViewerTenantInfoHasBridgeFields();
-    const bridgeColumnsAvailable = bridgeModeEnabled && tenantInfoHasBridgeFields;
-
-    const {domain: domainRoot, settings, isResolved: isClusterInfoResolved} = useClusterBaseInfo();
-    const loading = (isFetching && currentData === undefined) || !isClusterInfoResolved;
-
-    const {search, withProblems, handleSearchChange, handleWithProblemsChange} =
-        useTenantsQueryParams();
+    const queryParams = useTenantsQueryParams();
+    const {search, withProblems} = queryParams;
 
     // We should apply domain filter before other filters
     // It is done to ensure proper entities count
@@ -180,6 +192,66 @@ const TenantsTableContent = ({
         return filteredBySearch;
     }, [tenants, withProblems, search, showWithProblemsFilter]);
 
+    const renderView = (options: MyDatabasesTableOptions) => (
+        <TenantsTableView
+            {...props}
+            options={options}
+            tenants={tenants}
+            filteredTenants={filteredTenants}
+            queryParams={queryParams}
+            hasData={currentData !== undefined}
+            pending={isFetching && currentData === undefined}
+            error={error}
+        />
+    );
+
+    return Extension ? (
+        <Extension environmentName={environmentName} rows={filteredTenants}>
+            {renderView}
+        </Extension>
+    ) : (
+        renderView({})
+    );
+}
+
+interface TenantsTableViewProps extends TenantsTableContentProps {
+    options: MyDatabasesTableOptions;
+    tenants: PreparedTenant[];
+    filteredTenants: PreparedTenant[];
+    queryParams: ReturnType<typeof useTenantsQueryParams>;
+    hasData: boolean;
+    pending: boolean;
+    error?: unknown;
+}
+
+function TenantsTableView({
+    clusterName,
+    environmentName,
+    isMetaDatabasesAvailable,
+    scrollContainerRef,
+    additionalTenantsProps,
+    showDomainDatabase,
+    showWithProblemsFilter,
+    showPoolsColumn,
+    onStatusClick,
+    options,
+    tenants,
+    filteredTenants,
+    queryParams,
+    hasData,
+    pending,
+    error,
+}: TenantsTableViewProps) {
+    const SuccessImage = getIllustration('SuccessOperation');
+    const history = useHistory();
+    const [sortParams, setSortParams] = React.useState<SortOrder | SortOrder[] | undefined>();
+    const isCreateDBAvailable = useEmMetaAvailable() && uiFactory.onCreateDB !== undefined;
+    const bridgeModeEnabled = useBridgeModeEnabled();
+    const tenantInfoHasBridgeFields = useViewerTenantInfoHasBridgeFields();
+    const bridgeColumnsAvailable = bridgeModeEnabled && tenantInfoHasBridgeFields;
+    const {domain: domainRoot, settings, isResolved: isClusterInfoResolved} = useClusterBaseInfo();
+    const loading = pending || !isClusterInfoResolved;
+    const {search, withProblems, handleSearchChange, handleWithProblemsChange} = queryParams;
     const useMetaProxySetting = settings?.use_meta_proxy;
     const useDatabaseIdSetting = settings?.use_database_id;
     const tenantLinks = React.useMemo(
@@ -258,6 +330,7 @@ const TenantsTableContent = ({
                 {showWithProblemsFilter ? (
                     <ProblemFilter value={withProblems} onChange={handleWithProblemsChange} />
                 ) : null}
+                {options.controls}
                 <EntitiesCount
                     total={tenants?.length}
                     current={filteredTenants?.length || 0}
@@ -426,19 +499,21 @@ const TenantsTableContent = ({
         tenantLinks,
     ]);
 
+    const {columns, titles, defaults} = React.useMemo(
+        () => extendDatabaseColumns(rawDatabasesColumns, options.additionalColumns),
+        [rawDatabasesColumns, options.additionalColumns],
+    );
     const {columnsToShow, columnsToSelect, setColumns} = useSelectedColumns(
-        rawDatabasesColumns,
+        columns,
         DATABASES_SELECTED_COLUMNS_KEY,
-        DATABASES_COLUMNS_TITLES,
-        DATABASES_DEFAULT_COLUMNS,
+        titles,
+        defaults,
         DATABASES_REQUIRED_COLUMNS,
+        undefined,
+        {preserveUnavailableColumns: true},
     );
 
-    const renderTable = () => {
-        if (filteredTenants.length === 0 && withProblems) {
-            return <SuccessImage width={200} height={200} />;
-        }
-
+    const renderRows = (rows: PreparedTenant[]) => {
         return (
             <div>
                 <ResizeableDataTable
@@ -453,14 +528,32 @@ const TenantsTableContent = ({
                         EMPTY_DATA_PLACEHOLDER
                     }
                     columnsWidthLSKey={DATABASES_COLUMNS_WIDTH_LS_KEY}
-                    data={filteredTenants}
+                    data={rows}
                     columns={columnsToShow}
                     settings={DEFAULT_TABLE_SETTINGS}
                     emptyDataMessage={i18n('no-databases')}
+                    sortOrder={sortParams}
                     onSortChange={setSortParams}
                 />
             </div>
         );
+    };
+
+    const renderTable = () => {
+        if (!filteredTenants.length && withProblems) {
+            return <SuccessImage width={200} height={200} />;
+        }
+        if (options.groups) {
+            if (!options.groups.length) {
+                return renderRows([]);
+            }
+            return options.groups.map((group) => (
+                <DatabaseGroup key={group.id} group={group}>
+                    {renderRows(group.rows)}
+                </DatabaseGroup>
+            ));
+        }
+        return renderRows(filteredTenants);
     };
 
     const renderColumnSetup = () => {
@@ -491,6 +584,7 @@ const TenantsTableContent = ({
                     withProblems,
                     showDomainDatabase,
                     showWithProblemsFilter,
+                    Boolean(options.groups),
                 ])}
             >
                 <TableWithControlsLayout.Controls renderExtraControls={renderExtraControls}>
@@ -500,14 +594,14 @@ const TenantsTableContent = ({
                 <TableWithControlsLayout.Table
                     scrollContainerRef={scrollContainerRef}
                     loading={loading}
-                    scrollDependencies={[search, withProblems, sortParams]}
+                    scrollDependencies={[search, withProblems, sortParams, Boolean(options.groups)]}
                 >
-                    <div>{currentData ? renderTable() : null}</div>
+                    <div>{hasData ? renderTable() : null}</div>
                 </TableWithControlsLayout.Table>
             </TableWithControlsLayout>
         </div>
     );
-};
+}
 
 export function TenantsTable(props: TenantsTableProps) {
     return (
