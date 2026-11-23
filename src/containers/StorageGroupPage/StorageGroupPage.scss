@@ -51,6 +51,11 @@
         padding: var(--g-spacing-1) var(--g-spacing-3) var(--g-spacing-3);
     }
 
+    &__summary:has(> &__sync) ~ * {
+        // Let Storage move down when synchronization details expand.
+        overflow-anchor: none;
+    }
+
     &__storage-title {
         z-index: 3;
 

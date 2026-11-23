@@ -14,6 +14,7 @@ import {StorageGroupInfo} from '../../components/StorageGroupInfo/StorageGroupIn
 import {useCapabilitiesLoaded} from '../../store/reducers/capabilities/hooks';
 import {setHeaderBreadcrumbs} from '../../store/reducers/header/header';
 import {storageApi} from '../../store/reducers/storage/storage';
+import {BridgeSyncStatus} from '../../types/api/cluster';
 import {valueIsDefined} from '../../utils';
 import {cn} from '../../utils/cn';
 import {EMPTY_DATA_PLACEHOLDER} from '../../utils/constants';
@@ -50,6 +51,13 @@ export function StorageGroupPage() {
     );
 
     const storageGroupData = groupQuery.currentData?.groups?.[0];
+    const syncStatus = storageGroupData?.BridgeSyncStatus;
+    const showSyncDetails =
+        storageGroupData &&
+        (storageGroupData.BridgeMode ??
+            (syncStatus === BridgeSyncStatus.SYNCING ||
+                syncStatus === BridgeSyncStatus.PENDING ||
+                syncStatus === BridgeSyncStatus.SYNCED));
 
     React.useEffect(() => {
         dispatch(setHeaderBreadcrumbs('storageGroup', {groupId: groupId ?? undefined, database}));
@@ -152,7 +160,7 @@ export function StorageGroupPage() {
                 {renderPageTitle()}
                 {renderError()}
                 {renderInfo()}
-                {storageGroupData?.BridgeMode === true && (
+                {showSyncDetails && (
                     <Disclosure
                         key={groupId}
                         arrowPosition="end"
@@ -162,7 +170,7 @@ export function StorageGroupPage() {
                                 <Text variant="subheader-2">
                                     {storageGroupPageKeyset('title_sync')}
                                 </Text>
-                                <BridgeSyncStatusLabel status={storageGroupData.BridgeSyncStatus} />
+                                <BridgeSyncStatusLabel status={syncStatus} />
                             </Flex>
                         }
                     >
