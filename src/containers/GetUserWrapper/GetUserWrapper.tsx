@@ -23,12 +23,16 @@ export function GetUser({
 }) {
     const database = useDatabaseFromQuery();
 
-    const {isFetching, error, refetch} = authenticationApi.useWhoamiQuery({
+    const {currentData, isFetching, error, refetch} = authenticationApi.useWhoamiQuery({
         database,
         useMeta,
     });
 
     useHandleVisibilityChange(refetch);
+
+    // Only the first request for the current database blocks the page: a background
+    // revalidation (e.g. when the tab becomes visible again) must not unmount it.
+    const loading = isFetching && currentData === undefined;
 
     const {appTitle} = useAppTitle();
 
@@ -37,7 +41,7 @@ export function GetUser({
     const errorProps = errorToDisplay ? {...uiFactory.clusterOrDatabaseAccessError} : undefined;
 
     return (
-        <LoaderWrapper loading={isFetching} size="l" delay={0}>
+        <LoaderWrapper loading={loading} size="l" delay={0}>
             <PageError
                 error={errorToDisplay}
                 {...errorProps}
