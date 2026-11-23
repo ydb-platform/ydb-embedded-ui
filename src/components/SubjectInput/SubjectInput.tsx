@@ -3,19 +3,31 @@ import React from 'react';
 import type {FlexProps} from '@gravity-ui/uikit';
 import {Flex, Label, Text, TextInput} from '@gravity-ui/uikit';
 
-import i18n from '../i18n';
-import {block} from '../shared';
+import {cn} from '../../utils/cn';
 
+import './SubjectInput.scss';
+
+const block = cn('ydb-subject-input');
 const PixelsInLetter = 10;
 
-interface SubjectInputProps {
+export interface SubjectInputProps {
+    label: string;
     newSubjects: string[];
     setNewSubjects: React.Dispatch<React.SetStateAction<string[]>>;
+    /** Maximum number of subjects that can be selected. Omit to allow any number. */
+    maxSubjects?: number;
 }
 
-export function SubjectInput({newSubjects, setNewSubjects}: SubjectInputProps) {
+export function SubjectInput({
+    label,
+    newSubjects,
+    setNewSubjects,
+    maxSubjects = Infinity,
+}: SubjectInputProps) {
     const [renderInline, setRenderInline] = React.useState(true);
     const [inputValue, setInputValue] = React.useState('');
+    const inputId = React.useId();
+    const limitReached = newSubjects.length >= maxSubjects;
 
     const subjectInputRef = React.useRef<HTMLInputElement>(null);
     const labelsRef = React.useRef<HTMLDivElement>(null);
@@ -34,17 +46,19 @@ export function SubjectInput({newSubjects, setNewSubjects}: SubjectInputProps) {
         }
     };
 
-    const addNewAclSubject = () => {
-        if (inputValue) {
-            setNewSubjects((prev) => [...prev, inputValue]);
-            setInputValue('');
-            checkWidth(inputValue.length * PixelsInLetter);
+    const addSubject = () => {
+        if (!inputValue || limitReached) {
+            return;
         }
+
+        setNewSubjects((prev) => (prev.length >= maxSubjects ? prev : [...prev, inputValue]));
+        setInputValue('');
+        checkWidth(inputValue.length * PixelsInLetter);
     };
 
     const handleEnterClick = (e: React.KeyboardEvent) => {
         if (e.key === 'Enter') {
-            addNewAclSubject();
+            addSubject();
         }
     };
 
@@ -79,26 +93,23 @@ export function SubjectInput({newSubjects, setNewSubjects}: SubjectInputProps) {
     return (
         <Flex direction="column" gap={2}>
             <Flex gap={2} alignItems="start">
-                <label htmlFor="subjectInput">
-                    <Text
-                        as="div"
-                        whiteSpace="nowrap"
-                        color="secondary"
-                        className={block('subject-input-label')}
-                    >
-                        {i18n('label_grant-access-to')}
+                <label htmlFor={inputId}>
+                    <Text as="div" whiteSpace="nowrap" color="secondary" className={block('label')}>
+                        {label}
                     </Text>
                 </label>
-                <Flex direction="column" gap={1} className={block('subject-input-wrapper')}>
+                <Flex direction="column" gap={1} className={block('input-wrapper')}>
                     <TextInput
+                        id={inputId}
                         name="subjectInput"
-                        className={block('subject-input')}
-                        onBlur={addNewAclSubject}
+                        className={block('input')}
+                        onBlur={addSubject}
                         onKeyDown={handleEnterClick}
                         value={inputValue}
                         onUpdate={setInputValue}
                         ref={subjectInputRef}
                         startContent={renderInline ? renderLabels() : undefined}
+                        readOnly={limitReached}
                         autoFocus
                     />
                     {!renderInline && renderLabels('wrap')}
