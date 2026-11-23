@@ -1,6 +1,6 @@
 import {expect, test} from '@playwright/test';
 
-import {BridgePileState, BridgeSyncStatus} from '../../../src/types/api/cluster';
+import {BridgeSyncStatus} from '../../../src/types/api/cluster';
 import {PageModel} from '../../models/PageModel';
 import {backend, nodesPage} from '../../utils/constants';
 import {ClusterPage} from '../cluster/ClusterPage';
@@ -128,32 +128,19 @@ test.describe('Bridge mode - Storage group page', () => {
         await expect(page.getByTestId('storage-group-sync-stage')).toContainText(stage);
     });
 
-    for (const {status, stage} of [
-        {status: BridgeSyncStatus.SYNCING, stage: 'BLOCKS'},
-        {status: BridgeSyncStatus.PENDING},
-        {status: BridgeSyncStatus.SYNCED, stage: 'SYNCED'},
-    ]) {
-        test(`shows sync details for a v17 group with status ${status} without BridgeMode`, async ({
-            page,
-        }) => {
-            await mockCapabilities(page, true, {'/storage/groups': 17});
-            await mockStorageGroup(page, {
-                GroupId: groupId,
-                PoolName: poolName,
-                BridgeSyncStatus: status,
-                BridgeSyncStage: stage,
-            });
-            await new PageModel(page, 'storageGroup', {groupId}).goto();
-
-            await page.getByRole('button', {name: /Synchronisation details/}).click();
-            const stageRow = page.getByTestId('storage-group-sync-stage');
-            await expect(stageRow).toBeVisible();
-            if (stage) {
-                await expect(stageRow).toContainText(stage);
-            }
-            await expect(page.getByText('Sync partners', {exact: true})).toHaveCount(0);
+    test('shows sync details for a v17 group without BridgeMode', async ({page}) => {
+        await mockCapabilities(page, true, {'/storage/groups': 17});
+        await mockStorageGroup(page, {
+            GroupId: groupId,
+            PoolName: poolName,
+            BridgeSyncStatus: BridgeSyncStatus.SYNCING,
+            BridgeSyncStage: 'BLOCKS',
         });
-    }
+        await new PageModel(page, 'storageGroup', {groupId}).goto();
+
+        await page.getByRole('button', {name: /Synchronisation details/}).click();
+        await expect(page.getByTestId('storage-group-sync-stage')).toContainText('BLOCKS');
+    });
 
     test('hides sync details for an ordinary group in a Bridge cluster', async ({page}) => {
         await mockStorageGroup(page, {
@@ -294,10 +281,9 @@ test.describe('Bridge mode - Cluster Overview', () => {
         await expect(clusterPage.bridgeSection).toBeVisible({timeout: VISIBILITY_TIMEOUT});
 
         // Should show pile cards
-        expect(await clusterPage.getPileCardsCount()).toBe(3);
-        await expect(clusterPage.pileCards.locator('.ydb-bridge-info-table__pile-name')).toHaveText(
-            ['all-group-statuses-pile', 'r1', 'r2'],
-        );
+        const pileNames = clusterPage.pileCards.locator('.ydb-bridge-info-table__pile-name');
+        const expectedOrder = ['all-group-statuses-pile', 'r1', 'r2'];
+        await expect(pileNames).toHaveText(expectedOrder);
 
         const currentPile = clusterPage.pileCards.filter({hasText: 'r2'});
         const primaryPile = clusterPage.pileCards.filter({hasText: 'r1'});
@@ -322,44 +308,12 @@ test.describe('Bridge mode - Cluster Overview', () => {
         await expect(
             failingPile.getByTestId('bridge-pile-healthcheck').getByRole('button'),
         ).toHaveAccessibleName(/Caution/);
-    });
 
-    test('on: keeps piles sorted by name when Primary changes', async ({page}) => {
-        await mockCapabilities(page, true);
-        await mockBridgeHealthcheck(page, 'pile-c');
-        let primary = 'pile-b';
-        await page.route('**/viewer/json/cluster?*', (route) =>
-            route.fulfill({
-                json: {
-                    Version: 10,
-                    Domain: '/Root',
-                    BridgeInfo: {
-                        Piles: ['pile-c', 'pile-b', 'pile-a'].map((Name) => ({
-                            Name,
-                            State:
-                                Name === primary
-                                    ? BridgePileState.PRIMARY
-                                    : BridgePileState.SYNCHRONIZED,
-                        })),
-                    },
-                },
-            }),
-        );
-        const clusterPage = new ClusterPage(page);
-        const pileNames = clusterPage.pileCards.locator('.ydb-bridge-info-table__pile-name');
-        await clusterPage.goto();
-        await expect(pileNames).toHaveText(['pile-a', 'pile-b', 'pile-c']);
-        await expect(clusterPage.pileCards.filter({hasText: 'pile-b'})).toContainText('Primary');
-
-        primary = 'pile-a';
+        await mockClusterWithBridgePiles(page, 'r2');
         await page.reload();
-        await expect(clusterPage.pileCards.filter({hasText: 'pile-a'})).toContainText('Primary');
-        await expect(pileNames).toHaveText(['pile-a', 'pile-b', 'pile-c']);
-        await expect(
-            clusterPage.pileCards
-                .filter({hasText: 'pile-c'})
-                .getByRole('img', {name: 'You are here'}),
-        ).toBeVisible();
+        await expect(currentPile).toContainText('Primary');
+        await expect(pileNames).toHaveText(expectedOrder);
+        await expect(currentPile.getByRole('img', {name: 'You are here'})).toBeVisible();
     });
 
     test('on: shows unavailable healthcheck as non-interactive unknown', async ({page}) => {

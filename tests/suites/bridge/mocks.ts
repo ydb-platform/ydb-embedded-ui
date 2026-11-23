@@ -199,7 +199,7 @@ export const mockBridgeVisualLoadingScenario = async (page: Page) => {
     return releaseHealthcheck;
 };
 
-export const mockClusterWithBridgePiles = (page: Page) => {
+export const mockClusterWithBridgePiles = (page: Page, primaryPile: 'r1' | 'r2' = 'r1') => {
     return page.route(`**/viewer/json/cluster?*`, async (route: Route) => {
         await route.fulfill({
             status: 200,
@@ -277,7 +277,10 @@ export const mockClusterWithBridgePiles = (page: Page) => {
                         {
                             PileId: 1,
                             Name: 'r1',
-                            State: BridgePileState.PRIMARY,
+                            State:
+                                primaryPile === 'r1'
+                                    ? BridgePileState.PRIMARY
+                                    : BridgePileState.SYNCHRONIZED,
                             Nodes: 16,
                             GroupStatuses: {
                                 [BridgePileGroupStatus.FULL]: 24,
@@ -287,7 +290,10 @@ export const mockClusterWithBridgePiles = (page: Page) => {
                         {
                             PileId: 2,
                             Name: 'r2',
-                            State: BridgePileState.SYNCHRONIZED,
+                            State:
+                                primaryPile === 'r2'
+                                    ? BridgePileState.PRIMARY
+                                    : BridgePileState.SYNCHRONIZED,
                             Nodes: 12,
                             GroupStatuses: {
                                 [BridgePileGroupStatus.FULL]: 36,
