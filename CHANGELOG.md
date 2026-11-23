@@ -1,5 +1,12 @@
 # Changelog
 
+## [18.1.0-hotfix.4](https://github.com/ydb-platform/ydb-embedded-ui/compare/v18.1.0-hotfix.3...v18.1.0-hotfix.4) (2026-11-23)
+
+
+### Bug Fixes
+
+* **bridge:** stabilize pile card order in 18.1.0 ([#4630](https://github.com/ydb-platform/ydb-embedded-ui/issues/4630)) ([e1c9383](https://github.com/ydb-platform/ydb-embedded-ui/commit/e1c9383e09077c9099b8e15fcec3dbd2d4d03655))
+
 ## [18.1.0-hotfix.3](https://github.com/ydb-platform/ydb-embedded-ui/compare/v18.1.0-hotfix.2...v18.1.0-hotfix.3) (2026-11-22)
 
 
