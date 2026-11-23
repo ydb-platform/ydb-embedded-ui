@@ -337,17 +337,7 @@ export const BridgeInfoTable = React.memo(function BridgeInfoTable({
                 index,
                 current: Boolean(currentPileName?.trim() && pile.Name === currentPileName),
             }))
-            .sort((left, right) => {
-                if (left.current !== right.current) {
-                    return left.current ? -1 : 1;
-                }
-                const leftPrimary = left.pile.State === BridgePileState.PRIMARY;
-                const rightPrimary = right.pile.State === BridgePileState.PRIMARY;
-                if (leftPrimary !== rightPrimary) {
-                    return leftPrimary ? -1 : 1;
-                }
-                return left.index - right.index;
-            });
+            .sort((left, right) => (left.pile.Name ?? '').localeCompare(right.pile.Name ?? ''));
     }, [piles, currentPileName]);
 
     return (
