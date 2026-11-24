@@ -20,6 +20,7 @@
   "form.validation.limitRows": "Лимит строк должен быть между 1 и 100000",
   "docs": "Документация",
   "field_tracing": "Трассировка",
+  "field_timeout-in-seconds": "Таймаут в секундах",
   "action_advanced-settings": "Расширенные настройки",
   "value_recommended": "Рекомендуется",
   "value_legacy": "Устаревший",

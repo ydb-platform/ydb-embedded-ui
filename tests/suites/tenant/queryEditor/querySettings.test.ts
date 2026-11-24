@@ -189,10 +189,11 @@ test.describe('Test Query Settings', async () => {
         await queryEditor.settingsDialog.changeLimitRows(100001);
         await queryEditor.settingsDialog.clickButton(ButtonNames.Apply);
 
-        await expect(queryEditor.settingsDialog.isLimitRowsError()).resolves.toBe(true);
-        await expect(queryEditor.settingsDialog.getLimitRowsErrorMessage()).resolves.toBe(
-            'Too big: expected number to be <=100000',
+        const message = 'Too big: expected number to be <=100000';
+        await expect(queryEditor.settingsDialog.limitRowsInput).toHaveAccessibleDescription(
+            message,
         );
+        await expect(page.getByText(message, {exact: true})).toBeVisible();
     });
 
     test('Shows error for negative limit rows', async ({page}) => {
@@ -200,10 +201,9 @@ test.describe('Test Query Settings', async () => {
         await queryEditor.clickGearButton();
 
         await queryEditor.settingsDialog.changeLimitRows(-1);
-        await queryEditor.settingsDialog.clickButton(ButtonNames.Apply);
-
-        await expect(queryEditor.settingsDialog.isLimitRowsError()).resolves.toBe(true);
-        await expect(queryEditor.settingsDialog.getLimitRowsErrorMessage()).resolves.toBe(
+        await page.getByRole('button', {name: ButtonNames.Apply, exact: true}).press('Enter');
+        await expect(queryEditor.settingsDialog.limitRowsInput).toBeFocused();
+        await expect(queryEditor.settingsDialog.limitRowsInput).toHaveAccessibleDescription(
             'Too small: expected number to be >0',
         );
     });
@@ -348,8 +348,9 @@ test.describe('Test Query Settings', async () => {
         await queryEditor.settingsDialog.changeTimeout(MAX_QUERY_TIMEOUT_SECONDS + 1);
         await queryEditor.settingsDialog.clickButton(ButtonNames.Apply);
 
-        // Dialog should stay open with validation error
-        await expect(queryEditor.settingsDialog.isTimeoutError()).resolves.toBe(true);
+        const message = `Too big: expected number to be <=${MAX_QUERY_TIMEOUT_SECONDS}`;
+        await expect(queryEditor.settingsDialog.timeoutInput).toHaveAccessibleDescription(message);
+        await expect(page.getByText(message, {exact: true})).toBeVisible();
 
         await queryEditor.settingsDialog.clickButton(ButtonNames.Cancel);
     });
@@ -395,10 +396,11 @@ test.describe('Test Query Settings', async () => {
 
         // Enter a negative value
         await queryEditor.settingsDialog.changeTimeout(-10);
-        await queryEditor.settingsDialog.clickButton(ButtonNames.Apply);
-
-        // Dialog should stay open with validation error
-        await expect(queryEditor.settingsDialog.isTimeoutError()).resolves.toBe(true);
+        await page.getByRole('button', {name: ButtonNames.Apply, exact: true}).press('Enter');
+        await expect(queryEditor.settingsDialog.timeoutInput).toBeFocused();
+        await expect(queryEditor.settingsDialog.timeoutInput).toHaveAccessibleDescription(
+            'Too small: expected number to be >0',
+        );
 
         await queryEditor.settingsDialog.clickButton(ButtonNames.Cancel);
     });

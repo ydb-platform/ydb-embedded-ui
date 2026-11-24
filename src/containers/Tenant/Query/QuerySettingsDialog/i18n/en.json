@@ -20,6 +20,7 @@
   "form.validation.limitRows": "Must be between 1 and 100000",
   "docs": "Documentation",
   "field_tracing": "Tracing",
+  "field_timeout-in-seconds": "Timeout in seconds",
   "action_advanced-settings": "Advanced settings",
   "value_recommended": "Recommended",
   "value_legacy": "Legacy",

@@ -262,7 +262,6 @@ function QuerySettingsForm({initialValues, onSubmit, onClose}: QuerySettingsForm
                                 placeholder="10000"
                                 validationState={errors.limitRows ? 'invalid' : undefined}
                                 errorMessage={errors.limitRows?.message}
-                                errorPlacement="inside"
                                 endContent={
                                     <span className={b('postfix')}>{i18n('form.limit.rows')}</span>
                                 }

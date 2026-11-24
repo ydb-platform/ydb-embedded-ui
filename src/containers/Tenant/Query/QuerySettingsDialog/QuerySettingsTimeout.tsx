@@ -65,6 +65,7 @@ export function QuerySettingsTimeout({
                     <TextInput
                         id={id}
                         controlRef={controlRef}
+                        controlProps={{'aria-label': i18n('field_timeout-in-seconds')}}
                         type="number"
                         value={value?.toString() || ''}
                         onChange={handleValueChange}
@@ -72,7 +73,6 @@ export function QuerySettingsTimeout({
                         placeholder="60"
                         validationState={validationState}
                         errorMessage={errorMessage}
-                        errorPlacement="inside"
                         endContent={
                             <span className={b('postfix')}>{i18n('form.timeout.seconds')}</span>
                         }

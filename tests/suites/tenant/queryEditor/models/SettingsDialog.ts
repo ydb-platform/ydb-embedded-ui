@@ -12,22 +12,18 @@ import {VISIBILITY_TIMEOUT} from '../../TenantPage';
 import type {ButtonNames} from './QueryEditor';
 
 export class SettingsDialog {
+    readonly limitRowsInput: Locator;
+    readonly timeoutInput: Locator;
+
     private dialog: Locator;
     private page: Page;
     private selectPopup: Locator;
-    private limitRowsInput: Locator;
     private outputChunkMaxSizeInput: Locator;
     private pragmasInput: Locator;
-    private limitRowsErrorIcon: Locator;
-    private limitRowsErrorPopover: Locator;
-    private timeoutInput: Locator;
     private timeoutSwitch: Locator;
     private timeoutSwitchHint: Locator;
     private timeoutHintPopover: Locator;
     private timeoutLabel: Locator;
-
-    private timeoutErrorIcon: Locator;
-    private timeoutErrorPopover: Locator;
 
     private queryModeSelect: Locator;
     private resourcePoolSelect: Locator;
@@ -38,25 +34,23 @@ export class SettingsDialog {
         this.page = page;
         this.dialog = page.locator('.ydb-query-settings-dialog');
 
-        this.limitRowsInput = this.dialog.locator('.ydb-query-settings-dialog__limit-rows input');
+        this.limitRowsInput = this.dialog.getByRole('spinbutton', {
+            name: 'Limit rows',
+            exact: true,
+        });
         this.outputChunkMaxSizeInput = this.dialog.locator(
             '.ydb-query-settings-dialog__output-chunk-max-size input',
         );
         this.pragmasInput = this.dialog.locator('#pragmas');
-        this.limitRowsErrorIcon = this.dialog.locator(
-            '.ydb-query-settings-dialog__limit-rows [data-qa="control-error-icon-qa"]',
-        );
-        this.limitRowsErrorPopover = this.page.locator('.g-popover-legacy__tooltip-content');
         this.selectPopup = page.locator('.ydb-query-settings-select__popup');
-        this.timeoutInput = this.dialog.locator('.ydb-query-settings-timeout__input');
+        this.timeoutInput = this.dialog.getByRole('spinbutton', {
+            name: 'Timeout in seconds',
+            exact: true,
+        });
         this.timeoutSwitch = this.dialog.locator('.ydb-query-settings-timeout__switch');
         this.timeoutSwitchHint = this.dialog.locator('.ydb-timeout-label__question-icon');
         this.timeoutHintPopover = this.page.locator('.g-help-mark__popover');
         this.timeoutLabel = this.dialog.locator('.ydb-timeout-label__label-title');
-        this.timeoutErrorIcon = this.dialog.locator(
-            '.ydb-query-settings-timeout__input [data-qa="control-error-icon-qa"]',
-        );
-        this.timeoutErrorPopover = this.page.locator('.g-popover-legacy__tooltip-content');
 
         // Define distinct locators for selects
         this.queryModeSelect = this.dialog.locator(
@@ -166,16 +160,6 @@ export class SettingsDialog {
         await this.pragmasInput.fill(pragmas);
     }
 
-    async isLimitRowsError() {
-        return await this.limitRowsErrorIcon.isVisible();
-    }
-
-    async getLimitRowsErrorMessage() {
-        await this.limitRowsErrorIcon.hover();
-        await this.limitRowsErrorPopover.waitFor({state: 'visible', timeout: VISIBILITY_TIMEOUT});
-        return await this.limitRowsErrorPopover.textContent();
-    }
-
     async clickButton(buttonName: ButtonNames) {
         const button = this.dialog.getByRole('button', {name: buttonName});
         await button.waitFor({state: 'visible', timeout: VISIBILITY_TIMEOUT});
@@ -234,34 +218,19 @@ export class SettingsDialog {
 
     async changeTimeout(value: number) {
         await this.expandAdvanced();
-        const input = this.timeoutInput.locator('input');
-        await input.fill(value.toString());
-        await expect(input).toHaveValue(value.toString());
+        await this.timeoutInput.fill(value.toString());
+        await expect(this.timeoutInput).toHaveValue(value.toString());
     }
 
     async clearTimeout() {
         await this.expandAdvanced();
-        const input = this.timeoutInput.locator('input');
-        await input.clear();
-        await expect(input).toHaveValue('');
+        await this.timeoutInput.clear();
+        await expect(this.timeoutInput).toHaveValue('');
     }
 
     async getTimeoutValue() {
         await this.expandAdvanced();
-        const input = this.timeoutInput.locator('input');
-        return await input.inputValue();
-    }
-
-    async isTimeoutError() {
-        await this.expandAdvanced();
-        return await this.timeoutErrorIcon.isVisible();
-    }
-
-    async getTimeoutErrorMessage() {
-        await this.expandAdvanced();
-        await this.timeoutErrorIcon.hover();
-        await this.timeoutErrorPopover.waitFor({state: 'visible', timeout: VISIBILITY_TIMEOUT});
-        return await this.timeoutErrorPopover.textContent();
+        return await this.timeoutInput.inputValue();
     }
 
     async hoverStatisticsSelect() {
