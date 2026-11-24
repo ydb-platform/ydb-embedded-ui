@@ -1,3 +1,5 @@
+import React from 'react';
+
 import {
     useSnapshotReadWriteAvailable,
     useTracingLevelOptionAvailable,
@@ -6,23 +8,29 @@ import {SETTING_KEYS} from '../../store/reducers/settings/constants';
 import type {QuerySettings} from '../../types/store/query';
 import {
     DEFAULT_QUERY_SETTINGS,
-    TRANSACTION_MODES,
     getEffectiveQueryTimeout,
+    getEffectiveTransactionMode,
     querySettingsRestoreSchema,
 } from '../query';
 
 import {useQueryStreamingSetting} from './useQueryStreamingSetting';
 import {useSetting} from './useSetting';
 
-export const useQueryExecutionSettings = () => {
+export const useQuerySettings = () => {
     const enableTracingLevel = useTracingLevelOptionAvailable();
-    const enableSnapshotReadWrite = useSnapshotReadWriteAvailable();
     const [storageSettings, setSettings] = useSetting<QuerySettings>(
         SETTING_KEYS.QUERY_EXECUTION_SETTINGS,
     );
 
-    const validatedSettings = querySettingsRestoreSchema.parse(storageSettings);
+    const validatedSettings = React.useMemo(
+        () => querySettingsRestoreSchema.parse(storageSettings),
+        [storageSettings],
+    );
     const [enableQueryStreaming] = useQueryStreamingSetting();
+    const updateSettings = React.useCallback(
+        (changes: Partial<QuerySettings>) => setSettings({...validatedSettings, ...changes}),
+        [validatedSettings, setSettings],
+    );
 
     const settings: QuerySettings = {
         ...validatedSettings,
@@ -30,12 +38,18 @@ export const useQueryExecutionSettings = () => {
         tracingLevel: enableTracingLevel
             ? validatedSettings.tracingLevel
             : DEFAULT_QUERY_SETTINGS.tracingLevel,
-        transactionMode:
-            !enableSnapshotReadWrite &&
-            validatedSettings.transactionMode === TRANSACTION_MODES.snapshotrw
-                ? DEFAULT_QUERY_SETTINGS.transactionMode
-                : validatedSettings.transactionMode,
     };
 
-    return [settings, setSettings] as const;
+    return [settings, updateSettings] as const;
+};
+
+export const useQueryExecutionSettings = () => {
+    const [settings, updateSettings] = useQuerySettings();
+    const enableSnapshotReadWrite = useSnapshotReadWriteAvailable();
+    const transactionMode = getEffectiveTransactionMode(
+        settings.transactionMode,
+        enableSnapshotReadWrite,
+    );
+
+    return [{...settings, transactionMode}, updateSettings] as const;
 };

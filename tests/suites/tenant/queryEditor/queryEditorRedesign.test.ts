@@ -368,7 +368,7 @@ test.describe('Query editor regressions @query-editor-redesign', () => {
         await toggleEditorSetting(page, 'off', 'Query Streaming');
         await editor.clickGearButton();
         await editor.settingsDialog.changeStatsLevel('basic');
-        await editor.settingsDialog.clickButton(ButtonNames.Save);
+        await editor.settingsDialog.clickButton(ButtonNames.Apply);
         let requests = 0;
         let conversions = 0;
         await page.route(queryUrl, (route) => {
@@ -404,7 +404,7 @@ test.describe('Query editor regressions @query-editor-redesign', () => {
         expect(requests).toBe(1);
         expect(conversions).toBe(0);
         await editor.settingsDialog.changeStatsLevel('full');
-        await editor.settingsDialog.clickButton(ButtonNames.Save);
+        await editor.settingsDialog.clickButton(ButtonNames.Apply);
         await expect(placeholder.getByText('Query plan not enabled', {exact: true})).toBeVisible();
         expect(requests).toBe(1);
         await editor.run('SELECT 1;', 'query');

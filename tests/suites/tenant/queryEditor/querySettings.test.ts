@@ -208,9 +208,13 @@ test.describe('Test Query Settings', async () => {
         );
     });
 
-    test('Persists limit rows without replacing a saved snapshot transaction mode', async ({
+    test('Persists limit rows without replacing a saved snapshot mode on an older Viewer', async ({
         page,
     }) => {
+        let viewerQueryVersion = 10;
+        await page.route('**/viewer/capabilities*', (route) =>
+            route.fulfill({json: {Capabilities: {'/viewer/query': viewerQueryVersion}}}),
+        );
         await page.evaluate(
             (settings) => localStorage.setItem('queryExecutionSettings', JSON.stringify(settings)),
             {...DEFAULT_QUERY_SETTINGS, transactionMode: TRANSACTION_MODES.snapshotrw},
@@ -224,11 +228,16 @@ test.describe('Test Query Settings', async () => {
         const transactionMode = page.getByRole('combobox', {name: 'Transaction mode', exact: true});
 
         await queryEditor.clickGearButton();
-        await expect(transactionMode).toContainText('Snapshot Read-Write');
+        await expect(transactionMode).toContainText('Implicit');
         await queryEditor.settingsDialog.changeLimitRows(validValue);
         await queryEditor.settingsDialog.clickButton(ButtonNames.Apply);
         await expect(queryEditor.settingsDialog.isHidden()).resolves.toBe(true);
 
+        viewerQueryVersion = 11;
+        await Promise.all([
+            page.waitForResponse((response) => response.url().includes('/viewer/capabilities')),
+            page.reload(),
+        ]);
         await queryEditor.clickGearButton();
         await expect(queryEditor.settingsDialog.getLimitRowsValue()).resolves.toBe(
             validValue.toString(),
@@ -357,9 +366,21 @@ test.describe('Test Query Settings', async () => {
         await expect(chunkSize).toBeHidden();
         await queryEditor.settingsDialog.clickButton(ButtonNames.Apply);
         await expect(chunkSize).toBeFocused();
+        await chunkSize.fill('0');
+        await page.getByRole('button', {name: 'Apply', exact: true}).press('Enter');
+        await expect(chunkSize).toBeFocused();
+        await expect(chunkSize).toHaveAccessibleDescription('Too small: expected number to be >0');
         await chunkSize.fill('1024');
         await queryEditor.settingsDialog.clickButton(ButtonNames.Apply);
         await expect(queryEditor.settingsDialog.isHidden()).resolves.toBe(true);
+    });
+
+    test('Footer buttons fit in the dialog at 320px', async ({page}) => {
+        await page.setViewportSize({width: 320, height: 900});
+        await new QueryEditor(page).clickGearButton();
+        const dialog = page.locator('.ydb-query-settings-dialog');
+        await expect(dialog.getByRole('button', {name: 'Apply'})).toBeInViewport({ratio: 1});
+        await expect.poll(() => dialog.evaluate((el) => el.scrollWidth - el.clientWidth)).toBe(0);
     });
 
     test('Shows error for negative timeout', async ({page}) => {

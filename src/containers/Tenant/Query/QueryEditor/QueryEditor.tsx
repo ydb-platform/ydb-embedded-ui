@@ -126,7 +126,7 @@ export default function QueryEditor({
 
     const isResultLoaded = Boolean(result);
 
-    const [querySettings, setQuerySettings] = useQueryExecutionSettings();
+    const [querySettings, updateQuerySettings] = useQueryExecutionSettings();
     const enableTracingLevel = useTracingLevelOptionAvailable();
     const [lastQueryExecutionSettings, setLastQueryExecutionSettings] =
         useLastQueryExecutionSettings();
@@ -142,11 +142,10 @@ export default function QueryEditor({
         SETTING_KEYS.BINARY_DATA_IN_PLAIN_TEXT_DISPLAY,
     );
 
-    const {
-        resourcePools,
-        normalizedResourcePool,
-        isLoading: isResourcePoolsLoading,
-    } = useResourcePools(database, querySettings.resourcePool);
+    const {normalizedResourcePool, isLoading: isResourcePoolsLoading} = useResourcePools(
+        database,
+        querySettings.resourcePool,
+    );
 
     const encodeTextWithBase64 = !binaryDataInPlainTextDisplay;
 
@@ -248,16 +247,12 @@ export default function QueryEditor({
             return;
         }
 
-        setQuerySettings({
-            ...querySettings,
-            resourcePool: normalizedResourcePool,
-        });
+        updateQuerySettings({resourcePool: normalizedResourcePool});
     }, [
         isResourcePoolsLoading,
         normalizedResourcePool,
-        querySettings,
-        resourcePools.length,
-        setQuerySettings,
+        querySettings.resourcePool,
+        updateQuerySettings,
     ]);
 
     const tableSettings = React.useMemo(() => {

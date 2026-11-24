@@ -100,7 +100,7 @@ test.describe('Plan to SVG functionality @query-editor-redesign', () => {
             await queryEditor.clickGearButton();
             await queryEditor.settingsDialog.changeQueryMode(mode);
             await queryEditor.settingsDialog.changeStatsLevel(STATISTICS_MODES.none);
-            await queryEditor.settingsDialog.clickButton(ButtonNames.Save);
+            await queryEditor.settingsDialog.clickButton(ButtonNames.Apply);
             const query = `SELECT NodeId FROM \`${database}/.sys/nodes\` LIMIT 1;`;
             await queryEditor.setQuery(query);
 

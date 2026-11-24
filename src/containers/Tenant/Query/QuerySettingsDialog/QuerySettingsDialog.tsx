@@ -28,7 +28,7 @@ import type {QuerySettings} from '../../../../types/store/query';
 import {cn} from '../../../../utils/cn';
 import {BRAND_BUTTON_CLASS} from '../../../../utils/constants';
 import {
-    useQueryExecutionSettings,
+    useQuerySettings,
     useQueryStreamingSetting,
     useResourcePools,
     useTypedDispatch,
@@ -38,6 +38,7 @@ import {
     RESOURCE_POOL_NO_OVERRIDE_VALUE,
     TRACING_LEVELS,
     TRANSACTION_MODES,
+    getEffectiveTransactionMode,
     isStreamingSupportedForMode,
     querySettingsValidationSchema,
 } from '../../../../utils/query';
@@ -57,7 +58,7 @@ const b = cn('ydb-query-settings-dialog');
 export function QuerySettingsDialog() {
     const dispatch = useTypedDispatch();
     const queryAction = useTypedSelector(selectQueryAction);
-    const [querySettings, setQuerySettings] = useQueryExecutionSettings();
+    const [querySettings, setQuerySettings] = useQuerySettings();
     const onClose = React.useCallback(() => dispatch(setQueryAction('idle')), [dispatch]);
     const onSubmit = React.useCallback(
         (data: QuerySettings) => {
@@ -165,7 +166,6 @@ function QuerySettingsForm({initialValues, onSubmit, onClose}: QuerySettingsForm
     const timeout = watch('timeout');
     const resourcePool = watch('resourcePool');
     const queryMode = watch('queryMode');
-    const transactionMode = watch('transactionMode');
     const statisticsMode = watch('statisticsMode');
 
     React.useEffect(() => {
@@ -180,12 +180,6 @@ function QuerySettingsForm({initialValues, onSubmit, onClose}: QuerySettingsForm
             setValue('resourcePool', RESOURCE_POOL_NO_OVERRIDE_VALUE);
         }
     }, [isResourcePoolsLoading, resourcePools, resourcePool, setValue]);
-
-    React.useEffect(() => {
-        if (!enableSnapshotReadWrite && transactionMode === TRANSACTION_MODES.snapshotrw) {
-            setValue('transactionMode', TRANSACTION_MODES.implicit);
-        }
-    }, [enableSnapshotReadWrite, transactionMode, setValue]);
 
     const transactionModeOptions = React.useMemo(
         () =>
@@ -284,7 +278,10 @@ function QuerySettingsForm({initialValues, onSubmit, onClose}: QuerySettingsForm
                             <QuerySettingsSelect
                                 id="transactionMode"
                                 ariaLabel={QUERY_SETTINGS_FIELD_SETTINGS.transactionMode.title}
-                                setting={field.value}
+                                setting={getEffectiveTransactionMode(
+                                    field.value,
+                                    enableSnapshotReadWrite,
+                                )}
                                 onUpdateSetting={field.onChange}
                                 settingOptions={transactionModeOptions}
                             />
@@ -411,7 +408,6 @@ function QuerySettingsForm({initialValues, onSubmit, onClose}: QuerySettingsForm
                                                 errors.outputChunkMaxSize ? 'invalid' : undefined
                                             }
                                             errorMessage={errors.outputChunkMaxSize?.message}
-                                            errorPlacement="inside"
                                             endContent={
                                                 <span className={b('postfix')}>
                                                     {i18n('form.output.chunk.max.size.bytes')}

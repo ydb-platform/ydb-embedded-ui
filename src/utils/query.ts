@@ -490,6 +490,15 @@ export function isStreamingSupportedForMode(mode: QueryMode) {
     return mode === QUERY_MODES.query;
 }
 
+export function getEffectiveTransactionMode(
+    mode: TransactionMode,
+    snapshotReadWriteAvailable: boolean,
+) {
+    return mode === TRANSACTION_MODES.snapshotrw && !snapshotReadWriteAvailable
+        ? TRANSACTION_MODES.implicit
+        : mode;
+}
+
 export function getEffectiveQueryTimeout(settings: QuerySettings, streamingEnabled: boolean) {
     return (
         settings.timeout ??

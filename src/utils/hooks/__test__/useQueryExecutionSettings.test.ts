@@ -53,7 +53,7 @@ describe('useQueryExecutionSettings', () => {
         jest.clearAllMocks();
     });
 
-    test('falls back from snapshot read-write when the capability is unavailable', () => {
+    test('falls back for execution but preserves the saved mode when updating the resource pool', () => {
         mockUseSnapshotReadWriteAvailable.mockReturnValue(false);
         const storageSettings = createSettings({
             transactionMode: TRANSACTION_MODES.snapshotrw,
@@ -63,6 +63,8 @@ describe('useQueryExecutionSettings', () => {
         const {result} = renderHook(() => useQueryExecutionSettings());
 
         expect(result.current[0].transactionMode).toBe(DEFAULT_QUERY_SETTINGS.transactionMode);
+        result.current[1]({resourcePool: 'batch'});
+        expect(mockSetSettings).toHaveBeenCalledWith({...storageSettings, resourcePool: 'batch'});
     });
 
     test('keeps snapshot read-write when the capability is available', () => {

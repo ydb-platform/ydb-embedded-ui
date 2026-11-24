@@ -103,6 +103,10 @@
         gap: var(--g-spacing-2);
     }
     @media (max-width: 480px) {
+        &__main-buttons {
+            flex-wrap: wrap;
+        }
+
         &__dialog-row {
             grid-template-columns: minmax(0, 1fr);
             gap: var(--g-spacing-1);
