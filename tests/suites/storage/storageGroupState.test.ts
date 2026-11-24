@@ -102,6 +102,11 @@ test.describe('Storage group state labels', () => {
                         JSON.stringify([
                             {id: 'GroupId', selected: true},
                             {id: 'State', selected: true},
+                            // Default columns missing from saved settings are treated as new and shown
+                            {id: 'PoolName', selected: false},
+                            {id: 'Erasure', selected: false},
+                            {id: 'Used', selected: false},
+                            {id: 'VDisks', selected: false},
                         ]),
                     );
                 }, theme);

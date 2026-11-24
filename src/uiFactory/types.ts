@@ -56,6 +56,8 @@ export interface MyDatabasesTableExtensionProps {
     environmentName?: string;
     /** Filtered rows for this environment. Preserve their order and identity when deriving groups. */
     rows: PreparedTenant[];
+    /** True until the first response arrives; `rows` is empty meanwhile. */
+    loading: boolean;
     children: (options: MyDatabasesTableOptions) => React.ReactNode;
 }
 

@@ -25,7 +25,12 @@ async function openGroups(
             'storageGroupsSelectedColumns',
             JSON.stringify([
                 {id: 'GroupId', selected: true},
-                {id: expert ? 'VDisksPDisks' : 'VDisks', selected: true},
+                {id: 'VDisksPDisks', selected: expert},
+                // Default columns missing from saved settings are treated as new and shown
+                {id: 'VDisks', selected: !expert},
+                {id: 'PoolName', selected: false},
+                {id: 'Erasure', selected: false},
+                {id: 'Used', selected: false},
             ]),
         );
     }, expertMode);

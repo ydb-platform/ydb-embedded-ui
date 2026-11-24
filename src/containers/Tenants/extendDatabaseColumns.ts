@@ -5,6 +5,9 @@ import type {MyDatabasesTableColumn} from '../../uiFactory/types';
 
 import {DATABASES_COLUMNS_TITLES, DATABASES_DEFAULT_COLUMNS} from './constants';
 
+// The function runs on every columns recalculation, report each duplicate only once
+const reportedDuplicates = new Set<string>();
+
 export function extendDatabaseColumns(
     base: Column<PreparedTenant>[],
     additional: readonly MyDatabasesTableColumn[] = [],
@@ -15,9 +18,12 @@ export function extendDatabaseColumns(
     const insertions = new Map<string | undefined, Column<PreparedTenant>[]>();
     for (const {after, settingsTitle, visibleByDefault, ...column} of additional) {
         if (Object.hasOwn(titles, column.name)) {
-            console.warn(
-                `MyDatabasesTableExtension: column "${column.name}" is skipped, the name is already in use`,
-            );
+            if (!reportedDuplicates.has(column.name)) {
+                reportedDuplicates.add(column.name);
+                console.warn(
+                    `MyDatabasesTableExtension: column "${column.name}" is skipped, the name is already in use`,
+                );
+            }
             continue;
         }
         titles[column.name] = settingsTitle;

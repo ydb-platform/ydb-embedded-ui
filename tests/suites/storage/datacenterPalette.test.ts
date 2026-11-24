@@ -75,6 +75,11 @@ for (const theme of ['light', 'dark']) {
                 JSON.stringify([
                     {id: 'GroupId', selected: true},
                     {id: 'VDisksPDisks', selected: true},
+                    // Default columns missing from saved settings are treated as new and shown
+                    {id: 'PoolName', selected: false},
+                    {id: 'Erasure', selected: false},
+                    {id: 'Used', selected: false},
+                    {id: 'VDisks', selected: false},
                 ]),
             );
         }, theme);

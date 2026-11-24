@@ -8,15 +8,20 @@ export function useExpandedGroups(groups?: TableGroup[]) {
     React.useEffect(() => {
         if (groups?.length) {
             setExpandedGroups((previousExpandedGroups) => {
-                return groups.reduce((result, {name}) => {
-                    const previousValue = previousExpandedGroups[name];
+                const names = groups.map(({name}) => name);
+                const previousNames = Object.keys(previousExpandedGroups);
+                // Keep the same state object when the groups list is unchanged to avoid extra renders
+                if (
+                    names.length === previousNames.length &&
+                    names.every((name) => Object.hasOwn(previousExpandedGroups, name))
+                ) {
+                    return previousExpandedGroups;
+                }
 
-                    // Preserve previously expanded groups on groups list change
-                    return {
-                        ...result,
-                        [name]: previousValue ?? false,
-                    };
-                }, {});
+                // Preserve previously expanded groups on groups list change
+                return Object.fromEntries(
+                    names.map((name) => [name, previousExpandedGroups[name] ?? false]),
+                );
             });
         }
     }, [groups]);

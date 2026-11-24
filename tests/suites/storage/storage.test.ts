@@ -175,6 +175,11 @@ test.describe('Storage group latency', () => {
                     JSON.stringify([
                         {id: 'GroupId', selected: true},
                         {id: 'Latency', selected: true},
+                        // Default columns missing from saved settings are treated as new and shown
+                        {id: 'PoolName', selected: false},
+                        {id: 'Erasure', selected: false},
+                        {id: 'Used', selected: false},
+                        {id: 'VDisks', selected: false},
                     ]),
                 );
             });

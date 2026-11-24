@@ -1,6 +1,6 @@
 {
   "create-database": "Create database",
-  "label-databases": "Databases",
+  "field_databases": "Databases",
   "no-databases": "No such databases",
   "controls_search-placeholder": "Database name",
 

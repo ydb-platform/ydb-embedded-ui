@@ -165,7 +165,9 @@ export const useSelectedColumns = <T extends {name: string}>(
                 setSavedColumns(preparedColumns);
                 return;
             }
-            // Keep saved state of columns that are currently unavailable (conditional or extension columns)
+            // Keep saved state of columns that are currently unavailable (conditional or extension columns).
+            // IDs of columns removed from the code stay here on purpose: the hook cannot tell them
+            // from temporarily unavailable ones, and they are ignored on render.
             const available = new Set(preparedColumns.map(({id}) => id));
             const unavailable = normalizedSavedColumns
                 .filter(({id}) => !available.has(id))

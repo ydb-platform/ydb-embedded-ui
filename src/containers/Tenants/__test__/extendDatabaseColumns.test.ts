@@ -77,6 +77,11 @@ describe('extendDatabaseColumns', () => {
         expect(titles.owner).toBe('owner title');
         expect(warn).toHaveBeenCalledTimes(2);
 
+        // Each duplicate is reported only once
+        extendDatabaseColumns(base, [column({name: 'cpu'}), column({name: 'owner'})]);
+        extendDatabaseColumns(base, [column({name: 'owner'}), column({name: 'owner'})]);
+        expect(warn).toHaveBeenCalledTimes(2);
+
         warn.mockRestore();
     });
 });

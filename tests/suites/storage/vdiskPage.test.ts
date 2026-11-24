@@ -53,6 +53,11 @@ async function enableStorageNodesCapacityColumns(page: Page) {
                 {id: 'MaxVDiskRawUsage', selected: true},
                 {id: 'CapacityAlert', selected: true},
                 {id: 'DiskSpaceUsage', selected: true},
+                // Default columns missing from saved settings are treated as new and shown
+                {id: 'Host', selected: false},
+                {id: 'Uptime', selected: false},
+                {id: 'CPU', selected: false},
+                {id: 'RAM', selected: false},
             ]),
         );
     });
@@ -65,6 +70,12 @@ async function enableStorageNodesVDiskSlotUsageOnly(page: Page) {
             JSON.stringify([
                 {id: 'NodeId', selected: true},
                 {id: 'MaxVDiskSlotUsage', selected: true},
+                // Default columns missing from saved settings are treated as new and shown
+                {id: 'Host', selected: false},
+                {id: 'Uptime', selected: false},
+                {id: 'CPU', selected: false},
+                {id: 'RAM', selected: false},
+                {id: 'PDisks', selected: false},
             ]),
         );
     });
@@ -80,6 +91,11 @@ async function enableStorageGroupsLegacyCapacityColumns(page: Page) {
                 {id: 'DiskSpaceUsage', selected: true},
                 {id: 'DiskSpace', selected: true},
                 {id: 'MaxVDiskSlotUsage', selected: true},
+                // Default columns missing from saved settings are treated as new and shown
+                {id: 'PoolName', selected: false},
+                {id: 'Erasure', selected: false},
+                {id: 'Used', selected: false},
+                {id: 'VDisks', selected: false},
             ]),
         );
     });

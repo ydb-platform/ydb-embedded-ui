@@ -167,6 +167,8 @@ function TenantsTableContent(props: TenantsTableContentProps) {
         return filteredBySearch;
     }, [tenants, withProblems, search, showWithProblemsFilter]);
 
+    const pending = isFetching && currentData === undefined;
+
     const renderView = (options: MyDatabasesTableOptions) => (
         <TenantsTableView
             {...props}
@@ -175,13 +177,13 @@ function TenantsTableContent(props: TenantsTableContentProps) {
             filteredTenants={filteredTenants}
             queryParams={queryParams}
             hasData={currentData !== undefined}
-            pending={isFetching && currentData === undefined}
+            pending={pending}
             error={error}
         />
     );
 
     return Extension ? (
-        <Extension environmentName={environmentName} rows={filteredTenants}>
+        <Extension environmentName={environmentName} rows={filteredTenants} loading={pending}>
             {renderView}
         </Extension>
     ) : (
@@ -309,7 +311,7 @@ function TenantsTableView({
                 <EntitiesCount
                     total={tenants?.length}
                     current={filteredTenants?.length || 0}
-                    label={i18n('label-databases')}
+                    label={i18n('field_databases')}
                     loading={loading}
                 />
             </React.Fragment>
@@ -532,7 +534,7 @@ function TenantsTableView({
                     groupId={group.id}
                     title={group.title}
                     count={group.rows.length}
-                    entityName={i18n('label-databases')}
+                    entityName={i18n('field_databases')}
                     expanded={Boolean(expandedGroups[group.id])}
                     onIsExpandedChange={setIsGroupExpanded}
                 >
