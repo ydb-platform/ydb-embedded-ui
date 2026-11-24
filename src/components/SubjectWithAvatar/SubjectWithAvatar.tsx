@@ -1,3 +1,5 @@
+import type React from 'react';
+
 import {Avatar, Flex, Text} from '@gravity-ui/uikit';
 
 import {cn} from '../../utils/cn';
@@ -9,14 +11,15 @@ import './SubjectWithAvatar.scss';
 interface SubjectProps {
     subject: string;
     title?: string;
+    avatar?: React.ReactNode;
     renderIcon?: () => React.ReactNode;
 }
 
-export function SubjectWithAvatar({subject, title, renderIcon}: SubjectProps) {
+export function SubjectWithAvatar({subject, title, avatar, renderIcon}: SubjectProps) {
     return (
         <Flex gap={2} alignItems="center">
             <div className={block('avatar-wrapper')}>
-                <Avatar theme="brand" text={subject} title={subject} />
+                {avatar ?? <Avatar theme="brand" text={subject} title={subject} />}
                 {renderIcon?.()}
             </div>
             <Flex direction="column" overflow="hidden">
