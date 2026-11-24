@@ -17,6 +17,7 @@ import {TableColumnSetup} from '../../components/TableColumnSetup/TableColumnSet
 import {TableWithControlsLayout} from '../../components/TableWithControlsLayout/TableWithControlsLayout';
 import {TenantNameWrapper} from '../../components/TenantNameWrapper/TenantNameWrapper';
 import {getTenantLink} from '../../components/TenantNameWrapper/utils';
+import {TitleWithHelpMark} from '../../components/TitleWithHelpmark/TitleWithHelpmark';
 import {
     useBridgeModeEnabled,
     useEmMetaAvailable,
@@ -49,7 +50,7 @@ import {
 import {useAutoRefreshInterval} from '../../utils/hooks';
 import {useSelectedColumns} from '../../utils/hooks/useSelectedColumns';
 import {getIllustration} from '../../utils/illustrations';
-import {isNumeric} from '../../utils/utils';
+import {isNumeric, parseOptionalNonNegativeNumber} from '../../utils/utils';
 import {TableGroup} from '../Storage/TableGroup/TableGroup';
 import {useExpandedGroups} from '../Storage/TableGroup/useExpandedTableGroups';
 
@@ -87,6 +88,12 @@ function formatDatabaseState(state?: State): string {
             // For other states, use capitalized version (first letter uppercase, rest lowercase)
             return state.charAt(0).toUpperCase() + state.slice(1).toLowerCase();
     }
+}
+
+/** Shows an explicitly reported zero, the placeholder is for missing values only */
+function renderOptionalNumber(value: unknown, format: (value: number) => React.ReactNode) {
+    const parsed = parseOptionalNonNegativeNumber(value);
+    return parsed === undefined ? EMPTY_DATA_PLACEHOLDER : format(parsed);
 }
 
 function databaseStateToLabelTheme(state?: State): LabelProps['theme'] {
@@ -174,7 +181,7 @@ function TenantsTableContent(props: TenantsTableContentProps) {
             {...props}
             options={options}
             tenants={tenants}
-            filteredTenants={filteredTenants}
+            filteredTenants={options.filteredRows ?? filteredTenants}
             queryParams={queryParams}
             hasData={currentData !== undefined}
             pending={pending}
@@ -183,7 +190,12 @@ function TenantsTableContent(props: TenantsTableContentProps) {
     );
 
     return Extension ? (
-        <Extension environmentName={environmentName} rows={filteredTenants} loading={pending}>
+        <Extension
+            environmentName={environmentName}
+            allRows={tenants}
+            rows={filteredTenants}
+            loading={pending}
+        >
             {renderView}
         </Extension>
     ) : (
@@ -374,24 +386,31 @@ function TenantsTableView({
             ...(bridgeColumnsAvailable ? getDatabaseBridgeColumns() : []),
             {
                 name: DATABASES_COLUMNS_IDS.CPU,
-                header: DATABASES_COLUMNS_TITLES[DATABASES_COLUMNS_IDS.CPU],
-                width: 80,
-                render: ({row}) => {
-                    // Don't show values below 0.01 when formatted
-                    if (row.cpu && row.cpu > 10_000) {
-                        return formatCPU(row.cpu);
-                    }
-                    return EMPTY_DATA_PLACEHOLDER;
-                },
+                header: (
+                    <TitleWithHelpMark
+                        header={DATABASES_COLUMNS_TITLES[DATABASES_COLUMNS_IDS.CPU]}
+                        note={i18n('description_cpu-used')}
+                    />
+                ),
+                width: 140,
+                sortAccessor: (row) => parseOptionalNonNegativeNumber(row.CoresUsed),
+                render: ({row}) =>
+                    renderOptionalNumber(row.CoresUsed, (cores) => formatCPU(cores * 1_000_000)),
                 align: DataTable.RIGHT,
                 defaultOrder: DataTable.DESCENDING,
             },
             {
                 name: DATABASES_COLUMNS_IDS.Memory,
-                header: DATABASES_COLUMNS_TITLES[DATABASES_COLUMNS_IDS.Memory],
-                width: 120,
+                header: (
+                    <TitleWithHelpMark
+                        header={DATABASES_COLUMNS_TITLES[DATABASES_COLUMNS_IDS.Memory]}
+                        note={i18n('description_memory-used')}
+                    />
+                ),
+                width: 165,
+                sortAccessor: (row) => parseOptionalNonNegativeNumber(row.MemoryUsed),
                 render: ({row}) =>
-                    row.memory ? formatStorageValuesToGb(row.memory) : EMPTY_DATA_PLACEHOLDER,
+                    renderOptionalNumber(row.MemoryUsed, (used) => formatStorageValuesToGb(used)),
                 align: DataTable.RIGHT,
                 defaultOrder: DataTable.DESCENDING,
             },
@@ -399,8 +418,11 @@ function TenantsTableView({
                 name: DATABASES_COLUMNS_IDS.Storage,
                 header: DATABASES_COLUMNS_TITLES[DATABASES_COLUMNS_IDS.Storage],
                 width: 120,
+                sortAccessor: (row) => parseOptionalNonNegativeNumber(row.StorageAllocatedSize),
                 render: ({row}) =>
-                    row.storage ? formatStorageValuesToGb(row.storage) : EMPTY_DATA_PLACEHOLDER,
+                    renderOptionalNumber(row.StorageAllocatedSize, (allocated) =>
+                        formatStorageValuesToGb(allocated),
+                    ),
                 align: DataTable.RIGHT,
                 defaultOrder: DataTable.DESCENDING,
             },
@@ -434,8 +456,8 @@ function TenantsTableView({
                 name: DATABASES_COLUMNS_IDS.NodesCount,
                 header: DATABASES_COLUMNS_TITLES[DATABASES_COLUMNS_IDS.NodesCount],
                 width: 100,
-                render: ({row}) =>
-                    row.nodesCount ? formatNumber(row.nodesCount) : EMPTY_DATA_PLACEHOLDER,
+                sortAccessor: (row) => row.NodeIds?.length,
+                render: ({row}) => renderOptionalNumber(row.NodeIds?.length, formatNumber),
                 align: DataTable.RIGHT,
                 defaultOrder: DataTable.DESCENDING,
             },
@@ -443,8 +465,8 @@ function TenantsTableView({
                 name: DATABASES_COLUMNS_IDS.GroupsCount,
                 header: DATABASES_COLUMNS_TITLES[DATABASES_COLUMNS_IDS.GroupsCount],
                 width: 100,
-                render: ({row}) =>
-                    row.groupsCount ? formatNumber(row.groupsCount) : EMPTY_DATA_PLACEHOLDER,
+                sortAccessor: (row) => parseOptionalNonNegativeNumber(row.StorageGroups),
+                render: ({row}) => renderOptionalNumber(row.StorageGroups, formatNumber),
                 align: DataTable.RIGHT,
                 defaultOrder: DataTable.DESCENDING,
             },

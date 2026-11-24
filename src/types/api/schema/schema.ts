@@ -1,4 +1,4 @@
-import type {TMetrics} from '../tenant';
+import type {TDomainState, TMetrics} from '../tenant';
 
 import type {TCdcStreamDescription} from './cdcStream';
 import type {TColumnStoreDescription, TColumnTableDescription} from './columnEntity';
@@ -176,10 +176,6 @@ interface TProcessingParams {
     Hive?: string;
     /** fixed64 */
     SysViewProcessor?: string;
-}
-
-interface TDomainState {
-    DiskQuotaExceeded?: boolean;
 }
 
 interface TDiskSpaceUsage {

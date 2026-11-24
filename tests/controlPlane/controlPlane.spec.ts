@@ -399,6 +399,62 @@ test.describe('Operations', () => {
     });
 });
 
+test('My databases shows confirmed write blocks in the Database cell without an extension', async ({
+    page,
+}) => {
+    await mockApi(page, {});
+    await page.route('**/meta/databases?*', (route) =>
+        route.fulfill({
+            json: {
+                databases: [
+                    {
+                        Name: '/db/quota',
+                        Overall: 'Green',
+                        DomainState: {DiskQuotaExceeded: true},
+                    },
+                    {
+                        Name: '/db/space',
+                        DomainState: {DiskQuotaExceeded: true, StorageSpaceExhausted: true},
+                    },
+                    {Name: '/db/unknown'},
+                    {Name: '/db/available', DomainState: {DiskQuotaExceeded: false}},
+                ],
+            },
+        }),
+    );
+    await page.goto('/home/databases?databasesFixture');
+    const badge = (name: string) =>
+        page
+            .getByRole('cell')
+            .filter({
+                has: page.getByRole('link', {name, exact: true}),
+            })
+            .getByText('Writes blocked', {exact: true});
+    await badge('quota').hover();
+    await expect(page.getByRole('tooltip')).toContainText('exceeded its storage quota');
+    await badge('space').hover();
+    await expect(page.getByRole('tooltip')).toContainText('running out of space');
+    await expect(badge('unknown')).toHaveCount(0);
+    await expect(badge('available')).toHaveCount(0);
+});
+
+test('My databases truncates narrow column titles and keeps their help accessible', async ({
+    page,
+}) => {
+    await mockApi(page, {});
+    await page.addInitScript(() =>
+        localStorage.setItem('databasesTableColumnsWidth', JSON.stringify({cpu: 80})),
+    );
+    await page.goto('/home/databases?databasesFixture');
+
+    const header = page.locator('thead').first();
+    const title = header.getByText('CPU used', {exact: true});
+    await expect(title).toHaveCSS('text-overflow', 'ellipsis');
+    expect(await title.evaluate((el) => el.scrollWidth > el.clientWidth)).toBe(true);
+    await header.getByRole('button', {name: 'CPU used'}).hover();
+    await expect(page.getByText('CPU currently used by the database, in cores.')).toBeVisible();
+});
+
 test('My databases extension groups filtered rows and preserves additional column settings', async ({
     page,
 }) => {
@@ -419,8 +475,14 @@ test('My databases extension groups filtered rows and preserves additional colum
     await expect(groupBy).toBeVisible();
     const headers = page.locator('thead').first().locator('th');
     await expect(
-        headers.filter({hasText: /^CPU$/}).locator('xpath=following-sibling::th[1]'),
+        headers.filter({hasText: /^CPU used$/}).locator('xpath=following-sibling::th[1]'),
     ).toHaveText('Owner');
+    const alphaFilter = page.getByRole('checkbox', {name: 'Alpha only (2)'});
+    await alphaFilter.check();
+    await expect(page.getByRole('link', {name: 'second', exact: true})).toHaveCount(0);
+    await expect(page.getByText('Databases: 1 of 2', {exact: true})).toBeVisible();
+    await alphaFilter.uncheck();
+    await expect(page.getByRole('link', {name: 'second', exact: true})).toBeVisible();
     await groupBy.click();
     const alpha = page.getByRole('button', {name: /Cluster alpha/});
     await expect(page.getByRole('button', {name: /Cluster beta/})).toBeVisible();
@@ -471,6 +533,6 @@ test('My databases extension restores a saved column order after editing setting
     await expect(page.locator('thead').first().locator('th')).toHaveText([
         'Database',
         'Owner',
-        'CPU',
+        'CPU used',
     ]);
 });

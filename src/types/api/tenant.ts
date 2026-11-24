@@ -67,6 +67,7 @@ export interface TTenant {
 
     StorageAllocatedLimit?: string;
     DatabaseQuotas?: DatabaseQuotas;
+    DomainState?: TDomainState;
 
     StorageUsage?: TStorageUsage[];
     QuotaUsage?: TStorageUsage[];
@@ -139,6 +140,7 @@ export interface TTenantResource {
 
 /** incomplete */
 export interface ControlPlane {
+    cloud_id?: string;
     name?: string;
     id?: string;
     endpoint?: string;
@@ -188,6 +190,12 @@ export enum ETabletVolatileState {
     'TABLET_VOLATILE_STATE_BOOTING' = 'TABLET_VOLATILE_STATE_BOOTING',
     'TABLET_VOLATILE_STATE_STARTING' = 'TABLET_VOLATILE_STATE_STARTING',
     'TABLET_VOLATILE_STATE_RUNNING' = 'TABLET_VOLATILE_STATE_RUNNING',
+}
+
+export interface TDomainState {
+    DiskQuotaExceeded?: boolean;
+    StorageSpaceExhausted?: boolean;
+    SmallBlobsQuotaExceeded?: boolean;
 }
 
 export interface DatabaseQuotas {

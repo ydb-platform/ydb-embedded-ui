@@ -21,6 +21,7 @@ import {DropdownMenu} from '../DropdownMenu';
 import {EntityStatus} from '../EntityStatus/EntityStatus';
 import {InternalLink} from '../InternalLink/InternalLink';
 
+import {WritesBlockedLabel} from './WritesBlockedLabel';
 import i18n from './i18n';
 import {getTenantLink} from './utils';
 
@@ -234,8 +235,13 @@ export function TenantNameWrapper({
         <Flex direction="column" gap={0.5}>
             <Flex alignItems="flex-start" justifyContent="space-between" gap={1}>
                 <div className={b('db-name-wrapper')}>{renderName()}</div>
-                <Flex gap={1}>
-                    {renderStatus()}
+                <Flex gap={1} alignItems="flex-start">
+                    <Flex direction="column" alignItems="flex-end" gap={0.5}>
+                        {renderStatus()}
+                        {tenant.DomainState?.DiskQuotaExceeded === true && (
+                            <WritesBlockedLabel tenant={tenant} />
+                        )}
+                    </Flex>
                     {renderActions()}
                 </Flex>
             </Flex>

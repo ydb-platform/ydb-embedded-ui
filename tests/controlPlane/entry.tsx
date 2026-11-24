@@ -21,13 +21,31 @@ const TEST_DATABASES_COLUMNS: MyDatabasesTableColumn[] = [
     },
 ];
 
-function TestDatabasesExtension({rows, environmentName, children}: MyDatabasesTableExtensionProps) {
+function TestDatabasesExtension({
+    allRows,
+    rows,
+    environmentName,
+    children,
+}: MyDatabasesTableExtensionProps) {
     const [grouped, setGrouped] = React.useState(false);
+    const [alphaOnly, setAlphaOnly] = React.useState(false);
+    const visibleRows = alphaOnly ? rows.filter((row) => row.Cluster === 'alpha') : rows;
     return children({
+        filteredRows: visibleRows,
         controls: (
-            <button onClick={() => setGrouped(!grouped)}>
-                {grouped ? 'Clear grouping' : `Group databases in ${environmentName}`}
-            </button>
+            <React.Fragment>
+                <label>
+                    <input
+                        type="checkbox"
+                        checked={alphaOnly}
+                        onChange={(ev) => setAlphaOnly(ev.target.checked)}
+                    />
+                    Alpha only ({allRows.length})
+                </label>
+                <button onClick={() => setGrouped(!grouped)}>
+                    {grouped ? 'Clear grouping' : `Group databases in ${environmentName}`}
+                </button>
+            </React.Fragment>
         ),
         additionalColumns: TEST_DATABASES_COLUMNS,
         groups: grouped
@@ -35,7 +53,7 @@ function TestDatabasesExtension({rows, environmentName, children}: MyDatabasesTa
                   .map((cluster) => ({
                       id: cluster,
                       title: `Cluster ${cluster}`,
-                      rows: rows.filter((row) => row.Cluster === cluster),
+                      rows: visibleRows.filter((row) => row.Cluster === cluster),
                   }))
                   .filter((group) => group.rows.length > 0)
             : undefined,

@@ -45,6 +45,11 @@ export interface MyDatabasesTableGroup {
 }
 
 export interface MyDatabasesTableOptions {
+    /**
+     * Optional subset of rows after the extension's filters. Used for the flat view and count.
+     * Pass the original objects from `rows` in their order: copies lose database links and keyboard activation.
+     */
+    filteredRows?: PreparedTenant[];
     controls?: React.ReactNode;
     /** Omit for a flat table. Pass an ordered partition of the filtered rows for grouped display. */
     groups?: readonly MyDatabasesTableGroup[];
@@ -53,6 +58,8 @@ export interface MyDatabasesTableOptions {
 }
 
 export interface MyDatabasesTableExtensionProps {
+    /** Rows in the current environment before search and table filters, for filter options. */
+    allRows: PreparedTenant[];
     environmentName?: string;
     /** Filtered rows for this environment. Preserve their order and identity when deriving groups. */
     rows: PreparedTenant[];
