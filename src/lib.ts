@@ -9,7 +9,6 @@ export {useOpenExternalQueryInEditor} from './containers/Tenant/Query/hooks/useO
 export {getQueryTextTabTitle} from './containers/Tenant/Query/utils/queryTabTitles';
 export {useDrawerContext} from './components/Drawer';
 export {AccessTable} from './components/AccessTable/AccessTable';
-export {SubjectInput} from './components/SubjectInput/SubjectInput';
 
 export {configureStore, rootReducer} from './store';
 export {default as appRoutes} from './routes';
@@ -42,7 +41,6 @@ export type {AsideNavigationProps} from './containers/AsideNavigation/AsideNavig
 export type {ExternalQueryToOpen} from './containers/Tenant/Query/hooks/useOpenExternalQueryInEditor';
 export type {DrawerContextType} from './components/Drawer';
 export type {AccessTableProps, AccessTableRow} from './components/AccessTable/AccessTable';
-export type {SubjectInputProps} from './components/SubjectInput/SubjectInput';
 export type {GetMonitoringLink, GetMonitoringClusterLink} from './utils/monitoring';
 export type {
     AccessPageContext,

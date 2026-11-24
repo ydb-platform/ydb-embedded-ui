@@ -3,7 +3,6 @@ import React from 'react';
 import {Flex} from '@gravity-ui/uikit';
 
 import {LoaderWrapper} from '../../../components/LoaderWrapper/LoaderWrapper';
-import {SubjectInput} from '../../../components/SubjectInput/SubjectInput';
 import {SubjectWithAvatar} from '../../../components/SubjectWithAvatar/SubjectWithAvatar';
 import {useNonDefaultAclInheritanceRevocationAvailable} from '../../../store/reducers/capabilities/hooks';
 import {useClusterWithProxy} from '../../../store/reducers/cluster/cluster';
@@ -23,6 +22,7 @@ import {useTenantQueryParams} from '../useTenantQueryParams';
 import {Footer} from './components/Footer';
 import {Rights} from './components/Rights';
 import {RightsSectionSelector} from './components/RightsSectionSelector';
+import {SubjectInput} from './components/SubjectInput';
 import i18n from './i18n';
 import type {RightsView} from './shared';
 import {block} from './shared';
@@ -160,13 +160,7 @@ export function GrantAccess({handleCloseDrawer}: GrantAccessProps) {
         if (aclSubject) {
             return <SubjectWithAvatar subject={aclSubject} />;
         }
-        return (
-            <SubjectInput
-                label={i18n('label_grant-access-to')}
-                newSubjects={newSubjects}
-                setNewSubjects={setNewSubjects}
-            />
-        );
+        return <SubjectInput newSubjects={newSubjects} setNewSubjects={setNewSubjects} />;
     };
 
     const subjectSelected = Boolean(aclSubject || newSubjects.length > 0);
