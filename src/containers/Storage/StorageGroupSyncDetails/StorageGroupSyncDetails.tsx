@@ -89,7 +89,6 @@ export function StorageGroupSyncDetails({
                     content={PileName}
                     disabled={!PileName}
                     placement={['top', 'bottom']}
-                    fullWidth
                 >
                     <span tabIndex={PileName ? 0 : undefined}>
                         {PileName || EMPTY_DATA_PLACEHOLDER}
