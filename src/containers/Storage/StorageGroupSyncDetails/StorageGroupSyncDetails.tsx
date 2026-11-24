@@ -1,3 +1,5 @@
+import React from 'react';
+
 import {dateTimeParse} from '@gravity-ui/date-utils';
 import {
     Alert,
@@ -38,8 +40,13 @@ export function StorageGroupSyncDetails({
     const isPage = layout === 'page';
     const stage = group.BridgeSyncStage?.trim();
     const getGroupPath = useStorageGroupPath();
-    const partners = (group.BridgeGroups ?? []).filter(
-        (partner) => partner.GroupId && partner.GroupId !== String(group.GroupId),
+    const {BridgeGroups: bridgeGroups, GroupId: groupId} = group;
+    const partners = React.useMemo(
+        () =>
+            (bridgeGroups ?? []).filter(
+                (partner) => partner.GroupId && partner.GroupId !== String(groupId),
+            ),
+        [bridgeGroups, groupId],
     );
     const remaining = parseOptionalNonNegativeNumber(group.BridgeSyncRemainingBytes);
     const rate = parseOptionalNonNegativeNumber(group.BridgeSyncCopyBytesPerSecond);
@@ -53,51 +60,54 @@ export function StorageGroupSyncDetails({
         parseOptionalNonNegativeNumber(group.BridgeSyncLastErrorTimestamp),
         3,
     );
-    const columns: TableColumnConfig<TBridgeGroupLink>[] = [
-        {
-            id: 'GroupId',
-            name: () => (
-                <Text variant="body-1" color="secondary">
-                    {i18n('field_group-id')}
-                </Text>
-            ),
-            className: b('partner-cell', {id: true}),
-            template: ({GroupId}) =>
-                GroupId ? (
+    const columns = React.useMemo<TableColumnConfig<TBridgeGroupLink>[]>(
+        () => [
+            {
+                id: 'GroupId',
+                name: () => (
+                    <Text variant="body-1" color="secondary">
+                        {i18n('field_group-id')}
+                    </Text>
+                ),
+                className: b('partner-cell', {id: true}),
+                template: ({GroupId}) =>
+                    GroupId ? (
+                        <CellWithPopover
+                            content={GroupId}
+                            placement={['top', 'bottom']}
+                            wrapperClassName={b('partner-id')}
+                            fullWidth
+                        >
+                            <InternalLink to={getGroupPath(GroupId)}>{GroupId}</InternalLink>
+                        </CellWithPopover>
+                    ) : (
+                        EMPTY_DATA_PLACEHOLDER
+                    ),
+            },
+            {
+                id: 'PileName',
+                name: () => (
+                    <Text variant="body-1" color="secondary">
+                        {i18n('field_pile')}
+                    </Text>
+                ),
+                className: b('partner-cell', {pile: true}),
+                template: ({PileName}) => (
                     <CellWithPopover
-                        content={GroupId}
+                        content={PileName}
+                        disabled={!PileName}
                         placement={['top', 'bottom']}
-                        wrapperClassName={b('partner-id')}
                         fullWidth
                     >
-                        <InternalLink to={getGroupPath(GroupId)}>{GroupId}</InternalLink>
+                        <span tabIndex={PileName ? 0 : undefined}>
+                            {PileName || EMPTY_DATA_PLACEHOLDER}
+                        </span>
                     </CellWithPopover>
-                ) : (
-                    EMPTY_DATA_PLACEHOLDER
                 ),
-        },
-        {
-            id: 'PileName',
-            name: () => (
-                <Text variant="body-1" color="secondary">
-                    {i18n('field_pile')}
-                </Text>
-            ),
-            className: b('partner-cell', {pile: true}),
-            template: ({PileName}) => (
-                <CellWithPopover
-                    content={PileName}
-                    disabled={!PileName}
-                    placement={['top', 'bottom']}
-                    fullWidth
-                >
-                    <span tabIndex={PileName ? 0 : undefined}>
-                        {PileName || EMPTY_DATA_PLACEHOLDER}
-                    </span>
-                </CellWithPopover>
-            ),
-        },
-    ];
+            },
+        ],
+        [getGroupPath],
+    );
 
     return (
         <Flex
