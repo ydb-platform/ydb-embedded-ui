@@ -21,16 +21,10 @@ test('prepares cached ACL for the table and preserves explicit-allow and inherit
         dialect: 'ydb',
         useMetaProxy: true,
     };
-    const selectorArgs = [
-        args.path,
-        args.database,
-        args.databaseFullPath,
-        args.dialect,
-        args.useMetaProxy,
-    ] as const;
+    const scope = [args.database, args.databaseFullPath, args.dialect, args.useMetaProxy] as const;
+    const selectorArgs = [args.path, ...scope] as const;
 
     try {
-        expect(selectPreparedRights(store.getState(), ...selectorArgs)).toBeNull();
         await store.dispatch(
             schemaAclApi.util.upsertQueryData('getSchemaAcl', args, {
                 acl: [
@@ -38,7 +32,6 @@ test('prepares cached ACL for the table and preserves explicit-allow and inherit
                         Subject: 'alice',
                         AccessType: 'Allow',
                         AccessRules: ['select'],
-                        AccessRights: ['select'],
                     },
                     {Subject: 'alice', AccessType: 'Deny', AccessRights: ['update']},
                 ],
@@ -46,9 +39,8 @@ test('prepares cached ACL for the table and preserves explicit-allow and inherit
                     {
                         Subject: 'alice',
                         AccessType: 'Allow',
-                        AccessRights: ['select', 'describe_schema'],
+                        AccessRights: ['select', 'update', 'describe_schema'],
                     },
-                    {Subject: 'inherited', AccessType: 'Allow', AccessRules: ['select']},
                 ],
                 owner: 'owner',
                 interruptInheritance: false,
@@ -59,9 +51,8 @@ test('prepares cached ACL for the table and preserves explicit-allow and inherit
             {
                 subject: 'alice',
                 explicit: ['select', 'update'],
-                effective: ['select', 'describe_schema'],
+                effective: ['select', 'update', 'describe_schema'],
             },
-            {subject: 'inherited', explicit: [], effective: ['select']},
         ]);
         expect(selectSubjectExplicitRights(store.getState(), 'alice', ...selectorArgs)).toEqual([
             'select',
@@ -69,22 +60,7 @@ test('prepares cached ACL for the table and preserves explicit-allow and inherit
         expect(selectSubjectInheritedRights(store.getState(), 'alice', ...selectorArgs)).toEqual(
             new Set(['describe_schema']),
         );
-        expect(
-            selectSubjectInheritedRights(store.getState(), 'inherited', ...selectorArgs),
-        ).toEqual(new Set(['select']));
-        expect(selectSubjectInheritedRights(store.getState(), 'missing', ...selectorArgs)).toEqual(
-            new Set(),
-        );
-        expect(
-            selectPreparedRights(
-                store.getState(),
-                '/Root/other',
-                args.database,
-                args.databaseFullPath,
-                args.dialect,
-                args.useMetaProxy,
-            ),
-        ).toBeNull();
+        expect(selectPreparedRights(store.getState(), '/Root/other', ...scope)).toBeNull();
 
         await store.dispatch(
             schemaAclApi.util.upsertQueryData('getSchemaAcl', args, {

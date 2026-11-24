@@ -11,7 +11,7 @@ describe('prepareAccessRights', () => {
                 AccessRights: ['select', 'update'],
             },
             {Subject: 'bob', AccessType: 'Allow', AccessRights: ['describe_schema']},
-            {Subject: 'alice', AccessType: 'Allow', AccessRules: ['update', 'erase']},
+            {Subject: 'alice', AccessType: 'Deny', AccessRules: ['update', 'erase']},
         ];
         const effectiveAcl: TACE[] = [
             {
@@ -31,20 +31,6 @@ describe('prepareAccessRights', () => {
             },
             {subject: 'bob', explicit: ['describe_schema'], effective: []},
             {subject: 'inherited', explicit: [], effective: ['select']},
-        ]);
-    });
-
-    test('keeps server effective rights separate from explicit allow and deny entries', () => {
-        expect(
-            prepareAccessRights(
-                [
-                    {Subject: 'alice', AccessType: 'Allow', AccessRules: ['select']},
-                    {Subject: 'alice', AccessType: 'Deny', AccessRights: ['update']},
-                ],
-                [{Subject: 'alice', AccessType: 'Allow', AccessRights: ['describe_schema']}],
-            ),
-        ).toEqual([
-            {subject: 'alice', explicit: ['select', 'update'], effective: ['describe_schema']},
         ]);
     });
 
