@@ -68,6 +68,20 @@ export interface TTenant {
     StorageAllocatedLimit?: string;
     DatabaseQuotas?: DatabaseQuotas;
     DomainState?: TDomainState;
+    /** Quotas enforced by SchemeShard with the usage they are compared against; absent on older versions */
+    DiskSpaceQuotaUsage?: {
+        Mode?: 'MODE_UNSPECIFIED' | 'MODE_OVERALL' | 'MODE_STORAGE_POOL_KINDS';
+        Entries?: {
+            /** Empty in MODE_OVERALL */
+            PoolKind?: string;
+            /** uint64, bytes */
+            Usage?: string | number;
+            /** uint64, bytes; 0 means no limit */
+            SoftQuota?: string | number;
+            /** uint64, bytes; 0 means no limit */
+            HardQuota?: string | number;
+        }[];
+    };
 
     StorageUsage?: TStorageUsage[];
     QuotaUsage?: TStorageUsage[];
