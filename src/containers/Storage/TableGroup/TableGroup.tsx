@@ -54,7 +54,7 @@ export const TableGroup = ({
     const renderContent = () => {
         if (expanded) {
             return (
-                <TableKeyboardNavigationGroupContext.Provider value={groupId}>
+                <TableKeyboardNavigationGroupContext.Provider value={title}>
                     <div className={b('content')}>{children}</div>
                 </TableKeyboardNavigationGroupContext.Provider>
             );

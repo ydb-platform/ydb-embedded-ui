@@ -51,7 +51,6 @@ export const useSelectedColumns = <T extends {name: string}>(
     defaultColumnsIds: string[],
     requiredColumnsIds?: string[],
     stickyColumnsIds: string[] | undefined = requiredColumnsIds,
-    {preserveUnavailableColumns = false} = {},
 ) => {
     const [savedColumns, setSavedColumns] = useSetting<unknown[]>(storageKey, defaultColumnsIds);
 
@@ -78,15 +77,33 @@ export const useSelectedColumns = <T extends {name: string}>(
                 }
             }
 
-            // Then, append any new columns that weren't in saved data (in columns definition order)
-            for (const column of columns) {
-                if (!processedIds.has(column.name)) {
-                    result.push({
-                        id: column.name,
-                        selected: false,
-                    });
+            // Legacy string format lists only selected columns, so a missing column may be a hidden one
+            const canDetectNewColumns = savedColumns.some((column) => typeof column !== 'string');
+
+            columns.forEach((column, index) => {
+                if (processedIds.has(column.name)) {
+                    return;
                 }
-            }
+                processedIds.add(column.name);
+                if (!canDetectNewColumns) {
+                    // Append new columns that weren't in saved data (in columns definition order)
+                    result.push({id: column.name, selected: false});
+                    return;
+                }
+                // Place a new column after its closest predecessor from the columns definition
+                let insertionIndex = 0;
+                for (let i = index - 1; i >= 0; i--) {
+                    const position = result.findIndex(({id}) => id === columns[i].name);
+                    if (position !== -1) {
+                        insertionIndex = position + 1;
+                        break;
+                    }
+                }
+                result.splice(insertionIndex, 0, {
+                    id: column.name,
+                    selected: defaultColumnsIds.includes(column.name),
+                });
+            });
 
             return result;
         }
@@ -144,11 +161,11 @@ export const useSelectedColumns = <T extends {name: string}>(
         (value) => {
             const preparedColumns = value.map(({id, selected}) => ({id, selected}));
 
-            if (!preserveUnavailableColumns || savedColumns === defaultColumnsIds) {
+            if (savedColumns === defaultColumnsIds) {
                 setSavedColumns(preparedColumns);
                 return;
             }
-            // My databases shares settings with the cluster table, which may omit extension columns.
+            // Keep saved state of columns that are currently unavailable (conditional or extension columns)
             const available = new Set(preparedColumns.map(({id}) => id));
             const unavailable = normalizedSavedColumns
                 .filter(({id}) => !available.has(id))
@@ -161,13 +178,7 @@ export const useSelectedColumns = <T extends {name: string}>(
                 ),
             );
         },
-        [
-            defaultColumnsIds,
-            normalizedSavedColumns,
-            preserveUnavailableColumns,
-            savedColumns,
-            setSavedColumns,
-        ],
+        [defaultColumnsIds, normalizedSavedColumns, savedColumns, setSavedColumns],
     );
 
     // Get set of column IDs that are explicitly selected by user

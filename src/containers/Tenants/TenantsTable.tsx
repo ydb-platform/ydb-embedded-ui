@@ -32,11 +32,7 @@ import {tenantsApi} from '../../store/reducers/tenants/tenants';
 import type {PreparedTenant} from '../../store/reducers/tenants/types';
 import type {AdditionalTenantsProps} from '../../types/additionalProps';
 import {State} from '../../types/api/tenant';
-import type {
-    MyDatabasesTableGroup,
-    MyDatabasesTableOptions,
-    UIFactory,
-} from '../../uiFactory/types';
+import type {MyDatabasesTableOptions, UIFactory} from '../../uiFactory/types';
 import {uiFactory} from '../../uiFactory/uiFactory';
 import {formatBytes} from '../../utils/bytesParsers';
 import {cn} from '../../utils/cn';
@@ -55,6 +51,7 @@ import {useSelectedColumns} from '../../utils/hooks/useSelectedColumns';
 import {getIllustration} from '../../utils/illustrations';
 import {isNumeric} from '../../utils/utils';
 import {TableGroup} from '../Storage/TableGroup/TableGroup';
+import {useExpandedGroups} from '../Storage/TableGroup/useExpandedTableGroups';
 
 import type {DatabaseStatusClickHandler} from './DatabaseDrawerHealthcheck';
 import {DatabaseDrawerHealthcheck} from './DatabaseDrawerHealthcheck';
@@ -112,28 +109,6 @@ function databaseStateToLabelTheme(state?: State): LabelProps['theme'] {
             return 'unknown';
         }
     }
-}
-
-function DatabaseGroup({
-    group,
-    children,
-}: {
-    group: MyDatabasesTableGroup;
-    children: React.ReactNode;
-}) {
-    const [expanded, setExpanded] = React.useState(false);
-    return (
-        <TableGroup
-            groupId={group.id}
-            title={group.title}
-            count={group.rows.length}
-            entityName={i18n('label-databases')}
-            expanded={expanded}
-            onIsExpandedChange={(_, value) => setExpanded(value)}
-        >
-            {children}
-        </TableGroup>
-    );
 }
 
 interface TenantsTableProps {
@@ -324,7 +299,7 @@ function TenantsTableView({
                     tableFilter
                     value={search}
                     onChange={handleSearchChange}
-                    placeholder="Database name"
+                    placeholder={i18n('controls_search-placeholder')}
                     className={b('search')}
                 />
                 {showWithProblemsFilter ? (
@@ -334,7 +309,7 @@ function TenantsTableView({
                 <EntitiesCount
                     total={tenants?.length}
                     current={filteredTenants?.length || 0}
-                    label={'Databases'}
+                    label={i18n('label-databases')}
                     loading={loading}
                 />
             </React.Fragment>
@@ -509,9 +484,13 @@ function TenantsTableView({
         titles,
         defaults,
         DATABASES_REQUIRED_COLUMNS,
-        undefined,
-        {preserveUnavailableColumns: true},
     );
+
+    const tableGroups = React.useMemo(
+        () => options.groups?.map(({id, rows}) => ({name: id, count: rows.length})),
+        [options.groups],
+    );
+    const {expandedGroups, setIsGroupExpanded} = useExpandedGroups(tableGroups);
 
     const renderRows = (rows: PreparedTenant[]) => {
         return (
@@ -548,9 +527,17 @@ function TenantsTableView({
                 return renderRows([]);
             }
             return options.groups.map((group) => (
-                <DatabaseGroup key={group.id} group={group}>
+                <TableGroup
+                    key={group.id}
+                    groupId={group.id}
+                    title={group.title}
+                    count={group.rows.length}
+                    entityName={i18n('label-databases')}
+                    expanded={Boolean(expandedGroups[group.id])}
+                    onIsExpandedChange={setIsGroupExpanded}
+                >
                     {renderRows(group.rows)}
-                </DatabaseGroup>
+                </TableGroup>
             ));
         }
         return renderRows(filteredTenants);

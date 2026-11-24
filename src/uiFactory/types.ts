@@ -28,6 +28,8 @@ import type {GetLogsLink} from '../utils/logs';
 import type {GetMonitoringClusterLink, GetMonitoringLink} from '../utils/monitoring';
 
 export interface MyDatabasesTableColumn extends Column<PreparedTenant> {
+    /** Unique column ID. A column that repeats a built-in or another additional column name is skipped. */
+    name: string;
     settingsTitle: string;
     visibleByDefault?: boolean;
     /** Built-in column ID. An unavailable anchor places the column at the end. */
@@ -46,6 +48,7 @@ export interface MyDatabasesTableOptions {
     controls?: React.ReactNode;
     /** Omit for a flat table. Pass an ordered partition of the filtered rows for grouped display. */
     groups?: readonly MyDatabasesTableGroup[];
+    /** Keep the array reference stable between renders (module constant or useMemo), otherwise every table re-renders. */
     additionalColumns?: readonly MyDatabasesTableColumn[];
 }
 

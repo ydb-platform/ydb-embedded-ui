@@ -3,12 +3,23 @@ import React from 'react';
 import {Link} from '@gravity-ui/uikit';
 import ReactDOM from 'react-dom/client';
 
-import type {MyDatabasesTableExtensionProps} from '../../src/lib';
+import type {MyDatabasesTableColumn, MyDatabasesTableExtensionProps} from '../../src/lib';
 import {MultiClusterApp} from '../../src/lib';
 import {configureStore} from '../../src/store';
 import {configureUIFactory} from '../../src/uiFactory/uiFactory';
 
 import '../../src/styles/index.scss';
+
+const TEST_DATABASES_COLUMNS: MyDatabasesTableColumn[] = [
+    {
+        name: 'test-owner',
+        settingsTitle: 'Test owner',
+        header: 'Owner',
+        after: 'cpu',
+        visibleByDefault: true,
+        render: ({row}) => row.Owner,
+    },
+];
 
 function TestDatabasesExtension({rows, environmentName, children}: MyDatabasesTableExtensionProps) {
     const [grouped, setGrouped] = React.useState(false);
@@ -18,16 +29,7 @@ function TestDatabasesExtension({rows, environmentName, children}: MyDatabasesTa
                 {grouped ? 'Clear grouping' : `Group databases in ${environmentName}`}
             </button>
         ),
-        additionalColumns: [
-            {
-                name: 'test-owner',
-                settingsTitle: 'Test owner',
-                header: 'Owner',
-                after: 'cpu',
-                visibleByDefault: true,
-                render: ({row}) => row.Owner,
-            },
-        ],
+        additionalColumns: TEST_DATABASES_COLUMNS,
         groups: grouped
             ? ['alpha', 'beta']
                   .map((cluster) => ({

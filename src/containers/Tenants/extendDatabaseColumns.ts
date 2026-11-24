@@ -15,6 +15,9 @@ export function extendDatabaseColumns(
     const insertions = new Map<string | undefined, Column<PreparedTenant>[]>();
     for (const {after, settingsTitle, visibleByDefault, ...column} of additional) {
         if (Object.hasOwn(titles, column.name)) {
+            console.warn(
+                `MyDatabasesTableExtension: column "${column.name}" is skipped, the name is already in use`,
+            );
             continue;
         }
         titles[column.name] = settingsTitle;
