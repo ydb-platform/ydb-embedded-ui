@@ -44,10 +44,14 @@ export function getBridgeSyncStatusPresentation(status?: BridgeSyncStatus) {
 
 export function BridgeSyncStatusLabel({
     status,
+    size = 'xs',
+    plainTextColor = 'hint',
     withInfo = false,
     interactive = false,
 }: {
     status?: BridgeSyncStatus;
+    size?: 'xs' | 's';
+    plainTextColor?: 'hint' | 'primary';
     withInfo?: boolean;
     interactive?: boolean;
 }) {
@@ -57,7 +61,7 @@ export function BridgeSyncStatusLabel({
     }
     if (!presentation.icon) {
         return (
-            <Text variant="inherit" color="hint">
+            <Text variant={size === 's' ? 'body-1' : 'inherit'} color={plainTextColor}>
                 {presentation.label()}
             </Text>
         );
@@ -67,9 +71,9 @@ export function BridgeSyncStatusLabel({
         <Label
             type={withInfo ? 'info' : 'default'}
             interactive={interactive}
-            size="xs"
+            size={size}
             theme={presentation.theme}
-            icon={<Icon data={presentation.icon} size={12} />}
+            icon={<Icon data={presentation.icon} size={size === 's' ? 14 : 12} />}
         >
             {presentation.label()}
         </Label>
