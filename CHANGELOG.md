@@ -1,5 +1,14 @@
 # Changelog
 
+## [22.11.1](https://github.com/ydb-platform/ydb-embedded-ui/compare/v22.11.0...v22.11.1) (2026-11-23)
+
+
+### Bug Fixes
+
+* **GetUser:** keep the page mounted while whoami revalidates ([#4606](https://github.com/ydb-platform/ydb-embedded-ui/issues/4606)) ([81cc4ea](https://github.com/ydb-platform/ydb-embedded-ui/commit/81cc4eaa63c33300342c1e4f377773334ae211ee))
+* **query:** enforce saved query and history size limits ([#4615](https://github.com/ydb-platform/ydb-embedded-ui/issues/4615)) ([e7b1a2f](https://github.com/ydb-platform/ydb-embedded-ui/commit/e7b1a2f4c6f75becb4dabbf50c8788a9684f350a))
+* **storage:** keep scroll position when sync details open ([#4627](https://github.com/ydb-platform/ydb-embedded-ui/issues/4627)) ([ca83a33](https://github.com/ydb-platform/ydb-embedded-ui/commit/ca83a336a97dfe3d08a07bb4e5b646bcd6050672))
+
 ## [22.11.0](https://github.com/ydb-platform/ydb-embedded-ui/compare/v22.10.0...v22.11.0) (2026-11-19)
 
 
