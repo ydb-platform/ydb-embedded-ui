@@ -553,12 +553,14 @@ function TenantsTableView({
             return options.groups.map((group) => (
                 <TableGroup
                     key={group.id}
-                    groupId={group.id}
                     title={group.title}
                     count={group.rows.length}
                     entityName={i18n('field_databases')}
                     expanded={Boolean(expandedGroups[group.id])}
-                    onIsExpandedChange={setIsGroupExpanded}
+                    // Titles may repeat across grouping modes, the state is kept by the group ID
+                    onIsExpandedChange={(_title, isExpanded) =>
+                        setIsGroupExpanded(group.id, isExpanded)
+                    }
                 >
                     {renderRows(group.rows)}
                 </TableGroup>

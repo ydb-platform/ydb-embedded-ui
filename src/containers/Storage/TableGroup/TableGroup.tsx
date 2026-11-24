@@ -12,7 +12,6 @@ const b = cn('ydb-table-group');
 interface TableGroupProps {
     children?: React.ReactNode;
 
-    groupId?: string;
     title: string;
     titleContent?: React.ReactNode;
     entityName: string;
@@ -25,14 +24,13 @@ export const TableGroup = ({
     children,
     title,
     titleContent,
-    groupId = title,
     entityName,
     count,
     expanded = false,
     onIsExpandedChange,
 }: TableGroupProps) => {
     const toggleCollapsed = () => {
-        onIsExpandedChange(groupId, !expanded);
+        onIsExpandedChange(title, !expanded);
     };
 
     const renderTitle = () => {
