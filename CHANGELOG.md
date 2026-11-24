@@ -1,5 +1,12 @@
 # Changelog
 
+## [22.11.2](https://github.com/ydb-platform/ydb-embedded-ui/compare/v22.11.1...v22.11.2) (2026-11-24)
+
+
+### Bug Fixes
+
+* **bridge:** restore group status labels and node pile names ([#4641](https://github.com/ydb-platform/ydb-embedded-ui/issues/4641)) ([e507288](https://github.com/ydb-platform/ydb-embedded-ui/commit/e50728826b7044052e378cc3fe02936029a654f6))
+
 ## [22.11.1](https://github.com/ydb-platform/ydb-embedded-ui/compare/v22.11.0...v22.11.1) (2026-11-23)
 
 
