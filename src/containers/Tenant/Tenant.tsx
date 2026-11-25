@@ -127,7 +127,6 @@ export function Tenant({additionalTenantProps}: TenantProps) {
                         database={database}
                         path={databaseAccessPath}
                         databaseFullPath={databaseAccessPath}
-                        useMetaProxy={useMetaProxy}
                     >
                         <TenantContextProvider
                             database={database}
@@ -227,7 +226,6 @@ function TreePagesContent({
                 database={database}
                 databaseFullPath={databaseName}
                 path={databaseName}
-                useMetaProxy={useMetaProxy}
             >
                 <TreeKeyProvider>
                     <SplitPane
@@ -250,7 +248,6 @@ function TreePagesContent({
                                 type={currentPathType}
                                 subType={currentPathSubType}
                                 diagnosticsAccessError={accessError}
-                                useMetaProxy={useMetaProxy}
                             />
                         </div>
                     </SplitPane>

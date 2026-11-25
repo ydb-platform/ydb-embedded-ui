@@ -21,7 +21,6 @@ interface ObjectGeneralProps {
     type: EPathType | undefined;
     subType: EPathSubType | undefined;
     diagnosticsAccessError?: unknown;
-    useMetaProxy?: boolean;
 }
 
 function ObjectGeneral({
@@ -29,7 +28,6 @@ function ObjectGeneral({
     subType,
     additionalTenantProps,
     diagnosticsAccessError,
-    useMetaProxy,
 }: ObjectGeneralProps) {
     const theme = useThemeValue();
     const isV2Enabled = useNavigationV2Enabled();
@@ -53,7 +51,6 @@ function ObjectGeneral({
                             database={database}
                             databaseFullPath={databaseFullPath}
                             path={path}
-                            useMetaProxy={useMetaProxy}
                         />
                     );
                 }

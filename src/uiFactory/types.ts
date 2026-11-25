@@ -43,7 +43,6 @@ export interface AccessPageContext {
 
 export interface AccessErrorContext extends AccessPageContext {
     source: 'database' | 'schema-tree' | 'schema-object';
-    useMetaProxy?: boolean;
 }
 
 export interface AccessUIConfig {

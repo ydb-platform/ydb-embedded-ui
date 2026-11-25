@@ -55,7 +55,6 @@ export function GetUser({
                         database={database}
                         databaseFullPath={databaseAccessPath}
                         path={databaseAccessPath}
-                        useMetaProxy={uiFactory.useMetaProxy}
                     />
                 </DrawerContextProvider>
             ) : (
