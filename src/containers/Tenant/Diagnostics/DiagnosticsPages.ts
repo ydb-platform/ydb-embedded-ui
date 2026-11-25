@@ -44,6 +44,7 @@ interface GetPagesOptions {
     databaseType?: ETenantType;
     databasePagesDisplay?: DatabasePagesDisplay;
     accessTitle?: string;
+    accessBadge?: Page['badge'];
 }
 
 const database = {
@@ -343,11 +344,14 @@ function applyFilters(pages: Page[], options: GetPagesOptions = {}) {
         removals.push(TENANT_DIAGNOSTICS_TABS_IDS.monitoring);
     }
 
+    const accessTitle = options.accessTitle?.trim() ? options.accessTitle : undefined;
+    const {accessBadge} = options;
+
     return result
         .filter((p) => !removals.includes(p.id))
         .map((page) =>
-            page.id === TENANT_DIAGNOSTICS_TABS_IDS.access && options.accessTitle?.trim()
-                ? {...page, title: options.accessTitle}
+            page.id === TENANT_DIAGNOSTICS_TABS_IDS.access && (accessTitle || accessBadge)
+                ? {...page, title: accessTitle ?? page.title, badge: accessBadge ?? page.badge}
                 : page,
         );
 }

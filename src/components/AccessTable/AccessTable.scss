@@ -8,6 +8,28 @@
         height: 100%;
     }
 
+    .data-table__td#{$block}__actions-cell {
+        overflow: visible;
+
+        padding-block-start: calc(var(--g-spacing-1) + var(--g-spacing-half));
+        // Leave space for the 28px button and an 8px gap on each side.
+        padding-inline-end: calc(var(--g-spacing-7) + var(--g-spacing-2) * 2);
+
+        vertical-align: top;
+
+        #{$block}__rights {
+            overflow: hidden;
+        }
+    }
+
+    &__row-actions {
+        position: absolute;
+        // The automatic block position keeps the overlay aligned with its cell.
+        inset-inline: 0;
+
+        pointer-events: none;
+    }
+
     &__actions {
         pointer-events: none;
 
@@ -23,6 +45,14 @@
             opacity: 1;
         }
 
+        &_row {
+            position: sticky;
+            z-index: 1;
+            inset-inline-end: var(--g-spacing-2);
+
+            margin-inline-end: var(--g-spacing-2);
+        }
+
         &_explicit {
             position: absolute;
             right: 0;
@@ -34,26 +64,12 @@
         }
     }
 
-    .data-table__row:hover,
-    .data-table__row:focus-within {
-        #{$block}__actions {
-            pointer-events: auto;
+    .data-table__row:hover #{$block}__actions,
+    .data-table__row:focus-within #{$block}__actions,
+    .data-table__row.ydb-keyboard-focused-row #{$block}__actions_row {
+        pointer-events: auto;
 
-            opacity: 1;
-        }
-    }
-
-    &__actions-title {
-        position: absolute;
-
-        overflow: hidden;
-
-        width: 1px;
-        height: 1px;
-
-        white-space: nowrap;
-
-        clip-path: inset(50%);
+        opacity: 1;
     }
 
     @media (hover: none) {

@@ -65,6 +65,7 @@ function Diagnostics({
         subType,
         databasePagesDisplay,
         accessTitle: uiFactory.access?.getTabTitle?.({capabilities}),
+        accessBadge: uiFactory.access?.getTabBadge?.({capabilities}),
     });
 
     const activeTab = React.useMemo(() => {

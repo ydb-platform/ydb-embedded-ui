@@ -2,6 +2,7 @@ import React from 'react';
 
 import type {Column, Settings} from '@gravity-ui/react-data-table';
 import {Flex, Label} from '@gravity-ui/uikit';
+import type {LabelProps} from '@gravity-ui/uikit';
 
 import type {PreparedAccessRights} from '../../types/api/acl';
 import {cn} from '../../utils/cn';
@@ -17,6 +18,7 @@ import './AccessTable.scss';
 const b = cn('ydb-access-table');
 const settings: Settings = {...DEFAULT_TABLE_SETTINGS, dynamicRender: false};
 const getRowKey = (row: AccessTableRow) => row.subject;
+const rowActionButtonProps = {view: 'raised', size: 'm'} as const;
 
 export interface AccessTableRow extends PreparedAccessRights {
     subjectDescription?: string;
@@ -24,7 +26,7 @@ export interface AccessTableRow extends PreparedAccessRights {
 
 export interface AccessTableProps<Row extends AccessTableRow = AccessTableRow> {
     data: Row[];
-    /** Inserted after Subject. Names must be unique and differ from subject, explicit, effective and actions. */
+    /** Inserted after Subject. Names must be unique and differ from subject, explicit and effective. */
     additionalColumns?: Column<Row>[];
     /** Titles and initial widths of the standard columns. Saved widths take precedence. */
     columnOptions?: Partial<
@@ -32,8 +34,10 @@ export interface AccessTableProps<Row extends AccessTableRow = AccessTableRow> {
     >;
     /** Actions inside the Explicit rights cell. Supply accessible names for interactive controls. */
     renderExplicitActions?: (row: Row) => React.ReactNode;
-    /** Actions in a separate cell at the end of the row. Supply accessible names for interactive controls. */
-    renderRowActions?: (row: Row) => React.ReactNode;
+    /** Optional chip themes for the two rights columns. */
+    rightsChipTheme?: Partial<Record<'explicit' | 'effective', LabelProps['theme']>>;
+    /** Actions at the visible right edge of a row. Supply accessible names for interactive controls. */
+    renderRowActions?: (row: Row, buttonProps: typeof rowActionButtonProps) => React.ReactNode;
     /** Use a separate settings key for each table layout. */
     columnsWidthLSKey?: string;
     emptyDataMessage?: string;
@@ -47,6 +51,7 @@ export function AccessTable<Row extends AccessTableRow>({
     columnOptions,
     renderExplicitActions,
     renderRowActions,
+    rightsChipTheme,
     columnsWidthLSKey,
     emptyDataMessage,
     className,
@@ -79,7 +84,10 @@ export function AccessTable<Row extends AccessTableRow>({
                 },
                 render: ({row}) => (
                     <Flex alignItems="center" className={b('explicit')}>
-                        <Rights rights={row.explicit} theme="normal" />
+                        <Rights
+                            rights={row.explicit}
+                            theme={rightsChipTheme?.explicit ?? 'normal'}
+                        />
                         {renderExplicitActions && (
                             <Flex alignItems="center" className={b('actions', {explicit: true})}>
                                 {renderExplicitActions(row)}
@@ -92,6 +100,7 @@ export function AccessTable<Row extends AccessTableRow>({
             {
                 name: 'effective',
                 width: columnOptions?.effective?.width ?? 400,
+                className: renderRowActions ? b('actions-cell') : undefined,
                 get header() {
                     return (
                         columnOptions?.effective?.header ?? (
@@ -102,33 +111,31 @@ export function AccessTable<Row extends AccessTableRow>({
                         )
                     );
                 },
-                render: ({row}) => <Rights rights={row.effective} theme="unknown" />,
+                render: ({row}) => (
+                    <React.Fragment>
+                        {renderRowActions && (
+                            <Flex justifyContent="flex-end" className={b('row-actions')}>
+                                <Flex className={b('actions', {row: true})}>
+                                    {renderRowActions(row, rowActionButtonProps)}
+                                </Flex>
+                            </Flex>
+                        )}
+                        <Rights
+                            rights={row.effective}
+                            theme={rightsChipTheme?.effective ?? 'unknown'}
+                        />
+                    </React.Fragment>
+                ),
                 sortable: false,
             },
-            ...(renderRowActions
-                ? [
-                      {
-                          name: 'actions',
-                          width: 64,
-                          get header() {
-                              return (
-                                  <span className={b('actions-title')}>
-                                      {i18n('field_actions')}
-                                  </span>
-                              );
-                          },
-                          render: ({row}: {row: Row}) => (
-                              <Flex justifyContent="center" className={b('actions')}>
-                                  {renderRowActions(row)}
-                              </Flex>
-                          ),
-                          sortable: false,
-                          resizeable: false,
-                      },
-                  ]
-                : []),
         ],
-        [additionalColumns, columnOptions, renderExplicitActions, renderRowActions],
+        [
+            additionalColumns,
+            columnOptions,
+            renderExplicitActions,
+            renderRowActions,
+            rightsChipTheme,
+        ],
     );
 
     return (
@@ -146,9 +153,9 @@ export function AccessTable<Row extends AccessTableRow>({
     );
 }
 
-function Rights({rights, theme}: {rights: string[]; theme: 'normal' | 'unknown'}) {
+function Rights({rights, theme}: {rights: string[]; theme: LabelProps['theme']}) {
     return (
-        <Flex gap={2} wrap="wrap">
+        <Flex gap={2} wrap="wrap" className={b('rights')}>
             {rights.length
                 ? rights.map((right) => (
                       <Label theme={theme} key={right} size="xs">

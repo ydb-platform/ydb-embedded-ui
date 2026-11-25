@@ -25,6 +25,7 @@ export interface UseDiagnosticsPagesParams {
     subType?: EPathSubType;
     databasePagesDisplay?: DatabasePagesDisplay;
     accessTitle?: string;
+    accessBadge?: Page['badge'];
 }
 
 export function useDiagnosticsPages({
@@ -35,6 +36,7 @@ export function useDiagnosticsPages({
     subType,
     databasePagesDisplay,
     accessTitle,
+    accessBadge,
 }: UseDiagnosticsPagesParams): Page[] {
     const isDatabase = isDatabaseEntityType(type) || path === databaseFullPath;
 
@@ -64,6 +66,7 @@ export function useDiagnosticsPages({
             databaseType,
             databasePagesDisplay,
             accessTitle,
+            accessBadge,
         });
     }, [
         type,
@@ -79,6 +82,7 @@ export function useDiagnosticsPages({
         databaseType,
         databasePagesDisplay,
         accessTitle,
+        accessBadge,
         userPermissions,
     ]);
 }

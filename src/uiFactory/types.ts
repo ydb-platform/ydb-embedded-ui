@@ -2,6 +2,7 @@ import type React from 'react';
 
 import type {EmptyStateProps} from '../components/EmptyState';
 import type {YDBDefinitionListItem} from '../components/YDBDefinitionList/YDBDefinitionList';
+import type {Page} from '../containers/Tenant/Diagnostics/DiagnosticsPages';
 import type {
     CommonIssueCategory,
     GetHealthcheckViewTitles,
@@ -43,6 +44,8 @@ export interface AccessPageContext {
 export interface AccessUIConfig {
     /** Return undefined to keep the default tab title. */
     getTabTitle?: (context: Pick<AccessPageContext, 'capabilities'>) => string | undefined;
+    /** Return undefined to omit the badge. The host decides when to show it. */
+    getTabBadge?: (context: Pick<AccessPageContext, 'capabilities'>) => Page['badge'];
     /** Return null or undefined to render the default access page. */
     renderPage?: (context: AccessPageContext) => React.ReactNode;
 }

@@ -1,5 +1,6 @@
 import {TENANT_DIAGNOSTICS_TABS_IDS} from '../../../../store/reducers/tenant/constants';
 import {EPathType} from '../../../../types/api/schema';
+import type {Page} from '../DiagnosticsPages';
 import {getPagesByType} from '../DiagnosticsPages';
 
 const BASE_OPTIONS = {
@@ -11,18 +12,21 @@ const BASE_OPTIONS = {
 };
 
 describe('DiagnosticsPages', () => {
-    test('changes the access title without changing its route or the default pages', () => {
-        const getAccessPage = (accessTitle?: string) =>
+    test('customizes the access title and badge while preserving the default tab', () => {
+        const getAccessPage = (accessTitle?: string, accessBadge?: Page['badge']) =>
             getPagesByType(EPathType.EPathTypeTable, undefined, {
                 ...BASE_OPTIONS,
                 accessTitle,
+                accessBadge,
             }).find((page) => page.id === TENANT_DIAGNOSTICS_TABS_IDS.access);
 
-        expect(getAccessPage('Custom access')).toMatchObject({
+        const badge = {text: 'New', theme: 'info'} as const;
+        expect(getAccessPage('Custom access', badge)).toMatchObject({
             id: 'access',
             title: 'Custom access',
+            badge,
         });
-        expect(getAccessPage()).toMatchObject({id: 'access', title: 'Access'});
+        expect(getAccessPage()).toEqual({id: 'access', title: 'Access'});
         expect(getAccessPage('')).toEqual(getAccessPage());
         expect(getAccessPage('   ')).toEqual(getAccessPage());
     });
