@@ -8,6 +8,8 @@
   "column-title.family": "Family",
   "column-title.media": "Media",
   "column-title.compression": "Compression",
+  "field_encoding": "Encoding",
+  "value_dictionary": "Dictionary",
   "column-codec.plain": "Turned off",
   "primary-key.title": "Primary key:",
   "partitioning-key.title": "Partitioning key:"
