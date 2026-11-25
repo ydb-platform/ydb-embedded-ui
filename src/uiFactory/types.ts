@@ -41,6 +41,10 @@ export interface AccessPageContext {
     capabilities?: CapabilitiesResponse;
 }
 
+/**
+ * For `source: 'database'`, `path` and `databaseFullPath` may be empty
+ * when the full path is unknown. Use `database` to identify the database.
+ */
 export interface AccessErrorContext extends AccessPageContext {
     source: 'database' | 'schema-tree' | 'schema-object';
 }

@@ -33,7 +33,8 @@ export function TenantAccessError({
         <PageError
             error={error}
             {...defaultProps}
-            {...customProps}
+            title={customProps?.title ?? defaultProps?.title}
+            description={customProps?.description ?? defaultProps?.description}
             actions={actions}
             size="l"
             illustrationSize="m"

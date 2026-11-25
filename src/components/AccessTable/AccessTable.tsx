@@ -32,7 +32,10 @@ export interface AccessTableProps<Row extends AccessTableRow = AccessTableRow> {
     columnOptions?: Partial<
         Record<'subject' | 'explicit' | 'effective', Pick<Column<Row>, 'header' | 'width'>>
     >;
-    /** Override the initials avatar in the Subject cell for a row. */
+    /**
+     * Render a custom avatar in the Subject cell.
+     * Return `null` or `undefined` to use the default initials avatar.
+     */
     renderSubjectAvatar?: (row: Row) => React.ReactNode;
     /** Actions inside the Explicit rights cell. Supply accessible names for interactive controls. */
     renderExplicitActions?: (row: Row) => React.ReactNode;
