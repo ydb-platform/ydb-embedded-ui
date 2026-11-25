@@ -4,6 +4,17 @@ on:
       - main
       - hotfix/v[0-9]+.[0-9]+.[0-9]+* # match branches in format hotfix/v6.20.10 and hotfix/v6.20.10-hotfix.1
   workflow_dispatch:
+    inputs:
+      publish_beta:
+        description: Publish an npm beta package
+        type: boolean
+        default: false
+      source_sha:
+        description: Full commit SHA to build for a beta release
+        type: string
+      npm_tag:
+        description: npm distribution tag for the beta release
+        type: string
 
 name: Release
 
@@ -15,7 +26,9 @@ permissions:
 
 jobs:
   release:
-    if: github.repository == 'ydb-platform/ydb-embedded-ui'
+    if: >-
+      github.repository == 'ydb-platform/ydb-embedded-ui' &&
+      (github.event_name != 'workflow_dispatch' || !inputs.publish_beta)
     runs-on: ubuntu-latest
     env:
       ASSET_NAME: embedded-ui
@@ -82,3 +95,68 @@ jobs:
               "asset_name": "${{ env.ASSET_NAME }}",
               "repository": "${{ github.repository }}"
             }
+
+  build-beta-package:
+    if: >-
+      github.repository == 'ydb-platform/ydb-embedded-ui' &&
+      github.event_name == 'workflow_dispatch' &&
+      github.ref == 'refs/heads/main' &&
+      inputs.publish_beta
+    permissions:
+      contents: read
+    runs-on: ubuntu-latest
+    steps:
+      - name: Validate beta inputs
+        env:
+          SOURCE_SHA: ${{ inputs.source_sha }}
+          NPM_TAG: ${{ inputs.npm_tag }}
+        run: |
+          if [[ ! "$SOURCE_SHA" =~ ^[0-9a-f]{40}$ ]]; then
+            echo "::error::source_sha must be a full commit SHA"
+            exit 1
+          fi
+          if [[ -z "$NPM_TAG" || "$NPM_TAG" == latest || "$NPM_TAG" =~ [[:space:]] ]]; then
+            echo "::error::npm_tag must be a non-empty distribution tag other than latest"
+            exit 1
+          fi
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ inputs.source_sha }}
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+      - run: npm ci
+      - run: npm test
+      - name: Build the beta package
+        env:
+          SOURCE_SHA: ${{ inputs.source_sha }}
+        run: |
+          VERSION=$(npm version prerelease --preid=beta --no-git-tag-version --ignore-scripts)
+          npm version "${VERSION#v}.sha-${SOURCE_SHA:0:9}" --no-git-tag-version --ignore-scripts
+          npm run package
+          mkdir -p "$RUNNER_TEMP/npm-beta"
+          npm pack --ignore-scripts --pack-destination "$RUNNER_TEMP/npm-beta"
+      - uses: actions/upload-artifact@v4
+        with:
+          name: npm-beta-package
+          path: ${{ runner.temp }}/npm-beta/*.tgz
+          if-no-files-found: error
+
+  publish-beta-package:
+    needs: build-beta-package
+    permissions:
+      id-token: write
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+      - uses: actions/download-artifact@v4
+        with:
+          name: npm-beta-package
+          path: npm-beta
+      - name: Publish the beta to npm
+        env:
+          NPM_TAG: ${{ inputs.npm_tag }}
+        run: npm publish ./npm-beta/*.tgz --ignore-scripts --registry=https://registry.npmjs.org --tag="$NPM_TAG"
