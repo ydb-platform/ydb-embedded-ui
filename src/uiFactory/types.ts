@@ -41,6 +41,11 @@ export interface AccessPageContext {
     capabilities?: CapabilitiesResponse;
 }
 
+export interface AccessErrorContext extends AccessPageContext {
+    source: 'database' | 'schema-tree' | 'schema-object';
+    useMetaProxy?: boolean;
+}
+
 export interface AccessUIConfig {
     /** Return undefined to keep the default tab title. */
     getTabTitle?: (context: Pick<AccessPageContext, 'capabilities'>) => string | undefined;
@@ -48,6 +53,10 @@ export interface AccessUIConfig {
     getTabBadge?: (context: Pick<AccessPageContext, 'capabilities'>) => Page['badge'];
     /** Return null or undefined to render the default access page. */
     renderPage?: (context: AccessPageContext) => React.ReactNode;
+    /** Customize a database or schema 403. Actions are appended to the configured defaults. */
+    getErrorProps?: (
+        context: AccessErrorContext,
+    ) => Partial<Pick<EmptyStateProps, 'title' | 'description' | 'actions'>> | undefined;
 }
 
 export interface UIFactory<H extends string = CommonIssueCategory, T extends string = string> {

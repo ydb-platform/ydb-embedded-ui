@@ -1,13 +1,16 @@
 import React from 'react';
 
+import {DrawerContextProvider} from '../../components/Drawer/DrawerContext';
 import {PageError} from '../../components/Errors/PageError/PageError';
 import {LoaderWrapper} from '../../components/LoaderWrapper/LoaderWrapper';
 import {authenticationApi} from '../../store/reducers/authentication/authentication';
 import {uiFactory} from '../../uiFactory/uiFactory';
 import {useDatabaseFromQuery} from '../../utils/hooks/useDatabaseFromQuery';
 import {useMetaAuth} from '../../utils/hooks/useMetaAuth';
+import {isForbiddenError} from '../../utils/response';
 import {useAppTitle} from '../App/AppTitleContext';
 import {SettingsBootstrap} from '../App/SettingsBootstrap';
+import {TenantAccessError} from '../Tenant/TenantAccessError';
 
 import {useHandleVisibilityChange} from './useHandleVisibilityChange';
 
@@ -39,18 +42,33 @@ export function GetUser({
     const errorToDisplay = displayWhoamiError ? error : undefined;
 
     const errorProps = errorToDisplay ? {...uiFactory.clusterOrDatabaseAccessError} : undefined;
+    const databaseAccessPath = database?.startsWith('/') ? database : '';
 
     return (
         <LoaderWrapper loading={loading} size="l" delay={0}>
-            <PageError
-                error={errorToDisplay}
-                {...errorProps}
-                size="l"
-                illustrationSize="m"
-                errorPageTitle={appTitle}
-            >
-                <SettingsBootstrap>{children}</SettingsBootstrap>
-            </PageError>
+            {database && isForbiddenError(errorToDisplay) && uiFactory.access?.getErrorProps ? (
+                <DrawerContextProvider>
+                    <TenantAccessError
+                        error={errorToDisplay}
+                        errorPageTitle={appTitle}
+                        source="database"
+                        database={database}
+                        databaseFullPath={databaseAccessPath}
+                        path={databaseAccessPath}
+                        useMetaProxy={uiFactory.useMetaProxy}
+                    />
+                </DrawerContextProvider>
+            ) : (
+                <PageError
+                    error={errorToDisplay}
+                    {...errorProps}
+                    size="l"
+                    illustrationSize="m"
+                    errorPageTitle={appTitle}
+                >
+                    <SettingsBootstrap>{children}</SettingsBootstrap>
+                </PageError>
+            )}
         </LoaderWrapper>
     );
 }

@@ -43,6 +43,7 @@ export type {DrawerContextType} from './components/Drawer';
 export type {AccessTableProps, AccessTableRow} from './components/AccessTable/AccessTable';
 export type {GetMonitoringLink, GetMonitoringClusterLink} from './utils/monitoring';
 export type {
+    AccessErrorContext,
     AccessPageContext,
     AccessUIConfig,
     CreateGraphLayoutWorker,
