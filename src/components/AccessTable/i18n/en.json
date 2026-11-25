@@ -1,0 +1,8 @@
+{
+  "field_subject": "Subject",
+  "field_explicit-rights": "Explicit rights",
+  "field_effective-rights": "Effective rights",
+  "context_empty-rights": "No access rights",
+  "context_explicit-rights": "Direct granted permissions",
+  "context_effective-rights": "Total active permissions from inheritance and direct grants"
+}

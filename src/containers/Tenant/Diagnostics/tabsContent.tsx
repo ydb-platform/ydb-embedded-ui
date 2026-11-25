@@ -11,7 +11,7 @@ import {PaginatedStorage} from '../../Storage/PaginatedStorage';
 import {Tablets} from '../../Tablets/Tablets';
 import {SchemaViewer} from '../Schema/SchemaViewer/SchemaViewer';
 
-import {AccessRights} from './AccessRights/AccessRights';
+import {AccessPage} from './AccessRights/AccessPage';
 import {Consumers} from './Consumers/Consumers';
 import Describe from './Describe/Describe';
 import DetailedOverview from './DetailedOverview/DetailedOverview';
@@ -95,7 +95,9 @@ const diagnosticsTabRenderers: Record<TenantDiagnosticsTab, DiagnosticsTabRender
             scrollContainerRef={scrollContainerRef}
         />
     ),
-    [TENANT_DIAGNOSTICS_TABS_IDS.access]: () => <AccessRights />,
+    [TENANT_DIAGNOSTICS_TABS_IDS.access]: ({database, databaseFullPath, path}) => (
+        <AccessPage database={database} databaseFullPath={databaseFullPath} path={path} />
+    ),
     [TENANT_DIAGNOSTICS_TABS_IDS.tablets]: ({
         scrollContainerRef,
         path,

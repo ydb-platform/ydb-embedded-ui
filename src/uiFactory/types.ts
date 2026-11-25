@@ -2,6 +2,7 @@ import type React from 'react';
 
 import type {EmptyStateProps} from '../components/EmptyState';
 import type {YDBDefinitionListItem} from '../components/YDBDefinitionList/YDBDefinitionList';
+import type {Page} from '../containers/Tenant/Diagnostics/DiagnosticsPages';
 import type {
     CommonIssueCategory,
     GetHealthcheckViewTitles,
@@ -15,6 +16,7 @@ import type {ClusterInfo} from '../store/reducers/cluster/cluster';
 import type {PreparedStorageNode} from '../store/reducers/storage/types';
 import type {PreparedTenant} from '../store/reducers/tenants/types';
 import type {ClusterLink, DatabaseLink} from '../types/additionalProps';
+import type {CapabilitiesResponse} from '../types/api/capabilities';
 import type {MetaBaseClusterInfo} from '../types/api/meta';
 import type {ETenantType} from '../types/api/tenant';
 import type {TUserToken} from '../types/api/whoami';
@@ -31,6 +33,22 @@ export type IllustrationName =
     | 'Unauthenticated'
     | 'NoSearchResults'
     | 'SuccessOperation';
+
+export interface AccessPageContext {
+    database: string;
+    databaseFullPath: string;
+    path: string;
+    capabilities?: CapabilitiesResponse;
+}
+
+export interface AccessUIConfig {
+    /** Return undefined to keep the default tab title. */
+    getTabTitle?: (context: Pick<AccessPageContext, 'capabilities'>) => string | undefined;
+    /** Return undefined to omit the badge. The host decides when to show it. */
+    getTabBadge?: (context: Pick<AccessPageContext, 'capabilities'>) => Page['badge'];
+    /** Return null or undefined to render the default access page. */
+    renderPage?: (context: AccessPageContext) => React.ReactNode;
+}
 
 export interface UIFactory<H extends string = CommonIssueCategory, T extends string = string> {
     onCreateDB?: HandleCreateDB;
@@ -64,6 +82,7 @@ export interface UIFactory<H extends string = CommonIssueCategory, T extends str
     renderMonitoring?: RenderMonitoring;
     renderNodeTooltipActions?: RenderNodeTooltipActions;
     renderChatPanel?: RenderChatPanel;
+    access?: AccessUIConfig;
     clusterOrDatabaseAccessError?: Partial<EmptyStateProps>;
 
     /** Defaults to true. Undefined preserves the current value when configuring the UI. */

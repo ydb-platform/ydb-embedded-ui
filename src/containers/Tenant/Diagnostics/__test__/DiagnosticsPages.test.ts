@@ -1,5 +1,6 @@
 import {TENANT_DIAGNOSTICS_TABS_IDS} from '../../../../store/reducers/tenant/constants';
 import {EPathType} from '../../../../types/api/schema';
+import type {Page} from '../DiagnosticsPages';
 import {getPagesByType} from '../DiagnosticsPages';
 
 const BASE_OPTIONS = {
@@ -11,6 +12,25 @@ const BASE_OPTIONS = {
 };
 
 describe('DiagnosticsPages', () => {
+    test('customizes the access title and badge while preserving the default tab', () => {
+        const getAccessPage = (accessTitle?: string, accessBadge?: Page['badge']) =>
+            getPagesByType(EPathType.EPathTypeTable, undefined, {
+                ...BASE_OPTIONS,
+                accessTitle,
+                accessBadge,
+            }).find((page) => page.id === TENANT_DIAGNOSTICS_TABS_IDS.access);
+
+        const badge = {text: 'New', theme: 'info'} as const;
+        expect(getAccessPage('Custom access', badge)).toMatchObject({
+            id: 'access',
+            title: 'Custom access',
+            badge,
+        });
+        expect(getAccessPage()).toEqual({id: 'access', title: 'Access'});
+        expect(getAccessPage('')).toEqual(getAccessPage());
+        expect(getAccessPage('   ')).toEqual(getAccessPage());
+    });
+
     test('hides storage usage tab for table pages when storage groups handler is unavailable', () => {
         const pages = getPagesByType(EPathType.EPathTypeTable, undefined, {
             ...BASE_OPTIONS,
