@@ -297,7 +297,7 @@ function AllocationUnitsHeader() {
     return (
         <TitleWithHelpMark
             header={STORAGE_GROUPS_COLUMNS_TITLES.AllocationUnits}
-            note={columnsI18n('allocation-units-note')}
+            note={columnsI18n('context_allocation-units-note')}
             docsLink={getDocsLink('distributedStorageChannel')}
         />
     );

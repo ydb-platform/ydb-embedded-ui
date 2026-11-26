@@ -21,7 +21,7 @@
   "write": "Write",
   "latency": "Latency",
   "allocation-units": "Allocation Units",
-  "allocation-units-note": "The number of tablet channels used for write",
+  "context_allocation-units-note": "The number of tablet channels used for write",
   "group-size-in-units": "Group Size In Units",
   "vdisks": "VDisks",
   "pdisks": "PDisks",
