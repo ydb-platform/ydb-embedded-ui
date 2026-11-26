@@ -52,7 +52,7 @@ export interface AccessErrorContext extends AccessPageContext {
 
 type AccessDrawerProps = Pick<
     React.ComponentProps<typeof DrawerWrapper>,
-    'title' | 'renderDrawerContent' | 'drawerId' | 'storageKey' | 'defaultWidth' | 'headerClassName'
+    'title' | 'renderDrawerContent' | 'drawerId' | 'headerClassName'
 >;
 
 export interface AccessUIConfig {
@@ -62,7 +62,10 @@ export interface AccessUIConfig {
     getTabBadge?: (context: Pick<AccessPageContext, 'capabilities'>) => Page['badge'];
     /** Return null or undefined to render the default access page. */
     renderPage?: (context: AccessPageContext) => React.ReactNode;
-    /** Override the access drawer for the current object. Undefined keeps the default drawer. */
+    /**
+     * Override the access drawer for the current object. Undefined keeps the default drawer.
+     * Both variants share the same width setting.
+     */
     getDrawerProps?: (
         context: AccessPageContext,
         onCloseDrawer: () => void,

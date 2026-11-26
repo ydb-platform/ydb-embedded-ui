@@ -44,19 +44,22 @@ export function TenantDrawerRights({children}: TenantDrawerWrapperProps) {
     const drawerProps = customDrawerProps ?? {
         renderDrawerContent,
         drawerId: 'tenant-grant-access',
-        storageKey: 'tenant-grant-access-drawer-width',
-        isPercentageWidth: true,
         title: <DrawerTitle />,
     };
 
     return (
         <DrawerWrapper
-            {...drawerProps}
             isDrawerVisible={Boolean(showGrantAccess)}
             onCloseDrawer={handleCloseDrawer}
+            renderDrawerContent={drawerProps.renderDrawerContent}
+            drawerId={drawerProps.drawerId}
+            storageKey="tenant-grant-access-drawer-width"
             detectClickOutside
             hideVeil={false}
+            isPercentageWidth
             drawerControls={[{type: 'close'}]}
+            title={drawerProps.title}
+            headerClassName={customDrawerProps?.headerClassName}
         >
             {children}
         </DrawerWrapper>
