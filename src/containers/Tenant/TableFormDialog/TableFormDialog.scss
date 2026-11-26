@@ -326,6 +326,11 @@
         opacity: 0.6;
     }
 
+    &__indexes-table_document &__indexes-head,
+    &__indexes-table_document &__indexes-row {
+        grid-template-columns: repeat(3, minmax(0, 224px)) 28px;
+    }
+
     &__indexes-cell {
         min-width: 0;
     }

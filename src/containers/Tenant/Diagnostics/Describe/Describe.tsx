@@ -4,7 +4,7 @@ import {ResponseError} from '../../../../components/Errors/ResponseError';
 import {JsonViewer} from '../../../../components/JsonViewer/JsonViewer';
 import {Loader} from '../../../../components/Loader';
 import {useClusterWithProxy} from '../../../../store/reducers/cluster/cluster';
-import {overviewApi} from '../../../../store/reducers/overview/overview';
+import {useGetOverviewQuery} from '../../../../store/reducers/overview/overview';
 import {cn} from '../../../../utils/cn';
 import {useAutoRefreshInterval} from '../../../../utils/hooks';
 
@@ -32,7 +32,7 @@ const Describe = ({path, database, databaseFullPath, scrollContainerRef}: IDescr
     const [autoRefreshInterval] = useAutoRefreshInterval();
     const useMetaProxy = useClusterWithProxy();
 
-    const {data, currentData, isFetching, error} = overviewApi.useGetOverviewQuery(
+    const {data, currentData, isFetching, error} = useGetOverviewQuery(
         {path, database, databaseFullPath, useMetaProxy},
         {pollingInterval: autoRefreshInterval},
     );

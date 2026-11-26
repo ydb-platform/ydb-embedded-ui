@@ -6,7 +6,7 @@ import {ResponseError} from '../../../../components/Errors/ResponseError';
 import {LoaderWrapper} from '../../../../components/LoaderWrapper/LoaderWrapper';
 import {useStorageGroupPath} from '../../../../routes';
 import {useClusterWithProxy} from '../../../../store/reducers/cluster/cluster';
-import {overviewApi} from '../../../../store/reducers/overview/overview';
+import {useGetOverviewQuery} from '../../../../store/reducers/overview/overview';
 import {
     buildStorageUsageSections,
     normalizeMediaType,
@@ -52,7 +52,7 @@ function StorageUsage({path, database, databaseFullPath}: StorageUsageProps) {
     const useMetaProxy = useClusterWithProxy();
     const getStorageGroupPath = useStorageGroupPath();
 
-    const {currentData: overviewData, error: overviewError} = overviewApi.useGetOverviewQuery(
+    const {currentData: overviewData, error: overviewError} = useGetOverviewQuery(
         {path, database, databaseFullPath, useMetaProxy},
         {pollingInterval: autoRefreshInterval},
     );

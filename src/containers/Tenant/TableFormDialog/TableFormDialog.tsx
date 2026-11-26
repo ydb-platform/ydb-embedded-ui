@@ -8,6 +8,7 @@ import {FormProvider, useForm, useWatch} from 'react-hook-form';
 import {ResponseError} from '../../../components/Errors/ResponseError';
 import {Loader} from '../../../components/Loader';
 import {useClusterWithProxy} from '../../../store/reducers/cluster/cluster';
+import {documentTablesApi} from '../../../store/reducers/documentTables';
 import {tableApi} from '../../../store/reducers/table/table';
 import {
     getTablePathInfoForUpdate,
@@ -15,10 +16,13 @@ import {
     hasUpdateTableSettings,
 } from '../../../store/reducers/table/utils';
 import type {TEvDescribeSchemeResult} from '../../../types/api/schema/schema';
+import type {DocumentTableContext} from '../../../uiFactory/types';
 import {cn} from '../../../utils/cn';
 import {BRAND_BUTTON_CLASS} from '../../../utils/constants';
 import createToast from '../../../utils/createToast';
 import {prepareCommonErrorMessage} from '../../../utils/errors';
+import {transformPath} from '../ObjectSummary/transformPath';
+import {isDocumentTable} from '../utils';
 
 import {
     TABLE_FORM_DIALOG,
@@ -28,13 +32,15 @@ import {
     YDB_TABLE_TYPES,
 } from './constants';
 import i18n from './i18n';
+import {DocumentColumnsSection} from './sections/DocumentColumnsSection';
+import {DocumentIndexesSection} from './sections/DocumentIndexesSection';
 import {GeneralSection} from './sections/GeneralSection';
 import {PartitioningSection} from './sections/PartitioningSection';
 import {SettingsSection} from './sections/SettingsSection';
 import {TTLSection} from './sections/TTLSection';
 import {YdbColumnsSection} from './sections/YdbColumnsSection';
 import {YdbIndexesSection} from './sections/YdbIndexesSection';
-import type {FormMode, FormValues, OriginalTableInfo, TableType} from './types';
+import type {DialogFormValues, FormMode, OriginalTableInfo, TableType} from './types';
 import {
     describeOriginalTable,
     getCreateInitialValues,
@@ -46,8 +52,14 @@ import {buildTableValidationSchema} from './validation';
 import './TableFormDialog.scss';
 
 const b = cn('ydb-table-form-dialog');
+const defaultTableTypes: readonly TableType[] = ['row', 'column'];
 
-type DialogSuccessHandler = (path: string) => void;
+const ydbColumnOptions = {
+    row: {types: YDB_TABLE_TYPES, pkTypes: YDB_PK_TYPES, keyNullable: true},
+    column: {types: YDB_COLUMN_TABLE_TYPES, pkTypes: YDB_COLUMN_PK_TYPES, keyNullable: false},
+};
+
+type DialogSuccessHandler = (path: string, type: TableType) => void;
 
 interface CommonDialogProps {
     mode: FormMode;
@@ -55,11 +67,15 @@ interface CommonDialogProps {
     databaseFullPath: string;
     parentPath?: string;
     path?: string;
+    availableTypes?: readonly TableType[];
+    getDocumentTableContext?: (path: string) => DocumentTableContext | undefined;
+    isCurrentDatabase?: () => boolean;
     onSuccess?: DialogSuccessHandler;
 }
 
 interface TableFormDialogNiceModalProps extends CommonDialogProps {
     onClose?: () => void;
+    onRefresh?: (path: string, type: TableType, dialogOpen: boolean) => void;
 }
 
 interface TableFormDialogInnerProps extends Omit<CommonDialogProps, 'onSuccess'> {
@@ -68,13 +84,9 @@ interface TableFormDialogInnerProps extends Omit<CommonDialogProps, 'onSuccess'>
     onSuccess: DialogSuccessHandler;
 }
 
-interface TableFormProps {
-    mode: FormMode;
-    database: string;
-    databaseFullPath: string;
-    parentPath?: string;
-    path?: string;
-    initialValues: FormValues;
+interface TableFormProps extends Omit<CommonDialogProps, 'onSuccess'> {
+    availableTypes: readonly TableType[];
+    initialValues: DialogFormValues;
     originalInfo?: OriginalTableInfo;
     originalTable?: TEvDescribeSchemeResult;
     onClose: () => void;
@@ -88,8 +100,7 @@ function hasRenameConflict({
     originalName,
     originalTable,
     name,
-    addedColumnsCount,
-    deletedColumnsCount,
+    hasAddedOrDeletedColumns,
     updateSettings,
 }: {
     mode: FormMode;
@@ -97,8 +108,7 @@ function hasRenameConflict({
     originalName?: string;
     originalTable?: TEvDescribeSchemeResult;
     name: string;
-    addedColumnsCount: number;
-    deletedColumnsCount: number;
+    hasAddedOrDeletedColumns: boolean;
     updateSettings: ReturnType<typeof getUpdateTableSettings>;
 }) {
     if (
@@ -117,17 +127,10 @@ function hasRenameConflict({
     );
 
     return (
-        deletedColumnsCount > 0 ||
-        addedColumnsCount > 0 ||
+        hasAddedOrDeletedColumns ||
         hasUpdateTableSettings(updateSettings) ||
         (updateSettings?.ttl?.status === 'disabled' && originalHadTtl)
     );
-}
-
-function buildTablePath(parentPath: string, name: string) {
-    const trimmedParentPath = parentPath.replace(/\/+$/, '');
-    const trimmedName = name.replace(/^\/+|\/+$/g, '');
-    return `${trimmedParentPath}/${trimmedName}`;
 }
 
 function TableForm({
@@ -137,6 +140,9 @@ function TableForm({
     parentPath,
     path,
     initialValues,
+    availableTypes,
+    getDocumentTableContext,
+    isCurrentDatabase = () => true,
     originalInfo,
     originalTable,
     onClose,
@@ -144,14 +150,19 @@ function TableForm({
     nameInputRef,
 }: TableFormProps) {
     const [createTable, createState] = tableApi.useCreateTableMutation();
+    const [createDocumentTable, documentCreateState] =
+        documentTablesApi.useCreateDocumentTableMutation();
     const [updateTable, updateState] = tableApi.useUpdateTableMutation();
 
+    const directoryPath = (parentPath ?? databaseFullPath).replace(/\/+$/, '');
+    const relativeDirectory =
+        directoryPath === databaseFullPath ? '' : transformPath(directoryPath, databaseFullPath);
     const validationSchema = React.useMemo(
-        () => buildTableValidationSchema({mode, originalInfo}),
-        [mode, originalInfo],
+        () => buildTableValidationSchema({mode, originalInfo, relativeDirectory}),
+        [mode, originalInfo, relativeDirectory],
     );
 
-    const methods = useForm<FormValues>({
+    const methods = useForm<DialogFormValues>({
         defaultValues: initialValues,
         resolver: zodResolver(validationSchema),
         mode: 'onChange',
@@ -181,9 +192,13 @@ function TableForm({
             return;
         }
 
+        const previousType = previousTypeRef.current;
         previousTypeRef.current = type;
 
         const nextValues = getCreateInitialValues(type);
+        if (nextValues.type === 'document' || previousType === 'document') {
+            return;
+        }
         setValue('columns', nextValues.columns, {shouldValidate: false});
         setValue('secondaryIndexes', nextValues.secondaryIndexes, {shouldValidate: false});
         setValue('partitionKey', nextValues.partitionKey, {shouldValidate: false});
@@ -198,17 +213,18 @@ function TableForm({
         ]).catch(() => undefined);
     }, [mode, type, setValue, trigger]);
 
-    const isSubmitting = createState.isLoading || updateState.isLoading;
+    const isSubmitting =
+        createState.isLoading || updateState.isLoading || documentCreateState.isLoading;
     const renameConflictMessage = i18n('error_rename-with-other-changes');
-    const updateSettings = getUpdateTableSettings(settings, dirtyFields.settings);
+    const dirtySettings = 'settings' in dirtyFields ? dirtyFields.settings : undefined;
+    const updateSettings = getUpdateTableSettings(settings, dirtySettings);
     const hasNameConflict = hasRenameConflict({
         mode,
         type,
         originalName: originalInfo?.name,
         originalTable,
         name,
-        addedColumnsCount: columns.length,
-        deletedColumnsCount: deletedColumns.length,
+        hasAddedOrDeletedColumns: Boolean(columns?.length || deletedColumns?.length),
         updateSettings,
     });
 
@@ -224,6 +240,13 @@ function TableForm({
     }, [clearErrors, errors.name?.message, hasNameConflict, renameConflictMessage, setError]);
 
     const handleFormSubmit = handleSubmit(async (formValues) => {
+        if (isSubmitting || !availableTypes.length) {
+            return;
+        }
+        if (!isCurrentDatabase()) {
+            onClose();
+            return;
+        }
         if (hasNameConflict) {
             setError('name', {type: 'manual', message: renameConflictMessage});
             return;
@@ -231,28 +254,39 @@ function TableForm({
 
         try {
             if (mode === 'create') {
-                const fullName = buildTablePath(parentPath ?? databaseFullPath, formValues.name);
-                await createTable({
-                    database,
-                    formValues: {...formValues, name: fullName},
-                }).unwrap();
+                const fullName = `${directoryPath}/${formValues.name}`;
+                if (formValues.type === 'document') {
+                    const context = getDocumentTableContext?.(fullName);
+                    if (!context?.connectionId) {
+                        throw new Error(i18n('alert_table-type-unavailable'));
+                    }
+                    await createDocumentTable({
+                        context,
+                        definition: formValues.document,
+                    }).unwrap();
+                } else {
+                    await createTable({
+                        database,
+                        formValues: {...formValues, name: fullName},
+                    }).unwrap();
+                }
                 createToast({
                     name: 'table-create-success',
-                    title: i18n('alert_create-success'),
+                    title:
+                        formValues.type === 'document'
+                            ? i18n('alert_document-create-started')
+                            : i18n('alert_create-success'),
                     theme: 'success',
                     autoHiding: 5000,
                 });
-                onSuccess(fullName);
+                onSuccess(fullName, formValues.type);
                 return;
             }
 
-            if (!originalTable || !path) {
+            if (!originalTable || !path || formValues.type === 'document') {
                 throw new Error('Original table is required for update');
             }
-            const nextUpdateSettings = getUpdateTableSettings(
-                formValues.settings,
-                dirtyFields.settings,
-            );
+            const nextUpdateSettings = getUpdateTableSettings(formValues.settings, dirtySettings);
 
             await updateTable({
                 database,
@@ -268,7 +302,7 @@ function TableForm({
             });
 
             const {updatedTablePath} = getTablePathInfoForUpdate(originalTable, formValues.name);
-            onSuccess(updatedTablePath);
+            onSuccess(updatedTablePath, formValues.type);
         } catch (error) {
             createToast({
                 name: `table-${mode}-error`,
@@ -284,29 +318,38 @@ function TableForm({
     const showSettings = type === 'row';
     const showPartitioning = type === 'column' && mode === 'create';
 
-    const columnTypes = type === 'column' ? YDB_COLUMN_TABLE_TYPES : YDB_TABLE_TYPES;
-    const pkTypes = type === 'column' ? YDB_COLUMN_PK_TYPES : YDB_PK_TYPES;
-    const keyNullable = type !== 'column';
-
     return (
         <FormProvider {...methods}>
             <form onSubmit={handleFormSubmit} className={b('form')}>
                 <Dialog.Body className={b('body')}>
                     <div className={b('scroll-container')}>
                         <div className={b('scroll-content')}>
-                            <GeneralSection mode={mode} nameInputRef={nameInputRef} />
-                            <YdbColumnsSection
+                            <GeneralSection
                                 mode={mode}
-                                tableType={type}
-                                types={columnTypes}
-                                pkTypes={pkTypes}
-                                keyNullable={keyNullable}
-                                originalInfo={originalInfo}
+                                nameInputRef={nameInputRef}
+                                availableTypes={availableTypes}
                             />
-                            {showIndexes ? <YdbIndexesSection /> : null}
-                            <TTLSection originalInfo={originalInfo} />
-                            {showSettings ? <SettingsSection mode={mode} /> : null}
-                            {showPartitioning ? <PartitioningSection pkTypes={pkTypes} /> : null}
+                            {type === 'document' ? (
+                                <React.Fragment>
+                                    <DocumentColumnsSection />
+                                    <DocumentIndexesSection />
+                                </React.Fragment>
+                            ) : (
+                                <React.Fragment>
+                                    <YdbColumnsSection
+                                        mode={mode}
+                                        tableType={type}
+                                        {...ydbColumnOptions[type]}
+                                        originalInfo={originalInfo}
+                                    />
+                                    {showIndexes ? <YdbIndexesSection /> : null}
+                                    <TTLSection originalInfo={originalInfo} />
+                                    {showSettings ? <SettingsSection mode={mode} /> : null}
+                                    {showPartitioning ? (
+                                        <PartitioningSection pkTypes={YDB_COLUMN_PK_TYPES} />
+                                    ) : null}
+                                </React.Fragment>
+                            )}
                         </div>
                     </div>
                 </Dialog.Body>
@@ -321,7 +364,7 @@ function TableForm({
                         type: 'submit',
                         view: 'action',
                         className: BRAND_BUTTON_CLASS,
-                        disabled: isSubmitting,
+                        disabled: isSubmitting || !availableTypes.length,
                     }}
                 />
             </form>
@@ -336,6 +379,9 @@ function TableFormDialog({
     databaseFullPath,
     parentPath,
     path,
+    availableTypes = defaultTableTypes,
+    getDocumentTableContext,
+    isCurrentDatabase,
     onClose,
     onSuccess,
 }: TableFormDialogInnerProps) {
@@ -346,24 +392,26 @@ function TableFormDialog({
         {refetchOnMountOrArgChange: true},
     );
 
-    const originalTable = mode === 'update' ? tableQuery.data : undefined;
+    const originalTable = mode === 'update' ? tableQuery.currentData : undefined;
     const originalInfo = React.useMemo(() => describeOriginalTable(originalTable), [originalTable]);
 
-    const initialValues = React.useMemo<FormValues | undefined>(() => {
+    const initialValues = React.useMemo<DialogFormValues | undefined>(() => {
         if (mode === 'create') {
-            return getCreateInitialValues('row');
+            return getCreateInitialValues(availableTypes[0]);
         }
         if (!originalTable) {
             return undefined;
         }
         return getUpdateInitialValues(originalTable);
-    }, [mode, originalTable]);
+    }, [mode, availableTypes, originalTable]);
 
     const renderContent = () => {
-        if (mode === 'update' && !path) {
+        if (mode === 'update' && (!path || isDocumentTable(originalTable?.PathDescription))) {
             return (
                 <Dialog.Body className={b('body')}>
-                    <Text color="danger">{i18n('error_load-table')}</Text>
+                    <Text color="danger">
+                        {path ? i18n('error_edit-document-table') : i18n('error_load-table')}
+                    </Text>
                 </Dialog.Body>
             );
         }
@@ -395,6 +443,9 @@ function TableFormDialog({
                 parentPath={parentPath}
                 path={path}
                 initialValues={initialValues}
+                availableTypes={availableTypes}
+                getDocumentTableContext={getDocumentTableContext}
+                isCurrentDatabase={isCurrentDatabase}
                 originalInfo={originalInfo}
                 originalTable={originalTable}
                 onClose={onClose}
@@ -424,8 +475,10 @@ function TableFormDialog({
 
 export const TableFormDialogNiceModal = NiceModal.create((props: TableFormDialogNiceModalProps) => {
     const modal = NiceModal.useModal();
+    const closed = React.useRef(false);
 
     const handleClose = () => {
+        closed.current = true;
         modal.hide();
         modal.remove();
     };
@@ -434,8 +487,17 @@ export const TableFormDialogNiceModal = NiceModal.create((props: TableFormDialog
         <TableFormDialog
             {...props}
             open={modal.visible}
-            onSuccess={(path) => {
-                props.onSuccess?.(path);
+            onSuccess={(path, type) => {
+                const currentDatabase = props.isCurrentDatabase?.() ?? true;
+                if (currentDatabase) {
+                    props.onRefresh?.(path, type, !closed.current);
+                }
+                if (closed.current) {
+                    return;
+                }
+                if (currentDatabase) {
+                    props.onSuccess?.(path, type);
+                }
                 modal.resolve(path);
                 handleClose();
             }}

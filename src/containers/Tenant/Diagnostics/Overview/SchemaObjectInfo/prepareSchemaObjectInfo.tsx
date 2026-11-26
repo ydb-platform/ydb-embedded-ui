@@ -36,6 +36,7 @@ const PATH_TYPE_DESCRIPTIONS: Record<EPathType, string | undefined> = {
 interface PrepareSchemaObjectInfoItemsParams {
     data?: TEvDescribeSchemeResult;
     fallbackType?: EPathType;
+    typeLabel?: string;
     path: string;
     itemsAfterType?: YDBDefinitionListItem[];
     additionalItems?: YDBDefinitionListItem[];
@@ -51,7 +52,12 @@ function prepareTypeLabel({
     data,
     fallbackType,
     path,
-}: Pick<PrepareSchemaObjectInfoItemsParams, 'data' | 'fallbackType' | 'path'>) {
+    typeLabel,
+}: Pick<PrepareSchemaObjectInfoItemsParams, 'data' | 'fallbackType' | 'path' | 'typeLabel'>) {
+    if (typeLabel) {
+        return <SchemaObjectTypeLabel value={typeLabel} />;
+    }
+
     const pathDescription = data?.PathDescription;
     const self = pathDescription?.Self;
     const pathType = self?.PathType ?? fallbackType;
@@ -80,6 +86,7 @@ function prepareTypeLabel({
 export function prepareSchemaObjectInfoItems({
     data,
     fallbackType,
+    typeLabel,
     path,
     itemsAfterType = [],
     additionalItems = [],
@@ -91,14 +98,14 @@ export function prepareSchemaObjectInfoItems({
     if (!isPresent(pathId)) {
         pathId = isPresent(data?.PathId) ? data.PathId : undefined;
     }
-    const pathVersion = isPresent(self?.PathVersion) ? self.PathVersion : undefined;
+    const pathVersion = self?.PathVersion;
     const createStep = self?.CreateStep;
     const fullPath = isPresent(data?.Path) ? data.Path : path;
 
     const items: YDBDefinitionListItem[] = [
         {
             name: tenantKeyset('field_type'),
-            content: prepareTypeLabel({data, fallbackType, path}),
+            content: prepareTypeLabel({data, fallbackType, path, typeLabel}),
         },
         ...itemsAfterType,
     ];

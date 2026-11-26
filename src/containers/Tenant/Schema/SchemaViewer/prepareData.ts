@@ -10,8 +10,10 @@ import type {
     TTableDescription,
 } from '../../../../types/api/schema';
 import {EColumnCodec} from '../../../../types/api/schema';
+import type {DocumentTableSchema} from '../../../../uiFactory/types';
 import {EMPTY_DATA_PLACEHOLDER} from '../../../../utils/constants';
 import type {Nullable} from '../../../../utils/typecheckers';
+import {DOCUMENT_KEY_COLUMN_INDEX, getOrderedDocumentAttributes} from '../../utils';
 import {
     isColumnEntityType,
     isExternalTableType,
@@ -168,6 +170,14 @@ export function prepareSchemaData(
     }
 
     return [];
+}
+
+export function prepareDocumentTableSchema(schema?: DocumentTableSchema | null): SchemaData[] {
+    return getOrderedDocumentAttributes(schema).map(({name, type, keyType}) => ({
+        name,
+        type: type || EMPTY_DATA_PLACEHOLDER,
+        keyColumnIndex: keyType && DOCUMENT_KEY_COLUMN_INDEX[keyType],
+    }));
 }
 
 export function prepareViewSchema(columns?: ColumnType[]): SchemaData[] {

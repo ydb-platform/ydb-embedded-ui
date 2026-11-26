@@ -10,6 +10,7 @@ import type {TEvDescribeSchemeResult} from '../../../../../types/api/schema';
 import {cn} from '../../../../../utils/cn';
 import {useCompactionFeature} from '../../../../../utils/hooks/useCompactionFeature';
 import tenantKeyset from '../../../i18n';
+import {isDocumentTable} from '../../../utils';
 
 import {
     CompactTableAction,
@@ -35,6 +36,7 @@ interface TableInfoProps {
 
 export const TableInfo = ({data, type, database, path}: TableInfoProps) => {
     const isRowTable = type === EPathType.EPathTypeTable;
+    const canManageRowTable = isRowTable && !isDocumentTable(data?.PathDescription);
 
     // Prepare all table information
     const tableInfo = React.useMemo(() => prepareTableInfo(data, type), [data, type]);
@@ -56,8 +58,8 @@ export const TableInfo = ({data, type, database, path}: TableInfoProps) => {
     const hasMoreRight = tabletMetricsInfo.length > 0 || partitionConfigInfo.length > 0;
 
     // Compaction logic (only for row tables)
-    const {compactionEnabled} = useCompactionFeature(database, isRowTable);
-    const compactionEnabledForTable = isRowTable && compactionEnabled;
+    const {compactionEnabled} = useCompactionFeature(database, canManageRowTable);
+    const compactionEnabledForTable = canManageRowTable && compactionEnabled;
     const {
         runningCompaction,
         isFetching: isCompactionFetching,
@@ -120,7 +122,7 @@ export const TableInfo = ({data, type, database, path}: TableInfoProps) => {
                 >
                     <div className={b('title')}>{tenantKeyset('title_partitioning')}</div>
                     <Flex gap="2" alignItems="center">
-                        {managePartitioningDialogConfig && (
+                        {canManageRowTable && managePartitioningDialogConfig && (
                             <ActionTooltip title={i18n('action_manage-partition-config')}>
                                 <Button
                                     view="normal"

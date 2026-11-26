@@ -14,7 +14,7 @@ import {b} from '../shared';
 
 interface PreviewProps {
     path: string;
-    quantity?: number;
+    quantity?: number | null;
     truncated?: boolean;
     renderResult?: () => React.ReactNode;
     loading?: boolean;
@@ -40,9 +40,12 @@ export function Preview({
             <Flex justifyContent="space-between" alignItems="center" className={b('header')}>
                 <Flex gap={1}>
                     {i18n('title_query-preview')}
-                    <Text color="secondary" variant="body-2">
-                        {truncated ? `${i18n('value_truncated-query-preview')} ` : ''}({quantity})
-                    </Text>
+                    {quantity !== null && (
+                        <Text color="secondary" variant="body-2">
+                            {truncated ? `${i18n('value_truncated-query-preview')} ` : ''}(
+                            {quantity})
+                        </Text>
+                    )}
                     <div className={b('table-name')}>{path}</div>
                 </Flex>
                 <div className={b('controls-left')}>

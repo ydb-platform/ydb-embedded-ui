@@ -1,7 +1,7 @@
 import {createSlice} from '@reduxjs/toolkit';
 import type {PayloadAction} from '@reduxjs/toolkit';
 
-import type {TTenantInfo} from '../../../types/api/tenant';
+import type {TTenant, TTenantInfo} from '../../../types/api/tenant';
 import {useClusterNameFromQuery} from '../../../utils/hooks/useDatabaseFromQuery';
 import {useDatabasesV2} from '../../../utils/hooks/useDatabasesV2';
 import {backend, environment} from '../../runtimeParams';
@@ -48,6 +48,12 @@ const slice = createSlice({
 export default slice.reducer;
 export const {setQueryTab, setDiagnosticsTab, setSummaryTab, setMetricsTab} = slice.actions;
 
+function matchesDatabase(tenant: TTenant, database: string) {
+    return (
+        tenant.Name === database || tenant.Id === database || tenant.ControlPlane?.id === database
+    );
+}
+
 export const tenantApi = api.injectEndpoints({
     endpoints: (builder) => ({
         getTenantInfo: builder.query({
@@ -86,12 +92,8 @@ export const tenantApi = api.injectEndpoints({
                     );
                     // previous meta versions do not support filtering databases by name
                     const data =
-                        databases.find(
-                            (tenant) =>
-                                tenant.Name === database ||
-                                tenant.Id === database ||
-                                tenant.ControlPlane?.id === database,
-                        ) ?? databases[0];
+                        databases.find((tenant) => matchesDatabase(tenant, database)) ??
+                        databases[0];
                     if (!data) {
                         return {
                             error: {
@@ -160,6 +162,8 @@ export function useTenantBaseInfo(
 
     return {
         databaseData: currentData,
+        matchedDatabaseData:
+            currentData && matchesDatabase(currentData, database) ? currentData : undefined,
         controlPlane: ControlPlane,
         metaErrors: currentData?.metaErrors,
         name: Name,

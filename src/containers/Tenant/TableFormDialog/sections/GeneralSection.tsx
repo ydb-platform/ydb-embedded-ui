@@ -5,38 +5,47 @@ import {HelpMark, Select, TextInput} from '@gravity-ui/uikit';
 import {Controller, useFormContext, useWatch} from 'react-hook-form';
 
 import {cn} from '../../../../utils/cn';
+import tenantKeyset from '../../i18n';
 import {FormRow, FormSection} from '../components/layout';
 import i18n from '../i18n';
-import type {FormMode, FormValues, TableType} from '../types';
+import type {DialogFormValues, FormMode, TableType} from '../types';
+import {getCreateInitialValues} from '../utils';
 
 const b = cn('ydb-table-form-dialog');
 
 interface GeneralSectionProps {
     mode: FormMode;
+    availableTypes: readonly TableType[];
     nameInputRef?: React.Ref<HTMLInputElement>;
 }
 
 const tableTypeInfo: Record<TableType, string> = {
     row: i18n('label_info-table-type_row'),
     column: i18n('label_info-table-type_column'),
+    document: i18n('context_document-table-type'),
 };
 
-export function GeneralSection({mode, nameInputRef}: GeneralSectionProps) {
-    const {control, formState} = useFormContext<FormValues>();
+export function GeneralSection({mode, nameInputRef, availableTypes}: GeneralSectionProps) {
+    const {control, formState, getValues, reset} = useFormContext<DialogFormValues>();
     const type = useWatch({control, name: 'type'});
 
     const typeOptions = React.useMemo<SelectOption[]>(
-        () => [
-            {value: 'row', content: i18n('label_row-table')},
-            {value: 'column', content: i18n('label_column-table')},
-        ],
-        [],
+        () =>
+            availableTypes.map((value) => ({
+                value,
+                content:
+                    value === 'document'
+                        ? tenantKeyset('value_document-table')
+                        : i18n(`label_${value}-table`),
+            })),
+        [availableTypes],
     );
 
     const nameError = formState.errors.name?.message;
     const nameDisabled = mode === 'update' && type === 'column';
-    const typeDisabled = mode === 'update';
-    const tableTypeHelpText = mode === 'create' && type ? tableTypeInfo[type] : undefined;
+    const typeDisabled = mode === 'update' || typeOptions.length < 2;
+    const tableTypeHelpText =
+        mode === 'create' && availableTypes.length ? tableTypeInfo[type] : undefined;
     const nameHelpText = nameDisabled ? undefined : i18n('context_field-name');
 
     return (
@@ -69,9 +78,24 @@ export function GeneralSection({mode, nameInputRef}: GeneralSectionProps) {
                         render={({field}) => (
                             <Select
                                 className={b('type-select-control')}
-                                value={field.value ? [field.value] : []}
+                                value={availableTypes.length ? [field.value] : []}
                                 options={typeOptions}
-                                onUpdate={([value]) => field.onChange(value)}
+                                onUpdate={([value]) => {
+                                    const nextType = availableTypes.find(
+                                        (option) => option === value,
+                                    );
+                                    if (!nextType || nextType === type) {
+                                        return;
+                                    }
+                                    if (type === 'document' || nextType === 'document') {
+                                        reset({
+                                            ...getCreateInitialValues(nextType),
+                                            name: getValues('name'),
+                                        });
+                                    } else {
+                                        field.onChange(nextType);
+                                    }
+                                }}
                                 disabled={typeDisabled}
                                 width="max"
                             />

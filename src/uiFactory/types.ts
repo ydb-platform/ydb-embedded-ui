@@ -13,6 +13,8 @@ import type {
     HealthcheckAssistantActionProps,
     HealthcheckAssistantTarget,
 } from '../containers/Tenant/Healthcheck/types';
+import type {DOCUMENT_ATTRIBUTE_TYPES} from '../containers/Tenant/TableFormDialog/constants';
+import type {TenantContextType} from '../containers/Tenant/TenantContext';
 import type {ClusterInfo} from '../store/reducers/cluster/cluster';
 import type {PreparedStorageNode} from '../store/reducers/storage/types';
 import type {PreparedTenant} from '../store/reducers/tenants/types';
@@ -81,6 +83,8 @@ export interface UIFactory<H extends string = CommonIssueCategory, T extends str
     onEditDB?: HandleEditDB;
     onDeleteDB?: HandleDeleteDB;
     getAdditionalDatabaseInfoItems?: GetAdditionalDatabaseInfoItems;
+    getCreateTableTypes?: GetCreateTableTypes;
+    documentTables?: DocumentTableProvider;
 
     onAddCluster?: HandleAddCluster;
     onEditCluster?: HandleEditCluster;
@@ -224,6 +228,85 @@ export type HandleDeleteDB = (params: {
 export type GetAdditionalDatabaseInfoItems = (params: {
     databaseData: PreparedTenant;
 }) => YDBDefinitionListItem[];
+
+export interface DocumentTableContext extends TenantContextType {
+    relativePath: string;
+    clusterName?: string;
+    environment?: string;
+    backend?: string;
+    connectionId?: string;
+}
+
+export type GetCreateTableTypes = (
+    databaseData?: PreparedTenant,
+) => readonly ('row' | 'column' | 'document')[];
+
+export interface DocumentTableDefinition {
+    attributes: {
+        name: string;
+        type: (typeof DOCUMENT_ATTRIBUTE_TYPES)[number];
+        keyType?: 'partition' | 'sort';
+    }[];
+    indexes: {
+        name: string;
+        partitionKey: string;
+        sortKey?: string;
+    }[];
+}
+
+export interface DocumentTableProvider {
+    getDatabaseAccess: (database: PreparedTenant) => {
+        mayHaveDocumentTables: boolean;
+        connectionId?: string;
+    };
+    create?: (
+        context: DocumentTableContext,
+        definition: DocumentTableDefinition,
+        options: {signal: AbortSignal},
+    ) => Promise<void>;
+    onDelete?: (params: {
+        context: DocumentTableContext;
+        isCurrentContext: () => boolean;
+    }) => Promise<boolean>;
+    getSchema?: GetDocumentTableSchema;
+    getPreview?: GetDocumentTablePreview;
+}
+
+export interface DocumentTableIndex {
+    name: string;
+    status?: string;
+    partitionKey?: string;
+    sortKey?: string;
+}
+
+export interface DocumentTableSchema {
+    attributes: {
+        name: string;
+        type?: string;
+        keyType?: 'partition' | 'sort';
+    }[];
+    info?: {
+        status?: string;
+        itemCount?: number;
+        sizeBytes?: number;
+        globalSecondaryIndexes?: DocumentTableIndex[];
+    };
+}
+
+export type GetDocumentTableSchema = (
+    context: DocumentTableContext,
+    options: {signal: AbortSignal},
+) => Promise<DocumentTableSchema | null>;
+
+export interface DocumentTablePreviewData {
+    items: Record<string, string>[];
+    truncated: boolean;
+}
+
+export type GetDocumentTablePreview = (
+    context: DocumentTableContext,
+    options: {signal: AbortSignal; limit: number},
+) => Promise<DocumentTablePreviewData | null>;
 
 export type HandleAddCluster = () => Promise<boolean>;
 

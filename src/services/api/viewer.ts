@@ -188,7 +188,7 @@ export class ViewerAPI extends BaseYdbAPI {
 
     getSchema(
         {path, database}: {path: SchemaPathParam; database: string},
-        {concurrentId, signal}: AxiosOptions = {},
+        {concurrentId, timeout, signal}: AxiosOptions = {},
     ) {
         return this.get<Nullable<TEvDescribeSchemeResult>>(
             this.getPath('/viewer/json/describe'),
@@ -203,7 +203,7 @@ export class ViewerAPI extends BaseYdbAPI {
                 partitioning_info: false,
                 subs: 1,
             },
-            {concurrentId, requestConfig: {signal}},
+            {concurrentId, requestConfig: {signal}, timeout},
         );
     }
 

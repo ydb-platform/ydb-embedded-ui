@@ -7,7 +7,7 @@ import {LoaderWrapper} from '../../components/LoaderWrapper/LoaderWrapper';
 import SplitPane from '../../components/SplitPane';
 import {useClusterWithProxy} from '../../store/reducers/cluster/cluster';
 import {setHeaderBreadcrumbs} from '../../store/reducers/header/header';
-import {overviewApi} from '../../store/reducers/overview/overview';
+import {useGetOverviewQuery} from '../../store/reducers/overview/overview';
 import {selectSchemaObjectData} from '../../store/reducers/schema/schema';
 import {TENANT_PAGES_IDS} from '../../store/reducers/tenant/constants';
 import {useTenantBaseInfo} from '../../store/reducers/tenant/tenant';
@@ -159,7 +159,7 @@ function TreePagesContent({
         currentData: currentItem,
         error,
         isLoading,
-    } = overviewApi.useGetOverviewQuery({
+    } = useGetOverviewQuery({
         path,
         database,
         databaseFullPath: databaseName,

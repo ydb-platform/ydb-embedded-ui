@@ -13,6 +13,7 @@ import i18n from './i18n';
 import type {
     Column,
     ColumnField,
+    DialogFormValues,
     FormMode,
     FormValues,
     OriginalTableInfo,
@@ -84,7 +85,7 @@ export function generateColumnId() {
     return `col_${Date.now().toString(36)}_${columnIdCounter}`;
 }
 
-export function getInitialColumns(type: TableType): ColumnField[] {
+export function getInitialColumns(type: FormValues['type']): ColumnField[] {
     return [
         {
             _id: generateColumnId(),
@@ -98,7 +99,20 @@ export function getInitialColumns(type: TableType): ColumnField[] {
     ];
 }
 
-export function getCreateInitialValues(initialType: TableType = 'row'): FormValues {
+export function getCreateInitialValues(initialType: TableType = 'row'): DialogFormValues {
+    if (initialType === 'document') {
+        return {
+            name: '',
+            type: 'document',
+            document: {
+                attributes: [
+                    {name: 'id_shard', type: 'String', keyType: 'partition'},
+                    {name: 'id_sort', type: 'String', keyType: 'sort'},
+                ],
+                indexes: [],
+            },
+        };
+    }
     const columns = getInitialColumns(initialType);
     const firstName = columns[0]?.name ?? '';
 
