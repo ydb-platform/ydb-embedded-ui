@@ -120,6 +120,7 @@ test('filters by availability and keeps the selector available during search', a
     await expect(availability).toContainText('All');
     await list.getByPlaceholder('Cluster name, version, domain, host...').fill('unavailable');
     await expect(list.getByText('2 clusters found', {exact: true})).toBeVisible();
+    await expect(page).toHaveURL(/[?&]search=unavailable(&|$)/);
     await toggleAvailability(page, 'Unavailable');
     await expect(objectCluster).toHaveCount(0);
     await expect(jsonCluster).toHaveCount(0);

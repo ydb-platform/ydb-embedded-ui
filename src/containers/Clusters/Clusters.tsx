@@ -15,7 +15,6 @@ import {
     filterClusters,
     filterClustersByAvailability,
     selectAvailabilityFilter,
-    selectClusterNameFilter,
     selectGalaxyFilter,
     selectServiceFilter,
     selectStatusFilter,
@@ -39,6 +38,7 @@ import {
 } from './constants';
 import i18n from './i18n';
 import {b} from './shared';
+import {useClustersQueryParams} from './useClustersQueryParams';
 import {calculateClusterPath} from './utils';
 
 import './Clusters.scss';
@@ -75,7 +75,7 @@ export function Clusters({scrollContainerRef}: ClustersProps) {
     const isEditClusterAvailable = emMetaAvailable && uiFactory.onEditCluster !== undefined;
     const isDeleteClusterAvailable = emMetaAvailable && uiFactory.onDeleteCluster !== undefined;
 
-    const clusterName = useTypedSelector(selectClusterNameFilter);
+    const {search: clusterName, handleSearchChange: changeClusterName} = useClustersQueryParams();
     const status = useTypedSelector(selectStatusFilter);
     const service = useTypedSelector(selectServiceFilter);
     const version = useTypedSelector(selectVersionFilter);
@@ -87,9 +87,6 @@ export function Clusters({scrollContainerRef}: ClustersProps) {
     };
     const changeService = (value: string[]) => {
         dispatch(changeClustersFilters({service: value}));
-    };
-    const changeClusterName = (value: string) => {
-        dispatch(changeClustersFilters({clusterName: value}));
     };
     const changeVersion = (value: string[]) => {
         dispatch(changeClustersFilters({version: value}));

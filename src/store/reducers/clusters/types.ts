@@ -37,6 +37,9 @@ export interface ClustersFilters {
     clusterName: string;
 }
 
+// Text search is stored in the URL (`search` query param), not in the store
+export type ClustersStateFilters = Omit<ClustersFilters, 'clusterName'>;
+
 export interface ClustersStateSlice {
-    clusters: ClustersFilters;
+    clusters: ClustersStateFilters;
 }

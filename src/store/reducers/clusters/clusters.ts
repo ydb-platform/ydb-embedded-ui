@@ -4,12 +4,11 @@ import type {PayloadAction} from '@reduxjs/toolkit';
 import {api} from '../api';
 import {CLUSTER_DATA_LIST_TAG} from '../entityDataTags';
 
-import type {ClustersFilters} from './types';
+import type {ClustersStateFilters} from './types';
 import {prepareClustersData} from './utils';
 
-const initialState: ClustersFilters = {
+const initialState: ClustersStateFilters = {
     availability: ['available'],
-    clusterName: '',
     status: [],
     service: [],
     version: [],
@@ -20,7 +19,7 @@ const slice = createSlice({
     name: 'clusters',
     initialState,
     reducers: {
-        changeClustersFilters: (state, action: PayloadAction<Partial<ClustersFilters>>) => ({
+        changeClustersFilters: (state, action: PayloadAction<Partial<ClustersStateFilters>>) => ({
             ...state,
             ...action.payload,
         }),

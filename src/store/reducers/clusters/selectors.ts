@@ -9,7 +9,6 @@ import type {
 
 // ==== Simple selectors ====
 
-export const selectClusterNameFilter = (state: ClustersStateSlice) => state.clusters.clusterName;
 export const selectStatusFilter = (state: ClustersStateSlice) => state.clusters.status;
 export const selectServiceFilter = (state: ClustersStateSlice) => state.clusters.service;
 export const selectVersionFilter = (state: ClustersStateSlice) => state.clusters.version;
