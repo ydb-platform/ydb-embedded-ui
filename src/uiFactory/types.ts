@@ -1,5 +1,6 @@
 import type React from 'react';
 
+import type {DrawerWrapper} from '../components/Drawer';
 import type {EmptyStateProps} from '../components/EmptyState';
 import type {YDBDefinitionListItem} from '../components/YDBDefinitionList/YDBDefinitionList';
 import type {Page} from '../containers/Tenant/Diagnostics/DiagnosticsPages';
@@ -49,6 +50,11 @@ export interface AccessErrorContext extends AccessPageContext {
     source: 'database' | 'schema-tree' | 'schema-object';
 }
 
+type AccessDrawerProps = Pick<
+    React.ComponentProps<typeof DrawerWrapper>,
+    'title' | 'renderDrawerContent' | 'drawerId' | 'headerClassName'
+>;
+
 export interface AccessUIConfig {
     /** Return undefined to keep the default tab title. */
     getTabTitle?: (context: Pick<AccessPageContext, 'capabilities'>) => string | undefined;
@@ -56,6 +62,14 @@ export interface AccessUIConfig {
     getTabBadge?: (context: Pick<AccessPageContext, 'capabilities'>) => Page['badge'];
     /** Return null or undefined to render the default access page. */
     renderPage?: (context: AccessPageContext) => React.ReactNode;
+    /**
+     * Override the access drawer for the current object. Undefined keeps the default drawer.
+     * Both variants share the same width setting.
+     */
+    getDrawerProps?: (
+        context: AccessPageContext,
+        onCloseDrawer: () => void,
+    ) => AccessDrawerProps | undefined;
     /** Customize a database or schema 403. Actions are appended to the configured defaults. */
     getErrorProps?: (
         context: AccessErrorContext,

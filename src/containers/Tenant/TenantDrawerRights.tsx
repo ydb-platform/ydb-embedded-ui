@@ -3,9 +3,13 @@ import React from 'react';
 import {Flex, Text} from '@gravity-ui/uikit';
 
 import {DrawerWrapper} from '../../components/Drawer';
+import {selectDatabaseCapabilities} from '../../store/reducers/capabilities/capabilities';
 import {useEditAccessAvailable} from '../../store/reducers/capabilities/hooks';
+import {uiFactory} from '../../uiFactory/uiFactory';
+import {useTypedSelector} from '../../utils/hooks';
 
 import {GrantAccess} from './GrantAccess/GrantAccess';
+import {useCurrentSchema} from './TenantContext';
 import i18n from './i18n';
 import {useTenantQueryParams} from './useTenantQueryParams';
 
@@ -15,6 +19,11 @@ interface TenantDrawerWrapperProps {
 
 export function TenantDrawerRights({children}: TenantDrawerWrapperProps) {
     const editable = useEditAccessAvailable();
+    const schema = useCurrentSchema();
+    const getDrawerProps = uiFactory.access?.getDrawerProps;
+    const capabilities = useTypedSelector((state) =>
+        getDrawerProps ? selectDatabaseCapabilities(state, schema.database).data : undefined,
+    );
     const {showGrantAccess, handleShowGrantAccessChange, handleAclSubjectChange} =
         useTenantQueryParams();
 
@@ -27,22 +36,30 @@ export function TenantDrawerRights({children}: TenantDrawerWrapperProps) {
         return <GrantAccess handleCloseDrawer={handleCloseDrawer} />;
     }, [handleCloseDrawer]);
 
-    if (!editable) {
+    const customDrawerProps = getDrawerProps?.({...schema, capabilities}, handleCloseDrawer);
+    if (!editable && !customDrawerProps) {
         return children;
     }
+
+    const drawerProps = customDrawerProps ?? {
+        renderDrawerContent,
+        drawerId: 'tenant-grant-access',
+        title: <DrawerTitle />,
+    };
 
     return (
         <DrawerWrapper
             isDrawerVisible={Boolean(showGrantAccess)}
             onCloseDrawer={handleCloseDrawer}
-            renderDrawerContent={renderDrawerContent}
-            drawerId="tenant-grant-access"
+            renderDrawerContent={drawerProps.renderDrawerContent}
+            drawerId={drawerProps.drawerId}
             storageKey="tenant-grant-access-drawer-width"
             detectClickOutside
             hideVeil={false}
             isPercentageWidth
             drawerControls={[{type: 'close'}]}
-            title={<DrawerTitle />}
+            title={drawerProps.title}
+            headerClassName={customDrawerProps?.headerClassName}
         >
             {children}
         </DrawerWrapper>
