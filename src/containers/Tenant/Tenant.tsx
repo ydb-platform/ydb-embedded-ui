@@ -2,7 +2,7 @@ import React from 'react';
 
 import {Helmet} from 'react-helmet-async';
 
-import {PageError} from '../../components/Errors/PageError/PageError';
+import {DrawerContextProvider} from '../../components/Drawer/DrawerContext';
 import {LoaderWrapper} from '../../components/LoaderWrapper/LoaderWrapper';
 import SplitPane from '../../components/SplitPane';
 import {useClusterWithProxy} from '../../store/reducers/cluster/cluster';
@@ -12,7 +12,6 @@ import {selectSchemaObjectData} from '../../store/reducers/schema/schema';
 import {TENANT_PAGES_IDS} from '../../store/reducers/tenant/constants';
 import {useTenantBaseInfo} from '../../store/reducers/tenant/tenant';
 import type {AdditionalTenantsProps} from '../../types/additionalProps';
-import {uiFactory} from '../../uiFactory/uiFactory';
 import {cn} from '../../utils/cn';
 import {DEFAULT_IS_TENANT_SUMMARY_COLLAPSED, DEFAULT_SIZE_TENANT_KEY} from '../../utils/constants';
 import {useTypedDispatch, useTypedSelector} from '../../utils/hooks';
@@ -24,6 +23,7 @@ import Diagnostics from './Diagnostics/Diagnostics';
 import ObjectGeneral from './ObjectGeneral/ObjectGeneral';
 import {ObjectSummary} from './ObjectSummary/ObjectSummary';
 import {TreeKeyProvider} from './ObjectSummary/UpdateTreeContext';
+import {TenantAccessError} from './TenantAccessError';
 import {TenantContextProvider} from './TenantContext';
 import {TenantDrawerWrapper} from './TenantDrawerWrappers';
 import {useTenantPage} from './TenantNavigation/useTenantNavigation';
@@ -78,7 +78,7 @@ export function Tenant({additionalTenantProps}: TenantProps) {
     }, [databaseName, database, dispatch]);
 
     const showBlockingError = isAccessError(error);
-    const errorProps = showBlockingError ? uiFactory.clusterOrDatabaseAccessError : undefined;
+    const databaseAccessPath = databaseName || (database.startsWith('/') ? database : '');
 
     const isV2Enabled = useNavigationV2Enabled();
     const {tenantPage} = useTenantPage();
@@ -120,20 +120,23 @@ export function Tenant({additionalTenantProps}: TenantProps) {
                 titleTemplate={`%s — ${title} — ${appTitle}`}
             />
             <LoaderWrapper loading={isLoading}>
-                <PageError
-                    error={showBlockingError ? error : undefined}
-                    {...errorProps}
-                    size="l"
-                    illustrationSize="m"
-                >
-                    <TenantContextProvider
+                <DrawerContextProvider>
+                    <TenantAccessError
+                        error={showBlockingError ? error : undefined}
+                        source="database"
                         database={database}
-                        path={path}
-                        databaseFullPath={databaseName}
+                        path={databaseAccessPath}
+                        databaseFullPath={databaseAccessPath}
                     >
-                        <TenantDrawerWrapper>{renderContent()}</TenantDrawerWrapper>
-                    </TenantContextProvider>
-                </PageError>
+                        <TenantContextProvider
+                            database={database}
+                            path={path}
+                            databaseFullPath={databaseName}
+                        >
+                            <TenantDrawerWrapper>{renderContent()}</TenantDrawerWrapper>
+                        </TenantContextProvider>
+                    </TenantAccessError>
+                </DrawerContextProvider>
             </LoaderWrapper>
         </div>
     );
@@ -206,10 +209,6 @@ function TreePagesContent({
     );
 
     const accessError = isAccessError(error) ? error : undefined;
-    const showBlockingDescribeError = Boolean(accessError && path === databaseName);
-    const describeErrorProps = showBlockingDescribeError
-        ? uiFactory.clusterOrDatabaseAccessError
-        : undefined;
 
     // Use preloaded data if there is no current item data yet
     const currentPathType =
@@ -221,11 +220,12 @@ function TreePagesContent({
 
     return (
         <LoaderWrapper loading={initialLoading}>
-            <PageError
-                error={showBlockingDescribeError ? error : undefined}
-                {...describeErrorProps}
-                size="l"
-                illustrationSize="m"
+            <TenantAccessError
+                error={path === databaseName ? accessError : undefined}
+                source="schema-tree"
+                database={database}
+                databaseFullPath={databaseName}
+                path={databaseName}
             >
                 <TreeKeyProvider>
                     <SplitPane
@@ -252,7 +252,7 @@ function TreePagesContent({
                         </div>
                     </SplitPane>
                 </TreeKeyProvider>
-            </PageError>
+            </TenantAccessError>
         </LoaderWrapper>
     );
 }

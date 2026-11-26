@@ -16,6 +16,7 @@ interface SubjectInputProps {
 export function SubjectInput({newSubjects, setNewSubjects}: SubjectInputProps) {
     const [renderInline, setRenderInline] = React.useState(true);
     const [inputValue, setInputValue] = React.useState('');
+    const inputId = React.useId();
 
     const subjectInputRef = React.useRef<HTMLInputElement>(null);
     const labelsRef = React.useRef<HTMLDivElement>(null);
@@ -79,7 +80,7 @@ export function SubjectInput({newSubjects, setNewSubjects}: SubjectInputProps) {
     return (
         <Flex direction="column" gap={2}>
             <Flex gap={2} alignItems="start">
-                <label htmlFor="subjectInput">
+                <label htmlFor={inputId}>
                     <Text
                         as="div"
                         whiteSpace="nowrap"
@@ -91,6 +92,7 @@ export function SubjectInput({newSubjects, setNewSubjects}: SubjectInputProps) {
                 </label>
                 <Flex direction="column" gap={1} className={block('subject-input-wrapper')}>
                     <TextInput
+                        id={inputId}
                         name="subjectInput"
                         className={block('subject-input')}
                         onBlur={addNewAclSubject}

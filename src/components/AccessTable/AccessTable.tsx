@@ -32,6 +32,11 @@ export interface AccessTableProps<Row extends AccessTableRow = AccessTableRow> {
     columnOptions?: Partial<
         Record<'subject' | 'explicit' | 'effective', Pick<Column<Row>, 'header' | 'width'>>
     >;
+    /**
+     * Render a custom avatar in the Subject cell.
+     * Return `null` or `undefined` to use the default initials avatar.
+     */
+    renderSubjectAvatar?: (row: Row) => React.ReactNode;
     /** Actions inside the Explicit rights cell. Supply accessible names for interactive controls. */
     renderExplicitActions?: (row: Row) => React.ReactNode;
     /** Optional chip themes for the two rights columns. */
@@ -49,6 +54,7 @@ export function AccessTable<Row extends AccessTableRow>({
     data,
     additionalColumns,
     columnOptions,
+    renderSubjectAvatar,
     renderExplicitActions,
     renderRowActions,
     rightsChipTheme,
@@ -65,7 +71,11 @@ export function AccessTable<Row extends AccessTableRow>({
                     return columnOptions?.subject?.header ?? i18n('field_subject');
                 },
                 render: ({row}) => (
-                    <SubjectWithAvatar subject={row.subject} title={row.subjectDescription} />
+                    <SubjectWithAvatar
+                        subject={row.subject}
+                        title={row.subjectDescription}
+                        avatar={renderSubjectAvatar?.(row)}
+                    />
                 ),
             },
             ...(additionalColumns ?? []),
@@ -132,6 +142,7 @@ export function AccessTable<Row extends AccessTableRow>({
         [
             additionalColumns,
             columnOptions,
+            renderSubjectAvatar,
             renderExplicitActions,
             renderRowActions,
             rightsChipTheme,
