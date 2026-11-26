@@ -243,19 +243,25 @@ const BridgePileCard = React.memo(function BridgePileCard({
                 </Flex>
                 {stateStatus}
             </Flex>
-            <DefinitionList nameMaxWidth={130} className={text({variant: 'body-1'}, b('details'))}>
+            <DefinitionList nameMaxWidth={115} className={text({variant: 'body-1'}, b('details'))}>
                 {hasRoleCounters ? (
                     nodeCounters.map(({kind, total, alive}) => {
                         const title = i18n(
                             kind === 'storage' ? 'field_storage-nodes' : 'field_compute-nodes',
                         );
                         const progress = getBridgeNodesProgress(total, alive);
+                        const count = i18n('value_nodes-alive', {
+                            alive: formatCount(alive),
+                            total: formatCount(total),
+                        });
                         return (
-                            <DefinitionList.Item key={kind} name={title}>
+                            <DefinitionList.Item
+                                key={kind}
+                                name={<Text whiteSpace="nowrap">{title}</Text>}
+                            >
                                 <Flex
                                     alignItems="center"
                                     gap={2}
-                                    wrap
                                     qa={'bridge-pile-' + kind + '-nodes'}
                                 >
                                     {progress !== undefined ? (
@@ -263,12 +269,11 @@ const BridgePileCard = React.memo(function BridgePileCard({
                                             <Progress value={progress} size="xs" theme="info" />
                                         </span>
                                     ) : null}
-                                    <Text whiteSpace="nowrap">
-                                        {i18n('value_nodes-alive', {
-                                            alive: formatCount(alive),
-                                            total: formatCount(total),
-                                        })}
-                                    </Text>
+                                    <Tooltip content={count} placement="top">
+                                        <Text ellipsis className={b('nodes-count')} tabIndex={0}>
+                                            {count}
+                                        </Text>
+                                    </Tooltip>
                                 </Flex>
                             </DefinitionList.Item>
                         );

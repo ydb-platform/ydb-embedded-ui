@@ -55,7 +55,7 @@
         --g-progress-filled-background-color: var(--g-color-base-info-heavy);
         flex-shrink: 0;
 
-        width: 80px;
+        width: 70px;
     }
 
     &__summary-status {
@@ -64,6 +64,7 @@
 
     &__current-pile:focus-visible,
     &__state-label:focus-visible,
+    &__nodes-count:focus-visible,
     &__summary-status:focus-visible {
         outline: 2px solid var(--g-color-line-focus);
         outline-offset: 2px;
