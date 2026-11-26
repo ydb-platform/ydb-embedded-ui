@@ -30,7 +30,8 @@ type QuerySettingSelectOption<T> = SelectOption<T> & {
 interface QuerySettingsSelectProps<T extends SelectType> {
     id?: string;
     ariaLabel: string;
-    setting: T;
+    setting: T | undefined;
+    placeholder?: string;
     settingOptions: QuerySettingSelectOption<T>[];
     disabled?: boolean;
     onUpdateSetting: (mode: T) => void;
@@ -44,7 +45,8 @@ export function QuerySettingsSelect<T extends SelectType>(props: QuerySettingsSe
                 aria-label={props.ariaLabel}
                 disabled={props.disabled}
                 options={props.settingOptions}
-                value={[props.setting]}
+                value={props.setting === undefined ? [] : [props.setting]}
+                placeholder={props.placeholder}
                 onUpdate={(value) => {
                     props.onUpdateSetting(value[0] as T);
                 }}

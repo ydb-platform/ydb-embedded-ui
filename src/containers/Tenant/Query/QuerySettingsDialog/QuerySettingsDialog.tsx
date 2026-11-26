@@ -38,6 +38,7 @@ import {
     RESOURCE_POOL_NO_OVERRIDE_VALUE,
     TRACING_LEVELS,
     TRANSACTION_MODES,
+    TRANSACTION_MODES_TITLES,
     getEffectiveTransactionMode,
     isStreamingSupportedForMode,
     querySettingsValidationSchema,
@@ -278,18 +279,25 @@ function QuerySettingsForm({initialValues, onSubmit, onClose}: QuerySettingsForm
                     <Controller
                         name="transactionMode"
                         control={control}
-                        render={({field}) => (
-                            <QuerySettingsSelect
-                                id="transactionMode"
-                                ariaLabel={QUERY_SETTINGS_FIELD_SETTINGS.transactionMode.title}
-                                setting={getEffectiveTransactionMode(
-                                    field.value,
-                                    enableSnapshotReadWrite,
-                                )}
-                                onUpdateSetting={field.onChange}
-                                settingOptions={transactionModeOptions}
-                            />
-                        )}
+                        render={({field}) => {
+                            const effectiveMode = getEffectiveTransactionMode(
+                                field.value,
+                                enableSnapshotReadWrite,
+                            );
+                            // A fallback is a placeholder so explicitly picking it updates the draft.
+                            return (
+                                <QuerySettingsSelect
+                                    id="transactionMode"
+                                    ariaLabel={QUERY_SETTINGS_FIELD_SETTINGS.transactionMode.title}
+                                    setting={
+                                        field.value === effectiveMode ? field.value : undefined
+                                    }
+                                    placeholder={TRANSACTION_MODES_TITLES[effectiveMode]}
+                                    onUpdateSetting={field.onChange}
+                                    settingOptions={transactionModeOptions}
+                                />
+                            );
+                        }}
                     />
                 </SettingRow>
                 <SettingRow name="resourcePool" help={i18n('context_resource-pool')}>

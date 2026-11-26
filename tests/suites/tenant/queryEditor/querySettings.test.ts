@@ -208,47 +208,69 @@ test.describe('Test Query Settings', async () => {
         );
     });
 
-    test('Persists limit rows without replacing a saved snapshot mode on an older Viewer', async ({
-        page,
-    }) => {
-        let viewerQueryVersion = 10;
-        await page.route('**/viewer/capabilities*', (route) =>
-            route.fulfill({json: {Capabilities: {'/viewer/query': viewerQueryVersion}}}),
-        );
-        await page.evaluate(
-            (settings) => localStorage.setItem('queryExecutionSettings', JSON.stringify(settings)),
-            {...DEFAULT_QUERY_SETTINGS, transactionMode: TRANSACTION_MODES.snapshotrw},
-        );
-        await Promise.all([
-            page.waitForResponse((response) => response.url().includes('/viewer/capabilities')),
-            page.reload(),
-        ]);
-        const queryEditor = new QueryEditor(page);
-        const validValue = 50000;
-        const transactionMode = page.getByRole('combobox', {name: 'Transaction mode', exact: true});
+    test.describe('Saved Snapshot Read-Write', () => {
+        async function openSettingsOnViewer(page: Page, queryVersion: number) {
+            await page.route('**/viewer/capabilities*', (route) =>
+                route.fulfill({json: {Capabilities: {'/viewer/query': queryVersion}}}),
+            );
+            await Promise.all([
+                page.waitForResponse((response) => response.url().includes('/viewer/capabilities')),
+                page.reload(),
+            ]);
+            await new QueryEditor(page).clickGearButton();
+        }
 
-        await queryEditor.clickGearButton();
-        await expect(transactionMode).toContainText('Implicit');
-        await queryEditor.settingsDialog.changeLimitRows(validValue);
-        await queryEditor.settingsDialog.clickButton(ButtonNames.Apply);
-        await expect(queryEditor.settingsDialog.isHidden()).resolves.toBe(true);
+        test.beforeEach(async ({page}) => {
+            await page.evaluate(
+                (settings) =>
+                    localStorage.setItem('queryExecutionSettings', JSON.stringify(settings)),
+                {...DEFAULT_QUERY_SETTINGS, transactionMode: TRANSACTION_MODES.snapshotrw},
+            );
+            await openSettingsOnViewer(page, 10);
+            await expect(page.getByRole('combobox', {name: 'Transaction mode'})).toHaveText(
+                'Implicit',
+            );
+        });
 
-        viewerQueryVersion = 11;
-        await Promise.all([
-            page.waitForResponse((response) => response.url().includes('/viewer/capabilities')),
-            page.reload(),
-        ]);
-        await queryEditor.clickGearButton();
-        await expect(queryEditor.settingsDialog.getLimitRowsValue()).resolves.toBe(
-            validValue.toString(),
-        );
-        await expect(transactionMode).toContainText('Snapshot Read-Write');
-        await queryEditor.settingsDialog.changeTransactionMode(TRANSACTION_MODES.serializable);
-        await queryEditor.settingsDialog.clickButton(ButtonNames.Apply);
-        await expect(queryEditor.settingsDialog.isHidden()).resolves.toBe(true);
-        await queryEditor.clickGearButton();
-        await transactionMode.click();
-        await expect(page.getByRole('option', {name: /Snapshot Read-Write/})).toHaveCount(0);
+        test('Changing only Limit rows preserves Snapshot Read-Write', async ({page}) => {
+            const {settingsDialog} = new QueryEditor(page);
+            const transactionMode = page.getByRole('combobox', {name: 'Transaction mode'});
+
+            await settingsDialog.changeLimitRows(50000);
+            await settingsDialog.clickButton(ButtonNames.Apply);
+            await expect(settingsDialog.isHidden()).resolves.toBe(true);
+
+            await openSettingsOnViewer(page, 11);
+            await expect(settingsDialog.getLimitRowsValue()).resolves.toBe('50000');
+            await expect(transactionMode).toHaveText('Snapshot Read-Write');
+
+            await settingsDialog.changeTransactionMode(TRANSACTION_MODES.serializable);
+            await settingsDialog.clickButton(ButtonNames.Apply);
+            await expect(settingsDialog.isHidden()).resolves.toBe(true);
+            await new QueryEditor(page).clickGearButton();
+            await expect(transactionMode).toHaveText('Serializable');
+            await transactionMode.click();
+            const options = page.getByRole('listbox');
+            await expect(options).toBeVisible();
+            await expect(options.getByRole('option', {name: /Snapshot Read-Write/})).toHaveCount(0);
+        });
+
+        test('Choosing Implicit on an older Viewer replaces Snapshot Read-Write', async ({
+            page,
+        }) => {
+            const {settingsDialog} = new QueryEditor(page);
+            await settingsDialog.changeTransactionMode(TRANSACTION_MODES.implicit);
+            await settingsDialog.clickButton(ButtonNames.Apply);
+            await expect(settingsDialog.isHidden()).resolves.toBe(true);
+            const stored = await page.evaluate(() =>
+                JSON.parse(localStorage.getItem('queryExecutionSettings') ?? 'null'),
+            );
+            expect(stored).toMatchObject({transactionMode: TRANSACTION_MODES.implicit});
+
+            await openSettingsOnViewer(page, 11);
+            const transactionMode = page.getByRole('combobox', {name: 'Transaction mode'});
+            await expect(transactionMode).toHaveText('Implicit');
+        });
     });
 
     test('Allows empty limit rows value', async ({page}) => {
