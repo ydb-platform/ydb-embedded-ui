@@ -1,5 +1,15 @@
 # Changelog
 
+## [22.12.0](https://github.com/ydb-platform/ydb-embedded-ui/compare/v22.11.2...v22.12.0) (2026-11-26)
+
+
+### Features
+
+* **access:** add configurable access page and reusable table ([#4588](https://github.com/ydb-platform/ydb-embedded-ui/issues/4588)) ([af5473d](https://github.com/ydb-platform/ydb-embedded-ui/commit/af5473d307efdb9b9237549f856116c376c08e46))
+* **access:** allow custom access drawer content ([#4646](https://github.com/ydb-platform/ydb-embedded-ui/issues/4646)) ([463b150](https://github.com/ydb-platform/ydb-embedded-ui/commit/463b1503bc0eb0a39527c80c817a5b798af849e8))
+* **access:** customize access errors and subject avatars ([#4631](https://github.com/ydb-platform/ydb-embedded-ui/issues/4631)) ([8333812](https://github.com/ydb-platform/ydb-embedded-ui/commit/8333812bf95fdc1d2d479f37d0cf1aad99d391b8))
+* **storage:** add help mark to Allocation Units column ([#4647](https://github.com/ydb-platform/ydb-embedded-ui/issues/4647)) ([34dd214](https://github.com/ydb-platform/ydb-embedded-ui/commit/34dd21468719b16db549e8719e47fd609a5b42cf))
+
 ## [22.11.2](https://github.com/ydb-platform/ydb-embedded-ui/compare/v22.11.1...v22.11.2) (2026-11-24)
 
 
