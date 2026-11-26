@@ -195,11 +195,16 @@ function QuerySettingsForm({initialValues, onSubmit, onClose}: QuerySettingsForm
     );
 
     const submit = (data: QuerySettings) => {
+        onSubmit(data);
+
         const params = getQuerySettingsMetricaParams(openedSettings, data, isQueryStreamingEnabled);
         if (params) {
-            reachMetricaGoal('applyQuerySettings', params);
+            try {
+                reachMetricaGoal('applyQuerySettings', params);
+            } catch {
+                // The host's optional analytics counter can throw synchronously.
+            }
         }
-        onSubmit(data);
     };
     const revealInvalidField = () => {
         if (!advancedExpanded) {
