@@ -75,7 +75,7 @@ export function Clusters({scrollContainerRef}: ClustersProps) {
     const isEditClusterAvailable = emMetaAvailable && uiFactory.onEditCluster !== undefined;
     const isDeleteClusterAvailable = emMetaAvailable && uiFactory.onDeleteCluster !== undefined;
 
-    const {search: clusterName, handleSearchChange: changeClusterName} = useClustersQueryParams();
+    const {search, handleSearchChange} = useClustersQueryParams();
     const status = useTypedSelector(selectStatusFilter);
     const service = useTypedSelector(selectServiceFilter);
     const version = useTypedSelector(selectVersionFilter);
@@ -224,15 +224,18 @@ export function Clusters({scrollContainerRef}: ClustersProps) {
     }, [clustersForFilterOptions, service, version, galaxy]);
 
     const filteredClusters = React.useMemo(() => {
-        return filterClusters(clusters ?? [], {
-            clusterName,
-            status,
-            service,
-            version,
-            galaxy,
-            availability,
-        });
-    }, [clusterName, clusters, service, status, version, galaxy, availability]);
+        return filterClusters(
+            clusters ?? [],
+            {
+                status,
+                service,
+                version,
+                galaxy,
+                availability,
+            },
+            search,
+        );
+    }, [search, clusters, service, status, version, galaxy, availability]);
 
     const statuses = React.useMemo(() => {
         const clustersStatuses = clustersForFilterOptions
@@ -251,8 +254,8 @@ export function Clusters({scrollContainerRef}: ClustersProps) {
                     tableFilter
                     placeholder={i18n('controls_search-placeholder')}
                     endContent={<Icon data={Magnifier} className={b('search-icon')} />}
-                    onChange={changeClusterName}
-                    value={clusterName}
+                    onChange={handleSearchChange}
+                    value={search}
                     width={320}
                 />
                 {galaxiesToSelect.length > 0 || galaxy.length > 0 ? (

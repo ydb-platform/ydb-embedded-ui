@@ -34,12 +34,8 @@ export interface ClustersFilters {
     service: string[];
     version: string[];
     galaxy: string[];
-    clusterName: string;
 }
 
-// Text search is stored in the URL (`search` query param), not in the store
-export type ClustersStateFilters = Omit<ClustersFilters, 'clusterName'>;
-
 export interface ClustersStateSlice {
-    clusters: ClustersStateFilters;
+    clusters: ClustersFilters;
 }
