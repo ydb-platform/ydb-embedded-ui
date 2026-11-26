@@ -133,7 +133,7 @@ function SettingRow({
 }
 
 function QuerySettingsForm({initialValues, onSubmit, onClose}: QuerySettingsFormProps) {
-    const [openedSettings] = React.useState(initialValues);
+    const [baselineSettings, setBaselineSettings] = React.useState(initialValues);
     const [advancedExpanded, setAdvancedExpanded] = React.useState(false);
     const {
         control,
@@ -142,7 +142,7 @@ function QuerySettingsForm({initialValues, onSubmit, onClose}: QuerySettingsForm
         watch,
         formState: {errors},
     } = useForm<QuerySettingsFormInput, unknown, QuerySettings>({
-        defaultValues: openedSettings,
+        defaultValues: baselineSettings,
         resolver: zodResolver(querySettingsValidationSchema),
     });
     const enableTracingLevel = useTracingLevelOptionAvailable();
@@ -151,7 +151,7 @@ function QuerySettingsForm({initialValues, onSubmit, onClose}: QuerySettingsForm
     const {database} = useCurrentSchema();
     const {resourcePools, isLoading: isResourcePoolsLoading} = useResourcePools(
         database,
-        openedSettings.resourcePool,
+        baselineSettings.resourcePool,
     );
     const resourcePoolOptions = React.useMemo(
         () => [
@@ -179,6 +179,11 @@ function QuerySettingsForm({initialValues, onSubmit, onClose}: QuerySettingsForm
         }
         if (!resourcePools.includes(resourcePool)) {
             setValue('resourcePool', RESOURCE_POOL_NO_OVERRIDE_VALUE);
+            // A pool selected automatically is the starting point for tracking user edits.
+            setBaselineSettings((settings) => ({
+                ...settings,
+                resourcePool: RESOURCE_POOL_NO_OVERRIDE_VALUE,
+            }));
         }
     }, [isResourcePoolsLoading, resourcePools, resourcePool, setValue]);
 
@@ -189,16 +194,20 @@ function QuerySettingsForm({initialValues, onSubmit, onClose}: QuerySettingsForm
                 return (
                     option.value !== TRANSACTION_MODES.snapshotrw ||
                     (enableSnapshotReadWrite &&
-                        openedSettings.transactionMode === TRANSACTION_MODES.snapshotrw)
+                        baselineSettings.transactionMode === TRANSACTION_MODES.snapshotrw)
                 );
             }),
-        [enableSnapshotReadWrite, openedSettings.transactionMode],
+        [enableSnapshotReadWrite, baselineSettings.transactionMode],
     );
 
     const submit = (data: QuerySettings) => {
         onSubmit(data);
 
-        const params = getQuerySettingsMetricaParams(openedSettings, data, isQueryStreamingEnabled);
+        const params = getQuerySettingsMetricaParams(
+            baselineSettings,
+            data,
+            isQueryStreamingEnabled,
+        );
         if (params) {
             try {
                 reachMetricaGoal('applyQuerySettings', params);
