@@ -25,6 +25,7 @@ import type {PreparedStorageGroup} from '../../../../store/reducers/storage/type
 import {cn} from '../../../../utils/cn';
 import {EMPTY_DATA_PLACEHOLDER, YDB_POPOVER_CLASS_NAME} from '../../../../utils/constants';
 import {formatNumber} from '../../../../utils/dataFormatters/dataFormatters';
+import {getDocsLink} from '../../../../utils/docs';
 import {getUsageSeverity} from '../../../../utils/generateEvaluator';
 import {formatToMs} from '../../../../utils/timeParsers';
 import {bytesToGB, bytesToSpeed} from '../../../../utils/utils';
@@ -291,10 +292,21 @@ const latencyColumn: StorageGroupsColumn = {
     align: DataTable.RIGHT,
 };
 
+// Docs link is resolved on render, since uiFactory may be configured after this module is loaded
+function AllocationUnitsHeader() {
+    return (
+        <TitleWithHelpMark
+            header={STORAGE_GROUPS_COLUMNS_TITLES.AllocationUnits}
+            note={columnsI18n('context_allocation-units-note')}
+            docsLink={getDocsLink('distributedStorageChannel')}
+        />
+    );
+}
+
 const allocationUnitsColumn: StorageGroupsColumn = {
     name: STORAGE_GROUPS_COLUMNS_IDS.AllocationUnits,
-    header: STORAGE_GROUPS_COLUMNS_TITLES.AllocationUnits,
-    width: 150,
+    header: <AllocationUnitsHeader />,
+    width: 160,
     render: ({row}) => {
         return isNil(row.AllocationUnits)
             ? EMPTY_DATA_PLACEHOLDER
