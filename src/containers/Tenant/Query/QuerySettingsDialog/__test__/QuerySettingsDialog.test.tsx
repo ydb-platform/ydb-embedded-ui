@@ -18,23 +18,23 @@ import {QuerySettingsDialog} from '../QuerySettingsDialog';
 const originalApi = window.api;
 const originalMatchMedia = window.matchMedia;
 
-afterEach(() => {
-    jest.restoreAllMocks();
-    window.api = originalApi;
-    window.matchMedia = originalMatchMedia;
-    localStorage.removeItem(SETTING_KEYS.QUERY_EXECUTION_SETTINGS);
-});
-
-async function renderSettingsDialog(resourcePools: string[] = []) {
+beforeEach(async () => {
     window.matchMedia = jest.fn().mockReturnValue({
         matches: false,
         addEventListener: jest.fn(),
         removeEventListener: jest.fn(),
     });
+    localStorage.setItem(
+        SETTING_KEYS.QUERY_EXECUTION_SETTINGS,
+        JSON.stringify({...DEFAULT_QUERY_SETTINGS, resourcePool: 'old-pool'}),
+    );
     const storeConfiguration = configureStore();
     const {history, store} = storeConfiguration;
     await store.dispatch(
-        queryApi.util.upsertQueryData('getResourcePools', {database: '/local'}, resourcePools),
+        queryApi.util.upsertQueryData('getResourcePools', {database: '/local'}, [
+            'old-pool',
+            'available-pool',
+        ]),
     );
     store.dispatch(setQueryAction('settings'));
 
@@ -54,19 +54,44 @@ async function renderSettingsDialog(resourcePools: string[] = []) {
         </ThemeProvider>,
         {storeConfiguration},
     );
-    return store;
-}
+    const pool = screen.getByRole('combobox', {name: 'Resource pool'});
+    expect(pool).toHaveTextContent('old-pool');
+    act(() => {
+        store.dispatch(
+            queryApi.util.updateQueryData('getResourcePools', {database: '/local'}, () => [
+                'available-pool',
+            ]),
+        );
+    });
+    await waitFor(() => expect(pool).toHaveTextContent('No pool override'));
+});
+
+afterEach(() => {
+    jest.restoreAllMocks();
+    window.api = originalApi;
+    window.matchMedia = originalMatchMedia;
+    localStorage.removeItem(SETTING_KEYS.QUERY_EXECUTION_SETTINGS);
+});
 
 async function applySettings() {
     fireEvent.click(screen.getByRole('button', {name: 'Apply'}));
     await waitFor(() => expect(screen.queryByRole('dialog')).not.toBeInTheDocument());
 }
 
-test('Apply saves the changed settings and closes the dialog when the metrics counter throws', async () => {
+test('Apply without edits sends no event after an automatic pool reset', async () => {
+    const track = jest.spyOn(metrica, 'reachMetricaGoal').mockImplementation(() => {});
+    await applySettings();
+
+    expect(track).not.toHaveBeenCalled();
+    expect(readSettingValueFromLS(SETTING_KEYS.QUERY_EXECUTION_SETTINGS)).toMatchObject({
+        resourcePool: RESOURCE_POOL_NO_OVERRIDE_VALUE,
+    });
+});
+
+test('Apply tracks only the edited limit after a pool reset and saves it if analytics throws', async () => {
     const track = jest.spyOn(metrica, 'reachMetricaGoal').mockImplementation(() => {
         throw new Error('Counter unavailable');
     });
-    await renderSettingsDialog();
     fireEvent.change(screen.getByRole('spinbutton', {name: 'Limit rows'}), {
         target: {value: '50000'},
     });
@@ -75,54 +100,15 @@ test('Apply saves the changed settings and closes the dialog when the metrics co
     expect(readSettingValueFromLS(SETTING_KEYS.QUERY_EXECUTION_SETTINGS)).toMatchObject({
         limitRows: 50000,
     });
-    expect(track).toHaveBeenCalledWith(
-        'applyQuerySettings',
-        expect.objectContaining({limitRowsChanged: true, limitRows: 50000}),
-    );
-});
-
-describe('when the saved resource pool becomes unavailable', () => {
-    beforeEach(async () => {
-        localStorage.setItem(
-            SETTING_KEYS.QUERY_EXECUTION_SETTINGS,
-            JSON.stringify({...DEFAULT_QUERY_SETTINGS, resourcePool: 'old-pool'}),
-        );
-        const store = await renderSettingsDialog(['old-pool', 'available-pool']);
-        const pool = screen.getByRole('combobox', {name: 'Resource pool'});
-        expect(pool).toHaveTextContent('old-pool');
-        act(() => {
-            store.dispatch(
-                queryApi.util.updateQueryData('getResourcePools', {database: '/local'}, () => [
-                    'available-pool',
-                ]),
-            );
-        });
-        await waitFor(() => expect(pool).toHaveTextContent('No pool override'));
+    expect(track).toHaveBeenCalledTimes(1);
+    const [[goal, params]] = track.mock.calls;
+    expect(goal).toBe('applyQuerySettings');
+    expect(params).toMatchObject({
+        limitRows: 50000,
+        limitRowsChanged: true,
+        resourcePoolOverride: false,
     });
-
-    test('Apply without edits sends no analytics event', async () => {
-        const track = jest.spyOn(metrica, 'reachMetricaGoal').mockImplementation(() => {});
-        await applySettings();
-
-        expect(track).not.toHaveBeenCalled();
-        expect(readSettingValueFromLS(SETTING_KEYS.QUERY_EXECUTION_SETTINGS)).toMatchObject({
-            resourcePool: RESOURCE_POOL_NO_OVERRIDE_VALUE,
-        });
-    });
-
-    test('Apply after editing Limit rows records only limitRowsChanged', async () => {
-        const track = jest.spyOn(metrica, 'reachMetricaGoal').mockImplementation(() => {});
-        fireEvent.change(screen.getByRole('spinbutton', {name: 'Limit rows'}), {
-            target: {value: '50000'},
-        });
-        await applySettings();
-
-        expect(track).toHaveBeenCalledTimes(1);
-        const [[goal, params]] = track.mock.calls;
-        expect(goal).toBe('applyQuerySettings');
-        expect(params).toMatchObject({limitRows: 50000, resourcePoolOverride: false});
-        expect(Object.keys(params ?? {}).filter((key) => key.endsWith('Changed'))).toEqual([
-            'limitRowsChanged',
-        ]);
-    });
+    expect(Object.keys(params ?? {}).filter((key) => key.endsWith('Changed'))).toEqual([
+        'limitRowsChanged',
+    ]);
 });
