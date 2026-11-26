@@ -99,7 +99,7 @@ for (const scenario of [
             ).toBeVisible();
         }
 
-        await view.selectGroupByOption('Pile Name');
+        await view.selectGroupByOption('Bridge pile');
         const group = view.selectTableGroup('dc2');
         await expect(group).toContainText(`Nodes: ${scenario.nodeIds.length}`);
         await expect(view.selectTableGroup('dc1')).toHaveCount(0);

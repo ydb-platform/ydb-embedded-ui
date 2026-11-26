@@ -12,7 +12,7 @@ type NodesGroupByOptions =
     | 'Uptime'
     | 'Missing'
     | 'DiskSpaceUsage'
-    | 'Pile Name';
+    | 'Bridge pile';
 
 export class NodesPage extends PageModel {
     readonly table: Locator;

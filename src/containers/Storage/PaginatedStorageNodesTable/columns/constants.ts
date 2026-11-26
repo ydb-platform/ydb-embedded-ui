@@ -27,6 +27,7 @@ const STORAGE_NODES_GROUP_BY_PARAMS = [
     'Missing',
     'DiskSpaceUsage',
     'CapacityAlert',
+    'PileName',
 ] as const satisfies NodesGroupByField[];
 
 export const CAPACITY_METRICS_USER_SETTINGS_COLUMNS_IDS: NodesColumnId[] = [
@@ -45,10 +46,16 @@ export const STORAGE_NODES_GROUP_BY_OPTIONS: SelectOption[] = STORAGE_NODES_GROU
     },
 );
 
-export function getStorageNodesGroupByOptions(blobMetricsEnabled: boolean): SelectOption[] {
+export function getStorageNodesGroupByOptions(
+    blobMetricsEnabled: boolean,
+    bridgeModeEnabled: boolean,
+): SelectOption[] {
     const skippedValues: NodesGroupByField[] = blobMetricsEnabled
         ? ['DiskSpaceUsage']
         : ['CapacityAlert'];
+    if (!bridgeModeEnabled) {
+        skippedValues.push('PileName');
+    }
 
     return STORAGE_NODES_GROUP_BY_OPTIONS.filter(
         (option) => !skippedValues.includes(option.value as NodesGroupByField),
