@@ -15,7 +15,12 @@ const clusters: MetaExtendedClusterInfo[] = [
     {name: 'unavailable-json', settings: '{"unavailable":true}'},
 ];
 
-async function openClusters(page: Page, clusterList = clusters) {
+async function openClusters(
+    page: Page,
+    clusterList = clusters,
+    path = '',
+    query: Record<string, string> = {},
+) {
     await page.addInitScript(() => {
         Object.defineProperty(window, 'meta_backend', {get: () => '/meta', set: () => {}});
         Object.defineProperty(window, 'web_version', {get: () => 'true', set: () => {}});
@@ -28,7 +33,7 @@ async function openClusters(page: Page, clusterList = clusters) {
         }),
     );
     await page.route('**/viewer/json/nodelist*', (route) => route.fulfill({json: []}));
-    await new PageModel(page).goto();
+    await new PageModel(page, path, query).goto();
 }
 
 async function toggleAvailability(page: Page, value: 'Available' | 'Unavailable') {
@@ -126,6 +131,17 @@ test('filters by availability and keeps the selector available during search', a
     await expect(jsonCluster).toHaveCount(0);
     await expect(list.getByText('0 clusters found', {exact: true})).toBeVisible();
     await expect(availability).toBeVisible();
+});
+
+test('restores the search from the URL', async ({page}) => {
+    await openClusters(page, clusters, 'home/clusters', {search: 'explicitly'});
+    const list = page.locator('.ydb-clusters');
+
+    await expect(list.getByPlaceholder('Cluster name, version, domain, host...')).toHaveValue(
+        'explicitly',
+    );
+    await expect(list.getByRole('link', {name: 'explicitly-available', exact: true})).toBeVisible();
+    await expect(list.getByRole('link', {name: 'available', exact: true})).toHaveCount(0);
 });
 
 test('does not activate or change the selected row from an unavailable label', async ({page}) => {
