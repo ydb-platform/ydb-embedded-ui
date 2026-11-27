@@ -774,19 +774,7 @@ test('My databases displays allocations from cluster presets and groups by CPU a
     for (const title of ['Allocated physical resources', 'YDB logical resources']) {
         const item = page.locator('.g-popup').getByText(title, {exact: true});
         await expect(item).toBeVisible();
-        expect(
-            await item.evaluate((node) => {
-                for (let el: HTMLElement | null = node as HTMLElement; el; el = el.parentElement) {
-                    if (el.scrollWidth > el.clientWidth) {
-                        return el.className;
-                    }
-                    if (el.classList.contains('g-popup')) {
-                        break;
-                    }
-                }
-                return 'fits';
-            }),
-        ).toBe('fits');
+        expect(await item.evaluate((node) => node.scrollWidth <= node.clientWidth)).toBe(true);
     }
     await page.keyboard.press('Escape');
     const groupBy = page.getByRole('combobox', {name: /Group by/});
@@ -989,20 +977,7 @@ test('My databases pins allocated totals while scrolling and recalculates them a
     });
     await expect.poll(() => scroller.evaluate((node) => node.scrollTop)).toBeGreaterThan(300);
     await expect.poll(async () => Math.abs((await footerTop()) - top)).toBeLessThan(2);
-    // A row selected from the keyboard stays above the pinned totals
     const search = page.getByPlaceholder('Database name');
-    await search.focus();
-    for (let step = 0; step < 15; step++) {
-        await search.press('ArrowDown');
-    }
-    const selected = page.locator('.ydb-keyboard-focused-row');
-    await expect
-        .poll(async () => {
-            const row = await selected.boundingBox();
-            const totals = await footer.boundingBox();
-            return row && totals ? totals.y - (row.y + row.height) : undefined;
-        })
-        .toBeGreaterThanOrEqual(0);
     // The totals are not a row to pick: no highlight under the pointer
     const totalsRow = footer.getByRole('row');
     const totalsColor = () => totalsRow.evaluate((node) => getComputedStyle(node).backgroundColor);

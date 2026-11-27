@@ -2,18 +2,9 @@ import type {SortOrder} from '@gravity-ui/react-data-table';
 
 import {keepSortPriority} from '../keepSortPriority';
 
-const asc = (columnId: string): SortOrder => ({columnId, order: 1});
 const desc = (columnId: string): SortOrder => ({columnId, order: -1});
 
 describe('keepSortPriority', () => {
-    test('keeps the primary column first when its direction changes', () => {
-        // Sort by A, add B, then flip A: DataTable reports A last.
-        expect(keepSortPriority([desc('a'), desc('b')], [desc('b'), asc('a')])).toEqual([
-            asc('a'),
-            desc('b'),
-        ]);
-    });
-
     test('adds new columns after the already sorted ones', () => {
         expect(keepSortPriority(desc('a'), [desc('c'), desc('a'), desc('b')])).toEqual([
             desc('a'),

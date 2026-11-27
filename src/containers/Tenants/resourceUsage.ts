@@ -59,7 +59,7 @@ function configuredSize(config?: DatabaseComputeConfig) {
     return Number.isSafeInteger(size) && size >= 0 ? size : undefined;
 }
 
-export type PresetCatalogs = ReadonlyMap<string, ReadonlyMap<string, ResourcePreset>>;
+type PresetCatalogs = ReadonlyMap<string, ReadonlyMap<string, ResourcePreset>>;
 
 /**
  * The catalog of a cluster has its common presets.

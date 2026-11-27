@@ -94,27 +94,27 @@ function usePresetCatalogs(requests: CatalogRequest[]) {
 
     // A failed catalog is asked about again by the page that needs it, so that the retries
     // stop when the page is left and do not depend on other users of the same query.
-    const [retries, setRetries] = React.useState<Record<string, number>>({});
-    const nextRetryDelay = ({clusterName, cloudId}: CatalogRequest) =>
-        PRESETS_RETRY_DELAYS_MS[retries[presetCatalogKey(clusterName, cloudId)] ?? 0];
+    const [attempts, setAttempts] = React.useState<Record<string, number>>({});
+    const retries = React.useMemo(
+        () =>
+            failed.flatMap((query) => {
+                const key = presetCatalogKey(query.clusterName, query.cloudId);
+                const delay = PRESETS_RETRY_DELAYS_MS[attempts[key] ?? 0];
+                return delay === undefined ? [] : [{query, key, delay}];
+            }),
+        [failed, attempts],
+    );
     React.useEffect(() => {
-        const timers = failed.map((query) => {
-            const key = presetCatalogKey(query.clusterName, query.cloudId);
-            const delay = PRESETS_RETRY_DELAYS_MS[retries[key] ?? 0];
-            if (delay === undefined) {
-                return undefined;
-            }
-            return setTimeout(() => {
-                setRetries((current) => ({...current, [key]: (current[key] ?? 0) + 1}));
+        const timers = retries.map(({query, key, delay}) =>
+            setTimeout(() => {
+                setAttempts((current) => ({...current, [key]: (current[key] ?? 0) + 1}));
                 dispatch(endpoint.initiate(query, {subscribe: false, forceRefetch: true}));
-            }, delay);
-        });
-        return () => timers.forEach((timer) => clearTimeout(timer));
-    }, [failed, retries, dispatch]);
+            }, delay),
+        );
+        return () => timers.forEach(clearTimeout);
+    }, [retries, dispatch]);
 
-    const retrying = failed.some((query) => nextRetryDelay(query) !== undefined);
-
-    return {catalogs, loading: loading || retrying};
+    return {catalogs, loading: loading || retries.length > 0};
 }
 
 /** Resource presets the given databases are scaled by. */

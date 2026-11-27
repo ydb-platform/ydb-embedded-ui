@@ -132,12 +132,10 @@ describe('getMyDatabasesColumns', () => {
         getMyDatabasesColumns(clusterTableColumns, {withAllocatedResources}).map(({name}) => name);
 
     test('puts column groups after the state and drops the storage column', () => {
-        expect(names(true)).toEqual([
+        const withoutAllocated: string[] = [
             ids.Name,
             ids.Type,
             ids.State,
-            ids.AllocatedCPU,
-            ids.AllocatedMemory,
             ids.NodesCount,
             ids.GroupsCount,
             ids.BridgeMode,
@@ -145,11 +143,11 @@ describe('getMyDatabasesColumns', () => {
             ids.CPU,
             ids.Memory,
             ids.Network,
-        ]);
-    });
-
-    test('has no allocated columns when their presets cannot be loaded', () => {
-        expect(names(false)).not.toContain(ids.AllocatedCPU);
-        expect(names(false)).not.toContain(ids.AllocatedMemory);
+        ];
+        // Allocated resources need presets: without them there are no such columns
+        expect(names(false)).toEqual(withoutAllocated);
+        expect(names(true)).toEqual(
+            withoutAllocated.toSpliced(3, 0, ids.AllocatedCPU, ids.AllocatedMemory),
+        );
     });
 });
