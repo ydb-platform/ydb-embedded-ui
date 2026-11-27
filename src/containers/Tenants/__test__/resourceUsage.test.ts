@@ -105,7 +105,15 @@ test('supports nested and legacy fixed compute and only the tenant’s own exclu
     expect(
         allocatedResources({...dedicated, Type: 'Serverless', ControlPlane: exclusive}, catalogs),
     ).toEqual(allocation);
-    expect(allocatedResources({...dedicated, Type: 'Serverless'}, catalogs)).toBeUndefined();
+    // A serverless database without exclusive resources has no compute of its own.
+    expect(allocatedResources({...dedicated, Type: 'Serverless'}, catalogs)).toBeNull();
+    expect(
+        allocatedResources({...dedicated, ControlPlane: {serverless_database: {}}}, catalogs),
+    ).toBeNull();
+    // Without Control Plane data there is nothing to tell that from.
+    expect(
+        allocatedResources(database({Type: 'Serverless', Cluster: 'cluster-a'}), catalogs),
+    ).toBeUndefined();
 });
 
 test('requests a catalog only for a tenant with its own fixed compute size and preset ID', () => {
@@ -138,5 +146,16 @@ test('keeps missing memory and missing limits out of the zero-usage bucket', () 
             lower: undefined,
             rows: [missing, invalid, noAllocation],
         },
+    ]);
+});
+
+test('keeps databases without their own compute apart from the ones with unknown allocation', () => {
+    const used = {...dedicated, CoresUsed: 300, allocated: allocation};
+    const serverless = {...database({Type: 'Serverless', CoresUsed: 1}), allocated: null};
+    const unknown = database({CoresUsed: 1});
+    expect(groupByResourceUsage([unknown, serverless, used], 'cpu')).toEqual([
+        {name: 'usage-cpu-0', lower: 0, upper: 50, rows: [used]},
+        {name: 'usage-cpu-none', notApplicable: true, rows: [serverless]},
+        {name: 'usage-cpu-unknown', rows: [unknown]},
     ]);
 });

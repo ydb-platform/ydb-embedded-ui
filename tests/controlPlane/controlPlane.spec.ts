@@ -461,7 +461,7 @@ test('My databases temporarily hides storage columns, including saved selections
     await expect(header.locator('th')).toHaveText(['Database']);
     await page.getByRole('button', {name: /^\d+\/\d+$/}).click();
     const settings = page.locator('.g-popup');
-    await expect(settings.getByText('Storage groups', {exact: true})).toBeVisible();
+    await expect(settings.getByText('YDB logical resources', {exact: true})).toBeVisible();
     for (const title of ['Storage', 'Storage quota used', 'Storage quota limit']) {
         await expect(settings.getByText(title, {exact: true})).toHaveCount(0);
     }
@@ -559,9 +559,11 @@ test('My databases filters by cluster without cloud IDs or Control Plane', async
     await expect(header.getByText('Nodes', {exact: true})).toHaveCount(0);
     await expect(header.getByText('Storage groups', {exact: true})).toHaveCount(0);
     await page.getByRole('button', {name: /^\d+\/\d+$/}).click();
-    await page.locator('.g-popup').getByText('Nodes', {exact: true}).click();
-    await expect(logical).toHaveAttribute('colspan', '1');
-    await page.locator('.g-popup').getByText('Storage groups', {exact: true}).click();
+    // Columns of a group are shown and hidden together.
+    const settings = page.locator('.g-popup');
+    await expect(settings.getByText(/^(Nodes|Storage groups)$/)).toHaveCount(0);
+    await settings.getByText('YDB logical resources', {exact: true}).click();
+    await expect(logical).toHaveAttribute('colspan', '2');
     await page.reload();
     await expect(
         header.getByRole('columnheader', {name: 'State', exact: true}).locator('+ th'),
@@ -848,7 +850,7 @@ test('My databases sorts storage group counts and hides empty headers after relo
     await header.getByText('Storage groups', {exact: true}).click();
     await expect(values).toHaveText(['2', '10', '100']);
     await page.getByRole('button', {name: /^\d+\/\d+$/}).click();
-    await page.locator('.g-popup').getByText('Storage groups', {exact: true}).click();
+    await page.locator('.g-popup').getByText('YDB logical resources', {exact: true}).click();
     await page.reload();
     await expect(header.getByText('Storage groups', {exact: true})).toHaveCount(0);
     await expect(allocated).toHaveCount(0);

@@ -11,6 +11,7 @@ import {EntitiesCount} from '../../components/EntitiesCount';
 import {ResponseError} from '../../components/Errors/ResponseError';
 import {PoolsGraph} from '../../components/PoolsGraph/PoolsGraph';
 import {ProblemFilter} from '../../components/ProblemFilter/ProblemFilter';
+import {keepSortPriority} from '../../components/ResizeableDataTable/keepSortPriority';
 import {Search} from '../../components/Search';
 import {TableColumnSetup} from '../../components/TableColumnSetup/TableColumnSetup';
 import {TableWithControlsLayout} from '../../components/TableWithControlsLayout/TableWithControlsLayout';
@@ -64,7 +65,11 @@ import {
 } from './constants';
 import {renderOptionalNumber} from './formatters';
 import i18n from './i18n';
-import {getMyDatabasesColumns, groupResourceColumns} from './resourceColumns';
+import {
+    getMyDatabasesColumns,
+    groupResourceColumns,
+    ungroupResourceColumns,
+} from './resourceColumns';
 import type {DatabaseRow} from './types';
 import {isMyDatabase, useMyDatabasesView} from './useMyDatabasesView';
 import {useTenantsQueryParams} from './useTenantsQueryParams';
@@ -279,17 +284,6 @@ function TenantsTableContent({
         );
     };
 
-    const columnTitles = React.useMemo(
-        () =>
-            myDatabases
-                ? {
-                      ...DATABASES_COLUMNS_TITLES,
-                      [DATABASES_COLUMNS_IDS.GroupsCount]: i18n('column_storage-groups'),
-                  }
-                : DATABASES_COLUMNS_TITLES,
-        [myDatabases],
-    );
-
     const tableColumns = React.useMemo(() => {
         const columns: Column<DatabaseRow>[] = [
             {
@@ -477,7 +471,7 @@ function TenantsTableContent({
     const {columnsToShow, columnsToSelect, setColumns} = useSelectedColumns(
         tableColumns,
         tableKeys.columns,
-        columnTitles,
+        DATABASES_COLUMNS_TITLES,
         myDatabases ? MY_DATABASES_DEFAULT_COLUMNS : DATABASES_DEFAULT_COLUMNS,
         DATABASES_REQUIRED_COLUMNS,
     );
@@ -488,6 +482,12 @@ function TenantsTableContent({
                 ? groupResourceColumns(columnsToSelect)
                 : {columns: columnsToShow, items: columnsToSelect},
         [myDatabases, columnsToShow, columnsToSelect],
+    );
+
+    const handleSortChange = React.useCallback(
+        (order: SortOrder | SortOrder[] | undefined) =>
+            setSortParams((previous) => keepSortPriority(previous, order)),
+        [],
     );
 
     const {expandedGroups, setIsGroupExpanded} = useExpandedGroups(groups);
@@ -511,7 +511,7 @@ function TenantsTableContent({
                     columns={layout.columns}
                     emptyDataMessage={i18n('no-databases')}
                     sortOrder={sortParams}
-                    onSortChange={setSortParams}
+                    onSortChange={handleSortChange}
                 />
             </div>
         );
@@ -529,7 +529,7 @@ function TenantsTableContent({
                 <TableGroup
                     key={group.name}
                     name={group.name}
-                    title={resourceGroupTitle(group.lower, group.upper)}
+                    title={resourceGroupTitle(group)}
                     count={group.rows.length}
                     entityName={i18n('field_databases')}
                     expanded={Boolean(expandedGroups[group.name])}
@@ -548,7 +548,11 @@ function TenantsTableContent({
                 popupWidth={200}
                 items={layout.items}
                 showStatus
-                onUpdate={setColumns}
+                onUpdate={(updated) =>
+                    setColumns(
+                        myDatabases ? ungroupResourceColumns(updated, columnsToSelect) : updated,
+                    )
+                }
             />
         );
     };

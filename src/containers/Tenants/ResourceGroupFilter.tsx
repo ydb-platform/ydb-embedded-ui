@@ -2,9 +2,12 @@ import {Flex, Select, Spin, Text} from '@gravity-ui/uikit';
 
 import i18n from './i18n';
 import {RESOURCE_GROUPINGS} from './resourceUsage';
-import type {ResourceGrouping} from './resourceUsage';
+import type {ResourceGrouping, ResourceUsageGroup} from './resourceUsage';
 
-export function resourceGroupTitle(lower?: number, upper?: number) {
+export function resourceGroupTitle({lower, upper, notApplicable}: ResourceUsageGroup) {
+    if (notApplicable) {
+        return i18n('group_none');
+    }
     if (lower === undefined) {
         return i18n('group_unknown');
     }

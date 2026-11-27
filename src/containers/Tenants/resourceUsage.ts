@@ -12,6 +12,8 @@ export interface ResourceUsageGroup {
     name: string;
     lower?: number;
     upper?: number;
+    /** Databases that have no allocated resources to compare the usage with. */
+    notApplicable?: true;
     rows: DatabaseRow[];
 }
 
@@ -30,6 +32,15 @@ function fixedCompute(row: PreparedTenant) {
         resource_preset_id: compute?.resource_preset_id ?? cp.resource_preset_id,
         scale_policy: compute?.scale_policy ?? cp.scale_policy,
     };
+}
+
+/** A serverless database runs on shared compute unless it has exclusive resources. */
+function hasNoOwnCompute({ControlPlane: cp, Type}: PreparedTenant) {
+    return Boolean(
+        cp &&
+            (cp.serverless_database || Type === 'Serverless') &&
+            !cp.serverless_database?.exclusive_compute_resources,
+    );
 }
 
 function configuredSize(config?: DatabaseComputeConfig) {
@@ -58,7 +69,10 @@ function allocatedAmount(value: string, size: number, unit = 1) {
 export function allocatedResources(
     row: PreparedTenant,
     catalogs: ReadonlyMap<string, ReadonlyMap<string, ResourcePreset>>,
-): AllocatedResources | undefined {
+): AllocatedResources | null | undefined {
+    if (hasNoOwnCompute(row)) {
+        return null;
+    }
     const config = fixedCompute(row);
     const size = configuredSize(config);
     if (!row.Cluster || !config?.resource_preset_id || size === undefined) {
@@ -88,16 +102,18 @@ export function groupByResourceUsage(
     rows: readonly DatabaseRow[],
     mode: ResourceGrouping,
 ): ResourceUsageGroup[] {
-    const groups = new Map<number | undefined, DatabaseRow[]>();
+    const groups = new Map<number | 'none' | undefined, DatabaseRow[]>();
     for (const row of rows) {
         const ratio =
             mode === 'cpu'
                 ? usageRatio(row.CoresUsed, row.allocated?.cores)
                 : usageRatio(row.MemoryUsed, row.allocated?.memoryBytes);
-        const lower =
-            ratio === undefined
-                ? undefined
-                : USAGE_THRESHOLDS.find((threshold) => ratio >= threshold / 100);
+        let lower: number | 'none' | undefined;
+        if (row.allocated === null) {
+            lower = 'none';
+        } else if (ratio !== undefined) {
+            lower = USAGE_THRESHOLDS.find((threshold) => ratio >= threshold / 100);
+        }
         const existing = groups.get(lower);
         if (existing) {
             existing.push(row);
@@ -106,16 +122,24 @@ export function groupByResourceUsage(
         }
     }
     const result: ResourceUsageGroup[] = [];
-    for (const [index, lower] of [...USAGE_THRESHOLDS, undefined].entries()) {
+    for (const [index, lower] of USAGE_THRESHOLDS.entries()) {
         const members = groups.get(lower);
         if (members) {
             result.push({
-                name: `usage-${mode}-${lower ?? 'unknown'}`,
+                name: `usage-${mode}-${lower}`,
                 lower,
-                upper: lower === undefined ? undefined : USAGE_THRESHOLDS[index - 1],
+                upper: USAGE_THRESHOLDS[index - 1],
                 rows: members,
             });
         }
+    }
+    const withoutAllocation = groups.get('none');
+    if (withoutAllocation) {
+        result.push({name: `usage-${mode}-none`, notApplicable: true, rows: withoutAllocation});
+    }
+    const unknown = groups.get(undefined);
+    if (unknown) {
+        result.push({name: `usage-${mode}-unknown`, rows: unknown});
     }
     return result;
 }

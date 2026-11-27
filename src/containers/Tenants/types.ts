@@ -11,8 +11,11 @@ export interface AllocatedResources {
 /** A databases table row: the database with everything its cells need. */
 export interface DatabaseRow extends PreparedTenant {
     link?: ReturnType<typeof getTenantLink>;
-    /** Resources allocated by Control Plane; set on My databases only. */
-    allocated?: AllocatedResources;
+    /**
+     * Resources allocated by Control Plane; set on My databases only.
+     * `null`: the database has no resources of its own, `undefined`: they are unknown.
+     */
+    allocated?: AllocatedResources | null;
     /** Footer cells by column name; set on the totals row only. */
     totals?: Partial<Record<string, React.ReactNode>>;
 }

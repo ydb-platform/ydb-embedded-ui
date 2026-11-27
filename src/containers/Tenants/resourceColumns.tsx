@@ -35,24 +35,51 @@ export function isResourceGroup(column: DatabaseColumn) {
     return resourceGroups.some(({name}) => name === column.name);
 }
 
+/**
+ * Columns of a group are set up together: the settings list has one item per group,
+ * so a group is moved, shown and hidden as a whole.
+ */
 export function groupResourceColumns(items: DatabaseColumnSetting[]) {
-    const standalone = items.filter(({id}) => !resourceGroups.some(({members}) => members.has(id)));
-    const groupIndex = standalone.findIndex(({id}) => id === ids.State) + 1;
-    const before = standalone.slice(0, groupIndex);
-    const after = standalone.slice(groupIndex);
-    const visible = (settings: DatabaseColumnSetting[]) =>
-        settings.filter(({selected}) => selected).map(({column}) => column);
-    const columns = visible(before);
-    const orderedItems = [...before];
-    for (const {name, title, members} of resourceGroups) {
-        const groupItems = items.filter(({id}) => members.has(id));
-        const sub = visible(groupItems);
-        if (sub.length) {
-            columns.push({name, header: i18n(title), align: 'center', sub});
+    const columns: DatabaseColumn[] = [];
+    const setupItems: TableColumnSetupItem[] = [];
+    const placedGroups = new Set<string>();
+    for (const item of items) {
+        const group = resourceGroups.find(({members}) => members.has(item.id));
+        if (!group) {
+            setupItems.push(item);
+            if (item.selected) {
+                columns.push(item.column);
+            }
+        } else if (!placedGroups.has(group.name)) {
+            // The group stands where its first column does.
+            placedGroups.add(group.name);
+            const sub = items
+                .filter(({id, selected}) => selected && group.members.has(id))
+                .map(({column}) => column);
+            const title = i18n(group.title);
+            setupItems.push({id: group.name, title, selected: sub.length > 0});
+            if (sub.length) {
+                columns.push({name: group.name, header: title, align: 'center', sub});
+            }
         }
-        orderedItems.push(...groupItems);
     }
-    return {columns: [...columns, ...visible(after)], items: [...orderedItems, ...after]};
+    return {columns, items: setupItems};
+}
+
+/** Turns updated settings of column groups back into the settings of their columns. */
+export function ungroupResourceColumns(
+    updated: TableColumnSetupItem[],
+    items: DatabaseColumnSetting[],
+): TableColumnSetupItem[] {
+    return updated.flatMap((item) => {
+        const group = resourceGroups.find(({name}) => name === item.id);
+        if (!group) {
+            return [item];
+        }
+        return items
+            .filter(({id}) => group.members.has(id))
+            .map((member) => ({...member, selected: item.selected}));
+    });
 }
 
 function formatMemory(bytes: number) {
@@ -72,14 +99,20 @@ const TOTALS_ROW: PreparedTenant = {
 
 /** The footer row of a databases table: sums over the given rows by column name. */
 export function getTotalsRow(rows: readonly DatabaseRow[]): DatabaseRow {
+    /** `null` is a row the column does not apply to, `undefined` is a row with an unknown value. */
     function total(
-        getValue: (row: DatabaseRow) => number | undefined,
+        getValue: (row: DatabaseRow) => number | null | undefined,
         format: (value: number) => React.ReactNode,
     ) {
         let sum = 0;
         let count = 0;
+        let applicable = 0;
         for (const row of rows) {
             const value = getValue(row);
+            if (value === null) {
+                continue;
+            }
+            applicable++;
             if (value !== undefined) {
                 sum += value;
                 count++;
@@ -88,9 +121,9 @@ export function getTotalsRow(rows: readonly DatabaseRow[]): DatabaseRow {
         if (!count) {
             return EMPTY_DATA_PLACEHOLDER;
         }
-        if (count < rows.length) {
+        if (count < applicable) {
             return (
-                <Tooltip content={i18n('tooltip_partial-total', {count, total: rows.length})}>
+                <Tooltip content={i18n('tooltip_partial-total', {count, total: applicable})}>
                     <span tabIndex={0}>≥ {format(sum)}</span>
                 </Tooltip>
             );
@@ -100,8 +133,11 @@ export function getTotalsRow(rows: readonly DatabaseRow[]): DatabaseRow {
 
     const totals = {
         [ids.Name]: i18n('label_total'),
-        [ids.AllocatedCPU]: total((row) => row.allocated?.cores, formatNumber),
-        [ids.AllocatedMemory]: total((row) => row.allocated?.memoryBytes, formatMemory),
+        [ids.AllocatedCPU]: total((row) => row.allocated && row.allocated.cores, formatNumber),
+        [ids.AllocatedMemory]: total(
+            (row) => row.allocated && row.allocated.memoryBytes,
+            formatMemory,
+        ),
         [ids.NodesCount]: total((row) => row.NodeIds?.length, formatNumber),
         [ids.GroupsCount]: total(
             (row) => parseOptionalNonNegativeNumber(row.StorageGroups),
@@ -160,6 +196,7 @@ export function getMyDatabasesColumns(
     {withAllocatedResources}: {withAllocatedResources: boolean},
 ) {
     const result: DatabaseColumn[] = [];
+    const logicalResources: DatabaseColumn[] = [];
     for (const column of columns) {
         switch (column.name) {
             case ids.Type:
@@ -167,15 +204,26 @@ export function getMyDatabasesColumns(
                 break;
             case ids.Storage:
                 break;
+            case ids.NodesCount:
+                logicalResources.push(column);
+                break;
             case ids.GroupsCount:
-                result.push({...column, header: i18n('column_storage-groups'), width: 150});
+                logicalResources.push({
+                    ...column,
+                    header: i18n('column_storage-groups'),
+                    width: 150,
+                });
                 break;
             default:
                 result.push(column);
         }
     }
-    if (withAllocatedResources) {
-        result.push(...getAllocatedComputeColumns());
-    }
+    // Until the user moves them, column groups stand right after the state.
+    result.splice(
+        result.findIndex(({name}) => name === ids.State) + 1,
+        0,
+        ...(withAllocatedResources ? getAllocatedComputeColumns() : []),
+        ...logicalResources,
+    );
     return result.map(withTotalsFooter);
 }

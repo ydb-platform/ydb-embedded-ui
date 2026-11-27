@@ -43,6 +43,7 @@
   "label_group-by": "Group by:",
   "value_group-by-cpu": "CPU used / Allocated CPU",
   "group_unknown": "Insufficient data",
+  "group_none": "No allocated resources",
   "group_at-least": "≥{{lower}}%",
   "group_below": "<{{upper}}%",
   "group_range": "{{lower}}% – <{{upper}}%",
