@@ -240,11 +240,10 @@ export function HomePage() {
                     <TenantsTable
                         clusterName={undefined}
                         environmentName={databasesPageEnvironment}
-                        extension={uiFactory.MyDatabasesTableExtension}
+                        myDatabases
                         isMetaDatabasesAvailable={true}
                         scrollContainerRef={scrollContainerRef}
                         additionalTenantsProps={undefined}
-                        showDomainDatabase={true}
                         showPoolsColumn={false}
                         showWithProblemsFilter={false}
                     />

@@ -1,8 +1,22 @@
+import type {ETenantType} from '../../types/api/tenant';
 import type {ValueOf} from '../../types/common';
 
 import i18n from './i18n';
 
-export const DATABASES_SELECTED_COLUMNS_KEY = 'databasesTableSelectedColumns';
+// Temporarily hide storage usage and quota columns on My databases.
+export const SHOW_MY_DATABASES_STORAGE_COLUMNS = false;
+
+export const MY_DATABASE_TYPES = ['Serverless', 'Dedicated'] satisfies ETenantType[];
+
+export const DATABASES_TABLE_SETTINGS_KEYS = {
+    columns: 'databasesTableSelectedColumns',
+    widths: 'databasesTableColumnsWidth',
+};
+
+export const MY_DATABASES_TABLE_SETTINGS_KEYS = {
+    columns: 'myDatabasesTableSelectedColumns',
+    widths: 'myDatabasesTableColumnsWidth',
+};
 
 export const DATABASES_COLUMNS_IDS = {
     Name: 'Name',
@@ -11,8 +25,12 @@ export const DATABASES_COLUMNS_IDS = {
     BridgeMode: 'BridgeMode',
     BridgeSyncStatus: 'BridgeSyncStatus',
     CPU: 'cpu',
+    AllocatedCPU: 'allocatedCpuCores',
     Memory: 'memory',
+    AllocatedMemory: 'allocatedMemory',
     Storage: 'storage',
+    StorageQuotaUsed: 'storageQuotaUsed',
+    StorageQuotaLimit: 'storageQuotaLimit',
     Network: 'Network',
     NodesCount: 'nodesCount',
     GroupsCount: 'groupsCount',
@@ -28,8 +46,12 @@ export const DATABASES_DEFAULT_COLUMNS: DatabasesColumnId[] = [
     DATABASES_COLUMNS_IDS.BridgeMode,
     DATABASES_COLUMNS_IDS.BridgeSyncStatus,
     DATABASES_COLUMNS_IDS.CPU,
+    DATABASES_COLUMNS_IDS.AllocatedCPU,
     DATABASES_COLUMNS_IDS.Memory,
+    DATABASES_COLUMNS_IDS.AllocatedMemory,
     DATABASES_COLUMNS_IDS.Storage,
+    DATABASES_COLUMNS_IDS.StorageQuotaUsed,
+    DATABASES_COLUMNS_IDS.StorageQuotaLimit,
     DATABASES_COLUMNS_IDS.Network,
     DATABASES_COLUMNS_IDS.NodesCount,
     DATABASES_COLUMNS_IDS.GroupsCount,
@@ -56,11 +78,23 @@ export const DATABASES_COLUMNS_TITLES = {
     get [DATABASES_COLUMNS_IDS.CPU]() {
         return i18n('column-cpu');
     },
+    get [DATABASES_COLUMNS_IDS.AllocatedCPU]() {
+        return i18n('column_allocated');
+    },
     get [DATABASES_COLUMNS_IDS.Memory]() {
         return i18n('column-memory');
     },
+    get [DATABASES_COLUMNS_IDS.AllocatedMemory]() {
+        return i18n('column_memory-allocated');
+    },
     get [DATABASES_COLUMNS_IDS.Storage]() {
         return i18n('column-storage');
+    },
+    get [DATABASES_COLUMNS_IDS.StorageQuotaUsed]() {
+        return i18n('column_quota-used');
+    },
+    get [DATABASES_COLUMNS_IDS.StorageQuotaLimit]() {
+        return i18n('column_quota-limit');
     },
     get [DATABASES_COLUMNS_IDS.Network]() {
         return i18n('column-network');

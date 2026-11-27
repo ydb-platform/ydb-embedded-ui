@@ -1,6 +1,8 @@
 import {expect, test} from '@playwright/test';
 import type {Page} from '@playwright/test';
 
+import type {TTenant} from '../../src/types/api/tenant';
+
 interface MockOptions {
     hasCp?: boolean;
     hasOperationsCapability?: boolean;
@@ -54,7 +56,7 @@ async function mockApi(
                 Capabilities:
                     pathname.includes('/viewer/') || !hasOperationsCapability
                         ? {}
-                        : {'/meta/list_operations': 1},
+                        : {'/meta/list_operations': 1, '/meta/list_resource_presets': 1},
                 Settings: {Security: {UseLoginProvider: true}},
             };
         } else if (pathname.endsWith('/meta/db_clusters')) {
@@ -399,9 +401,9 @@ test.describe('Operations', () => {
     });
 });
 
-test('My databases shows confirmed write blocks in the Database cell without an extension', async ({
-    page,
-}) => {
+const databasesUrl = '/home/databases?databasesFixture';
+
+test('My databases shows confirmed write blocks in the Database cell', async ({page}) => {
     await mockApi(page, {});
     await page.route('**/meta/databases?*', (route) =>
         route.fulfill({
@@ -409,15 +411,21 @@ test('My databases shows confirmed write blocks in the Database cell without an 
                 databases: [
                     {
                         Name: '/db/quota',
+                        Type: 'Dedicated',
                         Overall: 'Green',
                         DomainState: {DiskQuotaExceeded: true},
                     },
                     {
                         Name: '/db/space',
+                        Type: 'Dedicated',
                         DomainState: {DiskQuotaExceeded: true, StorageSpaceExhausted: true},
                     },
-                    {Name: '/db/unknown'},
-                    {Name: '/db/available', DomainState: {DiskQuotaExceeded: false}},
+                    {Name: '/db/unknown', Type: 'Dedicated'},
+                    {
+                        Name: '/db/available',
+                        Type: 'Serverless',
+                        DomainState: {DiskQuotaExceeded: false},
+                    },
                 ],
             },
         }),
@@ -438,12 +446,33 @@ test('My databases shows confirmed write blocks in the Database cell without an 
     await expect(badge('available')).toHaveCount(0);
 });
 
+test('My databases temporarily hides storage columns, including saved selections', async ({
+    page,
+}) => {
+    await mockApi(page, {});
+    await page.addInitScript(() =>
+        localStorage.setItem(
+            'myDatabasesTableSelectedColumns',
+            JSON.stringify(['Name', 'storage', 'storageQuotaUsed', 'storageQuotaLimit']),
+        ),
+    );
+    await page.goto(databasesUrl);
+    const header = page.locator('thead').first();
+    await expect(header.locator('th')).toHaveText(['Database']);
+    await page.getByRole('button', {name: /^\d+\/\d+$/}).click();
+    const settings = page.locator('.g-popup');
+    await expect(settings.getByText('Storage groups', {exact: true})).toBeVisible();
+    for (const title of ['Storage', 'Storage quota used', 'Storage quota limit']) {
+        await expect(settings.getByText(title, {exact: true})).toHaveCount(0);
+    }
+});
+
 test('My databases truncates narrow column titles and keeps their help accessible', async ({
     page,
 }) => {
     await mockApi(page, {});
     await page.addInitScript(() =>
-        localStorage.setItem('databasesTableColumnsWidth', JSON.stringify({cpu: 80})),
+        localStorage.setItem('myDatabasesTableColumnsWidth', JSON.stringify({cpu: 80})),
     );
     await page.goto('/home/databases?databasesFixture');
 
@@ -455,84 +484,409 @@ test('My databases truncates narrow column titles and keeps their help accessibl
     await expect(page.getByText('CPU currently used by the database, in cores.')).toBeVisible();
 });
 
-test('My databases extension groups filtered rows and preserves additional column settings', async ({
+async function mockDatabases(page: Page, databases: TTenant[]) {
+    await mockApi(page, {});
+    await page.route('**/meta/databases?*', (route) => route.fulfill({json: {databases}}));
+}
+
+const cloudDatabases: TTenant[] = [
+    {Name: '/db/first', Type: 'Dedicated', Cluster: 'alpha', UserAttributes: {cloud_id: 'cloud-b'}},
+    {
+        Name: '/db/second',
+        Type: 'Serverless',
+        Cluster: 'alpha',
+        UserAttributes: {cloud_id: 'cloud-a'},
+    },
+    {Name: '/db/third', Type: 'Dedicated', Cluster: 'beta', UserAttributes: {cloud_id: 'cloud-b'}},
+];
+
+test('My databases filters by cluster without cloud IDs or Control Plane', async ({page}) => {
+    await mockDatabases(page, [
+        {
+            Name: '/db/first',
+            Type: 'Dedicated',
+            Cluster: 'alpha',
+            TablesStorage: [{Type: 'SSD', Size: '90', HardQuota: '100'}],
+            NodeIds: [1, 2],
+            StorageGroups: '3',
+        },
+        {
+            Name: '/db/second',
+            Type: 'Serverless',
+            Cluster: 'beta',
+            ControlPlane: {},
+            DiskSpaceQuotaUsage: {Mode: 'MODE_OVERALL', Entries: [{Usage: '20', HardQuota: '100'}]},
+            NodeIds: [3],
+            StorageGroups: '1',
+        },
+        {
+            Name: '/db/shared',
+            Type: 'Shared',
+            Cluster: 'hidden',
+            ControlPlane: {cloud_id: 'shared-cloud'},
+            StorageGroups: '99',
+        },
+        {Name: '/db/domain', Type: 'Domain', Cluster: 'hidden', NodeIds: [4]},
+        {Name: '/db/unknown-type', Type: 'UnknownTenantType', Cluster: 'hidden'},
+        {Name: '/db/untyped', Cluster: 'hidden'},
+    ]);
+    let resolverCalls = 0;
+    await page.exposeFunction('resolveTestCloudNames', () => {
+        resolverCalls++;
+        return [];
+    });
+    await page.addInitScript(() => {
+        if (!localStorage.getItem('databasesTableSelectedColumns')) {
+            localStorage.setItem(
+                'databasesTableSelectedColumns',
+                JSON.stringify(['Name', 'nodesCount']),
+            );
+        }
+    });
+    await page.goto(databasesUrl + '&resolveCloudNames&cloudId=obsolete&groupBy=allocated');
+    const first = page.getByRole('link', {name: 'first', exact: true});
+    const second = page.getByRole('link', {name: 'second', exact: true});
+    await expect(first).toBeVisible();
+    await expect(second).toBeVisible();
+    await expect(page.getByText('Databases: 2', {exact: true})).toBeVisible();
+    await expect(
+        page.getByRole('link', {name: /^(shared|domain|unknown-type|untyped)$/}),
+    ).toHaveCount(0);
+    await expect(page.getByText('Show shared', {exact: true})).toHaveCount(0);
+    await expect(page.getByRole('combobox', {name: 'Cloud', exact: true})).toHaveCount(0);
+    const header = page.locator('thead').first();
+    const logical = header.getByRole('columnheader', {name: 'YDB logical resources', exact: true});
+    await expect(logical).toHaveCount(0);
+    await expect(header.getByText('Nodes', {exact: true})).toHaveCount(0);
+    await expect(header.getByText('Storage groups', {exact: true})).toHaveCount(0);
+    await page.getByRole('button', {name: /^\d+\/\d+$/}).click();
+    await page.locator('.g-popup').getByText('Nodes', {exact: true}).click();
+    await expect(logical).toHaveAttribute('colspan', '1');
+    await page.locator('.g-popup').getByText('Storage groups', {exact: true}).click();
+    await page.reload();
+    await expect(
+        header.getByRole('columnheader', {name: 'State', exact: true}).locator('+ th'),
+    ).toHaveText('YDB logical resources');
+    const groupBy = page.getByRole('combobox', {name: /Group by/});
+    await expect(groupBy).toHaveCount(0);
+    await expect(header.locator('tr').nth(1).locator('th')).toHaveText(['Nodes', 'Storage groups']);
+    await expect(header.getByText('Storage quota used', {exact: true})).toHaveCount(0);
+    const totals = page.locator('.data-table__sticky_footer').getByRole('cell');
+    await expect(totals).toHaveText(['Total', '', '', '3', '4', '', '', '']);
+    expect(await page.evaluate(() => localStorage.getItem('databasesTableSelectedColumns'))).toBe(
+        JSON.stringify(['Name', 'nodesCount']),
+    );
+    await page.getByRole('combobox', {name: 'Cluster', exact: true}).click();
+    await expect(page.getByRole('option')).toHaveText(['alpha', 'beta']);
+    await page.getByRole('option', {name: 'beta', exact: true}).click();
+    await expect(first).toHaveCount(0);
+    await expect(second).toBeVisible();
+    await expect(page).toHaveURL(/[?&]cluster=beta(?:&|$)/);
+    await page.getByRole('combobox', {name: 'Cluster', exact: true}).press('Escape');
+    await page.getByRole('button', {name: /^\d+\/\d+$/}).click();
+    await page.locator('.g-popup').getByText('State', {exact: true}).click();
+    await expect(header.getByRole('columnheader', {name: 'State', exact: true})).toHaveCount(0);
+    await expect(
+        header.getByRole('columnheader', {name: 'Type', exact: true}).locator('+ th'),
+    ).toHaveText('YDB logical resources');
+    expect(resolverCalls).toBe(0);
+});
+
+test('My databases filters by type, restores the selection and clears it', async ({page}) => {
+    await mockDatabases(page, [
+        {Name: '/db/orders-one', Type: 'Serverless', StorageGroups: '2'},
+        {Name: '/db/orders-two', Type: 'Dedicated', StorageGroups: '4'},
+        {Name: '/db/analytics', Type: 'Dedicated', StorageGroups: '8'},
+    ]);
+    await page.addInitScript(() =>
+        localStorage.setItem(
+            'myDatabasesTableSelectedColumns',
+            JSON.stringify(['Name', 'groupsCount']),
+        ),
+    );
+    await page.goto(databasesUrl + '&search=orders&databaseType=Shared');
+    const type = page.getByRole('combobox', {name: 'Type', exact: true});
+    const groupsColumn = page
+        .locator('thead')
+        .first()
+        .getByRole('columnheader', {name: 'Storage groups', exact: true});
+    await expect(groupsColumn).toBeVisible();
+    const groupsIndex = Number(await groupsColumn.getAttribute('data-index'));
+    const groupsTotal = page
+        .locator('.data-table__sticky_footer')
+        .getByRole('cell')
+        .nth(groupsIndex);
+    await expect(type).toContainText('All');
+    await expect(groupsTotal).toHaveText('6');
+    await type.click();
+    await expect(page.getByRole('option')).toHaveText(['Serverless', 'Dedicated']);
+    await page.getByRole('option', {name: 'Serverless', exact: true}).click();
+    await expect(page).toHaveURL(/[?&]databaseType=Serverless(?:&|$)/);
+    await expect(groupsTotal).toHaveText('2');
+    await page.reload();
+    await expect(type).toContainText('Serverless');
+    await expect(page.getByRole('link', {name: 'orders-one', exact: true})).toBeVisible();
+    await expect(page.getByText('Databases: 1 of 3', {exact: true})).toBeVisible();
+    await type.click();
+    await page.getByRole('option', {name: 'Dedicated', exact: true}).click();
+    await expect(page.getByRole('link', {name: 'orders-two', exact: true})).toBeVisible();
+    await expect(groupsTotal).toHaveText('4');
+    await page.getByTestId('select-clear').click();
+    await expect(type).toContainText('All');
+    await expect(page).not.toHaveURL(/[?&]databaseType=/);
+    await expect(page.getByText('Databases: 2 of 3', {exact: true})).toBeVisible();
+    await expect(groupsTotal).toHaveText('6');
+});
+
+test('My databases restores cloud and cluster filters by ID and opens the matching database', async ({
     page,
 }) => {
-    await mockApi(page, {});
-    await page.route('**/meta/databases?*', (route) =>
-        route.fulfill({
-            json: {
-                databases: [
-                    {Name: '/db/first', Cluster: 'alpha', Owner: 'First owner'},
-                    {Name: '/db/second', Cluster: 'beta', Owner: 'Second owner'},
-                ],
-            },
-        }),
-    );
-    const url = '/home/databases?databasesFixture&withExtension';
-    await page.goto(url);
-    const groupBy = page.getByRole('button', {name: 'Group databases in env-a'});
-    await expect(groupBy).toBeVisible();
-    const headers = page.locator('thead').first().locator('th');
-    await expect(
-        headers.filter({hasText: /^CPU used$/}).locator('xpath=following-sibling::th[1]'),
-    ).toHaveText('Owner');
-    const alphaFilter = page.getByRole('checkbox', {name: 'Alpha only (2)'});
-    await alphaFilter.check();
+    await mockDatabases(page, cloudDatabases);
+    await page.goto(databasesUrl + '&cluster=alpha');
+    const cloud = page.getByRole('combobox', {name: 'Cloud', exact: true});
+    await cloud.click();
+    await expect(page.getByRole('option')).toHaveText(['cloud-a', 'cloud-b']);
+    await page.getByRole('option', {name: 'cloud-b', exact: true}).click();
+    await expect(page).toHaveURL(/[?&]cloudId=cloud-b(?:&|$)/);
+    await page.reload();
+    await expect(cloud).toContainText('cloud-b');
+    await expect(page.getByText('Databases: 1 of 3', {exact: true})).toBeVisible();
     await expect(page.getByRole('link', {name: 'second', exact: true})).toHaveCount(0);
-    await expect(page.getByText('Databases: 1 of 2', {exact: true})).toBeVisible();
-    await alphaFilter.uncheck();
-    await expect(page.getByRole('link', {name: 'second', exact: true})).toBeVisible();
-    await groupBy.click();
-    const alpha = page.getByRole('button', {name: /Cluster alpha/});
-    await expect(page.getByRole('button', {name: /Cluster beta/})).toBeVisible();
-    await alpha.click();
-    await expect(page.getByText('First owner', {exact: true})).toBeVisible();
+    await expect(page.getByRole('link', {name: 'third', exact: true})).toHaveCount(0);
+    const first = page.getByRole('link', {name: 'first', exact: true});
+    await expect(first).toBeVisible();
     const search = page.getByPlaceholder('Database name');
     await search.fill('first');
-    await expect(page.getByRole('button', {name: /Cluster beta/})).toHaveCount(0);
     await search.press('ArrowDown');
     const opened = page.waitForEvent('popup');
     await search.press('Enter');
     const database = await opened;
-    await expect(database).toHaveURL(/database=.*first/);
+    await expect(database).toHaveURL(
+        (url) =>
+            url.searchParams.get('database') === '/db/first' &&
+            url.searchParams.get('clusterName') === 'alpha',
+    );
     await database.close();
-    await search.fill('missing-database');
+    await search.fill('second');
     await expect(page.getByText('No such databases')).toBeVisible();
-    await search.fill('');
-    await page.getByRole('button', {name: 'Clear grouping'}).click();
-    await expect(alpha).toHaveCount(0);
-    await expect(page.getByText('Second owner', {exact: true})).toBeVisible();
-    await page.getByRole('button', {name: /^\d+\/\d+$/}).click();
-    await page.getByText('Test owner', {exact: true}).click();
-    await page.reload();
-    await expect(groupBy).toBeVisible();
-    await expect(headers.filter({hasText: /^Owner$/})).toHaveCount(0);
-    await page.goto('/home/databases?databasesFixture');
-    await expect(page.getByRole('link', {name: 'first', exact: true})).toBeVisible();
-    await expect(page.getByPlaceholder('Database name')).toBeVisible();
-    await expect(groupBy).toHaveCount(0);
 });
 
-test('My databases extension restores a saved column order after editing settings without the extension', async ({
+test('My databases resolves cloud names on open and searches by both name and ID', async ({
     page,
 }) => {
-    await mockApi(page, {});
+    await mockDatabases(page, cloudDatabases);
+    const calls: {ids: string[]; environment?: string}[] = [];
+    let releaseNames!: () => void;
+    const pending = new Promise<void>((resolve) => {
+        releaseNames = resolve;
+    });
+    await page.exposeFunction(
+        'resolveTestCloudNames',
+        async (ids: string[], environment?: string) => {
+            calls.push({ids, environment});
+            await pending;
+            return [{id: 'cloud-b', name: 'Production'}];
+        },
+    );
+    await page.goto(databasesUrl + '&resolveCloudNames&cloudId=cloud-b');
+    const cloud = page.getByRole('combobox', {name: 'Cloud', exact: true});
+    await expect(cloud).toContainText('cloud-b');
+    expect(calls).toHaveLength(0);
+    await cloud.click();
+    await expect(page.getByRole('listbox').locator('.g-loader')).toBeVisible();
+    expect(calls).toEqual([{ids: ['cloud-a', 'cloud-b'], environment: 'env-a'}]);
+    releaseNames();
+    const production = page.getByRole('option', {name: 'Production', exact: true});
+    await expect(production).toBeVisible();
+    await expect(page.getByRole('option', {name: 'cloud-a', exact: true})).toBeVisible();
+    const search = page.getByPlaceholder('Search by cloud name or ID');
+    for (const query of ['prod', 'cloud-b']) {
+        await search.fill(query);
+        await expect(page.getByRole('option')).toHaveText(['Production']);
+    }
+});
+
+test('My databases keeps cloud IDs selectable after name resolution fails', async ({page}) => {
+    await mockDatabases(page, cloudDatabases);
+    let resolverCalls = 0;
+    await page.exposeFunction('resolveTestCloudNames', () => {
+        resolverCalls++;
+        throw new Error('Cloud names unavailable');
+    });
+    await page.goto(databasesUrl + '&resolveCloudNames');
+    await page.getByRole('combobox', {name: 'Cloud', exact: true}).click();
+    await page.getByRole('option', {name: 'cloud-a', exact: true}).click();
+    await expect(page.getByRole('link', {name: 'second', exact: true})).toBeVisible();
+    await expect(page.getByText('Databases: 1 of 3', {exact: true})).toBeVisible();
+    expect(resolverCalls).toBe(1);
+});
+
+test('My databases displays allocations from cluster presets and groups by CPU and memory', async ({
+    page,
+}) => {
+    await mockDatabases(page, [
+        {
+            Name: '/db/provisioned',
+            Type: 'Dedicated',
+            Cluster: 'alpha',
+            CoresUsed: 3,
+            ControlPlane: {resource_preset_id: 'small', scale_policy: {fixed_scale: {size: 2}}},
+            MemoryUsed: String(3 * 1024 ** 3),
+        },
+        {Name: '/db/legacy', Type: 'Dedicated', Cluster: 'beta', StorageAllocatedSize: '500'},
+    ]);
+    await page.route('**/meta/list_resource_presets*', (route) =>
+        route.fulfill({json: {resource_presets: [{id: 'small', cores: '4', memory: '4'}]}}),
+    );
+    await page.goto(databasesUrl + '&groupBy=storage-quota');
+    const header = page.locator('thead').first();
+    const allocated = header.getByRole('columnheader', {
+        name: 'Allocated physical resources',
+        exact: true,
+    });
+    await expect(allocated).toHaveAttribute('colspan', '2');
+    await expect(
+        header.getByRole('columnheader', {name: 'State', exact: true}).locator('+ th'),
+    ).toHaveText('Allocated physical resources');
+    await expect(header.locator('tr').nth(1).locator('th')).toHaveText(['CPU', 'Memory']);
+    await expect(header.getByText('YDB logical resources', {exact: true})).toHaveCount(0);
+    const provisioned = page
+        .getByRole('row')
+        .filter({has: page.getByRole('link', {name: 'provisioned', exact: true})});
+    for (const value of ['8', '9 GB']) {
+        await expect(provisioned.getByRole('cell', {name: value, exact: true})).toBeVisible();
+    }
+    const totals = page.locator('.data-table__sticky_footer').getByRole('row');
+    await expect(totals.getByRole('cell', {name: '≥ 8', exact: true})).toBeVisible();
+    await expect(totals.getByRole('cell', {name: '≥ 9 GB', exact: true})).toBeVisible();
+    const groupBy = page.getByRole('combobox', {name: /Group by/});
+    await groupBy.click();
+    await expect(page.getByRole('option')).toHaveText([
+        'CPU used / Allocated CPU',
+        'Memory used / Allocated memory',
+    ]);
+    await page.getByRole('option', {name: 'CPU used / Allocated CPU'}).click();
+    await expect(page).toHaveURL(/[?&]groupBy=allocated(?:&|$)/);
+    await expect(page.getByRole('button', {name: /Insufficient data/})).toBeVisible();
+    await page.getByRole('button', {name: /<50%/}).click();
+    await expect(provisioned).toBeVisible();
+    await expect(totals.getByRole('cell', {name: '8', exact: true})).toBeVisible();
+    await page.getByRole('button', {name: /Insufficient data/}).click();
+    await expect(totals).toHaveCount(2);
+    await expect(totals.nth(1).getByText('—', {exact: true})).toHaveCount(2);
+    await expect(allocated).toHaveAttribute('colspan', '2');
+    await groupBy.click();
+    await page.getByRole('option', {name: 'Memory used / Allocated memory'}).click();
+    const lowMemory = page.getByRole('button', {name: /<50%/});
+    await expect(lowMemory).toHaveAttribute('aria-expanded', 'false');
+    await lowMemory.click();
+    await expect(provisioned).toBeVisible();
+    await page.getByPlaceholder('Database name').fill('legacy');
+    await expect(page.getByRole('button', {name: /<50%/})).toHaveCount(0);
+    await expect(groupBy).toContainText('Memory used / Allocated memory');
+});
+
+test('My databases sorts storage group counts and hides empty headers after reload', async ({
+    page,
+}) => {
+    await mockDatabases(
+        page,
+        [10, 2, 100].map((used) => ({
+            Name: '/db/usage-' + used,
+            Type: 'Dedicated',
+            ControlPlane: {id: 'id-' + used},
+            StorageGroups: String(used),
+        })),
+    );
     await page.addInitScript(() => {
-        const key = 'databasesTableSelectedColumns';
+        const key = 'myDatabasesTableSelectedColumns';
         if (!localStorage.getItem(key)) {
-            localStorage.setItem(key, JSON.stringify(['Name', 'test-owner', 'cpu', 'Type']));
+            localStorage.setItem(key, JSON.stringify(['Name', 'groupsCount']));
         }
     });
-    const url = '/home/databases?databasesFixture';
-    await page.goto(url);
+    await page.goto(databasesUrl);
+    const header = page.locator('thead').first();
+    const allocated = header.getByRole('columnheader', {
+        name: 'YDB logical resources',
+        exact: true,
+    });
+    await expect(allocated).toHaveAttribute('colspan', '1');
+    await expect(header.locator('tr').nth(1)).toHaveText('Storage groups');
+    const values = page.locator('.data-table__box tbody tr td:nth-child(2)');
+    await expect(values).toHaveCount(3);
+    await header.getByText('Storage groups', {exact: true}).click();
+    await expect(values).toHaveText(['100', '10', '2']);
+    await header.getByText('Storage groups', {exact: true}).click();
+    await expect(values).toHaveText(['2', '10', '100']);
     await page.getByRole('button', {name: /^\d+\/\d+$/}).click();
-    await page.locator('.g-popup').getByText('Type', {exact: true}).click();
-    await page.goto(url + '&withExtension');
-    await expect(page.getByRole('button', {name: 'Group databases in env-a'})).toBeVisible();
-    await expect(page.locator('thead').first().locator('th')).toHaveText([
-        'Database',
-        'Owner',
-        'CPU used',
-    ]);
+    await page.locator('.g-popup').getByText('Storage groups', {exact: true}).click();
+    await page.reload();
+    await expect(header.getByText('Storage groups', {exact: true})).toHaveCount(0);
+    await expect(allocated).toHaveCount(0);
+    await expect(page.locator('.data-table__sticky_footer')).toHaveCount(0);
+    await expect(header.locator('tr')).toHaveCount(1);
+});
+
+test('My databases pins allocated totals while scrolling and recalculates them after search', async ({
+    page,
+}) => {
+    await mockDatabases(
+        page,
+        Array.from({length: 80}, (_, index) => ({
+            Name: '/db/item-' + index,
+            Type: 'Dedicated',
+            Cluster: 'alpha',
+            ControlPlane: {id: 'id-' + index},
+            StorageGroups: index === 0 ? '0' : '2',
+            NodeIds: [index],
+            DatabaseQuotas:
+                index === 0
+                    ? {data_size_hard_quota: '0'}
+                    : {
+                          data_size_hard_quota: '100',
+                          storage_quotas: [{unit_kind: 'ssd', data_size_hard_quota: '80'}],
+                      },
+        })),
+    );
+    await page.addInitScript(() =>
+        localStorage.setItem(
+            'myDatabasesTableSelectedColumns',
+            JSON.stringify([
+                'Name',
+                'cpu',
+                'memory',
+                'storageQuotaUsed',
+                'storageQuotaLimit',
+                'nodesCount',
+                'groupsCount',
+            ]),
+        ),
+    );
+    await page.goto(databasesUrl);
+    const footer = page.locator('.data-table__sticky_footer');
+    const cells = footer.getByRole('cell');
+    await expect(cells).toHaveText(['Total', '', '', '80', '158']);
+    await expect(footer).toBeInViewport();
+    const footerTop = () => footer.evaluate((node) => node.getBoundingClientRect().top);
+    const top = await footerTop();
+    const scroller = await footer.evaluateHandle((node) => {
+        for (let el = node.parentElement; el; el = el.parentElement) {
+            if (
+                el.scrollHeight > el.clientHeight &&
+                /auto|scroll/.test(getComputedStyle(el).overflowY)
+            ) {
+                return el;
+            }
+        }
+        return document.scrollingElement ?? document.documentElement;
+    });
+    await scroller.evaluate((node) => {
+        node.scrollTo({top: 480});
+    });
+    await expect.poll(() => scroller.evaluate((node) => node.scrollTop)).toBeGreaterThan(300);
+    await expect.poll(async () => Math.abs((await footerTop()) - top)).toBeLessThan(2);
+    await page.getByPlaceholder('Database name').fill('item-79');
+    await expect(cells).toHaveText(['Total', '', '', '1', '2']);
+    await page.getByPlaceholder('Database name').fill('absent');
+    await expect(footer).toHaveCount(0);
 });

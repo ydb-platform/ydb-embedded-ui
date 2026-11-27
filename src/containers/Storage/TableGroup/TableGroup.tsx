@@ -13,6 +13,7 @@ interface TableGroupProps {
     children?: React.ReactNode;
 
     title: string;
+    name?: string;
     titleContent?: React.ReactNode;
     entityName: string;
     count: string | number;
@@ -23,6 +24,7 @@ interface TableGroupProps {
 export const TableGroup = ({
     children,
     title,
+    name = title,
     titleContent,
     entityName,
     count,
@@ -30,7 +32,7 @@ export const TableGroup = ({
     onIsExpandedChange,
 }: TableGroupProps) => {
     const toggleCollapsed = () => {
-        onIsExpandedChange(title, !expanded);
+        onIsExpandedChange(name, !expanded);
     };
 
     const renderTitle = () => {

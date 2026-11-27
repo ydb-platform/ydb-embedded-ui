@@ -1,8 +1,6 @@
 import React from 'react';
 
-import type {TableGroup} from '../../../store/reducers/storage/types';
-
-export function useExpandedGroups(groups?: TableGroup[]) {
+export function useExpandedGroups(groups?: readonly {name: string}[]) {
     const [expandedGroups, setExpandedGroups] = React.useState<Record<string, boolean>>({});
 
     React.useEffect(() => {

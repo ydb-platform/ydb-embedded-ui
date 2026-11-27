@@ -1,75 +1,23 @@
-import React from 'react';
-
 import {Link} from '@gravity-ui/uikit';
 import ReactDOM from 'react-dom/client';
 
-import type {MyDatabasesTableColumn, MyDatabasesTableExtensionProps} from '../../src/lib';
 import {MultiClusterApp} from '../../src/lib';
 import {configureStore} from '../../src/store';
+import type {UIFactory} from '../../src/uiFactory/types';
 import {configureUIFactory} from '../../src/uiFactory/uiFactory';
 
 import '../../src/styles/index.scss';
-
-const TEST_DATABASES_COLUMNS: MyDatabasesTableColumn[] = [
-    {
-        name: 'test-owner',
-        settingsTitle: 'Test owner',
-        header: 'Owner',
-        after: 'cpu',
-        visibleByDefault: true,
-        render: ({row}) => row.Owner,
-    },
-];
-
-function TestDatabasesExtension({
-    allRows,
-    rows,
-    environmentName,
-    children,
-}: MyDatabasesTableExtensionProps) {
-    const [grouped, setGrouped] = React.useState(false);
-    const [alphaOnly, setAlphaOnly] = React.useState(false);
-    const visibleRows = alphaOnly ? rows.filter((row) => row.Cluster === 'alpha') : rows;
-    return children({
-        filteredRows: visibleRows,
-        controls: (
-            <React.Fragment>
-                <label>
-                    <input
-                        type="checkbox"
-                        checked={alphaOnly}
-                        onChange={(ev) => setAlphaOnly(ev.target.checked)}
-                    />
-                    Alpha only ({allRows.length})
-                </label>
-                <button onClick={() => setGrouped(!grouped)}>
-                    {grouped ? 'Clear grouping' : `Group databases in ${environmentName}`}
-                </button>
-            </React.Fragment>
-        ),
-        additionalColumns: TEST_DATABASES_COLUMNS,
-        groups: grouped
-            ? ['alpha', 'beta']
-                  .map((cluster) => ({
-                      id: cluster,
-                      title: `Cluster ${cluster}`,
-                      rows: visibleRows.filter((row) => row.Cluster === cluster),
-                  }))
-                  .filter((group) => group.rows.length > 0)
-            : undefined,
-    });
-}
 
 const databasesFixture = new URLSearchParams(window.location.search);
 configureUIFactory({
     databasesEnvironmentsConfig: databasesFixture.has('databasesFixture')
         ? {getSupportedEnvironments: () => ['env-a'], getEnvironments: () => ['env-a']}
         : undefined,
-    MyDatabasesTableExtension: databasesFixture.has('withExtension')
-        ? TestDatabasesExtension
+    resolveCloudName: databasesFixture.has('resolveCloudNames')
+        ? window.resolveTestCloudNames
         : undefined,
     emMetaAvailable: true,
-    resolveUser: new URLSearchParams(window.location.search).has('resolveUsers')
+    resolveUser: databasesFixture.has('resolveUsers')
         ? ({userId}) => <Link href={`/accounts/${userId}`}>user@example.test</Link>
         : undefined,
     hideNewFeaturesNotifications: {navigationV2: true},
@@ -79,6 +27,7 @@ const {store, history} = configureStore({environments: ['env-a', 'env-b']});
 
 declare global {
     interface Window {
+        resolveTestCloudNames?: UIFactory['resolveCloudName'];
         controlPlaneTest: {navigate: (path: string) => void};
     }
 }

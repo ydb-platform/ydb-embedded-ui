@@ -11,6 +11,7 @@ import type {
     MetaClusters,
     MetaTenants,
 } from '../../types/api/meta';
+import type {ListResourcePresetsResponse} from '../../types/api/resourcePresets';
 import type {TopicDataRequest, TopicDataResponse} from '../../types/api/topic';
 import type {TUserToken} from '../../types/api/whoami';
 import {parseMetaTenants} from '../parsers/parseMetaTenants';
@@ -19,6 +20,15 @@ import type {AxiosOptions} from './base';
 import {BaseMetaAPI} from './baseMeta';
 
 export class MetaAPI extends BaseMetaAPI {
+    listResourcePresets({clusterName}: {clusterName: string}, {signal}: AxiosOptions = {}) {
+        return this.post<ListResourcePresetsResponse>(
+            this.getPath('/meta/list_resource_presets', clusterName),
+            {cluster_name: clusterName},
+            {},
+            {requestConfig: {signal}},
+        );
+    }
+
     getControlPlaneOperationList(
         {clusterName, folderId, databaseId, pageSize, pageToken}: ControlPlaneOperationListParams,
         {signal}: AxiosOptions = {},
