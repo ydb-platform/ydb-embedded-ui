@@ -33,10 +33,10 @@ export function CloudFilter({ids, environmentName, value, onChange}: CloudFilter
 
     return (
         <Select
-            label={`${i18n('label_cloud')}:`}
-            aria-label={i18n('label_cloud')}
+            label={`${i18n('field_cloud')}:`}
+            aria-label={i18n('field_cloud')}
             placeholder={i18n('value_all')}
-            filterPlaceholder={i18n('placeholder_search-clouds')}
+            filterPlaceholder={i18n('context_search-clouds')}
             filterable
             multiple
             hasCounter={value.length > 1}

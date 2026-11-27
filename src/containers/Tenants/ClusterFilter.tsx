@@ -24,14 +24,14 @@ export function ClusterFilter({rows, value, onChange}: ClusterFilterProps) {
             .sort()
             .map((name) => ({value: name, content: name}));
     }, [rows, value]);
-    const label = i18n('label_cluster');
+    const label = i18n('field_cluster');
 
     return (
         <Select
             label={`${label}:`}
             aria-label={label}
             placeholder={i18n('value_all')}
-            filterPlaceholder={i18n('placeholder_search-clusters')}
+            filterPlaceholder={i18n('context_search-clusters')}
             filterable
             multiple
             hasCounter={value.length > 1}

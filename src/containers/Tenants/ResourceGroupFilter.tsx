@@ -6,15 +6,17 @@ import type {ResourceGrouping, ResourceUsageGroup} from './resourceUsage';
 
 export function resourceGroupTitle({lower, upper, notApplicable}: ResourceUsageGroup) {
     if (notApplicable) {
-        return i18n('group_none');
+        return i18n('value_usage-none');
     }
     if (lower === undefined) {
-        return i18n('group_unknown');
+        return i18n('value_usage-unknown');
     }
     if (upper === undefined) {
-        return i18n('group_at-least', {lower});
+        return i18n('value_usage-at-least', {lower});
     }
-    return lower === 0 ? i18n('group_below', {upper}) : i18n('group_range', {lower, upper});
+    return lower === 0
+        ? i18n('value_usage-below', {upper})
+        : i18n('value_usage-range', {lower, upper});
 }
 
 export function ResourceGroupFilter({
@@ -26,7 +28,7 @@ export function ResourceGroupFilter({
     onChange: (mode?: ResourceGrouping) => void;
     loading: boolean;
 }) {
-    const label = i18n('label_group-by');
+    const label = i18n('field_group-by');
     const options = RESOURCE_GROUPINGS.map((value) => ({
         value,
         content: i18n(`value_group-by-${value}`),
@@ -43,7 +45,7 @@ export function ResourceGroupFilter({
                 onUpdate={([value]) => onChange(RESOURCE_GROUPINGS.find((item) => item === value))}
                 options={options}
             />
-            {loading && <Spin size="xs" aria-label={i18n('label_loading-presets')} />}
+            {loading && <Spin size="xs" aria-label={i18n('context_loading-presets')} />}
         </Flex>
     );
 }

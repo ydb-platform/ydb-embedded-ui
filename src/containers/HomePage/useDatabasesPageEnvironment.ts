@@ -1,14 +1,17 @@
 import React from 'react';
 
-import {StringParam, useQueryParam} from 'use-query-params';
+import {StringParam, useQueryParams} from 'use-query-params';
 
 import {useMetaEnvironmentsAvailable} from '../../store/reducers/capabilities/hooks';
 import {SETTING_KEYS} from '../../store/reducers/settings/constants';
 import {uiFactory} from '../../uiFactory/uiFactory';
 import {useSetting} from '../../utils/hooks';
+import {ENVIRONMENT_FILTERS_PARAMS} from '../Tenants/useMyDatabasesView';
+
+const queryParamsConfig = {env: StringParam, ...ENVIRONMENT_FILTERS_PARAMS};
 
 export function useDatabasesPageEnvironment(environments?: string[]) {
-    const [envParamFromQuery, setEnvParamToQuery] = useQueryParam('env', StringParam);
+    const [{env: envParamFromQuery}, setQueryParams] = useQueryParams(queryParamsConfig);
 
     const [savedEnvironment, saveEnvironment] = useSetting<string | undefined>(
         SETTING_KEYS.DATABASES_PAGE_ENVIRONMENT,
@@ -41,10 +44,16 @@ export function useDatabasesPageEnvironment(environments?: string[]) {
 
     const handleEnvironmentChange = React.useCallback(
         (value: string) => {
-            setEnvParamToQuery(value, 'replaceIn');
+            // Clusters and clouds selected in one environment do not exist in another
+            const leavesEnvironment =
+                databasesPageEnvironment !== undefined && value !== databasesPageEnvironment;
+            setQueryParams(
+                leavesEnvironment ? {env: value, cluster: [], cloudId: []} : {env: value},
+                'replaceIn',
+            );
             saveEnvironment(value);
         },
-        [setEnvParamToQuery, saveEnvironment],
+        [databasesPageEnvironment, setQueryParams, saveEnvironment],
     );
 
     return {

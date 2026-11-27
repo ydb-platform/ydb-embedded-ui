@@ -1,63 +1,54 @@
-import type {ListResourcePresetsResponse, ResourcePreset} from '../../types/api/resourcePresets';
+import type {ListResourcePresetsResponse} from '../../types/api/resourcePresets';
+import {isNetworkError, isResponseError} from '../../utils/response';
 import {backend, environment} from '../runtimeParams';
 
 import {api} from './api';
 
-interface RuntimeScope {
+interface ResourcePresetsParams {
+    clusterName: string;
     environment?: string;
     backend?: string;
 }
 
-interface ResourcePresetsParams extends RuntimeScope {
-    clusterName: string;
+/** Presets of a cluster almost never change, but a cluster can be briefly unavailable. */
+export const RESOURCE_PRESETS_RETRY_DELAYS_MS = [1000, 3000];
+
+function isTransientError(error: unknown) {
+    return (
+        isNetworkError(error) ||
+        (isResponseError(error) && !error.isCancelled && Number(error.status) >= 500)
+    );
 }
 
-interface ClustersResourcePresetsParams extends RuntimeScope {
-    clusterNames: string[];
+function wait(ms: number) {
+    return new Promise((resolve) => {
+        setTimeout(resolve, ms);
+    });
 }
 
 export const resourcePresetsApi = api.injectEndpoints({
     endpoints: (build) => ({
         listResourcePresets: build.query<ListResourcePresetsResponse, ResourcePresetsParams>({
-            queryFn: async (params, {signal}) => {
-                try {
-                    if (!window.api.meta) {
-                        return {error: {message: 'Meta API is not available.'}};
-                    }
-                    const data = await window.api.meta.listResourcePresets(params, {signal});
-                    return {data};
-                } catch (error) {
-                    return {error};
-                }
-            },
-        }),
-        /** Presets by cluster name. A cluster whose request failed is absent from the result. */
-        listClustersResourcePresets: build.query<
-            Record<string, ResourcePreset[]>,
-            ClustersResourcePresetsParams
-        >({
-            queryFn: async ({clusterNames}, {signal}) => {
+            queryFn: async ({clusterName}, {signal}) => {
                 const {meta} = window.api;
                 if (!meta) {
                     return {error: {message: 'Meta API is not available.'}};
                 }
-                const results = await Promise.allSettled(
-                    clusterNames.map((clusterName) =>
-                        meta.listResourcePresets({clusterName}, {signal}),
-                    ),
-                );
-                const data: Record<string, ResourcePreset[]> = {};
-                results.forEach((result, index) => {
-                    if (result.status === 'fulfilled') {
-                        data[clusterNames[index]] = result.value.resource_presets ?? [];
+                for (let attempt = 0; ; attempt++) {
+                    try {
+                        const data = await meta.listResourcePresets({clusterName}, {signal});
+                        return {data};
+                    } catch (error) {
+                        const delay = RESOURCE_PRESETS_RETRY_DELAYS_MS[attempt];
+                        if (delay === undefined || signal.aborted || !isTransientError(error)) {
+                            return {error};
+                        }
+                        await wait(delay);
                     }
-                });
-                const failed = results.find((result) => result.status === 'rejected');
-                if (failed && !Object.keys(data).length) {
-                    return {error: failed.reason};
                 }
-                return {data};
             },
+            // The Refresh button retries the clusters that still failed.
+            providesTags: ['All'],
         }),
     }),
     overrideExisting: 'throw',

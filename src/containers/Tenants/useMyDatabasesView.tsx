@@ -27,10 +27,15 @@ const filterValuesParam: QueryParamConfig<string[]> = {
     },
 };
 
-const queryParamsConfig = {
-    databaseType: createEnumParam<string>(MY_DATABASE_TYPES),
+/** Filters by entities of one environment: they make no sense in another one. */
+export const ENVIRONMENT_FILTERS_PARAMS = {
     cluster: filterValuesParam,
     cloudId: filterValuesParam,
+};
+
+const queryParamsConfig = {
+    ...ENVIRONMENT_FILTERS_PARAMS,
+    databaseType: createEnumParam<string>(MY_DATABASE_TYPES),
     groupBy: createEnumParam([...RESOURCE_GROUPINGS]),
 };
 

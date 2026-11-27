@@ -11,7 +11,6 @@ import {EntitiesCount} from '../../components/EntitiesCount';
 import {ResponseError} from '../../components/Errors/ResponseError';
 import {PoolsGraph} from '../../components/PoolsGraph/PoolsGraph';
 import {ProblemFilter} from '../../components/ProblemFilter/ProblemFilter';
-import {keepSortPriority} from '../../components/ResizeableDataTable/keepSortPriority';
 import {Search} from '../../components/Search';
 import {TableColumnSetup} from '../../components/TableColumnSetup/TableColumnSetup';
 import {TableWithControlsLayout} from '../../components/TableWithControlsLayout/TableWithControlsLayout';
@@ -267,7 +266,7 @@ function TenantsTableContent({
                     tableFilter
                     value={search}
                     onChange={handleSearchChange}
-                    placeholder={i18n('controls_search-placeholder')}
+                    placeholder={i18n('context_search-databases')}
                     className={b('search')}
                 />
                 {showWithProblemsFilter ? (
@@ -350,7 +349,7 @@ function TenantsTableContent({
                 header: (
                     <TitleWithHelpMark
                         header={DATABASES_COLUMNS_TITLES[DATABASES_COLUMNS_IDS.CPU]}
-                        note={i18n('description_cpu-used')}
+                        note={i18n('context_cpu-used')}
                     />
                 ),
                 width: 140,
@@ -365,13 +364,12 @@ function TenantsTableContent({
                 header: (
                     <TitleWithHelpMark
                         header={DATABASES_COLUMNS_TITLES[DATABASES_COLUMNS_IDS.Memory]}
-                        note={i18n('description_memory-used')}
+                        note={i18n('context_memory-used')}
                     />
                 ),
                 width: 165,
                 sortAccessor: (row) => parseOptionalNonNegativeNumber(row.MemoryUsed),
-                render: ({row}) =>
-                    renderOptionalNumber(row.MemoryUsed, (used) => formatStorageValuesToGb(used)),
+                render: ({row}) => renderOptionalNumber(row.MemoryUsed, formatStorageValuesToGb),
                 align: DataTable.RIGHT,
                 defaultOrder: DataTable.DESCENDING,
             },
@@ -380,15 +378,13 @@ function TenantsTableContent({
                 header: (
                     <TitleWithHelpMark
                         header={DATABASES_COLUMNS_TITLES[DATABASES_COLUMNS_IDS.Storage]}
-                        note={i18n('description_storage-used')}
+                        note={i18n('context_storage-used')}
                     />
                 ),
                 width: 135,
                 sortAccessor: (row) => parseOptionalNonNegativeNumber(row.StorageAllocatedSize),
                 render: ({row}) =>
-                    renderOptionalNumber(row.StorageAllocatedSize, (value) =>
-                        formatStorageValuesToGb(value),
-                    ),
+                    renderOptionalNumber(row.StorageAllocatedSize, formatStorageValuesToGb),
                 align: DataTable.RIGHT,
                 defaultOrder: DataTable.DESCENDING,
             },
@@ -484,12 +480,6 @@ function TenantsTableContent({
         [myDatabases, columnsToShow, columnsToSelect],
     );
 
-    const handleSortChange = React.useCallback(
-        (order: SortOrder | SortOrder[] | undefined) =>
-            setSortParams((previous) => keepSortPriority(previous, order)),
-        [],
-    );
-
     const {expandedGroups, setIsGroupExpanded} = useExpandedGroups(groups);
 
     const renderRows = (rows: DatabaseRow[]) => {
@@ -511,7 +501,7 @@ function TenantsTableContent({
                     columns={layout.columns}
                     emptyDataMessage={i18n('no-databases')}
                     sortOrder={sortParams}
-                    onSortChange={handleSortChange}
+                    onSortChange={setSortParams}
                 />
             </div>
         );

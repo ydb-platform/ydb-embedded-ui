@@ -65,6 +65,12 @@ export const MY_DATABASES_DEFAULT_COLUMNS: DatabasesColumnId[] = [
 
 export const DATABASES_REQUIRED_COLUMNS: DatabasesColumnId[] = [DATABASES_COLUMNS_IDS.Name];
 
+/** Allocated resources are set up as a column group and have no titles of their own. */
+type TitledColumnId = Exclude<
+    DatabasesColumnId,
+    typeof DATABASES_COLUMNS_IDS.AllocatedCPU | typeof DATABASES_COLUMNS_IDS.AllocatedMemory
+>;
+
 export const DATABASES_COLUMNS_TITLES = {
     get [DATABASES_COLUMNS_IDS.Name]() {
         return i18n('column-name');
@@ -84,14 +90,8 @@ export const DATABASES_COLUMNS_TITLES = {
     get [DATABASES_COLUMNS_IDS.CPU]() {
         return i18n('column-cpu');
     },
-    get [DATABASES_COLUMNS_IDS.AllocatedCPU]() {
-        return i18n('field_allocated-cpu');
-    },
     get [DATABASES_COLUMNS_IDS.Memory]() {
         return i18n('column-memory');
-    },
-    get [DATABASES_COLUMNS_IDS.AllocatedMemory]() {
-        return i18n('field_allocated-memory');
     },
     get [DATABASES_COLUMNS_IDS.Storage]() {
         return i18n('column-storage');
@@ -108,4 +108,4 @@ export const DATABASES_COLUMNS_TITLES = {
     get [DATABASES_COLUMNS_IDS.PoolStats]() {
         return i18n('column-pools');
     },
-} as const satisfies Record<DatabasesColumnId, string>;
+} as const satisfies Record<TitledColumnId, string>;

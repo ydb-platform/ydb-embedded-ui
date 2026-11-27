@@ -1,12 +1,17 @@
 import React from 'react';
 
+import {createSelector} from '@reduxjs/toolkit';
+
 import {useGetMetaFeatureVersion} from '../../store/reducers/capabilities/hooks';
 import {resourcePresetsApi} from '../../store/reducers/resourcePresets';
 import type {PreparedTenant} from '../../store/reducers/tenants/types';
 import {backend, environment} from '../../store/runtimeParams';
 import type {ResourcePreset} from '../../types/api/resourcePresets';
+import {useTypedDispatch, useTypedSelector} from '../../utils/hooks';
 
 import {needsPreset} from './resourceUsage';
+
+const endpoint = resourcePresetsApi.endpoints.listResourcePresets;
 
 function getClusters(rows: readonly PreparedTenant[]) {
     const clusters = new Set<string>();
@@ -18,23 +23,57 @@ function getClusters(rows: readonly PreparedTenant[]) {
     return Array.from(clusters).sort();
 }
 
-/** Resource presets of every cluster the given databases need them from. */
+/**
+ * Resource presets of every cluster the given databases need them from.
+ * Each cluster is a query of its own: a slow or failed cluster does not hold the others.
+ */
 export function useDatabasePresets(rows: readonly PreparedTenant[]) {
+    const dispatch = useTypedDispatch();
     const available =
         useGetMetaFeatureVersion('/meta/list_resource_presets') >= 1 && Boolean(window.api.meta);
-    const clusterNames = React.useMemo(() => getClusters(rows), [rows]);
-    // `data` outlives a change of the clusters list, so known presets stay while new ones load.
-    const {data, isLoading} = resourcePresetsApi.useListClustersResourcePresetsQuery(
-        {clusterNames, environment, backend},
-        {skip: !available || !clusterNames.length},
+    // The databases list is polled; the queries change only with the set of clusters.
+    const clustersKey = React.useMemo(
+        () => JSON.stringify(available ? getClusters(rows) : []),
+        [available, rows],
     );
-    const catalogs = React.useMemo(() => {
-        const result = new Map<string, Map<string, ResourcePreset>>();
-        for (const [clusterName, presets] of Object.entries(data ?? {})) {
-            result.set(clusterName, new Map(presets.map((preset) => [preset.id, preset])));
-        }
-        return result;
-    }, [data]);
+    const queries = React.useMemo(
+        () =>
+            (JSON.parse(clustersKey) as string[]).map((clusterName) => ({
+                clusterName,
+                environment,
+                backend,
+            })),
+        [clustersKey],
+    );
 
-    return {available, catalogs, loading: isLoading};
+    React.useEffect(() => {
+        const subscriptions = queries.map((query) => dispatch(endpoint.initiate(query)));
+        return () => subscriptions.forEach((subscription) => subscription.unsubscribe());
+    }, [queries, dispatch]);
+
+    const selectPresets = React.useMemo(
+        () =>
+            createSelector(
+                queries.map((query) => endpoint.select(query)),
+                (...results) => {
+                    const catalogs = new Map<string, Map<string, ResourcePreset>>();
+                    results.forEach(({data}, index) => {
+                        const presets = data?.resource_presets?.map(
+                            (preset) => [preset.id, preset] as const,
+                        );
+                        catalogs.set(queries[index].clusterName, new Map(presets));
+                    });
+                    return {
+                        catalogs,
+                        loading: results.some(
+                            ({data, isLoading, isUninitialized}) =>
+                                !data && (isLoading || isUninitialized),
+                        ),
+                    };
+                },
+            ),
+        [queries],
+    );
+
+    return {available, ...useTypedSelector(selectPresets)};
 }

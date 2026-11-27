@@ -139,18 +139,28 @@ export function DataTableKeyboardNavigation<T>({
                 positions.push({element, left: element.scrollLeft});
             }
             row.scrollIntoView({block: 'nearest', behavior: 'instant'});
-            const head = tableRef.current?.querySelector<HTMLElement>('.data-table__sticky_head');
-            const overlap = head
-                ? head.getBoundingClientRect().bottom - row.getBoundingClientRect().top
-                : 0;
-            if (overlap > 0) {
+            // `nearest` knows nothing about the sticky head and footer that cover the row
+            const rowRect = row.getBoundingClientRect();
+            const stickyEdge = (part: 'head' | 'footer') =>
+                tableRef.current
+                    ?.querySelector<HTMLElement>(`.data-table__sticky_${part}`)
+                    ?.getBoundingClientRect();
+            const headOverlap = (stickyEdge('head')?.bottom ?? -Infinity) - rowRect.top;
+            const footerOverlap = rowRect.bottom - (stickyEdge('footer')?.top ?? Infinity);
+            let shift = 0;
+            if (headOverlap > 0) {
+                shift = -headOverlap;
+            } else if (footerOverlap > 0) {
+                shift = footerOverlap;
+            }
+            if (shift) {
                 positions
                     .find(
                         ({element}) =>
                             element.scrollHeight > element.clientHeight &&
                             /auto|scroll/.test(getComputedStyle(element).overflowY),
                     )
-                    ?.element.scrollBy({top: -overlap, behavior: 'instant'});
+                    ?.element.scrollBy({top: shift, behavior: 'instant'});
             }
             for (const {element, left} of positions) {
                 if (element.scrollLeft !== left) {

@@ -1,6 +1,7 @@
 import type React from 'react';
 
 import type {Column} from '@gravity-ui/react-data-table';
+import DataTable from '@gravity-ui/react-data-table';
 import type {TableColumnSetupItem} from '@gravity-ui/uikit';
 import {Tooltip} from '@gravity-ui/uikit';
 
@@ -18,12 +19,12 @@ import type {DatabaseRow} from './types';
 const resourceGroups = [
     {
         name: 'allocatedPhysicalResources',
-        title: 'column_allocated-physical-resources',
+        title: 'field_allocated-physical-resources',
         members: new Set<string>([ids.AllocatedCPU, ids.AllocatedMemory]),
     },
     {
         name: 'ydbLogicalResources',
-        title: 'column_ydb-logical-resources',
+        title: 'field_ydb-logical-resources',
         members: new Set<string>([ids.NodesCount, ids.GroupsCount]),
     },
 ] as const;
@@ -82,10 +83,6 @@ export function ungroupResourceColumns(
     });
 }
 
-function formatMemory(bytes: number) {
-    return formatStorageValuesToGb(bytes);
-}
-
 const TOTALS_ROW: PreparedTenant = {
     sharedTenantName: undefined,
     sharedNodeIds: undefined,
@@ -123,7 +120,7 @@ export function getTotalsRow(rows: readonly DatabaseRow[]): DatabaseRow {
         }
         if (count < applicable) {
             return (
-                <Tooltip content={i18n('tooltip_partial-total', {count, total: applicable})}>
+                <Tooltip content={i18n('context_partial-total', {count, total: applicable})}>
                     <span tabIndex={0}>≥ {format(sum)}</span>
                 </Tooltip>
             );
@@ -132,11 +129,11 @@ export function getTotalsRow(rows: readonly DatabaseRow[]): DatabaseRow {
     }
 
     const totals = {
-        [ids.Name]: i18n('label_total'),
+        [ids.Name]: i18n('field_total'),
         [ids.AllocatedCPU]: total((row) => row.allocated && row.allocated.cores, formatNumber),
         [ids.AllocatedMemory]: total(
             (row) => row.allocated && row.allocated.memoryBytes,
-            formatMemory,
+            formatStorageValuesToGb,
         ),
         [ids.NodesCount]: total((row) => row.NodeIds?.length, formatNumber),
         [ids.GroupsCount]: total(
@@ -153,12 +150,13 @@ function getAllocatedComputeColumns(): DatabaseColumn[] {
             name: ids.AllocatedCPU,
             header: (
                 <TitleWithHelpMark
-                    header={i18n('field_allocated-cpu-short')}
+                    header={i18n('field_allocated-cpu')}
                     note={i18n('context_allocated-cpu')}
                 />
             ),
             align: 'right',
             width: 104,
+            defaultOrder: DataTable.DESCENDING,
             sortAccessor: (row) => row.allocated?.cores,
             render: ({row}) => renderOptionalNumber(row.allocated?.cores, formatNumber),
         },
@@ -166,14 +164,16 @@ function getAllocatedComputeColumns(): DatabaseColumn[] {
             name: ids.AllocatedMemory,
             header: (
                 <TitleWithHelpMark
-                    header={i18n('field_allocated-memory-short')}
+                    header={i18n('field_allocated-memory')}
                     note={i18n('context_allocated-memory')}
                 />
             ),
             align: 'right',
             width: 128,
+            defaultOrder: DataTable.DESCENDING,
             sortAccessor: (row) => row.allocated?.memoryBytes,
-            render: ({row}) => renderOptionalNumber(row.allocated?.memoryBytes, formatMemory),
+            render: ({row}) =>
+                renderOptionalNumber(row.allocated?.memoryBytes, formatStorageValuesToGb),
         },
     ];
 }
@@ -210,7 +210,7 @@ export function getMyDatabasesColumns(
             case ids.GroupsCount:
                 logicalResources.push({
                     ...column,
-                    header: i18n('column_storage-groups'),
+                    header: i18n('field_storage-groups'),
                     width: 150,
                 });
                 break;

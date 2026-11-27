@@ -446,14 +446,12 @@ test('My databases shows confirmed write blocks in the Database cell', async ({p
     await expect(badge('available')).toHaveCount(0);
 });
 
-test('My databases temporarily hides storage columns, including saved selections', async ({
-    page,
-}) => {
+test('My databases has no storage column, even when it was saved as selected', async ({page}) => {
     await mockApi(page, {});
     await page.addInitScript(() =>
         localStorage.setItem(
             'myDatabasesTableSelectedColumns',
-            JSON.stringify(['Name', 'storage', 'storageQuotaUsed', 'storageQuotaLimit']),
+            JSON.stringify(['Name', 'storage']),
         ),
     );
     await page.goto(databasesUrl);
@@ -462,9 +460,7 @@ test('My databases temporarily hides storage columns, including saved selections
     await page.getByRole('button', {name: /^\d+\/\d+$/}).click();
     const settings = page.locator('.g-popup');
     await expect(settings.getByText('YDB logical resources', {exact: true})).toBeVisible();
-    for (const title of ['Storage', 'Storage quota used', 'Storage quota limit']) {
-        await expect(settings.getByText(title, {exact: true})).toHaveCount(0);
-    }
+    await expect(settings.getByText('Storage', {exact: true})).toHaveCount(0);
 });
 
 test('My databases truncates narrow column titles and keeps their help accessible', async ({
@@ -571,7 +567,6 @@ test('My databases filters by cluster without cloud IDs or Control Plane', async
     const groupBy = page.getByRole('combobox', {name: /Group by/});
     await expect(groupBy).toHaveCount(0);
     await expect(header.locator('tr').nth(1).locator('th')).toHaveText(['Nodes', 'Storage groups']);
-    await expect(header.getByText('Storage quota used', {exact: true})).toHaveCount(0);
     const totals = page.locator('.data-table__sticky_footer').getByRole('cell');
     await expect(totals).toHaveText(['Total', '', '', '3', '4', '', '', '']);
     expect(await page.evaluate(() => localStorage.getItem('databasesTableSelectedColumns'))).toBe(
@@ -735,6 +730,7 @@ test('My databases displays allocations from cluster presets and groups by CPU a
             MemoryUsed: String(3 * 1024 ** 3),
         },
         {Name: '/db/legacy', Type: 'Dedicated', Cluster: 'beta', StorageAllocatedSize: '500'},
+        {Name: '/db/shared-compute', Type: 'Serverless', Cluster: 'alpha', ControlPlane: {id: 's'}},
     ]);
     await page.route('**/meta/list_resource_presets*', (route) =>
         route.fulfill({json: {resource_presets: [{id: 'small', cores: '4', memory: '4'}]}}),
@@ -769,6 +765,8 @@ test('My databases displays allocations from cluster presets and groups by CPU a
     await page.getByRole('option', {name: 'CPU used / Allocated CPU'}).click();
     await expect(page).toHaveURL(/[?&]groupBy=cpu(?:&|$)/);
     await expect(page.getByRole('button', {name: /Insufficient data/})).toBeVisible();
+    // A serverless database on shared compute is not a database with unknown allocation
+    await expect(page.getByRole('button', {name: /No allocated resources/})).toBeVisible();
     await page.getByRole('button', {name: /<50%/}).click();
     await expect(provisioned).toBeVisible();
     await expect(totals.getByRole('cell', {name: '8', exact: true})).toBeVisible();
@@ -867,27 +865,25 @@ test('My databases pins allocated totals while scrolling and recalculates them a
             Name: '/db/item-' + index,
             Type: 'Dedicated',
             Cluster: 'alpha',
-            ControlPlane: {id: 'id-' + index},
+            ControlPlane: {
+                id: 'id-' + index,
+                resource_preset_id: 'small',
+                scale_policy: {fixed_scale: {size: 1}},
+            },
             StorageGroups: index === 0 ? '0' : '2',
             NodeIds: [index],
-            DatabaseQuotas:
-                index === 0
-                    ? {data_size_hard_quota: '0'}
-                    : {
-                          data_size_hard_quota: '100',
-                          storage_quotas: [{unit_kind: 'ssd', data_size_hard_quota: '80'}],
-                      },
         })),
+    );
+    await page.route('**/meta/list_resource_presets*', (route) =>
+        route.fulfill({json: {resource_presets: [{id: 'small', cores: '2', memory: '4'}]}}),
     );
     await page.addInitScript(() =>
         localStorage.setItem(
             'myDatabasesTableSelectedColumns',
             JSON.stringify([
                 'Name',
-                'cpu',
-                'memory',
-                'storageQuotaUsed',
-                'storageQuotaLimit',
+                'allocatedCpuCores',
+                'allocatedMemory',
                 'nodesCount',
                 'groupsCount',
             ]),
@@ -896,7 +892,7 @@ test('My databases pins allocated totals while scrolling and recalculates them a
     await page.goto(databasesUrl);
     const footer = page.locator('.data-table__sticky_footer');
     const cells = footer.getByRole('cell');
-    await expect(cells).toHaveText(['Total', '', '', '80', '158']);
+    await expect(cells).toHaveText(['Total', '160', '344 GB', '80', '158']);
     await expect(footer).toBeInViewport();
     const footerTop = () => footer.evaluate((node) => node.getBoundingClientRect().top);
     const top = await footerTop();
@@ -916,8 +912,22 @@ test('My databases pins allocated totals while scrolling and recalculates them a
     });
     await expect.poll(() => scroller.evaluate((node) => node.scrollTop)).toBeGreaterThan(300);
     await expect.poll(async () => Math.abs((await footerTop()) - top)).toBeLessThan(2);
-    await page.getByPlaceholder('Database name').fill('item-79');
-    await expect(cells).toHaveText(['Total', '', '', '1', '2']);
-    await page.getByPlaceholder('Database name').fill('absent');
+    // A row selected from the keyboard stays above the pinned totals
+    const search = page.getByPlaceholder('Database name');
+    await search.focus();
+    for (let step = 0; step < 15; step++) {
+        await search.press('ArrowDown');
+    }
+    const selected = page.locator('.ydb-keyboard-focused-row');
+    await expect
+        .poll(async () => {
+            const row = await selected.boundingBox();
+            const totals = await footer.boundingBox();
+            return row && totals ? totals.y - (row.y + row.height) : undefined;
+        })
+        .toBeGreaterThanOrEqual(0);
+    await search.fill('item-79');
+    await expect(cells).toHaveText(['Total', '2', '4 GB', '1', '2']);
+    await search.fill('absent');
     await expect(footer).toHaveCount(0);
 });

@@ -66,31 +66,57 @@ test.each([true, false])(
     },
 );
 
-test('loads presets of several clusters at once and leaves out the clusters that failed', async () => {
-    const listResourcePresets = jest.fn(async ({clusterName}: {clusterName: string}) => {
-        if (clusterName === 'broken') {
-            throw new Error('unavailable');
-        }
-        return {resource_presets: [{id: 'small', cores: '2', memory: '8'}]};
-    });
-    const store = configureStore({
-        reducer: {[resourcePresetsApi.reducerPath]: resourcePresetsApi.reducer},
-        middleware: (getDefaultMiddleware) =>
-            getDefaultMiddleware({serializableCheck: false}).concat(resourcePresetsApi.middleware),
-    });
-    const originalApi = window.api;
-    window.api = {meta: {listResourcePresets}} as unknown as YdbEmbeddedAPI;
-    try {
-        const endpoint = resourcePresetsApi.endpoints.listClustersResourcePresets;
-        const load = (clusterNames: string[]) =>
-            store.dispatch(endpoint.initiate({clusterNames}, {subscribe: false}));
-
-        expect((await load(['alpha', 'broken'])).data).toEqual({
-            alpha: [{id: 'small', cores: '2', memory: '8'}],
+describe('a cluster that fails to list its presets', () => {
+    async function load(listResourcePresets: jest.Mock) {
+        const store = configureStore({
+            reducer: {[resourcePresetsApi.reducerPath]: resourcePresetsApi.reducer},
+            middleware: (getDefaultMiddleware) =>
+                getDefaultMiddleware({serializableCheck: false}).concat(
+                    resourcePresetsApi.middleware,
+                ),
         });
-        expect((await load(['broken'])).isError).toBe(true);
-    } finally {
-        store.dispatch(resourcePresetsApi.util.resetApiState());
-        window.api = originalApi;
+        const originalApi = window.api;
+        window.api = {meta: {listResourcePresets}} as unknown as YdbEmbeddedAPI;
+        jest.useFakeTimers();
+        try {
+            const request = store.dispatch(
+                resourcePresetsApi.endpoints.listResourcePresets.initiate(
+                    {clusterName: 'cluster-a'},
+                    {subscribe: false},
+                ),
+            );
+            await jest.runAllTimersAsync();
+            return await request;
+        } finally {
+            jest.useRealTimers();
+            store.dispatch(resourcePresetsApi.util.resetApiState());
+            window.api = originalApi;
+        }
     }
+
+    test('is asked again after a server error', async () => {
+        const presets = {resource_presets: [{id: 'small', cores: '2', memory: '8'}]};
+        const listResourcePresets = jest
+            .fn()
+            .mockRejectedValueOnce({status: 503})
+            .mockRejectedValueOnce({message: 'Network Error'})
+            .mockResolvedValue(presets);
+
+        expect((await load(listResourcePresets)).data).toEqual(presets);
+        expect(listResourcePresets).toHaveBeenCalledTimes(3);
+    });
+
+    test('gives up after the last retry', async () => {
+        const listResourcePresets = jest.fn().mockRejectedValue({status: 503});
+
+        expect((await load(listResourcePresets)).error).toEqual({status: 503});
+        expect(listResourcePresets).toHaveBeenCalledTimes(3);
+    });
+
+    test('is not asked again when the request is refused', async () => {
+        const listResourcePresets = jest.fn().mockRejectedValue({status: 403});
+
+        expect((await load(listResourcePresets)).isError).toBe(true);
+        expect(listResourcePresets).toHaveBeenCalledTimes(1);
+    });
 });
