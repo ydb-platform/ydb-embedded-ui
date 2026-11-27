@@ -5,11 +5,10 @@ import {TableIndexInfo} from '../../../../components/InfoViewer/schemaInfo';
 import {Loader} from '../../../../components/Loader';
 import {useClusterWithProxy} from '../../../../store/reducers/cluster/cluster';
 import {useGetOverviewQuery} from '../../../../store/reducers/overview/overview';
-import {selectSchemaObjectData} from '../../../../store/reducers/schema/schema';
 import {EPathType} from '../../../../types/api/schema';
 import {uiFactory} from '../../../../uiFactory/uiFactory';
 import {cn} from '../../../../utils/cn';
-import {useAutoRefreshInterval, useTypedSelector} from '../../../../utils/hooks';
+import {useAutoRefreshInterval} from '../../../../utils/hooks';
 import {ViewInfo} from '../../Info/View/View';
 import {isDomain} from '../../ObjectSummary/transformPath';
 import {isDocumentTable} from '../../utils';
@@ -52,22 +51,9 @@ function Overview({type, path, database, databaseFullPath}: OverviewProps) {
     const supportsDocumentTables = Boolean(uiFactory.documentTables?.getSchema);
     const lookupIndexParent = supportsDocumentTables && type === EPathType.EPathTypeTableIndex;
     const parentPath = selectedPath.slice(0, selectedPath.lastIndexOf('/'));
-    const cachedDescription = useTypedSelector((state) => {
-        if (!lookupIndexParent) {
-            return undefined;
-        }
-        const table = selectSchemaObjectData(
-            state,
-            parentPath,
-            database,
-            databaseFullPath,
-            useMetaProxy,
-        );
-        return table?.partial ? undefined : table?.PathDescription;
-    });
     const parent = useGetOverviewQuery(
         {path: parentPath, database, databaseFullPath, useMetaProxy},
-        {skip: !lookupIndexParent || Boolean(cachedDescription)},
+        {skip: !lookupIndexParent},
     );
     const isStreamingQuery = type === EPathType.EPathTypeStreamingQuery;
     const loading =
@@ -75,8 +61,7 @@ function Overview({type, path, database, databaseFullPath}: OverviewProps) {
 
     const renderContent = () => {
         const data = currentData ?? undefined;
-        const tableDescription =
-            cachedDescription ?? parent.currentData?.PathDescription ?? data?.PathDescription;
+        const tableDescription = parent.currentData?.PathDescription ?? data?.PathDescription;
         if (data && supportsDocumentTables && isDocumentTable(tableDescription)) {
             return (
                 <DocumentTableInfo

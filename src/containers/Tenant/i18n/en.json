@@ -9,7 +9,7 @@
   "field_source-type": "Source Type",
   "field_data-source": "Data Source",
   "action_copy-schema-path": "Copy schema path",
-  "action_delete-document-table": "Delete document table...",
+  "action_delete-document-table": "Delete",
   "field_type": "Type",
   "field_subtype": "SubType",
   "field_id": "ID",

@@ -2,6 +2,7 @@ import React from 'react';
 
 import {Text} from '@gravity-ui/uikit';
 
+import {ResponseError} from '../../../../components/Errors/ResponseError';
 import {ResizeableDataTable} from '../../../../components/ResizeableDataTable/ResizeableDataTable';
 import {TableSkeleton} from '../../../../components/TableSkeleton/TableSkeleton';
 import {DEFAULT_TABLE_SETTINGS} from '../../../../utils/constants';
@@ -33,7 +34,7 @@ export function DocumentTableSchemaViewer({
     children,
 }: DocumentTableSchemaViewerProps) {
     const [autoRefreshInterval] = useAutoRefreshInterval();
-    const {currentData, loading} = useDocumentTableSchema({
+    const {currentData, error, loading} = useDocumentTableSchema({
         database,
         databaseFullPath,
         path,
@@ -47,9 +48,14 @@ export function DocumentTableSchemaViewer({
     if (loading) {
         return <TableSkeleton />;
     }
+    const schemaError = error ? <ResponseError error={error} /> : null;
+    if (schemaError && currentData === undefined) {
+        return schemaError;
+    }
     if (currentData === null) {
         return (
             <React.Fragment>
+                {schemaError}
                 <Text as="p" color="secondary" className={b('description')}>
                     {tenantKeyset('context_underlying-document-table')}
                 </Text>
@@ -60,6 +66,7 @@ export function DocumentTableSchemaViewer({
 
     return (
         <React.Fragment>
+            {schemaError}
             <div className={b('keys-wrapper')}>
                 <KeysView tableData={tableData} extended={extended} type="document-partition" />
                 <KeysView tableData={tableData} extended={extended} type="document-sort" />
