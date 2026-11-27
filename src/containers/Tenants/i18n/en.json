@@ -45,5 +45,13 @@
   "value_usage-at-least": "≥{{lower}}%",
   "value_usage-below": "<{{upper}}%",
   "value_usage-range": "{{lower}}% – <{{upper}}%",
-  "context_loading-presets": "Loading resource presets"
+  "context_loading-presets": "Loading resource presets",
+  "field_quota-used": "Storage quota used",
+  "field_quota-limit": "Storage quota limit",
+  "context_quota-used": "Storage that YDB counts toward the quota.\nWhen only table and topic sizes are available, their sum estimates usage for the whole database.",
+  "context_quota-limit": "Maximum amount of storage allowed by the hard quota.\nIf YDB does not report the effective limit, this column shows the configured limit when available.",
+  "context_quota-estimate": "Usage estimated from the reported size of tables and topics.",
+  "context_configured-limit": "Configured threshold. YDB did not report the effective quota.",
+  "value_no-limit": "No limit",
+  "field_database-quota": "Database"
 }

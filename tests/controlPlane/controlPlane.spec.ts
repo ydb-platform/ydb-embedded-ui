@@ -511,6 +511,7 @@ test('My databases filters by cluster without cloud IDs or Control Plane', async
             Type: 'Serverless',
             Cluster: 'beta',
             ControlPlane: {},
+            DiskSpaceQuotaUsage: {Mode: 'MODE_OVERALL', Entries: [{Usage: '20', HardQuota: '100'}]},
             NodeIds: [3],
             StorageGroups: '1',
         },
