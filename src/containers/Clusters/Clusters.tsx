@@ -15,7 +15,6 @@ import {
     filterClusters,
     filterClustersByAvailability,
     selectAvailabilityFilter,
-    selectClusterNameFilter,
     selectGalaxyFilter,
     selectServiceFilter,
     selectStatusFilter,
@@ -39,6 +38,7 @@ import {
 } from './constants';
 import i18n from './i18n';
 import {b} from './shared';
+import {useClustersQueryParams} from './useClustersQueryParams';
 import {calculateClusterPath} from './utils';
 
 import './Clusters.scss';
@@ -75,7 +75,7 @@ export function Clusters({scrollContainerRef}: ClustersProps) {
     const isEditClusterAvailable = emMetaAvailable && uiFactory.onEditCluster !== undefined;
     const isDeleteClusterAvailable = emMetaAvailable && uiFactory.onDeleteCluster !== undefined;
 
-    const clusterName = useTypedSelector(selectClusterNameFilter);
+    const {search, handleSearchChange} = useClustersQueryParams();
     const status = useTypedSelector(selectStatusFilter);
     const service = useTypedSelector(selectServiceFilter);
     const version = useTypedSelector(selectVersionFilter);
@@ -87,9 +87,6 @@ export function Clusters({scrollContainerRef}: ClustersProps) {
     };
     const changeService = (value: string[]) => {
         dispatch(changeClustersFilters({service: value}));
-    };
-    const changeClusterName = (value: string) => {
-        dispatch(changeClustersFilters({clusterName: value}));
     };
     const changeVersion = (value: string[]) => {
         dispatch(changeClustersFilters({version: value}));
@@ -227,15 +224,18 @@ export function Clusters({scrollContainerRef}: ClustersProps) {
     }, [clustersForFilterOptions, service, version, galaxy]);
 
     const filteredClusters = React.useMemo(() => {
-        return filterClusters(clusters ?? [], {
-            clusterName,
-            status,
-            service,
-            version,
-            galaxy,
-            availability,
-        });
-    }, [clusterName, clusters, service, status, version, galaxy, availability]);
+        return filterClusters(
+            clusters ?? [],
+            {
+                status,
+                service,
+                version,
+                galaxy,
+                availability,
+            },
+            search,
+        );
+    }, [search, clusters, service, status, version, galaxy, availability]);
 
     const statuses = React.useMemo(() => {
         const clustersStatuses = clustersForFilterOptions
@@ -254,8 +254,8 @@ export function Clusters({scrollContainerRef}: ClustersProps) {
                     tableFilter
                     placeholder={i18n('controls_search-placeholder')}
                     endContent={<Icon data={Magnifier} className={b('search-icon')} />}
-                    onChange={changeClusterName}
-                    value={clusterName}
+                    onChange={handleSearchChange}
+                    value={search}
                     width={320}
                 />
                 {galaxiesToSelect.length > 0 || galaxy.length > 0 ? (

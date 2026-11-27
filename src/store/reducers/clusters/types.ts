@@ -34,7 +34,6 @@ export interface ClustersFilters {
     service: string[];
     version: string[];
     galaxy: string[];
-    clusterName: string;
 }
 
 export interface ClustersStateSlice {

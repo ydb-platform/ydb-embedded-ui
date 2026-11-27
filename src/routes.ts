@@ -200,6 +200,7 @@ export type HomePageTab = z.infer<typeof homePageTabSchema>;
 
 type HomePageQueryParams = BaseQueryParams & {
     env?: string;
+    search?: string;
 };
 
 export function getHomePagePath(

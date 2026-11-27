@@ -10,7 +10,12 @@ import {LoaderWrapper} from '../../components/LoaderWrapper/LoaderWrapper';
 import {useSlots} from '../../components/slots';
 import type {SlotMap} from '../../components/slots/SlotMap';
 import type {SlotComponent} from '../../components/slots/types';
-import routes, {CLUSTER, getClusterPath} from '../../routes';
+import routes, {
+    CLUSTER,
+    getClusterPath,
+    getHomePagePath,
+    getLocationObjectFromHref,
+} from '../../routes';
 import type {RootState} from '../../store';
 import {
     useAllCapabilitiesLoaded,
@@ -26,6 +31,7 @@ import {useMetaAuthUnavailable} from '../../utils/hooks/useMetaAuth';
 import {useNodesListQueryArgs} from '../../utils/hooks/useNodesListQueryArgs';
 import {useSetting} from '../../utils/hooks/useSetting';
 import {lazyComponent} from '../../utils/lazyComponent';
+import {getRedirectLocation} from '../../utils/queryParams';
 import {isForbiddenError, isRedirectToAuth, isUnauthenticatedError} from '../../utils/response';
 import Authentication from '../Authentication/Authentication';
 import {GetUser} from '../GetUserWrapper/GetUserWrapper';
@@ -161,8 +167,13 @@ export function Content(props: ContentProps) {
     const additionalRoutes = slots.get(RoutesSlot);
 
     const redirect = slots.get(RedirectSlot);
+    // Keep query params and hash, so links like `/?search=foo` survive the redirect to home page
+    const homePageRedirect = getRedirectLocation(
+        currentLocation,
+        getLocationObjectFromHref(getHomePagePath()).pathname,
+    );
     const redirectProps: RedirectProps =
-        redirect?.props ?? (singleClusterMode ? {to: getClusterPath()} : {to: routes.homePage});
+        redirect?.props ?? (singleClusterMode ? {to: getClusterPath()} : {to: homePageRedirect});
 
     return (
         <Switch>

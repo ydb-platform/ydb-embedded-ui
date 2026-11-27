@@ -9,7 +9,6 @@ import type {
 
 // ==== Simple selectors ====
 
-export const selectClusterNameFilter = (state: ClustersStateSlice) => state.clusters.clusterName;
 export const selectStatusFilter = (state: ClustersStateSlice) => state.clusters.status;
 export const selectServiceFilter = (state: ClustersStateSlice) => state.clusters.service;
 export const selectVersionFilter = (state: ClustersStateSlice) => state.clusters.version;
@@ -104,7 +103,11 @@ const isMatchesByTextQuery = (clusterData: PreparedCluster, searchQuery = '') =>
     return filteredByName || filteredByVersion || filteredByHost || filteredByDomain;
 };
 
-export function filterClusters(clusters: PreparedCluster[], filters: ClustersFilters) {
+export function filterClusters(
+    clusters: PreparedCluster[],
+    filters: ClustersFilters,
+    search?: string,
+) {
     return clusters.filter((cluster) => {
         return (
             isMatchesByAvailability(cluster, filters.availability) &&
@@ -112,7 +115,7 @@ export function filterClusters(clusters: PreparedCluster[], filters: ClustersFil
             isMatchesByStatus(cluster, filters.status) &&
             isMatchesByService(cluster, filters.service) &&
             isMatchesByVersion(cluster, filters.version) &&
-            isMatchesByTextQuery(cluster, filters.clusterName)
+            isMatchesByTextQuery(cluster, search)
         );
     });
 }

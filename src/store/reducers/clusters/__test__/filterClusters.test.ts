@@ -3,7 +3,6 @@ import type {ClustersFilters} from '../types';
 import {prepareClustersData} from '../utils';
 
 const defaultFilters: ClustersFilters = {
-    clusterName: '',
     status: [],
     service: [],
     version: [],
@@ -37,18 +36,16 @@ describe('filterClusters', () => {
     });
 
     test('keeps unavailable clusters hidden when they match the search', () => {
-        expect(filterClusters(clusters, {...defaultFilters, clusterName: 'unavailable'})).toEqual(
-            [],
-        );
+        expect(filterClusters(clusters, defaultFilters, 'unavailable')).toEqual([]);
     });
 
     test('applies the search when only unavailable clusters are selected', () => {
         expect(
-            filterClusters(clusters, {
-                ...defaultFilters,
-                availability: ['unavailable'],
-                clusterName: 'json',
-            }).map(({name}) => name),
+            filterClusters(
+                clusters,
+                {...defaultFilters, availability: ['unavailable']},
+                'json',
+            ).map(({name}) => name),
         ).toEqual(['unavailable-json']);
     });
 
