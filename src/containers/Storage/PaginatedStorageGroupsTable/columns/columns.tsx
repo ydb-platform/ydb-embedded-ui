@@ -432,7 +432,7 @@ export const getStorageGroupsColumns: StorageColumnsGetter = (data) => {
 
     return columns.map((column) => ({
         ...column,
-        sortable: isSortableStorageGroupsColumn(column.name),
+        sortable: isSortableStorageGroupsColumn(column.name, data?.bridgeModeSortingAvailable),
     }));
 };
 

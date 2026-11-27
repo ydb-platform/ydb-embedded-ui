@@ -8,6 +8,7 @@ export interface GetStorageColumnsData {
     viewContext?: StorageViewContext;
     isAllVDisksLayout?: boolean;
     isAllPDisksLayout?: boolean;
+    bridgeModeSortingAvailable?: boolean;
 }
 
 export interface GetStorageGroupsColumnsParams {

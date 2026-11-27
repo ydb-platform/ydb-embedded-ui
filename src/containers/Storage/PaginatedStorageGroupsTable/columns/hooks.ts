@@ -4,6 +4,7 @@ import {
     useBlobStorageCapacityMetricsEnabled,
     useBridgeModeEnabled,
     useStorageGroupsHandlerHasBridgeMode,
+    useStorageGroupsHandlerHasBridgeModeSorting,
     useStorageGroupsHandlerHasBridgeSyncStatus,
 } from '../../../../store/reducers/capabilities/hooks';
 import {VISIBLE_ENTITIES} from '../../../../store/reducers/storage/constants';
@@ -46,6 +47,11 @@ export function useStorageGroupsSelectedColumns({
     const isViewerUser = useIsViewerUser();
     const blobMetricsEnabled = useBlobStorageCapacityMetricsEnabled();
     const bridgeModeEnabled = useBridgeModeEnabled();
+    const handlerHasBridgeModeSorting = useStorageGroupsHandlerHasBridgeModeSorting();
+    const bridgeModeSortingAvailable =
+        bridgeModeEnabled &&
+        handlerHasBridgeModeSorting &&
+        Boolean(isViewerUser ?? isUserAllowedToMakeChanges);
     const handlerHasBridgeMode = useStorageGroupsHandlerHasBridgeMode();
     const handlerHasBridgeSyncStatus = useStorageGroupsHandlerHasBridgeSyncStatus();
     const isStorageExpertMode = useIsStorageExpertMode();
@@ -91,10 +97,17 @@ export function useStorageGroupsSelectedColumns({
             viewContext,
             isAllVDisksLayout,
             isAllPDisksLayout,
+            bridgeModeSortingAvailable,
         });
 
         return allColumns.filter((column) => !skippedColumnIds.some((id) => id === column.name));
-    }, [isAllPDisksLayout, isAllVDisksLayout, skippedColumnIds, viewContext]);
+    }, [
+        bridgeModeSortingAvailable,
+        isAllPDisksLayout,
+        isAllVDisksLayout,
+        skippedColumnIds,
+        viewContext,
+    ]);
 
     const stickyColumns = React.useMemo(() => {
         const sticky = [...REQUIRED_STORAGE_GROUPS_COLUMNS];

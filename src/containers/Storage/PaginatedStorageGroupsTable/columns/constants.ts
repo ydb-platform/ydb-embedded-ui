@@ -330,7 +330,7 @@ const STORAGE_GROUPS_COLUMNS_TO_SORT_FIELDS: Record<
     GroupId: 'GroupId',
     PoolName: 'PoolName',
     PileName: 'PileName',
-    BridgeMode: undefined,
+    BridgeMode: 'BridgeMode',
     BridgeSyncStatus: 'BridgeSyncStatus',
     MediaType: 'MediaType',
     Erasure: 'Erasure',
@@ -355,10 +355,19 @@ const STORAGE_GROUPS_COLUMNS_TO_SORT_FIELDS: Record<
     CapacityAlert: 'CapacityAlert',
 };
 
-export function getStorageGroupsColumnSortField(columnId?: string) {
+export function getStorageGroupsColumnSortField(
+    columnId?: string,
+    bridgeModeSortingAvailable = false,
+) {
+    if (columnId === STORAGE_GROUPS_COLUMNS_IDS.BridgeMode && !bridgeModeSortingAvailable) {
+        return undefined;
+    }
     return STORAGE_GROUPS_COLUMNS_TO_SORT_FIELDS[columnId as StorageGroupsColumnId];
 }
 
-export function isSortableStorageGroupsColumn(columnId: string) {
-    return Boolean(getStorageGroupsColumnSortField(columnId));
+export function isSortableStorageGroupsColumn(
+    columnId: string,
+    bridgeModeSortingAvailable?: boolean,
+) {
+    return Boolean(getStorageGroupsColumnSortField(columnId, bridgeModeSortingAvailable));
 }

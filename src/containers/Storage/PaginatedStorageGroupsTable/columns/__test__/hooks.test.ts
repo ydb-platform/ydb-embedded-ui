@@ -16,6 +16,7 @@ jest.mock('../../../../../store/reducers/capabilities/hooks', () => ({
     useBlobStorageCapacityMetricsEnabled: jest.fn(),
     useBridgeModeEnabled: jest.fn(),
     useStorageGroupsHandlerHasBridgeMode: () => false,
+    useStorageGroupsHandlerHasBridgeModeSorting: () => false,
     useStorageGroupsHandlerHasBridgeSyncStatus: () => false,
 }));
 

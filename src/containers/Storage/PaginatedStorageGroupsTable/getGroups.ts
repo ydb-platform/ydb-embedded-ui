@@ -19,8 +19,8 @@ type GetStorageGroups = FetchData<
     DataQualityMeta
 >;
 
-export function useGroupsGetter() {
-    const fetchData: GetStorageGroups = React.useCallback(async (params) => {
+export function useGroupsGetter(bridgeModeSortingAvailable: boolean) {
+    const fetchData: GetStorageGroups = async (params) => {
         const {limit, offset, sortParams, filters, columnsIds} = params;
         const {sortOrder, columnId} = sortParams ?? {};
         const {
@@ -34,7 +34,7 @@ export function useGroupsGetter() {
             filterGroupBy,
         } = filters ?? {};
 
-        const sortField = getStorageGroupsColumnSortField(columnId);
+        const sortField = getStorageGroupsColumnSortField(columnId, bridgeModeSortingAvailable);
         const sort = sortField ? prepareSortValue(sortField, sortOrder) : undefined;
         const dataFieldsRequired = getRequiredDataFields(columnsIds, GROUPS_COLUMNS_TO_DATA_FIELDS);
 
@@ -59,7 +59,7 @@ export function useGroupsGetter() {
             total: response.total || 0,
             meta: {dataQuality: response.dataQuality},
         };
-    }, []);
+    };
 
-    return fetchData;
+    return React.useCallback(fetchData, [bridgeModeSortingAvailable]);
 }

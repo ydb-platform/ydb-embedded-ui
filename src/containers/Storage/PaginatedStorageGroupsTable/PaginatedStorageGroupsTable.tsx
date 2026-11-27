@@ -77,7 +77,10 @@ export const PaginatedStorageGroupsTable = ({
     const getStorageGroupPath = useStorageGroupPath();
     const capabilitiesLoaded = useCapabilitiesLoaded();
 
-    const fetchData = useGroupsGetter();
+    const bridgeModeSortingAvailable = columns.some(
+        ({name, sortable}) => name === STORAGE_GROUPS_COLUMNS_IDS.BridgeMode && sortable,
+    );
+    const fetchData = useGroupsGetter(bridgeModeSortingAvailable);
 
     const hasVDisksColumns = React.useMemo(() => {
         return columns.some((column) => columnsWithVDisks.has(column.name));

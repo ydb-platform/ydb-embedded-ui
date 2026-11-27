@@ -114,6 +114,10 @@ export const useStorageGroupsHandlerHasBridgeMode = () => {
     return useGetFeatureVersion('/storage/groups') >= 18;
 };
 
+export const useStorageGroupsHandlerHasBridgeModeSorting = () => {
+    return useGetFeatureVersion('/storage/groups') >= 19;
+};
+
 export const useViewerTenantInfoHasBridgeFields = () => {
     return useGetFeatureVersion('/viewer/tenantinfo') >= 7;
 };
