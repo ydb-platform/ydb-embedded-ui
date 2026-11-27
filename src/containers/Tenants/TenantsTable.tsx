@@ -536,7 +536,7 @@ function TenantsTableContent({
         return (
             <TableColumnSetup
                 // Titles of column groups are longer than titles of columns
-                popupWidth={myDatabases ? 300 : 200}
+                popupWidth={myDatabases ? 250 : 200}
                 items={layout.items}
                 showStatus
                 onUpdate={(updated) =>
