@@ -5,7 +5,6 @@ import {api} from './api';
 
 interface ResourcePresetsParams {
     clusterName: string;
-    environmentName?: string;
     environment?: string;
     backend?: string;
 }

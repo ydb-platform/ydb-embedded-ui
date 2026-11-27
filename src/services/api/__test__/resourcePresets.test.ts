@@ -39,8 +39,8 @@ test.each([true, false])(
         window.api = {meta} as YdbEmbeddedAPI;
         try {
             const endpoint = resourcePresetsApi.endpoints.listResourcePresets;
-            const args = {clusterName: 'cluster-a', environmentName: 'Primary'};
-            const otherEnv = {...args, environmentName: 'Secondary'};
+            const args = {clusterName: 'cluster-a', environment: 'Primary'};
+            const otherEnv = {...args, environment: 'Secondary'};
             for (const scope of [args, args, otherEnv]) {
                 await store.dispatch(endpoint.initiate(scope, {subscribe: false})).unwrap();
             }

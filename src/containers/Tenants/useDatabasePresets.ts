@@ -25,7 +25,7 @@ function getClusters(rows: readonly PreparedTenant[], available: boolean) {
     return Array.from(clusters).sort();
 }
 
-export function useDatabasePresets(rows: readonly PreparedTenant[], environmentName?: string) {
+export function useDatabasePresets(rows: readonly PreparedTenant[]) {
     const dispatch = useTypedDispatch();
     const version = useGetMetaFeatureVersion('/meta/list_resource_presets');
     const selectClusters = React.useMemo(
@@ -39,11 +39,10 @@ export function useDatabasePresets(rows: readonly PreparedTenant[], environmentN
         () =>
             clusters.map((clusterName) => ({
                 clusterName,
-                environmentName,
                 environment: currentEnvironment,
                 backend: currentBackend,
             })),
-        [clusters, environmentName, currentEnvironment, currentBackend],
+        [clusters, currentEnvironment, currentBackend],
     );
 
     React.useEffect(() => {

@@ -90,7 +90,6 @@ export function useMyDatabasesView({
 
     const {catalogs, loading: loadingPresets} = useDatabasePresets(
         hasControlPlane ? filteredRows : EMPTY_ROWS,
-        environmentName,
     );
     const viewRows = React.useMemo(
         () =>
