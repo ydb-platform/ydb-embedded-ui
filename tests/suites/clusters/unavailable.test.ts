@@ -160,6 +160,20 @@ test('keeps the search when redirecting from the root to the clusters list', asy
     await expect(list.getByRole('link', {name: 'available', exact: true})).toHaveCount(0);
 });
 
+test('redirect from /home does not change which search value wins', async ({page}) => {
+    await openClusters(page, clusters, 'home', {
+        'search%5B%5D': 'unavailable',
+        search: 'explicitly',
+    });
+    const list = page.locator('.ydb-clusters');
+
+    await expect(page).toHaveURL(/\/home\/clusters\?/);
+    await expect(list.getByPlaceholder('Cluster name, version, domain, host...')).toHaveValue(
+        'explicitly',
+    );
+    await expect(list.getByRole('link', {name: 'explicitly-available', exact: true})).toBeVisible();
+});
+
 test('does not activate or change the selected row from an unavailable label', async ({page}) => {
     await openClusters(page);
     await toggleAvailability(page, 'Unavailable');

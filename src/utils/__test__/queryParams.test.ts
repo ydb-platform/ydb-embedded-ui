@@ -16,6 +16,13 @@ describe('omitVolatileQueryParamsFromSearch', () => {
         ).toBe('?search=alpha&tag=keep');
     });
 
+    test('keeps names of other params, including bracket notation', () => {
+        const search = '?search%5B%5D=secondary&search=alpha';
+
+        expect(omitVolatileQueryParamsFromSearch(search)).toBe(search);
+        expect(omitVolatileQueryParamsFromSearch(`${search}&utm_referrer=x`)).toBe(search);
+    });
+
     test('returns an empty search when only volatile params are present', () => {
         expect(omitVolatileQueryParamsFromSearch('?utm_referrer=https%3A%2F%2Fexample.test')).toBe(
             '',
