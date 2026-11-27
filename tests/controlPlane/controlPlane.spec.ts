@@ -931,3 +931,62 @@ test('My databases pins allocated totals while scrolling and recalculates them a
     await search.fill('absent');
     await expect(footer).toHaveCount(0);
 });
+
+test('My databases keeps a row selected from the keyboard visible between groups', async ({
+    page,
+}) => {
+    await mockDatabases(
+        page,
+        Array.from({length: 30}, (_, index) => ({
+            Name: '/db/item-' + index,
+            Type: 'Dedicated',
+            Cluster: 'alpha',
+            // 10%, 60% and 95% of the two allocated cores: three groups of ten databases
+            CoresUsed: [0.2, 1.2, 1.9][index % 3],
+            ControlPlane: {
+                id: 'id-' + index,
+                resource_preset_id: 'small',
+                scale_policy: {fixed_scale: {size: 1}},
+            },
+        })),
+    );
+    await page.route('**/meta/list_resource_presets*', (route) =>
+        route.fulfill({json: {resource_presets: [{id: 'small', cores: '2', memory: '4'}]}}),
+    );
+    await page.goto(databasesUrl + '&groupBy=cpu');
+    const groups = page.getByRole('button', {name: /%/});
+    await expect(groups).toHaveCount(3);
+    for (const group of await groups.all()) {
+        await group.click();
+    }
+    // A pointer resting over the table takes the selection over when rows move under it
+    await page.mouse.move(0, 0);
+    // How much of the selected row lies under the sticky head or the pinned totals of its table
+    const covered = () =>
+        page.evaluate(() => {
+            const row = document.querySelector('.ydb-keyboard-focused-row');
+            const table = row?.closest('.ydb-resizeable-data-table');
+            if (!row || !table) {
+                return undefined;
+            }
+            const edge = (part: string) =>
+                table.querySelector(`.data-table__sticky_${part}`)?.getBoundingClientRect();
+            const {top, bottom} = row.getBoundingClientRect();
+            const head = edge('head');
+            const totals = edge('footer');
+            return Math.max(0, head ? head.bottom - top : 0, totals ? bottom - totals.top : 0);
+        });
+    const search = page.getByPlaceholder('Database name');
+    await search.focus();
+    // Down across one group boundary, then up across two
+    for (const [key, steps] of [
+        ['ArrowDown', 15],
+        ['ArrowUp', 28],
+    ] as const) {
+        for (let step = 0; step < steps; step++) {
+            await search.press(key);
+            // A sticky head always lies 1px over the first row, and positions are fractional
+            await expect.poll(covered, {message: `${key} ${step}`}).toBeLessThan(2);
+        }
+    }
+});

@@ -113,8 +113,11 @@ describe('a cluster that fails to list its presets', () => {
         expect(listResourcePresets).toHaveBeenCalledTimes(3);
     });
 
-    test('is not asked again when the request is refused', async () => {
-        const listResourcePresets = jest.fn().mockRejectedValue({status: 403});
+    test.each([
+        ['is refused', {status: 403}],
+        ['is refused without CORS headers', {status: 403, message: 'Network Error'}],
+    ])('is not asked again when the request %s', async (_case, error) => {
+        const listResourcePresets = jest.fn().mockRejectedValue(error);
 
         expect((await load(listResourcePresets)).isError).toBe(true);
         expect(listResourcePresets).toHaveBeenCalledTimes(1);

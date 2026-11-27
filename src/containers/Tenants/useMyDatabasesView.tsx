@@ -1,14 +1,14 @@
 import React from 'react';
 
 import {Select} from '@gravity-ui/uikit';
-import type {QueryParamConfig} from 'use-query-params';
-import {ArrayParam, createEnumParam, useQueryParams} from 'use-query-params';
+import {createEnumParam, useQueryParams} from 'use-query-params';
 
 import {CloudFilter} from './CloudFilter';
 import {ClusterFilter} from './ClusterFilter';
 import {ResourceGroupFilter} from './ResourceGroupFilter';
 import {databaseCloudId} from './clouds';
 import {MY_DATABASE_TYPES} from './constants';
+import {ENVIRONMENT_FILTERS_PARAMS} from './environmentFilters';
 import i18n from './i18n';
 import {RESOURCE_GROUPINGS, allocatedResources, groupByResourceUsage} from './resourceUsage';
 import type {DatabaseRow} from './types';
@@ -17,21 +17,6 @@ import {useDatabasePresets} from './useDatabasePresets';
 const EMPTY_ROWS: DatabaseRow[] = [];
 
 const databaseTypeOptions = MY_DATABASE_TYPES.map((type) => ({value: type, content: type}));
-
-const filterValuesParam: QueryParamConfig<string[]> = {
-    encode: (values) => ArrayParam.encode(values.length ? values : undefined),
-    decode(input) {
-        return Array.from(
-            new Set(ArrayParam.decode(input)?.filter((value): value is string => Boolean(value))),
-        );
-    },
-};
-
-/** Filters by entities of one environment: they make no sense in another one. */
-export const ENVIRONMENT_FILTERS_PARAMS = {
-    cluster: filterValuesParam,
-    cloudId: filterValuesParam,
-};
 
 const queryParamsConfig = {
     ...ENVIRONMENT_FILTERS_PARAMS,

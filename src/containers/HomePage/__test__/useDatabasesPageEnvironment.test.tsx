@@ -14,11 +14,6 @@ jest.mock('../../../store/reducers/capabilities/hooks', () => ({
 jest.mock('../../../utils/hooks', () => ({
     useSetting: () => [undefined, jest.fn()],
 }));
-jest.mock('../../Tenants/useMyDatabasesView', () => {
-    const {ArrayParam} = jest.requireActual('use-query-params');
-    return {ENVIRONMENT_FILTERS_PARAMS: {cluster: ArrayParam, cloudId: ArrayParam}};
-});
-
 const environments = ['prod', 'test'];
 
 function setup(query: string) {
@@ -57,4 +52,17 @@ test('keeps the filters of a shared link when the environment is only written to
     expect(search().get('env')).toBe('prod');
     expect(search().getAll('cluster')).toEqual(['alpha']);
     expect(search().getAll('cloudId')).toEqual(['cloud-a']);
+});
+
+test('drops the filters of a link to an environment that is replaced with an available one', () => {
+    const {change, search} = setup(`env=preprod&${filters}`);
+
+    // The page opens its default environment instead and writes it to the URL
+    change('prod');
+
+    expect(Object.fromEntries(search())).toEqual({
+        env: 'prod',
+        databaseType: 'Dedicated',
+        search: 'db',
+    });
 });

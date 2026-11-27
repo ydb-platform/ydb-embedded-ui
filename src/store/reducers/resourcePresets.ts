@@ -14,10 +14,11 @@ interface ResourcePresetsParams {
 export const RESOURCE_PRESETS_RETRY_DELAYS_MS = [1000, 3000];
 
 function isTransientError(error: unknown) {
-    return (
-        isNetworkError(error) ||
-        (isResponseError(error) && !error.isCancelled && Number(error.status) >= 500)
-    );
+    // A response blocked by CORS keeps its status and still reads as a network error
+    if (isResponseError(error) && typeof error.status === 'number') {
+        return !error.isCancelled && error.status >= 500;
+    }
+    return isNetworkError(error);
 }
 
 function wait(ms: number) {
