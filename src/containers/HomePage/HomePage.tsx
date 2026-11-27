@@ -25,6 +25,7 @@ import {uiFactory} from '../../uiFactory/uiFactory';
 import {cn} from '../../utils/cn';
 import {useSetting, useTypedDispatch} from '../../utils/hooks';
 import {useIsViewerUser} from '../../utils/hooks/useIsUserAllowedToMakeChanges';
+import {omitVolatileQueryParamsFromSearch} from '../../utils/queryParams';
 import {isAccessError} from '../../utils/response';
 import {Clusters} from '../Clusters/Clusters';
 import {GetMetaUser} from '../GetUserWrapper/GetUserWrapper';
@@ -42,6 +43,7 @@ export function HomePage() {
     const dispatch = useTypedDispatch();
     const history = useHistory();
     const location = useLocation();
+    const redirectSearch = omitVolatileQueryParamsFromSearch(location.search);
     // Clusters and databases lists share the `search` param, keep it when switching tabs
     const [searchQuery] = useQueryParam('search', StringParam);
 
@@ -124,7 +126,13 @@ export function HomePage() {
     const handleTabChange = React.useCallback(
         (value: HomePageTab) => {
             saveHomePageTab(value);
-            const path = getHomePagePath({activeTab: value}, {search: searchQuery || undefined});
+            // The input writes to the URL with a debounce, so take the text user actually sees
+            const visibleSearch =
+                scrollContainerRef.current?.querySelector<HTMLInputElement>(
+                    '.ydb-search input',
+                )?.value;
+            const search = visibleSearch ?? searchQuery;
+            const path = getHomePagePath({activeTab: value}, {search: search || undefined});
             history.replace(path);
         },
         [history, saveHomePageTab, searchQuery],
@@ -228,7 +236,7 @@ export function HomePage() {
         if (noEnvironmentsAvailable && homePageTab !== 'clusters') {
             return (
                 <Redirect
-                    to={{pathname: clustersPath, search: location.search, hash: location.hash}}
+                    to={{pathname: clustersPath, search: redirectSearch, hash: location.hash}}
                 />
             );
         }
@@ -236,7 +244,7 @@ export function HomePage() {
             const path = getLocationObjectFromHref(
                 getHomePagePath({activeTab: homePageTab}),
             ).pathname;
-            return <Redirect to={{pathname: path, search: location.search, hash: location.hash}} />;
+            return <Redirect to={{pathname: path, search: redirectSearch, hash: location.hash}} />;
         }
 
         return (

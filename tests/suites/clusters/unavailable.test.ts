@@ -145,10 +145,14 @@ test('restores the search from the URL', async ({page}) => {
 });
 
 test('keeps the search when redirecting from the root to the clusters list', async ({page}) => {
-    await openClusters(page, clusters, '', {search: 'explicitly'});
+    await openClusters(page, clusters, '', {
+        search: 'explicitly',
+        utm_referrer: encodeURIComponent('https://example.test/origin'),
+    });
     const list = page.locator('.ydb-clusters');
 
     await expect(page).toHaveURL(/\/home\/clusters\?(.*&)?search=explicitly(&|$)/);
+    expect(page.url()).not.toContain('utm_referrer');
     await expect(list.getByPlaceholder('Cluster name, version, domain, host...')).toHaveValue(
         'explicitly',
     );

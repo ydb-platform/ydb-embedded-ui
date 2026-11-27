@@ -31,6 +31,7 @@ import {useMetaAuthUnavailable} from '../../utils/hooks/useMetaAuth';
 import {useNodesListQueryArgs} from '../../utils/hooks/useNodesListQueryArgs';
 import {useSetting} from '../../utils/hooks/useSetting';
 import {lazyComponent} from '../../utils/lazyComponent';
+import {omitVolatileQueryParamsFromSearch} from '../../utils/queryParams';
 import {isForbiddenError, isRedirectToAuth, isUnauthenticatedError} from '../../utils/response';
 import Authentication from '../Authentication/Authentication';
 import {GetUser} from '../GetUserWrapper/GetUserWrapper';
@@ -169,7 +170,7 @@ export function Content(props: ContentProps) {
     // Keep query params and hash, so links like `/?search=foo` survive the redirect to home page
     const homePageRedirect = {
         pathname: getLocationObjectFromHref(getHomePagePath()).pathname,
-        search: currentLocation.search,
+        search: omitVolatileQueryParamsFromSearch(currentLocation.search),
         hash: currentLocation.hash,
     };
     const redirectProps: RedirectProps =

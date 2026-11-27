@@ -19,3 +19,17 @@ export function omitVolatileQueryParams<T extends Record<string, unknown>>(
 
     return result;
 }
+
+export function omitVolatileQueryParamsFromSearch(search: string) {
+    const params = new URLSearchParams(search);
+    const volatileParams = VOLATILE_QUERY_PARAMS.filter((param) => params.has(param));
+
+    if (volatileParams.length === 0) {
+        return search;
+    }
+
+    volatileParams.forEach((param) => params.delete(param));
+    const result = params.toString();
+
+    return result ? `?${result}` : '';
+}
