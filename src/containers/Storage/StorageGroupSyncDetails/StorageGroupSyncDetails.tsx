@@ -13,13 +13,14 @@ import type {TableColumnConfig} from '@gravity-ui/uikit';
 import {CellWithPopover} from '../../../components/CellWithPopover/CellWithPopover';
 import {InternalLink} from '../../../components/InternalLink';
 import {useStorageGroupPath} from '../../../routes';
+import {useStorageGroupsHandlerHasBridgeSyncDetails} from '../../../store/reducers/capabilities/hooks';
 import type {PreparedStorageGroup} from '../../../store/reducers/storage/types';
 import type {TBridgeGroupLink} from '../../../types/api/storage';
 import {cn} from '../../../utils/cn';
 import {EMPTY_DATA_PLACEHOLDER} from '../../../utils/constants';
 import {formatDateTime} from '../../../utils/dataFormatters/dataFormatters';
 import {formatMetricBytes} from '../../../utils/storageMetrics';
-import {parseUsToMs} from '../../../utils/timeParsers';
+import {formatDurationToShortTimeFormat, parseUsToMs} from '../../../utils/timeParsers';
 import {parseOptionalNonNegativeNumber} from '../../../utils/utils';
 
 import i18n from './i18n';
@@ -38,11 +39,13 @@ export function StorageGroupSyncDetails({
     const isPage = layout === 'page';
     const stage = group.BridgeSyncStage?.trim();
     const getGroupPath = useStorageGroupPath();
+    const bridgeSyncDetailsAvailable = useStorageGroupsHandlerHasBridgeSyncDetails();
     const partners = (group.BridgeGroups ?? []).filter(
         (partner) => partner.GroupId && partner.GroupId !== String(group.GroupId),
     );
     const remaining = parseOptionalNonNegativeNumber(group.BridgeSyncRemainingBytes);
     const rate = parseOptionalNonNegativeNumber(group.BridgeSyncCopyBytesPerSecond);
+    const secondsLeft = parseOptionalNonNegativeNumber(group.BridgeSyncSecondsLeft);
     const lastProgress = parseUsToMs(
         parseOptionalNonNegativeNumber(group.BridgeSyncLastProgressTimestamp),
         3,
@@ -137,6 +140,15 @@ export function StorageGroupSyncDetails({
                         ? EMPTY_DATA_PLACEHOLDER
                         : i18n('value_rate', {size: formatMetricBytes(rate)})}
                 </DefinitionList.Item>
+                {bridgeSyncDetailsAvailable && (
+                    <DefinitionList.Item name={i18n('field_eta')}>
+                        {secondsLeft === undefined
+                            ? EMPTY_DATA_PLACEHOLDER
+                            : formatDurationToShortTimeFormat(secondsLeft * 1000, 2, {
+                                  compact: true,
+                              })}
+                    </DefinitionList.Item>
+                )}
                 <DefinitionList.Item name={i18n('field_last-progress')}>
                     {formattedLastProgress ? (
                         <Tooltip content={formattedLastProgress}>

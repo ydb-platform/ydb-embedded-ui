@@ -2,6 +2,7 @@
   "field_remaining": "Data remaining",
   "context_remaining": "Data still to be synchronised. This amount may increase as scanning discovers more data.",
   "field_rate": "Sync rate",
+  "field_eta": "ETA",
   "value_rate": "{{size}}/s",
   "field_last-progress": "Last progress",
   "title_partners": "Sync partners",

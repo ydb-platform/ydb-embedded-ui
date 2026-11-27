@@ -297,6 +297,7 @@ export const GROUPS_COLUMNS_TO_DATA_FIELDS: Record<StorageGroupsColumnId, Groups
         'BridgeSyncLastProgressTimestamp',
         'BridgeSyncCopyBytesPerSecond',
         'BridgeSyncRemainingBytes',
+        'BridgeSyncSecondsLeft',
     ],
     // We display MediaType and Encryption in one Type column
     MediaType: ['MediaType', 'Encryption'],

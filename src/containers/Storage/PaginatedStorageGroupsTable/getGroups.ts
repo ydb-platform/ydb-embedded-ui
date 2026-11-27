@@ -1,6 +1,7 @@
 import React from 'react';
 
 import type {FetchData} from '../../../components/PaginatedTable';
+import {useStorageGroupsHandlerHasBridgeSyncDetails} from '../../../store/reducers/capabilities/hooks';
 import {requestStorageData} from '../../../store/reducers/storage/requestStorageData';
 import type {
     PreparedStorageGroup,
@@ -20,6 +21,8 @@ type GetStorageGroups = FetchData<
 >;
 
 export function useGroupsGetter(bridgeModeSortingAvailable: boolean) {
+    const bridgeSyncDetailsAvailable = useStorageGroupsHandlerHasBridgeSyncDetails();
+
     const fetchData: GetStorageGroups = async (params) => {
         const {limit, offset, sortParams, filters, columnsIds} = params;
         const {sortOrder, columnId} = sortParams ?? {};
@@ -50,7 +53,9 @@ export function useGroupsGetter(bridgeModeSortingAvailable: boolean) {
             pDiskId,
             filter_group: filterGroup,
             filter_group_by: filterGroupBy,
-            fieldsRequired: dataFieldsRequired,
+            fieldsRequired: bridgeSyncDetailsAvailable
+                ? dataFieldsRequired
+                : dataFieldsRequired.filter((field) => field !== 'BridgeSyncSecondsLeft'),
         });
 
         return {
@@ -61,5 +66,5 @@ export function useGroupsGetter(bridgeModeSortingAvailable: boolean) {
         };
     };
 
-    return React.useCallback(fetchData, [bridgeModeSortingAvailable]);
+    return React.useCallback(fetchData, [bridgeModeSortingAvailable, bridgeSyncDetailsAvailable]);
 }

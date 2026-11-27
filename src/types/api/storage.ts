@@ -62,6 +62,8 @@ export interface TBridgeGroupSyncInfo {
     /** uint64, a lower bound until the estimate is complete. */
     BridgeSyncRemainingBytes?: string;
     BridgeSyncRemainingBytesComplete?: boolean;
+    /** uint64, seconds until synchronisation completes. */
+    BridgeSyncSecondsLeft?: string;
 }
 
 export interface TGroupsStorageGroupInfo extends TBridgeGroupSyncInfo {
@@ -257,6 +259,7 @@ export type GroupsRequiredField =
     | 'BridgeSyncCopyBytesPerSecond'
     | 'BridgeSyncRemainingBytes'
     | 'BridgeSyncRemainingBytesComplete'
+    | 'BridgeSyncSecondsLeft'
     | 'Kind'
     | 'MediaType'
     | 'Erasure'
