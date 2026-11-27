@@ -30,7 +30,14 @@
         }
 
         &_pile {
+            min-width: 80px;
             max-width: 0;
+        }
+
+        &_status {
+            width: 1px;
+
+            white-space: nowrap;
         }
     }
 
@@ -46,6 +53,10 @@
         border-radius: var(--g-border-radius-m);
 
         overflow-wrap: anywhere;
+    }
+
+    &_layout_popover .ydb-storage-group-sync-details__partners-section_with-status {
+        min-width: min(280px, calc(100vw - 64px));
     }
 
     &_layout_page {
@@ -66,6 +77,10 @@
         .ydb-storage-group-sync-details__partners-section {
             width: 280px;
             max-width: 100%;
+
+            &_with-status {
+                width: 360px;
+            }
         }
 
         .ydb-storage-group-sync-details__message-section {

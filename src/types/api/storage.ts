@@ -45,6 +45,7 @@ export interface TStorageGroupStateInfo {
 export interface TBridgeGroupLink {
     GroupId?: string;
     PileName?: string;
+    BridgeSyncStatus?: BridgeSyncStatus;
 }
 
 export interface TBridgeGroupSyncInfo {

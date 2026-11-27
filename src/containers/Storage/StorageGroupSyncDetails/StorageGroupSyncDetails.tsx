@@ -10,6 +10,7 @@ import {
 } from '@gravity-ui/uikit';
 import type {TableColumnConfig} from '@gravity-ui/uikit';
 
+import {BridgeSyncStatusLabel} from '../../../components/BridgeSyncStatusLabel';
 import {CellWithPopover} from '../../../components/CellWithPopover/CellWithPopover';
 import {InternalLink} from '../../../components/InternalLink';
 import {useStorageGroupPath} from '../../../routes';
@@ -79,6 +80,22 @@ export function StorageGroupSyncDetails({
                     EMPTY_DATA_PLACEHOLDER
                 ),
         },
+        ...(bridgeSyncDetailsAvailable
+            ? [
+                  {
+                      id: 'BridgeSyncStatus',
+                      name: () => (
+                          <Text variant="body-1" color="secondary">
+                              {i18n('field_sync-status')}
+                          </Text>
+                      ),
+                      className: b('partner-cell', {status: true}),
+                      template: ({BridgeSyncStatus}: TBridgeGroupLink) => (
+                          <BridgeSyncStatusLabel status={BridgeSyncStatus} />
+                      ),
+                  },
+              ]
+            : []),
         {
             id: 'PileName',
             name: () => (
@@ -160,7 +177,11 @@ export function StorageGroupSyncDetails({
                 </DefinitionList.Item>
             </DefinitionList>
             {partners.length > 0 && (
-                <Flex direction="column" gap={2} className={b('partners-section')}>
+                <Flex
+                    direction="column"
+                    gap={2}
+                    className={b('partners-section', {'with-status': bridgeSyncDetailsAvailable})}
+                >
                     <Text variant="body-1" className={b('section-title')}>
                         {i18n('title_partners')} <Text color="hint">{partners.length}</Text>
                     </Text>
