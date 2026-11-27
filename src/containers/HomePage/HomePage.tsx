@@ -2,7 +2,8 @@ import React from 'react';
 
 import {Flex, SegmentedRadioGroup, Text} from '@gravity-ui/uikit';
 import {Helmet} from 'react-helmet-async';
-import {Redirect, Route, Switch, useHistory} from 'react-router-dom';
+import {Redirect, Route, Switch, useHistory, useLocation} from 'react-router-dom';
+import {StringParam, useQueryParam} from 'use-query-params';
 
 import {AutoRefreshControl} from '../../components/AutoRefreshControl/AutoRefreshControl';
 import {DrawerContextProvider} from '../../components/Drawer/DrawerContext';
@@ -40,6 +41,9 @@ const b = cn('ydb-home-page');
 export function HomePage() {
     const dispatch = useTypedDispatch();
     const history = useHistory();
+    const location = useLocation();
+    // Clusters and databases lists share the `search` param, keep it when switching tabs
+    const [searchQuery] = useQueryParam('search', StringParam);
 
     const scrollContainerRef = React.useRef<HTMLDivElement>(null);
 
@@ -120,10 +124,10 @@ export function HomePage() {
     const handleTabChange = React.useCallback(
         (value: HomePageTab) => {
             saveHomePageTab(value);
-            const path = getHomePagePath({activeTab: value});
+            const path = getHomePagePath({activeTab: value}, {search: searchQuery || undefined});
             history.replace(path);
         },
-        [history, saveHomePageTab],
+        [history, saveHomePageTab, searchQuery],
     );
 
     const handleEnvironmentTabChange = React.useCallback(
@@ -222,13 +226,17 @@ export function HomePage() {
         const databasesPath = getLocationObjectFromHref(getDatabasesPath()).pathname;
 
         if (noEnvironmentsAvailable && homePageTab !== 'clusters') {
-            return <Redirect to={clustersPath} />;
+            return (
+                <Redirect
+                    to={{pathname: clustersPath, search: location.search, hash: location.hash}}
+                />
+            );
         }
         if (homePageTab !== tabFromPath) {
             const path = getLocationObjectFromHref(
                 getHomePagePath({activeTab: homePageTab}),
             ).pathname;
-            return <Redirect to={path} />;
+            return <Redirect to={{pathname: path, search: location.search, hash: location.hash}} />;
         }
 
         return (

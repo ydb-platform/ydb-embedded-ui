@@ -144,6 +144,18 @@ test('restores the search from the URL', async ({page}) => {
     await expect(list.getByRole('link', {name: 'available', exact: true})).toHaveCount(0);
 });
 
+test('keeps the search when redirecting from the root to the clusters list', async ({page}) => {
+    await openClusters(page, clusters, '', {search: 'explicitly'});
+    const list = page.locator('.ydb-clusters');
+
+    await expect(page).toHaveURL(/\/home\/clusters\?(.*&)?search=explicitly(&|$)/);
+    await expect(list.getByPlaceholder('Cluster name, version, domain, host...')).toHaveValue(
+        'explicitly',
+    );
+    await expect(list.getByRole('link', {name: 'explicitly-available', exact: true})).toBeVisible();
+    await expect(list.getByRole('link', {name: 'available', exact: true})).toHaveCount(0);
+});
+
 test('does not activate or change the selected row from an unavailable label', async ({page}) => {
     await openClusters(page);
     await toggleAvailability(page, 'Unavailable');

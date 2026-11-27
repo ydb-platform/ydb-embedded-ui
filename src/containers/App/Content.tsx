@@ -10,7 +10,12 @@ import {LoaderWrapper} from '../../components/LoaderWrapper/LoaderWrapper';
 import {useSlots} from '../../components/slots';
 import type {SlotMap} from '../../components/slots/SlotMap';
 import type {SlotComponent} from '../../components/slots/types';
-import routes, {CLUSTER, getClusterPath} from '../../routes';
+import routes, {
+    CLUSTER,
+    getClusterPath,
+    getHomePagePath,
+    getLocationObjectFromHref,
+} from '../../routes';
 import type {RootState} from '../../store';
 import {
     useAllCapabilitiesLoaded,
@@ -161,8 +166,14 @@ export function Content(props: ContentProps) {
     const additionalRoutes = slots.get(RoutesSlot);
 
     const redirect = slots.get(RedirectSlot);
+    // Keep query params and hash, so links like `/?search=foo` survive the redirect to home page
+    const homePageRedirect = {
+        pathname: getLocationObjectFromHref(getHomePagePath()).pathname,
+        search: currentLocation.search,
+        hash: currentLocation.hash,
+    };
     const redirectProps: RedirectProps =
-        redirect?.props ?? (singleClusterMode ? {to: getClusterPath()} : {to: routes.homePage});
+        redirect?.props ?? (singleClusterMode ? {to: getClusterPath()} : {to: homePageRedirect});
 
     return (
         <Switch>
