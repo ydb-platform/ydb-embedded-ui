@@ -543,7 +543,7 @@ test('My databases filters by cluster without cloud IDs or Control Plane', async
             );
         }
     });
-    await page.goto(databasesUrl + '&resolveCloudNames&cloudId=obsolete&groupBy=allocated');
+    await page.goto(databasesUrl + '&resolveCloudNames&cloudId=obsolete&groupBy=cpu');
     const first = page.getByRole('link', {name: 'first', exact: true});
     const second = page.getByRole('link', {name: 'second', exact: true});
     await expect(first).toBeVisible();
@@ -766,7 +766,7 @@ test('My databases displays allocations from cluster presets and groups by CPU a
         'Memory used / Allocated memory',
     ]);
     await page.getByRole('option', {name: 'CPU used / Allocated CPU'}).click();
-    await expect(page).toHaveURL(/[?&]groupBy=allocated(?:&|$)/);
+    await expect(page).toHaveURL(/[?&]groupBy=cpu(?:&|$)/);
     await expect(page.getByRole('button', {name: /Insufficient data/})).toBeVisible();
     await page.getByRole('button', {name: /<50%/}).click();
     await expect(provisioned).toBeVisible();

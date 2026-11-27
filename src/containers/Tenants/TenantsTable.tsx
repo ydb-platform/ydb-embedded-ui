@@ -4,7 +4,7 @@ import {CirclePlus} from '@gravity-ui/icons';
 import type {Column, SortOrder} from '@gravity-ui/react-data-table';
 import DataTable from '@gravity-ui/react-data-table';
 import type {LabelProps} from '@gravity-ui/uikit';
-import {Button, Flex, Icon, Label, Select} from '@gravity-ui/uikit';
+import {Button, Flex, Icon, Label} from '@gravity-ui/uikit';
 import {useHistory} from 'react-router-dom';
 
 import {EntitiesCount} from '../../components/EntitiesCount';
@@ -48,50 +48,30 @@ import {isNumeric, parseOptionalNonNegativeNumber} from '../../utils/utils';
 import {TableGroup} from '../Storage/TableGroup/TableGroup';
 import {useExpandedGroups} from '../Storage/TableGroup/useExpandedTableGroups';
 
-import {CloudFilter} from './CloudFilter';
-import {ClusterFilter} from './ClusterFilter';
 import type {DatabaseStatusClickHandler} from './DatabaseDrawerHealthcheck';
 import {DatabaseDrawerHealthcheck} from './DatabaseDrawerHealthcheck';
 import {DatabaseRowsTable} from './DatabaseRowsTable';
-import {
-    ResourceGroupFilter,
-    getResourceGroupingOptions,
-    resourceGroupTitle,
-} from './ResourceGroupFilter';
+import {resourceGroupTitle} from './ResourceGroupFilter';
 import {getDatabaseBridgeColumns} from './bridgeColumns';
-import {databaseCloudId} from './clouds';
 import {
     DATABASES_COLUMNS_IDS,
     DATABASES_COLUMNS_TITLES,
     DATABASES_DEFAULT_COLUMNS,
     DATABASES_REQUIRED_COLUMNS,
     DATABASES_TABLE_SETTINGS_KEYS,
+    MY_DATABASES_DEFAULT_COLUMNS,
     MY_DATABASES_TABLE_SETTINGS_KEYS,
-    MY_DATABASE_TYPES,
-    SHOW_MY_DATABASES_STORAGE_COLUMNS,
 } from './constants';
+import {renderOptionalNumber} from './formatters';
 import i18n from './i18n';
-import {
-    getAllocatedComputeColumns,
-    getStorageQuotaColumns,
-    groupResourceColumns,
-} from './resourceColumns';
-import {allocatedResources, groupByResourceUsage} from './resourceUsage';
-import {useDatabasePresets} from './useDatabasePresets';
+import {getMyDatabasesColumns, groupResourceColumns} from './resourceColumns';
+import type {DatabaseRow} from './types';
+import {isMyDatabase, useMyDatabasesView} from './useMyDatabasesView';
 import {useTenantsQueryParams} from './useTenantsQueryParams';
 
 import './Tenants.scss';
 
 const b = cn('tenants');
-
-const databaseTypeOptions = MY_DATABASE_TYPES.map((type) => ({value: type, content: type}));
-
-const MY_DATABASES_DEFAULT_COLUMNS = DATABASES_DEFAULT_COLUMNS.filter(
-    (id) =>
-        id !== DATABASES_COLUMNS_IDS.Storage &&
-        id !== DATABASES_COLUMNS_IDS.NodesCount &&
-        id !== DATABASES_COLUMNS_IDS.GroupsCount,
-);
 
 function formatDatabaseState(state?: State): string {
     if (!state) {
@@ -108,12 +88,6 @@ function formatDatabaseState(state?: State): string {
             // For other states, use capitalized version (first letter uppercase, rest lowercase)
             return state.charAt(0).toUpperCase() + state.slice(1).toLowerCase();
     }
-}
-
-/** Shows an explicitly reported zero, the placeholder is for missing values only */
-function renderOptionalNumber(value: unknown, format: (value: number) => React.ReactNode) {
-    const parsed = parseOptionalNonNegativeNumber(value);
-    return parsed === undefined ? EMPTY_DATA_PLACEHOLDER : format(parsed);
 }
 
 function databaseStateToLabelTheme(state?: State): LabelProps['theme'] {
@@ -176,87 +150,65 @@ function TenantsTableContent({
         {clusterName, environmentName, isMetaDatabasesAvailable},
         {pollingInterval: autoRefreshInterval},
     );
-    const queryParams = useTenantsQueryParams();
-    const {
-        search,
-        withProblems,
-        handleSearchChange,
-        handleWithProblemsChange,
-        databaseType,
-        clusters,
-        cloudIds,
-    } = queryParams;
+    const {search, withProblems, handleSearchChange, handleWithProblemsChange} =
+        useTenantsQueryParams();
+    const {domain: domainRoot, settings, isResolved: isClusterInfoResolved} = useClusterBaseInfo();
+    const useMetaProxySetting = settings?.use_meta_proxy;
+    const useDatabaseIdSetting = settings?.use_database_id;
 
+    // We should apply domain filter before other filters
+    // It is done to ensure proper entities count
+    // It should be 8/8 instead of 8/9 when no filters applied but show domain setting is off
     const tenants = React.useMemo(() => {
-        const rows = currentData ?? EMPTY_TENANTS;
-        if (myDatabases) {
-            return rows.filter(({Type}) => MY_DATABASE_TYPES.some((type) => type === Type));
-        }
-        return filterTenantsByDomain(rows, showDomainDatabase);
-    }, [currentData, myDatabases, showDomainDatabase]);
+        const rawTenants = currentData ?? EMPTY_TENANTS;
+        const pageTenants = myDatabases
+            ? rawTenants.filter(isMyDatabase)
+            : filterTenantsByDomain(rawTenants, showDomainDatabase);
 
-    const hasControlPlane = Boolean(
-        myDatabases &&
-            tenants.some((row) => row.ControlPlane && Object.keys(row.ControlPlane).length),
-    );
-    const availableCloudIds = React.useMemo(() => {
-        const ids = new Set<string>();
-        if (myDatabases) {
-            for (const row of tenants) {
-                const id = databaseCloudId(row);
-                if (id) {
-                    ids.add(id);
-                }
-            }
-        }
-        return Array.from(ids).sort();
-    }, [myDatabases, tenants]);
-    const hasCloudIds = availableCloudIds.length > 0;
-    const filteredTenants = React.useMemo(() => {
-        const byProblems = showWithProblemsFilter
-            ? filterTenantsByProblems(tenants, withProblems)
-            : tenants;
-        const bySearch = filterTenantsBySearch(byProblems, search);
-        if (!myDatabases) {
-            return bySearch;
-        }
-        const selectedClusters = new Set(clusters);
-        const selectedClouds = new Set(hasCloudIds ? cloudIds : []);
-        return bySearch.filter(
-            (row) =>
-                (!databaseType || row.Type === databaseType) &&
-                (!selectedClusters.size || selectedClusters.has(row.Cluster ?? '')) &&
-                (!selectedClouds.size || selectedClouds.has(databaseCloudId(row) ?? '')),
+        return pageTenants.map(
+            (tenant): DatabaseRow => ({
+                ...tenant,
+                link: getTenantLink({
+                    tenant,
+                    additionalTenantsProps,
+                    externalLink: Boolean(environmentName),
+                    useDatabaseId: uiFactory.useDatabaseId,
+                    isMetaDatabasesAvailable,
+                    settings: {
+                        use_meta_proxy: useMetaProxySetting,
+                        use_database_id: useDatabaseIdSetting,
+                    },
+                }),
+            }),
         );
     }, [
-        tenants,
-        withProblems,
-        search,
-        showWithProblemsFilter,
+        currentData,
         myDatabases,
-        databaseType,
-        clusters,
-        cloudIds,
-        hasCloudIds,
+        showDomainDatabase,
+        additionalTenantsProps,
+        environmentName,
+        isMetaDatabasesAvailable,
+        useMetaProxySetting,
+        useDatabaseIdSetting,
     ]);
 
-    const resourceRows = hasControlPlane ? filteredTenants : EMPTY_TENANTS;
-    const {catalogs, loading: loadingPresets} = useDatabasePresets(resourceRows, environmentName);
-    const allocations = React.useMemo(
-        () => new Map(resourceRows.map((row) => [row, allocatedResources(row, catalogs)])),
-        [resourceRows, catalogs],
-    );
-    const groupingOptions = React.useMemo(
-        () => (hasControlPlane ? getResourceGroupingOptions() : []),
-        [hasControlPlane],
-    );
-    const mode = groupingOptions.find(({value}) => value === queryParams.groupBy)?.value;
-    const groups = React.useMemo(
-        () => mode && groupByResourceUsage(filteredTenants, mode, allocations),
-        [filteredTenants, mode, allocations],
-    );
+    const searchedTenants = React.useMemo(() => {
+        const filteredByProblems = showWithProblemsFilter
+            ? filterTenantsByProblems(tenants, withProblems)
+            : tenants;
+
+        return filterTenantsBySearch(filteredByProblems, search);
+    }, [tenants, withProblems, search, showWithProblemsFilter]);
+
+    const myDatabasesView = useMyDatabasesView({
+        enabled: Boolean(myDatabases),
+        tenants,
+        rows: searchedTenants,
+        environmentName,
+    });
+    const {rows: filteredTenants, groups, hasControlPlane} = myDatabasesView;
+
     const hasData = currentData !== undefined;
-    const pending = isFetching && !hasData;
     const SuccessImage = getIllustration('SuccessOperation');
     const history = useHistory();
     const [sortParams, setSortParams] = React.useState<SortOrder | SortOrder[] | undefined>();
@@ -264,41 +216,10 @@ function TenantsTableContent({
     const bridgeModeEnabled = useBridgeModeEnabled();
     const tenantInfoHasBridgeFields = useViewerTenantInfoHasBridgeFields();
     const bridgeColumnsAvailable = bridgeModeEnabled && tenantInfoHasBridgeFields;
-    const {domain: domainRoot, settings, isResolved: isClusterInfoResolved} = useClusterBaseInfo();
-    const loading = pending || !isClusterInfoResolved;
-    const useMetaProxySetting = settings?.use_meta_proxy;
-    const useDatabaseIdSetting = settings?.use_database_id;
-    const tenantLinks = React.useMemo(
-        () =>
-            new Map(
-                tenants.map((tenant) => [
-                    tenant,
-                    getTenantLink({
-                        tenant,
-                        additionalTenantsProps,
-                        externalLink: Boolean(environmentName),
-                        useDatabaseId: uiFactory.useDatabaseId,
-                        isMetaDatabasesAvailable,
-                        settings: {
-                            use_meta_proxy: useMetaProxySetting,
-                            use_database_id: useDatabaseIdSetting,
-                        },
-                    }),
-                ]),
-            ),
-        [
-            tenants,
-            additionalTenantsProps,
-            environmentName,
-            isMetaDatabasesAvailable,
-            useMetaProxySetting,
-            useDatabaseIdSetting,
-        ],
-    );
+    const loading = (isFetching && !hasData) || !isClusterInfoResolved;
 
     const openTenant = React.useCallback(
-        (tenant: PreparedTenant) => {
-            const link = tenantLinks.get(tenant);
+        ({link}: DatabaseRow) => {
             if (!isClusterInfoResolved || !link) {
                 return;
             }
@@ -309,7 +230,7 @@ function TenantsTableContent({
 
             history.push(link.href);
         },
-        [tenantLinks, history, isClusterInfoResolved],
+        [history, isClusterInfoResolved],
     );
 
     const renderCreateDBButton = () => {
@@ -341,44 +262,10 @@ function TenantsTableContent({
                     placeholder={i18n('controls_search-placeholder')}
                     className={b('search')}
                 />
-                {myDatabases && (
-                    <Select
-                        label={`${i18n('column-type')}:`}
-                        aria-label={i18n('column-type')}
-                        placeholder={i18n('value_all')}
-                        width={200}
-                        hasClear
-                        options={databaseTypeOptions}
-                        value={databaseType ? [databaseType] : []}
-                        onUpdate={([value]) => queryParams.setDatabaseType(value)}
-                    />
-                )}
                 {showWithProblemsFilter ? (
                     <ProblemFilter value={withProblems} onChange={handleWithProblemsChange} />
                 ) : null}
-                {myDatabases && (
-                    <ClusterFilter
-                        rows={tenants}
-                        value={clusters}
-                        onChange={queryParams.setClusters}
-                    />
-                )}
-                {hasCloudIds && (
-                    <CloudFilter
-                        ids={availableCloudIds}
-                        environmentName={environmentName}
-                        value={cloudIds}
-                        onChange={queryParams.setCloudIds}
-                    />
-                )}
-                {hasControlPlane && (
-                    <ResourceGroupFilter
-                        options={groupingOptions}
-                        mode={mode}
-                        onChange={queryParams.setGroupBy}
-                        loading={loadingPresets}
-                    />
-                )}
+                {myDatabasesView.controls}
                 <EntitiesCount
                     total={tenants?.length}
                     current={filteredTenants?.length || 0}
@@ -401,8 +288,7 @@ function TenantsTableContent({
     );
 
     const tableColumns = React.useMemo(() => {
-        const compute = hasControlPlane ? getAllocatedComputeColumns(allocations) : undefined;
-        const columns: Column<PreparedTenant>[] = [
+        const columns: Column<DatabaseRow>[] = [
             {
                 name: DATABASES_COLUMNS_IDS.Name,
                 header: DATABASES_COLUMNS_TITLES[DATABASES_COLUMNS_IDS.Name],
@@ -412,7 +298,7 @@ function TenantsTableContent({
                         clusterName={clusterName}
                         additionalTenantsProps={additionalTenantsProps}
                         externalLink={Boolean(environmentName)}
-                        link={tenantLinks.get(row)}
+                        link={row.link}
                         onStatusClick={onStatusClick}
                     />
                 ),
@@ -427,7 +313,7 @@ function TenantsTableContent({
                 width: 200,
                 resizeMinWidth: 150,
                 render: ({row}) => {
-                    if (myDatabases || row.Type !== 'Serverless') {
+                    if (row.Type !== 'Serverless') {
                         return row.Type;
                     }
 
@@ -477,7 +363,6 @@ function TenantsTableContent({
                 align: DataTable.RIGHT,
                 defaultOrder: DataTable.DESCENDING,
             },
-            ...(compute ? [compute.cpu] : []),
             {
                 name: DATABASES_COLUMNS_IDS.Memory,
                 header: (
@@ -493,16 +378,7 @@ function TenantsTableContent({
                 align: DataTable.RIGHT,
                 defaultOrder: DataTable.DESCENDING,
             },
-        ];
-        if (compute) {
-            columns.push(compute.memory);
-        }
-        if (myDatabases && SHOW_MY_DATABASES_STORAGE_COLUMNS) {
-            columns.push(...getStorageQuotaColumns());
-        }
-
-        if (!myDatabases || SHOW_MY_DATABASES_STORAGE_COLUMNS) {
-            columns.push({
+            {
                 name: DATABASES_COLUMNS_IDS.Storage,
                 header: (
                     <TitleWithHelpMark
@@ -514,12 +390,12 @@ function TenantsTableContent({
                 sortAccessor: (row) => parseOptionalNonNegativeNumber(row.StorageAllocatedSize),
                 render: ({row}) =>
                     renderOptionalNumber(row.StorageAllocatedSize, (value) =>
-                        formatBytes({value, fixedDecimalPlaces: value < 1000 ? 0 : 2}),
+                        formatStorageValuesToGb(value),
                     ),
                 align: DataTable.RIGHT,
                 defaultOrder: DataTable.DESCENDING,
-            });
-        }
+            },
+        ];
 
         columns.push({
             name: DATABASES_COLUMNS_IDS.Network,
@@ -556,8 +432,8 @@ function TenantsTableContent({
             },
             {
                 name: DATABASES_COLUMNS_IDS.GroupsCount,
-                header: columnTitles[DATABASES_COLUMNS_IDS.GroupsCount],
-                width: myDatabases ? 150 : 100,
+                header: DATABASES_COLUMNS_TITLES[DATABASES_COLUMNS_IDS.GroupsCount],
+                width: 100,
                 sortAccessor: (row) => parseOptionalNonNegativeNumber(row.StorageGroups),
                 render: ({row}) => renderOptionalNumber(row.StorageGroups, formatNumber),
                 align: DataTable.RIGHT,
@@ -579,12 +455,12 @@ function TenantsTableContent({
             });
         }
 
-        return columns;
+        return myDatabases
+            ? getMyDatabasesColumns(columns, {withAllocatedResources: hasControlPlane})
+            : columns;
     }, [
-        hasControlPlane,
         myDatabases,
-        allocations,
-        columnTitles,
+        hasControlPlane,
         bridgeColumnsAvailable,
         clusterName,
         additionalTenantsProps,
@@ -592,7 +468,6 @@ function TenantsTableContent({
         handleSearchChange,
         onStatusClick,
         showPoolsColumn,
-        tenantLinks,
     ]);
 
     const tableKeys = myDatabases
@@ -616,11 +491,10 @@ function TenantsTableContent({
 
     const {expandedGroups, setIsGroupExpanded} = useExpandedGroups(groups);
 
-    const renderRows = (rows: PreparedTenant[]) => {
+    const renderRows = (rows: DatabaseRow[]) => {
         return (
             <div>
                 <DatabaseRowsTable
-                    allocations={allocations}
                     onKeyboardActivate={openTenant}
                     getKeyboardRowKey={(tenant) =>
                         JSON.stringify([tenant.Cluster, tenant.Id ?? tenant.Name])
@@ -695,10 +569,7 @@ function TenantsTableContent({
                     withProblems,
                     showDomainDatabase,
                     showWithProblemsFilter,
-                    mode,
-                    databaseType,
-                    clusters,
-                    cloudIds,
+                    ...myDatabasesView.filters,
                 ])}
             >
                 <TableWithControlsLayout.Controls renderExtraControls={renderExtraControls}>
@@ -712,10 +583,7 @@ function TenantsTableContent({
                         search,
                         withProblems,
                         sortParams,
-                        mode,
-                        databaseType,
-                        clusters,
-                        cloudIds,
+                        ...myDatabasesView.filters,
                     ]}
                 >
                     <div>{hasData ? renderTable() : null}</div>

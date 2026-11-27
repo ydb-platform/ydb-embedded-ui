@@ -12,9 +12,11 @@ import {formatNumber, formatStorageValuesToGb} from '../../utils/dataFormatters/
 import {parseOptionalNonNegativeNumber} from '../../utils/utils';
 
 import {SHOW_MY_DATABASES_STORAGE_COLUMNS, DATABASES_COLUMNS_IDS as ids} from './constants';
+import {renderOptionalNumber} from './formatters';
 import i18n from './i18n';
-import type {AllocatedResources, StorageQuota} from './resourceUsage';
+import type {StorageQuota} from './resourceUsage';
 import {databaseStorageQuotas} from './resourceUsage';
+import type {DatabaseRow} from './types';
 
 const resourceGroups = [
     {
@@ -29,9 +31,10 @@ const resourceGroups = [
     },
 ] as const;
 
-type DatabaseColumnSetting = TableColumnSetupItem & {column: Column<PreparedTenant>};
+type DatabaseColumn = Column<DatabaseRow>;
+type DatabaseColumnSetting = TableColumnSetupItem & {column: DatabaseColumn};
 
-export function isResourceGroup(column: Column<PreparedTenant>) {
+export function isResourceGroup(column: DatabaseColumn) {
     return resourceGroups.some(({name}) => name === column.name);
 }
 
@@ -55,21 +58,24 @@ export function groupResourceColumns(items: DatabaseColumnSetting[]) {
     return {columns: [...columns, ...visible(after)], items: [...orderedItems, ...after]};
 }
 
-function formatCores(value?: number) {
-    return typeof value === 'number' && Number.isFinite(value) && value >= 0
-        ? formatNumber(value)
-        : EMPTY_DATA_PLACEHOLDER;
+function formatMemory(bytes: number) {
+    return formatStorageValuesToGb(bytes);
 }
 
-function formatMemory(bytes?: number) {
-    return bytes === undefined ? EMPTY_DATA_PLACEHOLDER : formatStorageValuesToGb(bytes);
+function formatStorageSize(value: number) {
+    return formatBytes({value, fixedDecimalPlaces: value < 1000 ? 0 : 2});
 }
 
-function formatStorageSize(value?: number) {
-    return value === undefined
-        ? EMPTY_DATA_PLACEHOLDER
-        : formatBytes({value, fixedDecimalPlaces: value < 1000 ? 0 : 2});
-}
+const TOTALS_ROW: PreparedTenant = {
+    sharedTenantName: undefined,
+    sharedNodeIds: undefined,
+    controlPlaneName: '',
+    cpu: undefined,
+    memory: undefined,
+    storage: undefined,
+    nodesCount: 0,
+    groupsCount: 0,
+};
 
 function totalQuotaLimit(row: PreparedTenant) {
     const quotas = databaseStorageQuotas(row);
@@ -85,12 +91,10 @@ function totalQuotaLimit(row: PreparedTenant) {
     return limits.reduce((sum, limit) => sum + limit, 0);
 }
 
-export function getAllocatedResourceFooter(
-    rows: PreparedTenant[],
-    allocations: ReadonlyMap<PreparedTenant, AllocatedResources | undefined>,
-) {
+/** The footer row of a databases table: sums over the given rows by column name. */
+export function getTotalsRow(rows: readonly DatabaseRow[]): DatabaseRow {
     function total(
-        getValue: (row: PreparedTenant) => number | undefined,
+        getValue: (row: DatabaseRow) => number | undefined,
         format: (value: number) => React.ReactNode,
     ) {
         let sum = 0;
@@ -118,20 +122,20 @@ export function getAllocatedResourceFooter(
         return format(sum);
     }
 
-    const cells = new Map<string, React.ReactNode>([
-        [ids.Name, i18n('label_total')],
-        [ids.AllocatedCPU, total((row) => allocations.get(row)?.cores, formatCores)],
-        [ids.AllocatedMemory, total((row) => allocations.get(row)?.memoryBytes, formatMemory)],
-        [ids.NodesCount, total((row) => row.NodeIds?.length, formatNumber)],
-        [
-            ids.GroupsCount,
-            total((row) => parseOptionalNonNegativeNumber(row.StorageGroups), formatNumber),
-        ],
-    ]);
+    const totals: DatabaseRow['totals'] = {
+        [ids.Name]: i18n('label_total'),
+        [ids.AllocatedCPU]: total((row) => row.allocated?.cores, formatNumber),
+        [ids.AllocatedMemory]: total((row) => row.allocated?.memoryBytes, formatMemory),
+        [ids.NodesCount]: total((row) => row.NodeIds?.length, formatNumber),
+        [ids.GroupsCount]: total(
+            (row) => parseOptionalNonNegativeNumber(row.StorageGroups),
+            formatNumber,
+        ),
+    };
     if (SHOW_MY_DATABASES_STORAGE_COLUMNS) {
-        cells.set(ids.StorageQuotaLimit, total(totalQuotaLimit, formatStorageSize));
+        totals[ids.StorageQuotaLimit] = total(totalQuotaLimit, formatStorageSize);
     }
-    return cells;
+    return {...TOTALS_ROW, totals};
 }
 
 function renderQuotaCell(quotas: StorageQuota[], field: 'used' | 'limit') {
@@ -145,7 +149,7 @@ function renderQuotaCell(quotas: StorageQuota[], field: 'used' | 'limit') {
                 const amount =
                     field === 'limit' && value === 0
                         ? i18n('value_no-limit')
-                        : formatStorageSize(value);
+                        : renderOptionalNumber(value, formatStorageSize);
                 const scope =
                     quota.pool ?? (quotas.length > 1 ? i18n('label_database-quota') : undefined);
                 const text = scope ? `${scope} · ${amount}` : amount;
@@ -166,46 +170,39 @@ function renderQuotaCell(quotas: StorageQuota[], field: 'used' | 'limit') {
     );
 }
 
-interface AllocatedComputeColumns {
-    cpu: Column<PreparedTenant>;
-    memory: Column<PreparedTenant>;
-}
-
-export function getAllocatedComputeColumns(
-    allocations: ReadonlyMap<PreparedTenant, AllocatedResources | undefined>,
-): AllocatedComputeColumns {
-    return {
-        cpu: {
+function getAllocatedComputeColumns(): DatabaseColumn[] {
+    return [
+        {
             name: ids.AllocatedCPU,
             header: (
                 <TitleWithHelpMark
-                    header={i18n('column_cpu')}
-                    note={i18n('description_allocated')}
+                    header={i18n('field_allocated-cpu-short')}
+                    note={i18n('context_allocated-cpu')}
                 />
             ),
             align: 'right',
             width: 104,
-            sortAccessor: (row) => allocations.get(row)?.cores,
-            render: ({row}) => formatCores(allocations.get(row)?.cores),
+            sortAccessor: (row) => row.allocated?.cores,
+            render: ({row}) => renderOptionalNumber(row.allocated?.cores, formatNumber),
         },
-        memory: {
+        {
             name: ids.AllocatedMemory,
             header: (
                 <TitleWithHelpMark
-                    header={i18n('column_memory')}
-                    note={i18n('description_memory-allocated')}
+                    header={i18n('field_allocated-memory-short')}
+                    note={i18n('context_allocated-memory')}
                 />
             ),
             align: 'right',
             width: 128,
-            sortAccessor: (row) => allocations.get(row)?.memoryBytes,
-            render: ({row}) => formatMemory(allocations.get(row)?.memoryBytes),
+            sortAccessor: (row) => row.allocated?.memoryBytes,
+            render: ({row}) => renderOptionalNumber(row.allocated?.memoryBytes, formatMemory),
         },
-    };
+    ];
 }
 
-export function getStorageQuotaColumns() {
-    return (['used', 'limit'] as const).map((field): Column<PreparedTenant> => {
+function getStorageQuotaColumns() {
+    return (['used', 'limit'] as const).map((field): DatabaseColumn => {
         const title = i18n(field === 'used' ? 'column_quota-used' : 'column_quota-limit');
         const note = i18n(field === 'used' ? 'description_quota-used' : 'description_quota-limit');
         return {
@@ -222,4 +219,51 @@ export function getStorageQuotaColumns() {
             render: ({row}) => renderQuotaCell(databaseStorageQuotas(row), field),
         };
     });
+}
+
+/** Renders the footer cell from the totals row instead of the column's own cell. */
+function withTotalsFooter(column: DatabaseColumn): DatabaseColumn {
+    const {render} = column;
+    if (!render) {
+        return column;
+    }
+    return {
+        ...column,
+        render: (cell) => (cell.footer ? cell.row.totals?.[column.name] : render(cell)),
+    };
+}
+
+/** Turns the columns of the cluster databases table into the columns of My databases. */
+export function getMyDatabasesColumns(
+    columns: DatabaseColumn[],
+    {withAllocatedResources}: {withAllocatedResources: boolean},
+) {
+    const result: DatabaseColumn[] = [];
+    for (const column of columns) {
+        switch (column.name) {
+            case ids.Type:
+                result.push({...column, render: ({row}) => row.Type});
+                break;
+            case ids.Memory:
+                result.push(column);
+                if (SHOW_MY_DATABASES_STORAGE_COLUMNS) {
+                    result.push(...getStorageQuotaColumns());
+                }
+                break;
+            case ids.Storage:
+                if (SHOW_MY_DATABASES_STORAGE_COLUMNS) {
+                    result.push(column);
+                }
+                break;
+            case ids.GroupsCount:
+                result.push({...column, header: i18n('column_storage-groups'), width: 150});
+                break;
+            default:
+                result.push(column);
+        }
+    }
+    if (withAllocatedResources) {
+        result.push(...getAllocatedComputeColumns());
+    }
+    return result.map(withTotalsFooter);
 }

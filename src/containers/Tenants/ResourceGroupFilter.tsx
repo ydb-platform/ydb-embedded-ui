@@ -1,6 +1,7 @@
 import {Flex, Select, Spin, Text} from '@gravity-ui/uikit';
 
 import i18n from './i18n';
+import {RESOURCE_GROUPINGS} from './resourceUsage';
 import type {ResourceGrouping} from './resourceUsage';
 
 export function resourceGroupTitle(lower?: number, upper?: number) {
@@ -13,27 +14,20 @@ export function resourceGroupTitle(lower?: number, upper?: number) {
     return lower === 0 ? i18n('group_below', {upper}) : i18n('group_range', {lower, upper});
 }
 
-type GroupingOption = {value: ResourceGrouping; content: string};
-
-export function getResourceGroupingOptions(): GroupingOption[] {
-    return [
-        {value: 'allocated', content: i18n('group-by_allocated')},
-        {value: 'memory-allocated', content: i18n('group-by_memory-allocated')},
-    ];
-}
-
 export function ResourceGroupFilter({
     mode,
-    options,
     onChange,
     loading,
 }: {
     mode?: ResourceGrouping;
-    options: GroupingOption[];
-    onChange: (mode?: string) => void;
+    onChange: (mode?: ResourceGrouping) => void;
     loading: boolean;
 }) {
     const label = i18n('label_group-by');
+    const options = RESOURCE_GROUPINGS.map((value) => ({
+        value,
+        content: i18n(`value_group-by-${value}`),
+    }));
     return (
         <Flex alignItems="center" gap={2}>
             <Text variant="body-2">{label}</Text>
@@ -43,7 +37,7 @@ export function ResourceGroupFilter({
                 placeholder="–"
                 width={280}
                 value={mode ? [mode] : []}
-                onUpdate={([value]) => onChange(value || undefined)}
+                onUpdate={([value]) => onChange(RESOURCE_GROUPINGS.find((item) => item === value))}
                 options={options}
             />
             {loading && <Spin size="xs" aria-label={i18n('label_loading-presets')} />}

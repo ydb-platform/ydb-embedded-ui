@@ -33,10 +33,9 @@ const allocation = {cores: 640, memoryBytes: 3435973836800};
 
 test('groups CPU usage using the allocation from the cluster catalog', () => {
     expect(allocatedResources(dedicated, catalogs)).toEqual(allocation);
-    const row = {...dedicated, CoresUsed: 300};
-    const allocations = new Map([[row, allocation]]);
-    expect(groupByResourceUsage([row], 'allocated', allocations)[0]).toEqual({
-        name: 'usage-allocated-0',
+    const row = {...dedicated, CoresUsed: 300, allocated: allocation};
+    expect(groupByResourceUsage([row], 'cpu')[0]).toEqual({
+        name: 'usage-cpu-0',
         lower: 0,
         upper: 50,
         rows: [row],
@@ -59,25 +58,24 @@ test('sorts by unrounded usage and keeps unknown values separate from zero', () 
         undefined,
         Infinity,
         -1,
-    ].map((CoresUsed) => database({CoresUsed}));
-    const zeroCapacity = database({CoresUsed: 2});
-    const allocations = new Map(rows.map((row) => [row, {cores: 100}]));
-    allocations.set(zeroCapacity, {cores: 0});
-    const groups = groupByResourceUsage([...rows, zeroCapacity], 'allocated', allocations);
+    ].map((CoresUsed) => ({...database({CoresUsed}), allocated: {cores: 100}}));
+    const zeroCapacity = {...database({CoresUsed: 2}), allocated: {cores: 0}};
+    const groups = groupByResourceUsage([...rows, zeroCapacity], 'cpu');
     expect(groups).toEqual([
-        {name: 'usage-allocated-100', lower: 100, upper: undefined, rows: rows.slice(8, 10)},
-        {name: 'usage-allocated-90', lower: 90, upper: 100, rows: rows.slice(6, 8)},
-        {name: 'usage-allocated-75', lower: 75, upper: 90, rows: rows.slice(4, 6)},
-        {name: 'usage-allocated-50', lower: 50, upper: 75, rows: rows.slice(2, 4)},
-        {name: 'usage-allocated-0', lower: 0, upper: 50, rows: rows.slice(0, 2)},
+        {name: 'usage-cpu-100', lower: 100, upper: undefined, rows: rows.slice(8, 10)},
+        {name: 'usage-cpu-90', lower: 90, upper: 100, rows: rows.slice(6, 8)},
+        {name: 'usage-cpu-75', lower: 75, upper: 90, rows: rows.slice(4, 6)},
+        {name: 'usage-cpu-50', lower: 50, upper: 75, rows: rows.slice(2, 4)},
+        {name: 'usage-cpu-0', lower: 0, upper: 50, rows: rows.slice(0, 2)},
         {
-            name: 'usage-allocated-unknown',
+            name: 'usage-cpu-unknown',
             lower: undefined,
             rows: [...rows.slice(10), zeroCapacity],
         },
     ]);
-    expect(groupByResourceUsage(rows, 'allocated', new Map())).toEqual([
-        {name: 'usage-allocated-unknown', lower: undefined, rows},
+    const withoutAllocation = rows.map((row) => database({CoresUsed: row.CoresUsed}));
+    expect(groupByResourceUsage(withoutAllocation, 'cpu')).toEqual([
+        {name: 'usage-cpu-unknown', lower: undefined, rows: withoutAllocation},
     ]);
 });
 
@@ -127,21 +125,21 @@ test('requests a catalog only for a tenant with its own fixed compute size and p
 
 test('compares memory in bytes with the selected capacity, independently of CPU', () => {
     const row = {...dedicated, MemoryUsed: '1072505360384', MemoryLimit: '1200000000000'};
-    const allocations = new Map([[row, allocatedResources(row, catalogs)]]);
-    expect(groupByResourceUsage([row], 'memory-allocated', allocations)[0].lower).toBe(0);
+    const allocated = allocatedResources(row, catalogs);
+    expect(groupByResourceUsage([{...row, allocated}], 'memory')[0].lower).toBe(0);
 });
 
 test('keeps missing memory and missing limits out of the zero-usage bucket', () => {
-    const idle = database({MemoryUsed: '0'});
-    const missing = database({});
-    const invalid = database({MemoryUsed: ''});
+    const allocated = {memoryBytes: 100};
+    const idle = {...database({MemoryUsed: '0'}), allocated};
+    const missing = {...database({}), allocated};
+    const invalid = {...database({MemoryUsed: ''}), allocated};
     const noAllocation = database({MemoryUsed: '40'});
     const rows = [idle, missing, invalid, noAllocation];
-    const allocations = new Map([idle, missing, invalid].map((row) => [row, {memoryBytes: 100}]));
-    expect(groupByResourceUsage(rows, 'memory-allocated', allocations)).toEqual([
-        {name: 'usage-memory-allocated-0', lower: 0, upper: 50, rows: [idle]},
+    expect(groupByResourceUsage(rows, 'memory')).toEqual([
+        {name: 'usage-memory-0', lower: 0, upper: 50, rows: [idle]},
         {
-            name: 'usage-memory-allocated-unknown',
+            name: 'usage-memory-unknown',
             lower: undefined,
             rows: [missing, invalid, noAllocation],
         },

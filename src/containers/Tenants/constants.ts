@@ -57,6 +57,13 @@ export const DATABASES_DEFAULT_COLUMNS: DatabasesColumnId[] = [
     DATABASES_COLUMNS_IDS.GroupsCount,
     DATABASES_COLUMNS_IDS.PoolStats,
 ];
+export const MY_DATABASES_DEFAULT_COLUMNS = DATABASES_DEFAULT_COLUMNS.filter(
+    (id) =>
+        id !== DATABASES_COLUMNS_IDS.Storage &&
+        id !== DATABASES_COLUMNS_IDS.NodesCount &&
+        id !== DATABASES_COLUMNS_IDS.GroupsCount,
+);
+
 export const DATABASES_REQUIRED_COLUMNS: DatabasesColumnId[] = [DATABASES_COLUMNS_IDS.Name];
 
 export const DATABASES_COLUMNS_TITLES = {
@@ -79,13 +86,13 @@ export const DATABASES_COLUMNS_TITLES = {
         return i18n('column-cpu');
     },
     get [DATABASES_COLUMNS_IDS.AllocatedCPU]() {
-        return i18n('column_allocated');
+        return i18n('field_allocated-cpu');
     },
     get [DATABASES_COLUMNS_IDS.Memory]() {
         return i18n('column-memory');
     },
     get [DATABASES_COLUMNS_IDS.AllocatedMemory]() {
-        return i18n('column_memory-allocated');
+        return i18n('field_allocated-memory');
     },
     get [DATABASES_COLUMNS_IDS.Storage]() {
         return i18n('column-storage');

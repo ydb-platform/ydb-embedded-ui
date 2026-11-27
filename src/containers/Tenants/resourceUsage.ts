@@ -2,19 +2,18 @@ import type {PreparedTenant} from '../../store/reducers/tenants/types';
 import type {ResourcePreset} from '../../types/api/resourcePresets';
 import type {DatabaseComputeConfig} from '../../types/api/tenant';
 
-export type ResourceGrouping = 'allocated' | 'memory-allocated';
+import type {AllocatedResources, DatabaseRow} from './types';
 
-interface ResourceUsageGroup {
+export const RESOURCE_GROUPINGS = ['cpu', 'memory'] as const;
+export type ResourceGrouping = (typeof RESOURCE_GROUPINGS)[number];
+
+export interface ResourceUsageGroup {
     name: string;
     lower?: number;
     upper?: number;
-    rows: PreparedTenant[];
+    rows: DatabaseRow[];
 }
 
-export interface AllocatedResources {
-    cores?: number;
-    memoryBytes?: number;
-}
 const USAGE_THRESHOLDS = [100, 90, 75, 50, 0];
 
 function fixedCompute(row: PreparedTenant) {
@@ -172,17 +171,15 @@ export function databaseStorageQuotas(row: PreparedTenant): StorageQuota[] {
 }
 
 export function groupByResourceUsage(
-    rows: readonly PreparedTenant[],
+    rows: readonly DatabaseRow[],
     mode: ResourceGrouping,
-    allocations: ReadonlyMap<PreparedTenant, AllocatedResources | undefined>,
 ): ResourceUsageGroup[] {
-    const groups = new Map<number | undefined, PreparedTenant[]>();
+    const groups = new Map<number | undefined, DatabaseRow[]>();
     for (const row of rows) {
-        const allocated = allocations.get(row);
         const ratio =
-            mode === 'allocated'
-                ? usageRatio(row.CoresUsed, allocated?.cores)
-                : usageRatio(parseBytes(row.MemoryUsed), allocated?.memoryBytes);
+            mode === 'cpu'
+                ? usageRatio(row.CoresUsed, row.allocated?.cores)
+                : usageRatio(parseBytes(row.MemoryUsed), row.allocated?.memoryBytes);
         const lower =
             ratio === undefined
                 ? undefined
