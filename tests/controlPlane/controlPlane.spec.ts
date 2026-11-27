@@ -818,15 +818,14 @@ test('My databases displays allocations from cluster presets and groups by CPU a
     await expect(groupBy).toContainText('Memory used / Allocated memory');
 });
 
-test('My databases asks for presets with the cloud of a database when it has one', async ({
-    page,
-}) => {
+test('My databases asks for the presets restricted to the cloud of a database', async ({page}) => {
     const twoSlots = {scale_policy: {fixed_scale: {size: 2}}};
     await mockDatabases(page, [
         {
-            Name: '/db/no-cloud',
+            Name: '/db/common',
             Type: 'Dedicated',
             Cluster: 'alpha',
+            UserAttributes: {cloud_id: 'cloud-0'},
             ControlPlane: {resource_preset_id: 'small', ...twoSlots},
         },
         {
@@ -854,15 +853,13 @@ test('My databases asks for presets with the cloud of a database when it has one
             .getByRole('row')
             .filter({has: page.getByRole('link', {name: database, exact: true})})
             .getByRole('cell', {name: cores, exact: true});
-    await expect(allocatedCores('no-cloud', '4')).toBeVisible();
+    await expect(allocatedCores('common', '4')).toBeVisible();
     await expect(allocatedCores('restricted', '16')).toBeVisible();
-    expect(requests).toHaveLength(2);
-    expect(requests).toEqual(
-        expect.arrayContaining([
-            {cluster_name: 'alpha'},
-            {cluster_name: 'alpha', cloud_id: 'cloud-1'},
-        ]),
-    );
+    // The cloud of a database with a common preset is not asked about
+    expect(requests).toEqual([
+        {cluster_name: 'alpha'},
+        {cluster_name: 'alpha', cloud_id: 'cloud-1'},
+    ]);
 });
 
 test('My databases hides allocated resources when meta cannot list resource presets', async ({

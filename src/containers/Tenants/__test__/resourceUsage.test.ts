@@ -154,7 +154,7 @@ test('requires a preset only for a tenant with its own fixed compute size and pr
     ).toBeUndefined();
 });
 
-test('reads the presets listed for the cloud of the database', () => {
+test('finds a preset restricted to the cloud of the database in the catalog of that cloud', () => {
     const restricted = {id: 'custom', cores: '4', memory: '4'};
     const cloudCatalogs = new Map([
         ['cluster-a', new Map([['common', preset]])],
@@ -174,8 +174,8 @@ test('reads the presets listed for the cloud of the database', () => {
     // The preset is not listed for another cloud or without one
     expect(allocatedResources(inCloud('cloud-2'), cloudCatalogs)).toBeUndefined();
     expect(allocatedResources(dedicated, cloudCatalogs)).toBeUndefined();
-    // A database in a cloud does not read the list of its cluster
-    expect(allocatedResources(inCloud('cloud-1'), catalogs)).toBeUndefined();
+    // A common preset needs no catalog of the cloud
+    expect(allocatedResources(inCloud('cloud-2'), catalogs)).toEqual(allocation);
 });
 
 test('compares memory in bytes with the selected capacity, independently of CPU', () => {
