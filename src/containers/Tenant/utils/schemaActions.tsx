@@ -75,7 +75,7 @@ import {
     showCreateTableTemplate,
     upsertQueryTemplate,
 } from './schemaQueryTemplates';
-import type {YdbNavigationTreeProps} from './types';
+import type {TreeNodeMeta, YdbNavigationTreeProps} from './types';
 
 import MoniumIcon from '../../../assets/icons/monium.svg';
 
@@ -102,6 +102,9 @@ interface ActionsAdditionalParams {
     schemaDataPath?: string;
     isSchemaDataLoading?: boolean;
     isSchemaDataError?: boolean;
+    documentTablePath?: string;
+    mayHaveDocumentTables?: boolean;
+    showDeleteDocumentTableDialog?: (path: string) => void;
     hasMonitoring?: boolean;
     isV2NavigationEnabled?: boolean;
     streamingQueryData?: IQueryResult;
@@ -121,10 +124,8 @@ interface BindActionParams {
 }
 
 function getSchemaDataForAction(
-    schemaData: SchemaData[] | undefined,
-    schemaDataPath: string | undefined,
+    {schemaData, schemaDataPath, isSchemaDataError}: ActionsAdditionalParams,
     actionPath: string,
-    isSchemaDataError: boolean,
 ) {
     if (isSchemaDataError || schemaDataPath !== actionPath) {
         return undefined;
@@ -153,12 +154,7 @@ const bindActions = (
         streamingQueryData,
         showCreateTableData,
     } = additionalEffects;
-    const schemaData = getSchemaDataForAction(
-        additionalEffects.schemaData,
-        additionalEffects.schemaDataPath,
-        params.path,
-        Boolean(additionalEffects.isSchemaDataError),
-    );
+    const schemaData = getSchemaDataForAction(additionalEffects, params.path);
 
     const inputQuery = (tmpl: TemplateFn, templateName?: string) => () => {
         const snippet = tmpl({
@@ -385,6 +381,32 @@ const getActionWithLoader = ({text, action, isLoading, disabled, iconStart}: Act
     iconStart,
 });
 
+function getCompactionActionState(
+    type: NavigationTreeNodeType,
+    path: string,
+    effects: ActionsAdditionalParams,
+) {
+    if (
+        type === 'table' &&
+        effects.mayHaveDocumentTables &&
+        !getSchemaDataForAction(effects, path)
+    ) {
+        return {
+            text: effects.isSchemaDataError
+                ? i18n('action_compaction-schema-unavailable')
+                : i18n('action_compaction'),
+            isLoading: effects.isCompactionLoading || effects.isSchemaDataLoading,
+            disabled: true,
+        };
+    }
+
+    return {
+        text: i18n('action_compaction'),
+        isLoading: effects.isCompactionLoading,
+        disabled: effects.hasRunningCompaction?.(path),
+    };
+}
+
 export const getActions =
     (
         dispatch: AppDispatch,
@@ -392,7 +414,7 @@ export const getActions =
         rootPath = '',
         database: string,
     ) =>
-    (path: string, type: NavigationTreeNodeType) => {
+    (path: string, type: NavigationTreeNodeType, meta?: TreeNodeMeta) => {
         const relativePath = transformPath(path, rootPath);
         const actions = bindActions(
             {
@@ -562,11 +584,9 @@ export const getActions =
             iconStart: <Code />,
         });
         const compactionItem = getActionWithLoader({
-            text: i18n('action_compaction'),
+            ...getCompactionActionState(type, path, additionalEffects),
             action: actions.openCompactionDialog,
             iconStart: <Icon data={GearPlay} />,
-            isLoading: additionalEffects.isCompactionLoading,
-            disabled: additionalEffects.hasRunningCompaction?.(path),
         });
 
         const updateTableItem = {
@@ -715,6 +735,19 @@ export const getActions =
         ];
 
         const JUST_COPY: ActionsSet = [copyItem];
+        const deleteDocumentTable = additionalEffects.showDeleteDocumentTableDialog;
+        const DOCUMENT_TABLE_SET: ActionsSet = deleteDocumentTable
+            ? [
+                  [copyItem],
+                  [
+                      {
+                          text: i18n('action_delete-document-table'),
+                          theme: 'danger',
+                          action: () => deleteDocumentTable(path),
+                      },
+                  ],
+              ]
+            : JUST_COPY;
 
         // verbose mapping to guarantee a correct actions set for new node types
         // TS will error when a new type is added in the lib but is not mapped here
@@ -732,7 +765,8 @@ export const getActions =
             resource_pool: JUST_COPY,
             secret: additionalEffects.schemaSecretsEnabled ? SECRET_SET : JUST_COPY,
 
-            table: ROW_TABLE_SET,
+            table:
+                additionalEffects.documentTablePath === path ? DOCUMENT_TABLE_SET : ROW_TABLE_SET,
             column_table: COLUMN_TABLE_SET,
             system_table: SYSTEM_VIEW_SET,
 
@@ -740,7 +774,7 @@ export const getActions =
             topic: TOPIC_SET,
             stream: JUST_COPY,
 
-            index: INDEX_SET,
+            index: meta?.parentIsDocumentTable ? JUST_COPY : INDEX_SET,
 
             external_table: EXTERNAL_TABLE_SET,
             external_data_source: EXTERNAL_DATA_SOURCE_SET,

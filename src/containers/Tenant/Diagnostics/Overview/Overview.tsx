@@ -4,18 +4,21 @@ import {ResponseError} from '../../../../components/Errors/ResponseError';
 import {TableIndexInfo} from '../../../../components/InfoViewer/schemaInfo';
 import {Loader} from '../../../../components/Loader';
 import {useClusterWithProxy} from '../../../../store/reducers/cluster/cluster';
-import {overviewApi} from '../../../../store/reducers/overview/overview';
+import {useGetOverviewQuery} from '../../../../store/reducers/overview/overview';
 import {EPathType} from '../../../../types/api/schema';
+import {uiFactory} from '../../../../uiFactory/uiFactory';
 import {cn} from '../../../../utils/cn';
 import {useAutoRefreshInterval} from '../../../../utils/hooks';
 import {ViewInfo} from '../../Info/View/View';
 import {isDomain} from '../../ObjectSummary/transformPath';
+import {isDocumentTable} from '../../utils';
 import {useNavigationV2Enabled} from '../../utils/useNavigationV2Enabled';
 
 import {AsyncReplicationInfo} from './AsyncReplicationInfo';
 import {ChangefeedInfo} from './ChangefeedInfo';
 import {DatabaseInfo} from './DatabaseInfo/DatabaseInfo';
 import {DefaultEntityInfo} from './DefaultEntityInfo';
+import {DocumentTableInfo} from './DocumentTableInfo/DocumentTableInfo';
 import {ResourcePoolInfo} from './ResourcePoolInfo';
 import {ResourcePoolUsage} from './ResourcePoolInfo/ResourcePoolUsage';
 import {SchemaObjectInfoContainer} from './SchemaObjectInfo/SchemaObjectInfoContainer';
@@ -39,17 +42,39 @@ function Overview({type, path, database, databaseFullPath}: OverviewProps) {
 
     const isV2Navigation = useNavigationV2Enabled();
 
-    const {currentData, isFetching, error} = overviewApi.useGetOverviewQuery(
+    const {currentData, isFetching, error} = useGetOverviewQuery(
         {path, database, databaseFullPath, useMetaProxy},
         {pollingInterval: autoRefreshInterval},
     );
 
+    const selectedPath = (currentData?.Path || path).replace(/\/+$/, '');
+    const supportsDocumentTables = Boolean(uiFactory.documentTables?.getSchema);
+    const lookupIndexParent = supportsDocumentTables && type === EPathType.EPathTypeTableIndex;
+    const parentPath = selectedPath.slice(0, selectedPath.lastIndexOf('/'));
+    const parent = useGetOverviewQuery(
+        {path: parentPath, database, databaseFullPath, useMetaProxy},
+        {skip: !lookupIndexParent},
+    );
     const isStreamingQuery = type === EPathType.EPathTypeStreamingQuery;
     const loading =
         isFetching && currentData === undefined && (!isStreamingQuery || error === undefined);
 
     const renderContent = () => {
         const data = currentData ?? undefined;
+        const tableDescription = parent.currentData?.PathDescription ?? data?.PathDescription;
+        if (data && supportsDocumentTables && isDocumentTable(tableDescription)) {
+            return (
+                <DocumentTableInfo
+                    data={data}
+                    path={selectedPath}
+                    indexParentPath={lookupIndexParent ? parentPath : undefined}
+                    database={database}
+                    databaseFullPath={databaseFullPath}
+                    pollingInterval={autoRefreshInterval}
+                />
+            );
+        }
+
         // verbose mapping to guarantee a correct render for new path types
         // TS will error when a new type is added but not mapped here
 
@@ -149,7 +174,7 @@ function Overview({type, path, database, databaseFullPath}: OverviewProps) {
         );
     };
 
-    if (loading) {
+    if (loading || (parent.isFetching && !parent.currentData)) {
         return <Loader size="m" />;
     }
 

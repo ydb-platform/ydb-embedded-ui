@@ -5,7 +5,7 @@ import type {Column, Settings} from '@gravity-ui/react-data-table';
 
 import type {ColumnType, KeyValueRow} from '../../types/api/query';
 import {cn} from '../../utils/cn';
-import {DEFAULT_TABLE_SETTINGS} from '../../utils/constants';
+import {DEFAULT_TABLE_SETTINGS, EMPTY_DATA_PLACEHOLDER} from '../../utils/constants';
 import {getColumnWidth} from '../../utils/getColumnWidth';
 import {getColumnType} from '../../utils/query';
 import {isNumeric} from '../../utils/utils';
@@ -56,19 +56,34 @@ const prepareTypedColumns = (columns: ColumnType[], data: KeyValueRow[] | undefi
     });
 };
 
-const prepareGenericColumns = (data: KeyValueRow[] | undefined) => {
+const prepareGenericColumns = (
+    data: KeyValueRow[] | undefined,
+    sparseRows = false,
+    declaredColumnNames: string[] = [],
+) => {
     if (!data?.length) {
         return [];
     }
 
     const dataSlice = data?.slice(0, WIDTH_PREDICTION_ROWS_COUNT);
 
-    return Object.keys(data[0]).map((name) => {
+    const names = sparseRows
+        ? [...new Set([...declaredColumnNames, ...data.flatMap(Object.keys)])].sort()
+        : Object.keys(data[0]);
+
+    return names.map((name) => {
         const column: Column<KeyValueRow> = {
-            name,
+            name: sparseRows ? `attribute-${name}` : name,
+            header: name,
+            accessor: name,
             width: getColumnWidth({data: dataSlice, name}),
             align: isNumeric(data[0][name]) ? DataTable.RIGHT : DataTable.LEFT,
-            render: ({row}) => <Cell value={String(row[name])} />,
+            render: ({value}) => {
+                if (sparseRows && (value ?? '') === '') {
+                    return EMPTY_DATA_PLACEHOLDER;
+                }
+                return <Cell value={String(value)} />;
+            },
         };
 
         return column;
@@ -84,15 +99,19 @@ interface QueryResultTableProps
     extends Omit<ResizeableDataTableProps<KeyValueRow>, 'data' | 'columns'> {
     data?: KeyValueRow[];
     columns?: ColumnType[];
+    sparseRows?: boolean;
+    declaredColumnNames?: string[];
     settings?: Partial<Settings>;
 }
 
 export const QueryResultTable = (props: QueryResultTableProps) => {
-    const {columns, data, settings: propsSettings} = props;
+    const {columns, data, sparseRows, declaredColumnNames, settings: propsSettings} = props;
 
     const preparedColumns = React.useMemo(() => {
-        return columns ? prepareTypedColumns(columns, data) : prepareGenericColumns(data);
-    }, [columns, data]);
+        return columns
+            ? prepareTypedColumns(columns, data)
+            : prepareGenericColumns(data, sparseRows, declaredColumnNames);
+    }, [columns, data, sparseRows, declaredColumnNames]);
 
     const settings = React.useMemo(() => {
         return {

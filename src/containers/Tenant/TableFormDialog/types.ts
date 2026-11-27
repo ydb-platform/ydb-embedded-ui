@@ -8,9 +8,17 @@ import type {
 } from '../../../store/reducers/table/types';
 import {PartitionsType} from '../../../store/reducers/table/types';
 import type {TEvDescribeSchemeResult} from '../../../types/api/schema/schema';
+import type {DocumentTableDefinition} from '../../../uiFactory/types';
 
 export type FormMode = 'create' | 'update';
-export type TableType = TableFormValues['type'];
+export interface DocumentFormValues {
+    type: 'document';
+    name: string;
+    document: DocumentTableDefinition;
+}
+
+export type DialogFormValues = TableFormValues | DocumentFormValues;
+export type TableType = DialogFormValues['type'];
 
 export type {
     Column,

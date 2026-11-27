@@ -5,6 +5,7 @@ import {YDBDefinitionList} from '../../../../../components/YDBDefinitionList/YDB
 import type {EPathType, TEvDescribeSchemeResult} from '../../../../../types/api/schema';
 import {cn} from '../../../../../utils/cn';
 import {useUserPermissions} from '../../../../../utils/hooks/useWhoami';
+import {getDocumentTableTypeLabel} from '../../../utils';
 
 import {prepareSchemaObjectInfoItems} from './prepareSchemaObjectInfo';
 
@@ -15,6 +16,7 @@ const b = cn('ydb-schema-object-info');
 export interface SchemaObjectInfoProps {
     data?: TEvDescribeSchemeResult;
     fallbackType?: EPathType;
+    typeLabel?: string;
     path: string;
     itemsAfterType?: YDBDefinitionListItem[];
     additionalItems?: YDBDefinitionListItem[];
@@ -24,6 +26,7 @@ export interface SchemaObjectInfoProps {
 export function SchemaObjectInfo({
     data,
     fallbackType,
+    typeLabel = getDocumentTableTypeLabel(data?.PathDescription),
     path,
     itemsAfterType,
     additionalItems,
@@ -35,6 +38,7 @@ export function SchemaObjectInfo({
             prepareSchemaObjectInfoItems({
                 data,
                 fallbackType,
+                typeLabel,
                 path,
                 itemsAfterType,
                 additionalItems,
@@ -46,6 +50,7 @@ export function SchemaObjectInfo({
             createdContent,
             data,
             fallbackType,
+            typeLabel,
             itemsAfterType,
             path,
             showAdministrativeFields,

@@ -1,4 +1,5 @@
 export const TABLE_FORM_DIALOG = 'table-form-dialog';
+export const DOCUMENT_ATTRIBUTE_TYPES = ['String', 'Number', 'Binary'] as const;
 
 export const ENTITY_NAME_REG_EXP = /^[a-zA-Z0-9._-]+$/;
 export const ENTITY_PATH_REG_EXP = /^[a-zA-Z0-9._-]+(\/[a-zA-Z0-9._-]+)*$/;

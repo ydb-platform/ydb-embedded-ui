@@ -8,6 +8,7 @@ export type DropdownItem = {
 
 export type TreeNodeMeta = {
     subType?: string;
+    parentIsDocumentTable?: boolean;
 };
 
 export type YdbNavigationTreeProps = NavigationTreeProps<DropdownItem, TreeNodeMeta | undefined>;

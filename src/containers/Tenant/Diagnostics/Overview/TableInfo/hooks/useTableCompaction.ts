@@ -46,10 +46,10 @@ export function useTableCompaction(
 
     // Automatically fetch all pages to get complete list of operations
     React.useEffect(() => {
-        if (hasNextPage && !isFetching) {
+        if (enabled && hasNextPage && !isFetching) {
             fetchNextPage();
         }
-    }, [hasNextPage, isFetching, fetchNextPage]);
+    }, [enabled, hasNextPage, isFetching, fetchNextPage]);
 
     const operations = React.useMemo(
         () => compactionData?.pages?.flatMap((page) => page.operations ?? []),

@@ -733,7 +733,6 @@ export default function QueryEditor({
                             type={type}
                             subType={subType}
                             theme={theme}
-                            key={result?.queryId}
                             result={result}
                             database={database}
                             databaseFullPath={databaseFullPath}
@@ -797,6 +796,7 @@ function Result({
     if (result) {
         return (
             <QueryResultViewer
+                key={result.queryId}
                 result={result}
                 resultType={result?.type}
                 theme={theme}

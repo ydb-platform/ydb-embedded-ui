@@ -9,7 +9,7 @@ import {ResponseError} from '../../../../components/Errors/ResponseError';
 import {ResizeableDataTable} from '../../../../components/ResizeableDataTable/ResizeableDataTable';
 import {useClusterWithProxy} from '../../../../store/reducers/cluster/cluster';
 import {hotKeysApi} from '../../../../store/reducers/hotKeys/hotKeys';
-import {overviewApi} from '../../../../store/reducers/overview/overview';
+import {useGetOverviewQuery} from '../../../../store/reducers/overview/overview';
 import {SETTING_KEYS} from '../../../../store/reducers/settings/constants';
 import type {HotKey} from '../../../../types/api/hotkeys';
 import {cn} from '../../../../utils/cn';
@@ -70,7 +70,7 @@ export function HotKeys({path, database, databaseFullPath}: HotKeysProps) {
     } = hotKeysApi.useGetHotKeysQuery({path, database, databaseFullPath, useMetaProxy});
     const loading = isFetching && data === undefined;
     const [autoRefreshInterval] = useAutoRefreshInterval();
-    const {currentData: schemaData, isLoading: schemaLoading} = overviewApi.useGetOverviewQuery(
+    const {currentData: schemaData, isLoading: schemaLoading} = useGetOverviewQuery(
         {
             path,
             database,

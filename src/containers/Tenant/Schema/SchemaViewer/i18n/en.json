@@ -10,5 +10,8 @@
   "column-title.compression": "Compression",
   "column-codec.plain": "Turned off",
   "primary-key.title": "Primary key:",
-  "partitioning-key.title": "Partitioning key:"
+  "partitioning-key.title": "Partitioning key:",
+  "field_document-partition-key": "Partition key:",
+  "field_document-sort-key": "Sort key:",
+  "context_document-attributes": "Items can contain additional attributes that are not listed here."
 }

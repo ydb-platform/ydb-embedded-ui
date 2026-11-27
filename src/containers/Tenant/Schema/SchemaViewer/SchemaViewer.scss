@@ -1,6 +1,11 @@
 @use '../../../../styles/mixins.scss';
 
 .schema-viewer {
+    &__description {
+        margin: 0 0 var(--g-spacing-4);
+        padding-left: var(--g-spacing-2);
+    }
+
     &__keys {
         display: inline-block;
 

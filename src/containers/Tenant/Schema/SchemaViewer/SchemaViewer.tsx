@@ -3,11 +3,13 @@ import React from 'react';
 import {ResizeableDataTable} from '../../../../components/ResizeableDataTable/ResizeableDataTable';
 import {TableSkeleton} from '../../../../components/TableSkeleton/TableSkeleton';
 import {useClusterWithProxy} from '../../../../store/reducers/cluster/cluster';
-import {overviewApi} from '../../../../store/reducers/overview/overview';
+import {useGetOverviewQuery} from '../../../../store/reducers/overview/overview';
 import {viewSchemaApi} from '../../../../store/reducers/viewSchema/viewSchema';
 import type {EPathType} from '../../../../types/api/schema';
+import {uiFactory} from '../../../../uiFactory/uiFactory';
 import {DEFAULT_TABLE_SETTINGS} from '../../../../utils/constants';
 import {useAutoRefreshInterval} from '../../../../utils/hooks';
+import {isDocumentTable} from '../../utils';
 import {
     isColumnEntityType,
     isExternalTableType,
@@ -16,6 +18,7 @@ import {
     isViewType,
 } from '../../utils/schema';
 
+import {DocumentTableSchemaViewer} from './DocumentTableSchemaViewer';
 import {KeysView} from './KeysView';
 import {
     SCHEMA_COLUMNS_WIDTH_LS_KEY,
@@ -36,6 +39,7 @@ interface SchemaViewerProps {
     databaseFullPath: string;
     database: string;
     extended?: boolean;
+    visible?: boolean;
 }
 
 export const SchemaViewer = ({
@@ -43,6 +47,7 @@ export const SchemaViewer = ({
     path,
     database,
     extended = false,
+    visible = true,
     databaseFullPath,
 }: SchemaViewerProps) => {
     const [autoRefreshInterval] = useAutoRefreshInterval();
@@ -51,11 +56,10 @@ export const SchemaViewer = ({
     // Refresh table only in Diagnostics
     const pollingInterval = extended ? autoRefreshInterval : undefined;
 
-    const {currentData: tableSchemaData, isFetching: isTableSchemaFetching} =
-        overviewApi.useGetOverviewQuery(
-            {path, database, databaseFullPath, useMetaProxy},
-            {pollingInterval, skip: isViewType(type)},
-        );
+    const {currentData: tableSchemaData, isFetching: isTableSchemaFetching} = useGetOverviewQuery(
+        {path, database, databaseFullPath, useMetaProxy},
+        {pollingInterval, skip: isViewType(type)},
+    );
     const {currentData: viewColumnsData, isFetching: isViewSchemaFetching} =
         viewSchemaApi.useGetViewSchemaQuery(
             {path, database, databaseFullPath},
@@ -106,7 +110,7 @@ export const SchemaViewer = ({
         return <TableSkeleton />;
     }
 
-    return (
+    const viewerSchema = (
         <React.Fragment>
             <div className={b('keys-wrapper')}>
                 <KeysView tableData={tableData} extended={extended} type="primary" />
@@ -122,4 +126,24 @@ export const SchemaViewer = ({
             </div>
         </React.Fragment>
     );
+
+    if (
+        isRowTableType(type) &&
+        isDocumentTable(tableSchemaData?.PathDescription) &&
+        uiFactory.documentTables?.getSchema
+    ) {
+        return (
+            <DocumentTableSchemaViewer
+                path={tableSchemaData?.Path || path}
+                database={database}
+                databaseFullPath={databaseFullPath}
+                extended={extended}
+                visible={visible}
+            >
+                {viewerSchema}
+            </DocumentTableSchemaViewer>
+        );
+    }
+
+    return viewerSchema;
 };

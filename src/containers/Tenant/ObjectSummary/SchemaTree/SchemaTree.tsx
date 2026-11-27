@@ -3,9 +3,14 @@
 // In this case we can store state of tree - uploaded entities, opened nodes, selected entity and so on
 import React from 'react';
 
+import {nanoid} from '@reduxjs/toolkit';
+import {skipToken} from '@reduxjs/toolkit/query';
+import type {NavigationTreeNodeType} from 'ydb-ui-components';
 import {NavigationTree} from 'ydb-ui-components';
 
 import {getConnectToDBDialog} from '../../../../components/ConnectToDB/ConnectToDBDialog';
+import {backend, environment} from '../../../../store';
+import {api} from '../../../../store/reducers/api';
 import {
     useCreateDirectoryFeatureAvailable,
     useExecuteQueryAndForgetAvailable,
@@ -15,15 +20,16 @@ import {
 import {useClusterBaseInfo, useClusterWithProxy} from '../../../../store/reducers/cluster/cluster';
 import {operationsApi} from '../../../../store/reducers/operations';
 import {selectIsDirty, selectUserInput} from '../../../../store/reducers/query/query';
-import {schemaApi} from '../../../../store/reducers/schema/schema';
+import {schemaApi, setShowPreview} from '../../../../store/reducers/schema/schema';
 import {showCreateTableApi} from '../../../../store/reducers/showCreateTable/showCreateTable';
 import {streamingQueriesApi} from '../../../../store/reducers/streamingQuery/streamingQuery';
 import {tableSchemaDataApi} from '../../../../store/reducers/tableSchemaData';
-import {useTenantBaseInfo} from '../../../../store/reducers/tenant/tenant';
-import type {EPathType, TEvDescribeSchemeResult} from '../../../../types/api/schema';
-import {valueIsDefined} from '../../../../utils';
+import {EPathType} from '../../../../types/api/schema';
+import type {TEvDescribeSchemeResult} from '../../../../types/api/schema';
+import {uiFactory} from '../../../../uiFactory/uiFactory';
+import {wait} from '../../../../utils';
 import {getStringifiedData} from '../../../../utils/dataFormatters/dataFormatters';
-import {useTypedDispatch, useTypedSelector} from '../../../../utils/hooks';
+import {useEventHandler, useTypedDispatch, useTypedSelector} from '../../../../utils/hooks';
 import {useCompactionFeature} from '../../../../utils/hooks/useCompactionFeature';
 import {useSchemaSecretsFeature} from '../../../../utils/hooks/useSchemaSecretsFeature';
 import {useTopicsSqlIoOperationsFeature} from '../../../../utils/hooks/useTopicsSqlIoOperationsFeature';
@@ -33,19 +39,20 @@ import {findRunningTableCompactionOperation} from '../../../../utils/tableCompac
 import {openCompactTableDialog} from '../../Diagnostics/Overview/TableInfo/CompactTableAction/CompactTableAction';
 import {useTableCompaction} from '../../Diagnostics/Overview/TableInfo/hooks/useTableCompaction';
 import {openTableFormDialog} from '../../TableFormDialog/TableFormDialog';
+import type {FormMode} from '../../TableFormDialog/types';
 import {useTenantPage} from '../../TenantNavigation/useTenantNavigation';
 import {openTopicFormDialog} from '../../TopicFormDialog/TopicFormDialog';
+import {isDocumentTable} from '../../utils';
 import {getSchemaControls} from '../../utils/controls';
 import {
     isChildlessPathType,
     mapPathTypeToNavigationTreeType,
     nodeStreamingQueryTypeToPathType,
     nodeTableTypeToPathType,
-    rowTableNodeTypeToPathType,
-    tableTypeToPathType,
 } from '../../utils/schema';
 import {getActions} from '../../utils/schemaActions';
 import type {DropdownItem, TreeNodeMeta} from '../../utils/types';
+import {useDocumentTableDatabase} from '../../utils/useDocumentTableSchema';
 import {useNavigationV2Enabled} from '../../utils/useNavigationV2Enabled';
 import {CreateDirectoryDialog} from '../CreateDirectoryDialog/CreateDirectoryDialog';
 import {useDispatchTreeKey, useTreeKey} from '../UpdateTreeContext';
@@ -63,28 +70,78 @@ interface SchemaTreeProps {
 export function SchemaTree(props: SchemaTreeProps) {
     const createDirectoryFeatureAvailable = useCreateDirectoryFeatureAvailable();
     const {rootName, rootType, currentPath, onActivePathUpdate, databaseFullPath, database} = props;
+    const {
+        clusterName,
+        controlPlane,
+        databaseData,
+        connectionId,
+        getTableContext,
+        mayHaveDocumentTables,
+    } = useDocumentTableDatabase({database, databaseFullPath});
+    const scopeKey = JSON.stringify([
+        environment,
+        clusterName,
+        backend,
+        database,
+        databaseFullPath,
+    ]);
+    const selection = React.useMemo(() => ({scopeKey, currentPath}), [scopeKey, currentPath]);
+    const getCurrentSelection = useEventHandler(() => selection);
+    const updateActivePath = useEventHandler(onActivePathUpdate);
+    const databaseController = React.useRef<AbortController>();
+    React.useEffect(() => {
+        const controller = new AbortController();
+        databaseController.current = controller;
+        return () => controller.abort();
+    }, [scopeKey]);
+    const isCurrentDatabase = React.useCallback(
+        () =>
+            databaseController.current?.signal.aborted === false &&
+            getCurrentSelection().scopeKey === scopeKey,
+        [getCurrentSelection, scopeKey],
+    );
     const dispatch = useTypedDispatch();
     const useMetaProxy = useClusterWithProxy();
     const isMultiTabEnabled = useMultiTabQueryEditorEnabled();
     const input = useTypedSelector(selectUserInput);
     const isDirty = useTypedSelector(selectIsDirty);
-    const [
-        getTableSchemaDataQuery,
-        {
-            currentData: actionsSchemaData,
-            isFetching: isActionsDataFetching,
-            isError: isActionsDataError,
-            originalArgs: actionsSchemaArgs,
-        },
-    ] = tableSchemaDataApi.useLazyGetTableSchemaDataQuery();
+    const [menu, setMenu] = React.useState<{
+        path: string;
+        type: NavigationTreeNodeType;
+        scopeKey: string;
+    }>();
+    const activeMenu = menu?.scopeKey === scopeKey ? menu : undefined;
+    const schemaType = activeMenu ? nodeTableTypeToPathType[activeMenu.type] : undefined;
+    const {
+        currentData: actionsSchemaData,
+        isFetching: isActionsDataFetching,
+        isError: isActionsDataError,
+    } = tableSchemaDataApi.useGetTableSchemaDataQuery(
+        activeMenu && schemaType
+            ? {
+                  path: activeMenu.path,
+                  database,
+                  type: schemaType,
+                  databaseFullPath,
+                  useMetaProxy,
+                  scopeKey,
+              }
+            : skipToken,
+        {refetchOnMountOrArgChange: true},
+    );
+    const documentTablePath = actionsSchemaData?.isDocumentTable ? activeMenu?.path : undefined;
+    const sqlRowMenu = activeMenu?.type === 'table' && documentTablePath === undefined;
     const [
         getStreamingQueryInfo,
         {currentData: streamingSysData, isFetching: isStreamingInfoFetching},
     ] = streamingQueriesApi.useLazyGetStreamingQueryInfoQuery();
-    const [
-        getShowCreateTable,
-        {currentData: showCreateTableData, isFetching: isShowCreateTableFetching},
-    ] = showCreateTableApi.useLazyGetShowCreateTableQuery();
+    const {currentData: showCreateTableData, isFetching: isShowCreateTableFetching} =
+        showCreateTableApi.useGetShowCreateTableQuery(
+            activeMenu && (sqlRowMenu || activeMenu.type === 'column_table')
+                ? {path: transformPath(activeMenu.path, databaseFullPath), database, scopeKey}
+                : skipToken,
+            {refetchOnMountOrArgChange: true},
+        );
 
     const isTopicPreviewAvailable = useTopicDataAvailable();
 
@@ -96,7 +153,61 @@ export function SchemaTree(props: SchemaTreeProps) {
     const setSchemaTreeKey = useDispatchTreeKey();
     const schemaTreeKey = useTreeKey();
 
-    const [compactionActionsOpen, setCompactionActionsOpen] = React.useState(false);
+    const refreshAfterDocumentTableChange = React.useCallback(
+        async (tablePath: string, shouldExist: boolean, onConfirmed?: () => void) => {
+            const signal = databaseController.current?.signal;
+            if (!signal || !isCurrentDatabase()) {
+                return;
+            }
+
+            const isActive = () => !signal.aborted && isCurrentDatabase();
+            const deadline = Date.now() + 30_000;
+            const separator = tablePath.lastIndexOf('/');
+            const path = tablePath.slice(0, separator) || databaseFullPath;
+            const folderArgs = {path, databaseFullPath, useMetaProxy};
+            const name = tablePath.slice(separator + 1);
+
+            while (isActive()) {
+                const timeout = deadline - Date.now();
+                if (timeout <= 0) {
+                    break;
+                }
+                const folder = await window.api.viewer
+                    .getSchema({database, path: folderArgs}, {signal, timeout})
+                    .catch(() => null);
+                if (folder?.Status === 'StatusSuccess' && folder.PathDescription) {
+                    const present = folder.PathDescription.Children?.some(
+                        (child) => child.Name === name,
+                    );
+                    if (Boolean(present) === shouldExist) {
+                        await dispatch(
+                            schemaApi.util.getRunningQueryThunk('getSchema', {
+                                database,
+                                ...folderArgs,
+                            }),
+                        );
+                        if (isActive() && Date.now() < deadline) {
+                            onConfirmed?.();
+                        }
+                        break;
+                    }
+                }
+                const delay = Math.min(2_000, deadline - Date.now());
+                if (!signal.aborted && delay > 0) {
+                    await wait(delay);
+                }
+            }
+
+            if (isActive()) {
+                setSchemaTreeKey(nanoid());
+            }
+        },
+        [database, databaseFullPath, dispatch, isCurrentDatabase, setSchemaTreeKey, useMetaProxy],
+    );
+
+    React.useEffect(() => {
+        setMenu(undefined);
+    }, [schemaTreeKey, scopeKey]);
 
     // Compaction feature flag check
     const {compactionEnabled} = useCompactionFeature(database);
@@ -108,7 +219,7 @@ export function SchemaTree(props: SchemaTreeProps) {
         operations: compactionOperations,
         isFetching: isCompactionFetching,
         refresh: refreshCompactions,
-    } = useTableCompaction(database, '', compactionEnabled && compactionActionsOpen);
+    } = useTableCompaction(database, '', compactionEnabled && sqlRowMenu);
 
     const executeQueryAndForgetAvailable = useExecuteQueryAndForgetAvailable();
     const [startTableCompaction] = operationsApi.useStartTableCompactionMutation();
@@ -152,26 +263,19 @@ export function SchemaTree(props: SchemaTreeProps) {
                 throw new Error(`No describe data about path ${path}`);
             }
 
-            const {PathDescription: {Children = []} = {}} = schemaData;
+            const children = schemaData.PathDescription?.Children ?? [];
+            const parentIsDocumentTable =
+                uiFactory.documentTables && isDocumentTable(schemaData.PathDescription);
 
-            const childItems = Children.map((childData) => {
-                const {Name = '', PathType, PathSubType, ChildrenExist} = childData;
-
-                const isChildless =
-                    isChildlessPathType(PathType, PathSubType) ||
-                    (valueIsDefined(ChildrenExist) && !ChildrenExist);
-
-                return {
-                    name: Name,
-                    type: mapPathTypeToNavigationTreeType(PathType, PathSubType),
-                    // FIXME: should only be explicitly set to true for tables with indexes
-                    // at the moment of writing there is no property to determine this, fix later
-                    expandable: !isChildless,
-                    meta: {subType: PathSubType},
-                };
-            });
-
-            return childItems;
+            return children.map(({Name = '', PathType, PathSubType, ChildrenExist}) => ({
+                name: Name,
+                type: mapPathTypeToNavigationTreeType(PathType, PathSubType),
+                expandable:
+                    ChildrenExist !== false &&
+                    !isChildlessPathType(PathType, PathSubType) &&
+                    !(parentIsDocumentTable && PathType === EPathType.EPathTypeTableIndex),
+                meta: {subType: PathSubType, parentIsDocumentTable},
+            }));
         },
         [dispatch, database, databaseFullPath, useMetaProxy],
     );
@@ -239,20 +343,57 @@ export function SchemaTree(props: SchemaTreeProps) {
         [database, databaseFullPath, onActivePathUpdate, setSchemaTreeKey],
     );
 
-    const handleOpenCreateTableDialog = React.useCallback(
-        (nextParentPath: string) => {
+    const getCurrentTableContext = useEventHandler(getTableContext);
+    const handleOpenTableDialog = React.useCallback(
+        (mode: FormMode, path: string) => {
+            const selectionAtOpen = getCurrentSelection();
+            const databaseSignal = databaseController.current?.signal;
+            const availableTypes =
+                mode === 'create' && databaseData
+                    ? uiFactory.getCreateTableTypes?.(databaseData)
+                    : undefined;
+            const canCreateDocumentTable = Boolean(
+                connectionId && uiFactory.documentTables?.create,
+            );
             openTableFormDialog({
-                mode: 'create',
+                mode,
+                ...(mode === 'create' ? {parentPath: path} : {path}),
                 database,
                 databaseFullPath,
-                parentPath: nextParentPath,
-                onSuccess: (createdPath) => {
-                    onActivePathUpdate(createdPath);
-                    setSchemaTreeKey(createdPath);
+                availableTypes: availableTypes?.filter(
+                    (type) => type !== 'document' || canCreateDocumentTable,
+                ),
+                getDocumentTableContext: (tablePath) => {
+                    const context = getCurrentTableContext(tablePath);
+                    return context?.connectionId === connectionId ? context : undefined;
+                },
+                isCurrentDatabase: () => !databaseSignal?.aborted && isCurrentDatabase(),
+                onRefresh: (tablePath, type, dialogOpen) => {
+                    if (type === 'document') {
+                        refreshAfterDocumentTableChange(tablePath, true, () => {
+                            if (dialogOpen && getCurrentSelection() === selectionAtOpen) {
+                                updateActivePath(tablePath);
+                            }
+                        });
+                    } else {
+                        updateActivePath(tablePath);
+                        setSchemaTreeKey(tablePath);
+                    }
                 },
             });
         },
-        [database, databaseFullPath, onActivePathUpdate, setSchemaTreeKey],
+        [
+            database,
+            databaseFullPath,
+            databaseData,
+            connectionId,
+            getCurrentTableContext,
+            getCurrentSelection,
+            isCurrentDatabase,
+            refreshAfterDocumentTableChange,
+            setSchemaTreeKey,
+            updateActivePath,
+        ],
     );
 
     const handleOpenUpdateTopicDialog = React.useCallback(
@@ -271,24 +412,45 @@ export function SchemaTree(props: SchemaTreeProps) {
         [database, databaseFullPath, onActivePathUpdate, setSchemaTreeKey],
     );
 
-    const handleOpenUpdateTableDialog = React.useCallback(
-        (tablePath: string) => {
-            openTableFormDialog({
-                mode: 'update',
-                database,
-                databaseFullPath,
-                path: tablePath,
-                onSuccess: (updatedPath) => {
-                    onActivePathUpdate(updatedPath);
-                    setSchemaTreeKey(updatedPath);
-                },
+    const handleOpenDeleteDocumentTableDialog = React.useCallback(
+        async (path: string) => {
+            const context = getTableContext(path);
+            const databaseSignal = databaseController.current?.signal;
+            if (!context?.connectionId || !databaseSignal || !isCurrentDatabase()) {
+                return;
+            }
+            const isCurrentContext = () =>
+                !databaseSignal.aborted &&
+                isCurrentDatabase() &&
+                getCurrentTableContext(path)?.connectionId === context.connectionId;
+            const accepted = await uiFactory.documentTables?.onDelete?.({
+                context,
+                isCurrentContext,
             });
+            if (!accepted || !isCurrentContext()) {
+                return;
+            }
+            const selectedPath = getCurrentSelection().currentPath;
+            if (selectedPath === path || selectedPath?.startsWith(`${path}/`)) {
+                updateActivePath(path.slice(0, path.lastIndexOf('/')) || databaseFullPath);
+                dispatch(setShowPreview(false));
+            }
+            refreshAfterDocumentTableChange(path, false);
+            dispatch(api.util.invalidateTags(['SchemaTree']));
         },
-        [database, databaseFullPath, onActivePathUpdate, setSchemaTreeKey],
+        [
+            getTableContext,
+            isCurrentDatabase,
+            getCurrentTableContext,
+            getCurrentSelection,
+            updateActivePath,
+            databaseFullPath,
+            dispatch,
+            refreshAfterDocumentTableChange,
+        ],
     );
 
     const {monitoring: clusterMonitoring} = useClusterBaseInfo();
-    const {controlPlane} = useTenantBaseInfo(database);
     const getTreeNodeActions = React.useMemo(() => {
         const hasMonitoring = canShowTenantMonitoringTab(controlPlane, clusterMonitoring);
         return getActions(
@@ -299,9 +461,9 @@ export function SchemaTree(props: SchemaTreeProps) {
                 showCreateDirectoryDialog: createDirectoryFeatureAvailable
                     ? handleOpenCreateDirectoryDialog
                     : undefined,
-                showCreateTableDialog: handleOpenCreateTableDialog,
+                showCreateTableDialog: (path) => handleOpenTableDialog('create', path),
                 showCreateTopicDialog: handleOpenCreateTopicDialog,
-                showUpdateTableDialog: handleOpenUpdateTableDialog,
+                showUpdateTableDialog: (path) => handleOpenTableDialog('update', path),
                 showUpdateTopicDialog: handleOpenUpdateTopicDialog,
                 isMultiTabEnabled,
                 getConfirmation:
@@ -310,10 +472,20 @@ export function SchemaTree(props: SchemaTreeProps) {
                 showCompactionDialog: compactionEnabled ? handleOpenCompactionDialog : undefined,
                 hasRunningCompaction: compactionEnabled ? hasRunningCompaction : undefined,
                 isCompactionLoading: isCompactionFetching,
-                schemaData: actionsSchemaData,
-                schemaDataPath: actionsSchemaArgs?.path,
+                schemaData: actionsSchemaData?.schemaData,
+                schemaDataPath: activeMenu?.path,
                 isSchemaDataLoading: isActionsDataFetching,
                 isSchemaDataError: isActionsDataError,
+                documentTablePath,
+                mayHaveDocumentTables:
+                    Boolean(uiFactory.documentTables) && mayHaveDocumentTables !== false,
+                showDeleteDocumentTableDialog:
+                    documentTablePath &&
+                    !isActionsDataError &&
+                    uiFactory.documentTables?.onDelete &&
+                    getTableContext(documentTablePath)?.connectionId
+                        ? handleOpenDeleteDocumentTableDialog
+                        : undefined,
                 hasMonitoring,
                 isV2NavigationEnabled,
                 streamingQueryData: streamingSysData,
@@ -328,20 +500,23 @@ export function SchemaTree(props: SchemaTreeProps) {
         );
     }, [
         controlPlane,
+        getTableContext,
+        handleOpenDeleteDocumentTableDialog,
+        activeMenu,
+        documentTablePath,
+        mayHaveDocumentTables,
         clusterMonitoring,
         dispatch,
         onActivePathUpdate,
         handleTenantPageChange,
         createDirectoryFeatureAvailable,
-        handleOpenCreateTableDialog,
+        handleOpenTableDialog,
         handleOpenCreateTopicDialog,
-        handleOpenUpdateTableDialog,
         handleOpenUpdateTopicDialog,
         input,
         isDirty,
         isMultiTabEnabled,
         actionsSchemaData,
-        actionsSchemaArgs?.path,
         isActionsDataFetching,
         isActionsDataError,
         isV2NavigationEnabled,
@@ -380,32 +555,19 @@ export function SchemaTree(props: SchemaTreeProps) {
                 fetchPath={fetchPath}
                 getActions={getTreeNodeActions}
                 onActionsOpenToggle={({path, type, isOpen}) => {
-                    const pathType = nodeTableTypeToPathType[type];
-                    if (isOpen && pathType) {
-                        getTableSchemaDataQuery({
-                            path,
-                            database,
-                            type: pathType,
-                            databaseFullPath,
-                            useMetaProxy,
-                        });
+                    if (isOpen) {
+                        setMenu({path, type, scopeKey});
+                    } else {
+                        setMenu((current) =>
+                            current?.path === path && current.scopeKey === scopeKey
+                                ? undefined
+                                : current,
+                        );
                     }
-                    const tableType = tableTypeToPathType[type];
-
-                    if (isOpen && tableType) {
-                        const relativePath = transformPath(path, databaseFullPath);
-                        getShowCreateTable({path: relativePath, database});
-                    }
-
-                    const rowTableType = rowTableNodeTypeToPathType[type];
-                    setCompactionActionsOpen(isOpen && Boolean(rowTableType));
-
                     const streamingPathType = nodeStreamingQueryTypeToPathType[type];
                     if (isOpen && streamingPathType) {
                         getStreamingQueryInfo({database, path}, true);
                     }
-
-                    return [];
                 }}
                 renderAdditionalNodeElements={getSchemaControls(
                     dispatch,

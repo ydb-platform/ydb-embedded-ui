@@ -20,7 +20,7 @@ import {LinkWithIcon} from '../../../components/LinkWithIcon/LinkWithIcon';
 import SplitPane from '../../../components/SplitPane';
 import {createExternalUILink, getTenantPath} from '../../../routes';
 import {useClusterWithProxy} from '../../../store/reducers/cluster/cluster';
-import {overviewApi} from '../../../store/reducers/overview/overview';
+import {useGetOverviewQuery} from '../../../store/reducers/overview/overview';
 import {TENANT_SUMMARY_TABS_IDS} from '../../../store/reducers/tenant/constants';
 import {setSummaryTab} from '../../../store/reducers/tenant/tenant';
 import {EPathSubType, EPathType} from '../../../types/api/schema';
@@ -44,6 +44,7 @@ import {TENANT_INFO_TABS, TENANT_SCHEMA_TAB, TenantTabsGroups} from '../TenantPa
 import {ROW_COUNT_NOTE} from '../constants';
 import tenantKeyset from '../i18n';
 import {useTenantQueryParams} from '../useTenantQueryParams';
+import {getDocumentTableTypeLabel} from '../utils';
 import {getSummaryControls} from '../utils/controls';
 import {
     PaneVisibilityActionTypes,
@@ -124,7 +125,7 @@ export function ObjectSummary({
         ignoreQueryPrefix: true,
     });
 
-    const {currentData: currentObjectData} = overviewApi.useGetOverviewQuery({
+    const {currentData: currentObjectData} = useGetOverviewQuery({
         path,
         database,
         databaseFullPath,
@@ -416,6 +417,7 @@ export function ObjectSummary({
                         path={path}
                         database={database}
                         databaseFullPath={databaseFullPath}
+                        visible={!isCollapsed && !commonInfoVisibilityState.collapsed}
                     />
                 );
             }
@@ -474,10 +476,9 @@ export function ObjectSummary({
     const renderEntityTypeBadge = () => {
         const {Status, Reason} = currentObjectData ?? {};
         if (type) {
-            let label = type.replace('EPathType', '');
-            if (isDomain(path, type)) {
-                label = 'domain';
-            }
+            const label =
+                getDocumentTableTypeLabel(currentObjectData?.PathDescription) ??
+                (isDomain(path, type) ? 'domain' : type.replace('EPathType', ''));
             return <div className={b('entity-type')}>{label}</div>;
         }
 

@@ -11,7 +11,10 @@ SHOW CREATE TABLE \`${safePath}\``;
 export const showCreateTableApi = api.injectEndpoints({
     endpoints: (build) => ({
         getShowCreateTable: build.query({
-            queryFn: async ({database, path}: {database: string; path: string}, {signal}) => {
+            queryFn: async (
+                {database, path}: {database: string; path: string; scopeKey?: string},
+                {signal},
+            ) => {
                 try {
                     const response = await window.api.viewer.sendQuery(
                         {

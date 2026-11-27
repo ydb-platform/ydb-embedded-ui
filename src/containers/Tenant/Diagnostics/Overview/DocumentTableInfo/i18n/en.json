@@ -1,0 +1,15 @@
+{
+  "title_global-secondary-indexes": "Global secondary indexes",
+  "field_index-name": "Name",
+  "field_partition-key": "Partition key",
+  "field_sort-key": "Sort key",
+  "field_status": "Status",
+  "field_item-count": "Reported item count",
+  "field_table-size": "Table size",
+  "value_global-secondary-index": "Global secondary index",
+  "value_active": "Active",
+  "value_creating": "Creating",
+  "value_updating": "Updating",
+  "value_deleting": "Deleting",
+  "context_info-unavailable": "Document table details are unavailable"
+}

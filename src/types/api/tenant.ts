@@ -142,6 +142,8 @@ export interface ControlPlane {
     name?: string;
     id?: string;
     endpoint?: string;
+    document_api_endpoint?: string;
+    labels?: Record<string, string>;
 
     folder_id?: string;
     location_id?: string;

@@ -5,6 +5,7 @@ import {isValidEntityPath, isValidEntityPathSegment} from '../utils/pathSegmentV
 import {isValueForTypeValid} from './columnValueValidation';
 import {
     COLUMN_NAME_REG_EXP,
+    DOCUMENT_ATTRIBUTE_TYPES,
     ENTITY_NAME_REG_EXP,
     MAX_COLUMN_PARTITION_COUNT,
     MAX_PARTITIONS_COUNT,
@@ -12,7 +13,7 @@ import {
     MIN_PARTITIONS_COUNT,
 } from './constants';
 import i18n from './i18n';
-import type {FormMode, FormValues, OriginalTableInfo} from './types';
+import type {DialogFormValues, FormMode, FormValues, OriginalTableInfo} from './types';
 import {PartitionsType} from './types';
 import {getAvailableTtlColumns, isValidTtlNumType} from './utils';
 
@@ -29,7 +30,7 @@ const addIssue = (ctx: z.RefinementCtx, path: Array<string | number>, message: s
 const baseSchema = z
     .object({
         name: z.string(),
-        type: z.union([z.literal('row'), z.literal('column')]),
+        type: z.enum(['row', 'column']),
         columns: z.array(z.any()),
         secondaryIndexes: z.array(z.any()),
         deletedColumns: z.array(z.any()),
@@ -39,12 +40,79 @@ const baseSchema = z
     })
     .passthrough();
 
+const documentDefinitionSchema = z
+    .object({
+        attributes: z.array(
+            z.object({
+                name: z
+                    .string()
+                    .min(1, i18n('error_required'))
+                    .max(255, i18n('error_document-attribute-name-length'))
+                    .regex(COLUMN_NAME_REG_EXP, i18n('error_column-name-pattern')),
+                type: z.enum(DOCUMENT_ATTRIBUTE_TYPES),
+                keyType: z.enum(['partition', 'sort']).optional(),
+            }),
+        ),
+        indexes: z.array(
+            z.object({
+                name: z
+                    .string()
+                    .min(3, i18n('error_document-index-name-length'))
+                    .regex(ENTITY_NAME_REG_EXP, i18n('error_name-pattern')),
+                partitionKey: z.string().min(1, i18n('error_required')),
+                sortKey: z.string().optional(),
+            }),
+        ),
+    })
+    .superRefine(({attributes, indexes}, ctx) => {
+        const names = new Set<string>();
+        const partitionKeys = attributes.filter(({keyType}) => keyType === 'partition');
+        if (
+            partitionKeys.length !== 1 ||
+            attributes.filter(({keyType}) => keyType === 'sort').length > 1
+        ) {
+            addIssue(ctx, ['attributes'], i18n('error_document-keys'));
+        }
+        attributes.forEach(({name}, index) => {
+            if (name && names.has(name)) {
+                addIssue(ctx, ['attributes', index, 'name'], i18n('error_column-name-duplicate'));
+            }
+            names.add(name);
+        });
+
+        const indexNames = new Set<string>();
+        indexes.forEach(({name, partitionKey, sortKey}, index) => {
+            if (name && indexNames.has(name)) {
+                addIssue(ctx, ['indexes', index, 'name'], i18n('error_index-name-duplicate'));
+            }
+            indexNames.add(name);
+            if (partitionKey && !names.has(partitionKey)) {
+                addIssue(ctx, ['indexes', index, 'partitionKey'], i18n('error_indexes-key'));
+            } else if (partitionKey && partitionKey === partitionKeys[0]?.name) {
+                addIssue(
+                    ctx,
+                    ['indexes', index, 'partitionKey'],
+                    i18n('error_document-index-partition-key'),
+                );
+            }
+            if (sortKey && (!names.has(sortKey) || sortKey === partitionKey)) {
+                addIssue(ctx, ['indexes', index, 'sortKey'], i18n('error_indexes-key'));
+            }
+        });
+    });
+
+const createSchema = z.discriminatedUnion('type', [
+    baseSchema,
+    z.object({type: z.literal('document'), name: z.string(), document: documentDefinitionSchema}),
+]);
+
 interface SchemaContext {
     mode: FormMode;
     originalInfo?: OriginalTableInfo;
+    relativeDirectory?: string;
 }
 
-function validateName(data: FormValues, ctx: z.RefinementCtx, mode: FormMode) {
+function validateName(data: DialogFormValues, ctx: z.RefinementCtx, mode: FormMode) {
     if (!data.name) {
         addIssue(ctx, ['name'], i18n('error_required'));
         return;
@@ -424,10 +492,19 @@ function validateSettings(
 export function buildTableValidationSchema({
     mode,
     originalInfo,
-}: SchemaContext): z.ZodType<FormValues, FormValues> {
-    return baseSchema.superRefine((raw, ctx) => {
-        const data = raw as FormValues;
+    relativeDirectory = '',
+}: SchemaContext): z.ZodType<DialogFormValues, DialogFormValues> {
+    const schema = mode === 'create' ? createSchema : baseSchema;
+    return schema.superRefine((raw, ctx) => {
+        const data = raw as DialogFormValues;
         validateName(data, ctx, mode);
+        if (data.type === 'document') {
+            const tableName = relativeDirectory ? `${relativeDirectory}/${data.name}` : data.name;
+            if (data.name && (tableName.length < 3 || tableName.length > 255)) {
+                addIssue(ctx, ['name'], i18n('error_document-table-name-length'));
+            }
+            return;
+        }
         validateColumns(data, ctx, mode);
         validateColumnDefaults(data, ctx, mode);
         validateDuplicateColumns(data, ctx, originalInfo);
@@ -435,5 +512,5 @@ export function buildTableValidationSchema({
         validateSecondaryIndexes(data, ctx, originalInfo);
         validatePartitioning(data, ctx, mode);
         validateSettings(data, ctx, mode, originalInfo);
-    }) as z.ZodType<FormValues, FormValues>;
+    }) as z.ZodType<DialogFormValues, DialogFormValues>;
 }
