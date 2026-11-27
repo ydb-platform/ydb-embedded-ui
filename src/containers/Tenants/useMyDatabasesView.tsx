@@ -10,7 +10,12 @@ import {databaseCloudId} from './clouds';
 import {MY_DATABASE_TYPES} from './constants';
 import {ENVIRONMENT_FILTERS_PARAMS} from './environmentFilters';
 import i18n from './i18n';
-import {RESOURCE_GROUPINGS, allocatedResources, groupByResourceUsage} from './resourceUsage';
+import {
+    RESOURCE_GROUPINGS,
+    allocatedResources,
+    groupByResourceUsage,
+    hasControlPlaneData,
+} from './resourceUsage';
 import type {DatabaseRow} from './types';
 import {useDatabasePresets} from './useDatabasePresets';
 
@@ -48,8 +53,7 @@ export function useMyDatabasesView({
     const [{databaseType, cluster: clusters, cloudId: cloudIds, groupBy}, setQueryParams] =
         useQueryParams(queryParamsConfig);
 
-    const hasControlPlane =
-        enabled && tenants.some((row) => row.ControlPlane && Object.keys(row.ControlPlane).length);
+    const hasControlPlane = enabled && tenants.some(hasControlPlaneData);
     const presets = useDatabasePresets(hasControlPlane ? tenants : EMPTY_ROWS);
     const withAllocatedResources = hasControlPlane && presets.available;
     // Allocated resources are set before filtering: a row stays the same object while filters change.

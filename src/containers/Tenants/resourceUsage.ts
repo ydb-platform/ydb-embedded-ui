@@ -3,6 +3,7 @@ import type {ResourcePreset} from '../../types/api/resourcePresets';
 import type {DatabaseComputeConfig} from '../../types/api/tenant';
 import {parseOptionalNonNegativeNumber} from '../../utils/utils';
 
+import {databaseCloudId} from './clouds';
 import type {AllocatedResources, DatabaseRow} from './types';
 
 export const RESOURCE_GROUPINGS = ['cpu', 'memory'] as const;
@@ -34,12 +35,18 @@ function fixedCompute(row: PreparedTenant) {
     };
 }
 
+/** An empty object tells as little about the database as no Control Plane data at all. */
+export function hasControlPlaneData({ControlPlane: cp}: PreparedTenant) {
+    return Boolean(cp && Object.keys(cp).length);
+}
+
 /** A serverless database runs on shared compute unless it has exclusive resources. */
-function hasNoOwnCompute({ControlPlane: cp, Type}: PreparedTenant) {
+function hasNoOwnCompute(row: PreparedTenant) {
+    const {ControlPlane: cp, Type} = row;
     return Boolean(
-        cp &&
-            (cp.serverless_database || Type === 'Serverless') &&
-            !cp.serverless_database?.exclusive_compute_resources,
+        hasControlPlaneData(row) &&
+            (cp?.serverless_database || Type === 'Serverless') &&
+            !cp?.serverless_database?.exclusive_compute_resources,
     );
 }
 
@@ -52,9 +59,29 @@ function configuredSize(config?: DatabaseComputeConfig) {
     return Number.isSafeInteger(size) && size >= 0 ? size : undefined;
 }
 
-export function needsPreset(row: PreparedTenant) {
+export type PresetCatalogs = ReadonlyMap<string, ReadonlyMap<string, ResourcePreset>>;
+
+/**
+ * The catalog of a cluster has its common presets.
+ * The catalog of a cloud in the cluster also has the presets restricted to that cloud.
+ */
+export function presetCatalogKey(clusterName: string, cloudId?: string) {
+    return cloudId ? JSON.stringify([clusterName, cloudId]) : clusterName;
+}
+
+/** The preset a database of a fixed size is scaled by, and where it is listed. */
+export function requiredPreset(row: PreparedTenant) {
     const config = fixedCompute(row);
-    return Boolean(config?.resource_preset_id && configuredSize(config) !== undefined);
+    const size = configuredSize(config);
+    if (!row.Cluster || !config?.resource_preset_id || size === undefined) {
+        return undefined;
+    }
+    return {
+        clusterName: row.Cluster,
+        cloudId: databaseCloudId(row),
+        presetId: config.resource_preset_id,
+        size,
+    };
 }
 
 function allocatedAmount(value: string, size: number, unit = 1) {
@@ -68,17 +95,19 @@ function allocatedAmount(value: string, size: number, unit = 1) {
 
 export function allocatedResources(
     row: PreparedTenant,
-    catalogs: ReadonlyMap<string, ReadonlyMap<string, ResourcePreset>>,
+    catalogs: PresetCatalogs,
 ): AllocatedResources | null | undefined {
     if (hasNoOwnCompute(row)) {
         return null;
     }
-    const config = fixedCompute(row);
-    const size = configuredSize(config);
-    if (!row.Cluster || !config?.resource_preset_id || size === undefined) {
+    const required = requiredPreset(row);
+    if (!required) {
         return undefined;
     }
-    const preset = catalogs.get(row.Cluster)?.get(config.resource_preset_id);
+    const {clusterName, cloudId, presetId, size} = required;
+    const preset =
+        catalogs.get(presetCatalogKey(clusterName, cloudId))?.get(presetId) ??
+        catalogs.get(presetCatalogKey(clusterName))?.get(presetId);
     if (!preset) {
         return undefined;
     }

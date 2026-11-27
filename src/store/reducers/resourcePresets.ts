@@ -6,6 +6,8 @@ import {api} from './api';
 
 interface ResourcePresetsParams {
     clusterName: string;
+    /** Adds the presets restricted to this cloud to the common ones. */
+    cloudId?: string;
     environment?: string;
     backend?: string;
 }
@@ -30,14 +32,17 @@ function wait(ms: number) {
 export const resourcePresetsApi = api.injectEndpoints({
     endpoints: (build) => ({
         listResourcePresets: build.query<ListResourcePresetsResponse, ResourcePresetsParams>({
-            queryFn: async ({clusterName}, {signal}) => {
+            queryFn: async ({clusterName, cloudId}, {signal}) => {
                 const {meta} = window.api;
                 if (!meta) {
                     return {error: {message: 'Meta API is not available.'}};
                 }
                 for (let attempt = 0; ; attempt++) {
                     try {
-                        const data = await meta.listResourcePresets({clusterName}, {signal});
+                        const data = await meta.listResourcePresets(
+                            {clusterName, cloudId},
+                            {signal},
+                        );
                         return {data};
                     } catch (error) {
                         const delay = RESOURCE_PRESETS_RETRY_DELAYS_MS[attempt];
@@ -55,9 +60,9 @@ export const resourcePresetsApi = api.injectEndpoints({
     overrideExisting: 'throw',
 });
 
-export function useClusterResourcePresets(clusterName: string) {
+export function useClusterResourcePresets(clusterName: string, cloudId?: string) {
     return resourcePresetsApi.useListResourcePresetsQuery(
-        {clusterName, environment, backend},
+        {clusterName, cloudId, environment, backend},
         {skip: !clusterName},
     );
 }

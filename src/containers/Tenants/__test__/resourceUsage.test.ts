@@ -1,5 +1,10 @@
 import type {PreparedTenant} from '../../../store/reducers/tenants/types';
-import {allocatedResources, groupByResourceUsage, needsPreset} from '../resourceUsage';
+import {
+    allocatedResources,
+    groupByResourceUsage,
+    presetCatalogKey,
+    requiredPreset,
+} from '../resourceUsage';
 
 function database(fields: Partial<PreparedTenant>): PreparedTenant {
     return {
@@ -111,19 +116,66 @@ test('supports nested and legacy fixed compute and only the tenant’s own exclu
         allocatedResources({...dedicated, ControlPlane: {serverless_database: {}}}, catalogs),
     ).toBeNull();
     // Without Control Plane data there is nothing to tell that from.
+    for (const ControlPlane of [undefined, {}]) {
+        expect(
+            allocatedResources(
+                database({Type: 'Serverless', Cluster: 'cluster-a', ControlPlane}),
+                catalogs,
+            ),
+        ).toBeUndefined();
+    }
+});
+
+test('requires a preset only for a tenant with its own fixed compute size and preset ID', () => {
+    expect(requiredPreset(dedicated)).toEqual({
+        clusterName: 'cluster-a',
+        cloudId: undefined,
+        presetId: 'custom',
+        size: 64,
+    });
+    expect(requiredPreset(database({}))).toBeUndefined();
     expect(
-        allocatedResources(database({Type: 'Serverless', Cluster: 'cluster-a'}), catalogs),
+        requiredPreset(
+            database({Cluster: 'cluster-a', ControlPlane: {resource_preset_id: 'custom'}}),
+        ),
+    ).toBeUndefined();
+    expect(
+        requiredPreset(
+            database({
+                Cluster: 'cluster-a',
+                ControlPlane: {scale_policy: {fixed_scale: {size: 1}}},
+            }),
+        ),
+    ).toBeUndefined();
+    expect(
+        requiredPreset(
+            database({Cluster: 'cluster-a', Type: 'Serverless', sharedControlPlane: fixed}),
+        ),
     ).toBeUndefined();
 });
 
-test('requests a catalog only for a tenant with its own fixed compute size and preset ID', () => {
-    expect(needsPreset(dedicated)).toBe(true);
-    expect(needsPreset(database({}))).toBe(false);
-    expect(needsPreset(database({ControlPlane: {resource_preset_id: 'custom'}}))).toBe(false);
-    expect(needsPreset(database({ControlPlane: {scale_policy: {fixed_scale: {size: 1}}}}))).toBe(
-        false,
-    );
-    expect(needsPreset(database({Type: 'Serverless', sharedControlPlane: fixed}))).toBe(false);
+test('finds a preset restricted to the cloud of the database in the catalog of that cloud', () => {
+    const restricted = {id: 'custom', cores: '4', memory: '4'};
+    const cloudCatalogs = new Map([
+        ['cluster-a', new Map([['common', preset]])],
+        [presetCatalogKey('cluster-a', 'cloud-1'), new Map([[restricted.id, restricted]])],
+    ]);
+    const inCloud = (cloudId: string, viaControlPlane = false) => ({
+        ...dedicated,
+        ...(viaControlPlane
+            ? {ControlPlane: {...fixed, cloud_id: cloudId}}
+            : {UserAttributes: {cloud_id: cloudId}}),
+    });
+
+    expect(requiredPreset(inCloud('cloud-1'))?.cloudId).toBe('cloud-1');
+    for (const row of [inCloud('cloud-1'), inCloud('cloud-1', true)]) {
+        expect(allocatedResources(row, cloudCatalogs)?.cores).toBe(256);
+    }
+    // The preset is not listed for another cloud or without one
+    expect(allocatedResources(inCloud('cloud-2'), cloudCatalogs)).toBeUndefined();
+    expect(allocatedResources(dedicated, cloudCatalogs)).toBeUndefined();
+    // A common preset needs no catalog of the cloud
+    expect(allocatedResources(inCloud('cloud-2'), catalogs)).toEqual(allocation);
 });
 
 test('compares memory in bytes with the selected capacity, independently of CPU', () => {

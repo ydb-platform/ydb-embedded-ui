@@ -10,7 +10,10 @@ import {ENVIRONMENT_FILTERS_PARAMS} from '../Tenants/environmentFilters';
 
 const queryParamsConfig = {env: StringParam, ...ENVIRONMENT_FILTERS_PARAMS};
 
-export function useDatabasesPageEnvironment(environments?: string[]) {
+export function useDatabasesPageEnvironment(
+    environments: string[] | undefined,
+    {syncToUrl}: {syncToUrl: boolean},
+) {
     const [{env: envParamFromQuery}, setQueryParams] = useQueryParams(queryParamsConfig);
 
     const [savedEnvironment, saveEnvironment] = useSetting<string | undefined>(
@@ -56,9 +59,21 @@ export function useDatabasesPageEnvironment(environments?: string[]) {
         [envParamFromQuery, setQueryParams, saveEnvironment],
     );
 
+    // The URL names the opened environment when there is a choice, and never one that
+    // could not be opened: a link to it is replaced even with a single environment
+    const urlIsStale =
+        syncToUrl &&
+        Boolean(databasesPageEnvironment) &&
+        databasesPageEnvironment !== envParamFromQuery &&
+        Boolean(envParamFromQuery || (environments && environments.length > 1));
+    React.useEffect(() => {
+        if (urlIsStale && databasesPageEnvironment) {
+            handleEnvironmentChange(databasesPageEnvironment);
+        }
+    }, [urlIsStale, databasesPageEnvironment, handleEnvironmentChange]);
+
     return {
         databasesPageEnvironment,
-        envParamFromQuery,
         handleEnvironmentChange,
     };
 }

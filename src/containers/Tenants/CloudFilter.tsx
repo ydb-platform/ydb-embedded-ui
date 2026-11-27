@@ -20,13 +20,14 @@ export function CloudFilter({ids, environmentName, value, onChange}: CloudFilter
     const cloudNames = tenantsApi.endpoints.getDatabaseCloudNames;
     const args = React.useMemo(() => ({ids, environmentName}), [ids, environmentName]);
     const canResolve = Boolean(uiFactory.resolveCloudName);
-    // `data` outlives a change of the IDs list, so resolved labels do not fall back to IDs on refetch.
-    const {data, isFetching, isUninitialized} = cloudNames.useQueryState(args, {
+    // `data` outlives a change of the IDs list, so resolved labels do not fall back to IDs.
+    // `currentData` is the names of exactly these IDs: only it tells whether they are loaded.
+    const {data, currentData, isFetching, isUninitialized} = cloudNames.useQueryState(args, {
         skip: !canResolve,
     });
     // Keep resolved labels on the closed control and fetch uncached IDs only while open.
     cloudNames.useQuerySubscription(args, {
-        skip: !canResolve || (!open && !data),
+        skip: !canResolve || (!open && !currentData),
     });
     const loading = open && canResolve && !data && (isFetching || isUninitialized);
     const options = React.useMemo(() => cloudOptions(ids, data ?? [], value), [ids, data, value]);

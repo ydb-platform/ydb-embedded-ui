@@ -700,6 +700,19 @@ test('My databases resolves cloud names on open and searches by both name and ID
         await search.fill(query);
         await expect(page.getByRole('option')).toHaveText(['Production']);
     }
+    // A cloud that appears while the filter is closed is resolved when it is opened again
+    await page.keyboard.press('Escape');
+    await expect(page.getByRole('listbox')).toHaveCount(0);
+    const fourth = {Name: '/db/fourth', Type: 'Dedicated', UserAttributes: {cloud_id: 'cloud-c'}};
+    await page.route('**/meta/databases?*', (route) =>
+        route.fulfill({json: {databases: [...cloudDatabases, fourth]}}),
+    );
+    await page.getByRole('button', {name: 'Refresh', exact: true}).click();
+    await expect(page.getByText('Databases: 2 of 4', {exact: true})).toBeVisible();
+    await expect(cloud).toContainText('Production');
+    expect(calls).toHaveLength(1);
+    await cloud.click();
+    await expect.poll(() => calls.at(-1)?.ids).toEqual(['cloud-a', 'cloud-b', 'cloud-c']);
 });
 
 test('My databases keeps cloud IDs selectable after name resolution fails', async ({page}) => {
@@ -783,6 +796,50 @@ test('My databases displays allocations from cluster presets and groups by CPU a
     await page.getByPlaceholder('Database name').fill('legacy');
     await expect(page.getByRole('button', {name: /<50%/})).toHaveCount(0);
     await expect(groupBy).toContainText('Memory used / Allocated memory');
+});
+
+test('My databases asks for the presets restricted to the cloud of a database', async ({page}) => {
+    const twoSlots = {scale_policy: {fixed_scale: {size: 2}}};
+    await mockDatabases(page, [
+        {
+            Name: '/db/common',
+            Type: 'Dedicated',
+            Cluster: 'alpha',
+            UserAttributes: {cloud_id: 'cloud-0'},
+            ControlPlane: {resource_preset_id: 'small', ...twoSlots},
+        },
+        {
+            Name: '/db/restricted',
+            Type: 'Dedicated',
+            Cluster: 'alpha',
+            UserAttributes: {cloud_id: 'cloud-1'},
+            ControlPlane: {resource_preset_id: 'small-m4', ...twoSlots},
+        },
+    ]);
+    const requests: unknown[] = [];
+    await page.route('**/meta/list_resource_presets*', (route) => {
+        const request = route.request().postDataJSON();
+        requests.push(request);
+        // Control Plane lists a restricted preset only for the clouds it is allowed for
+        const presets = [{id: 'small', cores: '2', memory: '4'}];
+        if (request.cloud_id === 'cloud-1') {
+            presets.push({id: 'small-m4', cores: '8', memory: '4'});
+        }
+        return route.fulfill({json: {resource_presets: presets}});
+    });
+    await page.goto(databasesUrl);
+    const allocatedCores = (database: string, cores: string) =>
+        page
+            .getByRole('row')
+            .filter({has: page.getByRole('link', {name: database, exact: true})})
+            .getByRole('cell', {name: cores, exact: true});
+    await expect(allocatedCores('common', '4')).toBeVisible();
+    await expect(allocatedCores('restricted', '16')).toBeVisible();
+    // The cloud of a database with a common preset is not asked about
+    expect(requests).toEqual([
+        {cluster_name: 'alpha'},
+        {cluster_name: 'alpha', cloud_id: 'cloud-1'},
+    ]);
 });
 
 test('My databases hides allocated resources when meta cannot list resource presets', async ({

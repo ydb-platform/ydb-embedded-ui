@@ -53,6 +53,14 @@ test.each([true, false])(
             });
             expect(requests[0].signal).toBeDefined();
             expect(JSON.parse(requests[0].data)).toEqual({cluster_name: 'cluster-a'});
+
+            await store
+                .dispatch(endpoint.initiate({...args, cloudId: 'cloud-1'}, {subscribe: false}))
+                .unwrap();
+            expect(JSON.parse(requests[2].data)).toEqual({
+                cluster_name: 'cluster-a',
+                cloud_id: 'cloud-1',
+            });
             expect(endpoint.select(args)(store.getState()).data?.resource_presets?.[0].memory).toBe(
                 '1',
             );

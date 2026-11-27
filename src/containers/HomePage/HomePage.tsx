@@ -62,9 +62,6 @@ export function HomePage() {
         !metaEnvironmentsAvailable ||
         (!environmentsLoading && (!environments || environments?.length === 0));
 
-    const {databasesPageEnvironment, envParamFromQuery, handleEnvironmentChange} =
-        useDatabasesPageEnvironment(environments);
-
     const homePageTab = React.useMemo<HomePageTab>(() => {
         if (!metaEnvironmentsAvailable) {
             return 'clusters';
@@ -75,6 +72,11 @@ export function HomePage() {
 
         return homePageTabSchema.catch(savedHomePageTab).parse(tabFromPath);
     }, [isViewerUser, tabFromPath, savedHomePageTab, metaEnvironmentsAvailable]);
+
+    const {databasesPageEnvironment, handleEnvironmentChange} = useDatabasesPageEnvironment(
+        environments,
+        {syncToUrl: homePageTab === 'databases'},
+    );
 
     const initialPageTitle =
         homePageTab === 'clusters' ? i18n('page-title_clusters') : i18n('page-title_databases');
@@ -88,24 +90,6 @@ export function HomePage() {
     React.useEffect(() => {
         dispatch(setHeaderBreadcrumbs('homePage', {}));
     }, [dispatch]);
-
-    React.useEffect(() => {
-        if (
-            homePageTab === 'databases' &&
-            environments &&
-            environments?.length > 1 &&
-            databasesPageEnvironment &&
-            databasesPageEnvironment !== envParamFromQuery
-        ) {
-            handleEnvironmentChange(databasesPageEnvironment);
-        }
-    }, [
-        homePageTab,
-        environments,
-        databasesPageEnvironment,
-        envParamFromQuery,
-        handleEnvironmentChange,
-    ]);
 
     const environmentsTabs = React.useMemo(() => {
         const getEnvironmentTitle = uiFactory.databasesEnvironmentsConfig?.getEnvironmentTitle;
