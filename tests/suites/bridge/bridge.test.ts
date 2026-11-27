@@ -22,20 +22,20 @@ import {
 } from './mocks';
 
 test.describe('Bridge mode - Nodes table', () => {
-    test('off: no Pile Name column and no group-by option', async ({page}) => {
+    test('off: no Bridge pile column and no group-by option', async ({page}) => {
         await mockCapabilities(page, false);
         await page.route(`${backend}/viewer/json/nodes?*`, (route) => route.continue());
         await page.goto(`/${nodesPage}`, {waitUntil: 'domcontentloaded'});
         const table = new ClusterNodesTable(page);
         await table.waitForTableToLoad();
         const headers = await table.getHeaders();
-        expect(headers.join(' ')).not.toContain('Pile Name');
-        // open columns setup and ensure Pile Name not present
+        expect(headers.join(' ')).not.toContain('Bridge pile');
+        // open columns setup and ensure Bridge pile not present
         await table.getControls().openColumnSetup();
         expect(await table.getControls().isColumnVisible('PileName')).toBeFalsy();
     });
 
-    test('on: shows Pile Name column', async ({page}) => {
+    test('on: shows Bridge pile column', async ({page}) => {
         await mockCapabilities(page, true);
         await mockNodesWithPile(page);
         await page.goto(`/${nodesPage}`, {waitUntil: 'domcontentloaded'});
@@ -44,32 +44,67 @@ test.describe('Bridge mode - Nodes table', () => {
         await table.getControls().setColumnChecked('PileName');
         await table.waitForTableToLoad();
         const headers = await table.getHeaders();
-        expect(headers.join(' ')).toContain('Pile Name');
+        expect(headers.join(' ')).toContain('Bridge pile');
     });
 });
 
 test.describe('Bridge mode - Storage nodes', () => {
-    test('on: shows Pile Name', async ({page}) => {
-        await mockCapabilities(page, true);
+    test('on: shows Bridge pile and restores grouping from the URL', async ({page}) => {
+        await mockCapabilities(page, true, {'/viewer/nodes': 20});
         await mockNodesWithPile(page);
         const storage = new StoragePage(page);
         await storage.goto({visible: 'all', type: 'nodes'}, {waitUntil: 'domcontentloaded'});
         const table = new ClusterStorageTable(page);
-        await table.getControls().openColumnSetup();
-        await table.getControls().setColumnChecked('PileName');
         await table.waitForTableToLoad();
-        const headers = await table.getHeaders();
-        expect(headers.join(' ')).toContain('Pile Name');
+        expect(await table.getHeaders()).toContain('Bridge pile');
+
+        const groupBy = page.locator('.global-storage__controls-row .g-select');
+        await groupBy.click();
+        const groupedRequest = page.waitForRequest((request) => {
+            const url = new URL(request.url());
+            return (
+                url.pathname.endsWith('/viewer/json/nodes') &&
+                url.searchParams.get('group') === 'PileName'
+            );
+        });
+        await page.getByRole('option', {name: 'Bridge pile', exact: true}).click();
+        expect(new URL((await groupedRequest).url()).searchParams.get('type')).toBe('static');
+        await expect(page).toHaveURL(/storageNodesGroupBy=PileName/);
+
+        await page.reload();
+        await expect(groupBy).toContainText('Bridge pile');
+        const rowsRequest = page.waitForRequest((request) => {
+            const url = new URL(request.url());
+            return (
+                url.pathname.endsWith('/viewer/json/nodes') &&
+                url.searchParams.get('filter_group_by') === 'PileName'
+            );
+        });
+        await page.getByRole('button', {name: /^r1/}).click();
+        expect(new URL((await rowsRequest).url()).searchParams.get('filter_group')).toBe('r1');
     });
 
-    test('off: hides Pile Name', async ({page}) => {
-        await mockCapabilities(page, false);
+    test('off: ignores Bridge pile grouping from the URL and hides the option', async ({page}) => {
+        await mockCapabilities(page, false, {'/viewer/nodes': 20});
+        await mockNodesWithPile(page);
         const storage = new StoragePage(page);
-        await storage.goto({visible: 'all', type: 'nodes'}, {waitUntil: 'domcontentloaded'});
+        const nodesRequest = page.waitForRequest((request) => {
+            const url = new URL(request.url());
+            return (
+                url.pathname.endsWith('/viewer/json/nodes') &&
+                url.searchParams.get('type') === 'static'
+            );
+        });
+        await storage.goto(
+            {visible: 'all', type: 'nodes', storageNodesGroupBy: 'PileName'},
+            {waitUntil: 'domcontentloaded'},
+        );
+        expect(new URL((await nodesRequest).url()).searchParams.has('group')).toBe(false);
         const table = new ClusterStorageTable(page);
         await table.waitForTableToLoad();
-        const headers = await table.getHeaders();
-        expect(headers.join(' ')).not.toContain('Pile Name');
+        expect(await table.getHeaders()).not.toContain('Bridge pile');
+        await page.locator('.global-storage__controls-row .g-select').click();
+        await expect(page.getByRole('option', {name: 'Bridge pile', exact: true})).toHaveCount(0);
     });
 });
 

@@ -11,6 +11,7 @@ import {UptimeFilter} from '../../../components/UptimeFIlter';
 import {
     useBlobStorageCapacityMetricsAvailable,
     useBlobStorageCapacityMetricsEnabled,
+    useBridgeModeEnabled,
 } from '../../../store/reducers/capabilities/hooks';
 import {SETTING_KEYS} from '../../../store/reducers/settings/constants';
 import {useSetting} from '../../../utils/hooks';
@@ -66,10 +67,15 @@ export function StorageNodesControls({
     const isStorageExpertMode = useIsStorageExpertMode();
     const storageExpertModeAvailable = useBlobStorageCapacityMetricsAvailable();
     const blobMetricsEnabled = useBlobStorageCapacityMetricsEnabled();
+    const bridgeModeEnabled = useBridgeModeEnabled();
 
     const nodesGroupByOptions = React.useMemo(
-        () => getStorageNodesGroupByOptions(blobMetricsEnabled),
-        [blobMetricsEnabled],
+        () => getStorageNodesGroupByOptions(blobMetricsEnabled, bridgeModeEnabled),
+        [blobMetricsEnabled, bridgeModeEnabled],
+    );
+
+    const selectedGroupBy = nodesGroupByOptions.find(
+        ({value}) => value === storageNodesGroupByParam,
     );
 
     const handleGroupBySelectUpdate = (value: string[]) => {
@@ -110,9 +116,7 @@ export function StorageNodesControls({
                             hasClear
                             placeholder={'-'}
                             width={150}
-                            defaultValue={
-                                storageNodesGroupByParam ? [storageNodesGroupByParam] : undefined
-                            }
+                            defaultValue={selectedGroupBy ? [selectedGroupBy.value] : undefined}
                             onUpdate={handleGroupBySelectUpdate}
                             options={nodesGroupByOptions}
                         />

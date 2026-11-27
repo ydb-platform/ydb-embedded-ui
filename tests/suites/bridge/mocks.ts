@@ -29,6 +29,17 @@ export const mockCapabilities = (
 
 export const mockNodesWithPile = (page: Page) => {
     return page.route(`**/viewer/json/nodes?*`, async (route: Route) => {
+        const {searchParams} = new URL(route.request().url());
+        if (searchParams.get('group') === 'PileName') {
+            await route.fulfill({
+                json: {
+                    FoundNodes: 1,
+                    TotalNodes: 1,
+                    NodeGroups: [{GroupName: 'r1', NodeCount: 1}],
+                },
+            });
+            return;
+        }
         await route.fulfill({
             status: 200,
             contentType: 'application/json',

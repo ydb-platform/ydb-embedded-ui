@@ -2,6 +2,7 @@ import React from 'react';
 
 import {LoaderWrapper} from '../../../components/LoaderWrapper/LoaderWrapper';
 import {
+    useBridgeModeEnabled,
     useCapabilitiesLoaded,
     useViewerNodesHandlerHasGrouping,
 } from '../../../store/reducers/capabilities/hooks';
@@ -20,6 +21,10 @@ export function PaginatedStorageNodes(props: PaginatedStorageProps) {
 
     const capabilitiesLoaded = useCapabilitiesLoaded();
     const viewerNodesHandlerHasGrouping = useViewerNodesHandlerHasGrouping();
+    const bridgeModeEnabled = useBridgeModeEnabled();
+    const groupingAllowed =
+        viewerNodesHandlerHasGrouping &&
+        (storageNodesGroupByParam !== 'PileName' || bridgeModeEnabled);
 
     // Other filters do not fit with grouping
     // Reset them if grouping available
@@ -33,7 +38,7 @@ export function PaginatedStorageNodes(props: PaginatedStorageProps) {
     }, [handleShowAllNodes, nodesUptimeFilter, viewerNodesHandlerHasGrouping, visibleEntities]);
 
     const renderContent = () => {
-        if (viewerNodesHandlerHasGrouping && storageNodesGroupByParam) {
+        if (groupingAllowed && storageNodesGroupByParam) {
             return <GroupedStorageNodesComponent {...props} />;
         }
 
