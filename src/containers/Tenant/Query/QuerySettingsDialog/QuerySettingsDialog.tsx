@@ -24,7 +24,7 @@ import {
     selectQueryAction,
     setQueryAction,
 } from '../../../../store/reducers/queryActions/queryActions';
-import type {QuerySettings} from '../../../../types/store/query';
+import type {QueryMode, QuerySettings} from '../../../../types/store/query';
 import {cn} from '../../../../utils/cn';
 import {BRAND_BUTTON_CLASS} from '../../../../utils/constants';
 import {
@@ -39,6 +39,7 @@ import {
     TRACING_LEVELS,
     TRANSACTION_MODES,
     TRANSACTION_MODES_TITLES,
+    getEffectiveQueryTimeout,
     getEffectiveTransactionMode,
     isStreamingSupportedForMode,
     querySettingsValidationSchema,
@@ -200,6 +201,24 @@ function QuerySettingsForm({initialValues, onSubmit, onClose}: QuerySettingsForm
         [enableSnapshotReadWrite, baselineSettings.transactionMode],
     );
 
+    const updateTimeoutForQueryMode = (mode: QueryMode) => {
+        const resetTimeout = mode === 'query';
+        if (resetTimeout) {
+            setValue('timeout', null);
+        } else if (timeout === null) {
+            setValue('timeout', '');
+        }
+
+        // Compare against the timeout this mode would apply without any manual timeout edits.
+        setBaselineSettings((settings) => ({
+            ...settings,
+            timeout: getEffectiveQueryTimeout(
+                {...settings, queryMode: mode, timeout: resetTimeout ? null : settings.timeout},
+                isQueryStreamingEnabled,
+            ),
+        }));
+    };
+
     const submit = (data: QuerySettings) => {
         onSubmit(data);
 
@@ -354,11 +373,7 @@ function QuerySettingsForm({initialValues, onSubmit, onClose}: QuerySettingsForm
                                         setting={field.value}
                                         onUpdateSetting={(mode) => {
                                             field.onChange(mode);
-                                            if (mode !== 'query' && timeout === null) {
-                                                setValue('timeout', '');
-                                            } else if (mode === 'query') {
-                                                setValue('timeout', null);
-                                            }
+                                            updateTimeoutForQueryMode(mode);
                                         }}
                                         settingOptions={
                                             QUERY_SETTINGS_FIELD_SETTINGS.queryMode.options
