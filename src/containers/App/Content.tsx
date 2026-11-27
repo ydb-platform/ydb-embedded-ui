@@ -31,7 +31,7 @@ import {useMetaAuthUnavailable} from '../../utils/hooks/useMetaAuth';
 import {useNodesListQueryArgs} from '../../utils/hooks/useNodesListQueryArgs';
 import {useSetting} from '../../utils/hooks/useSetting';
 import {lazyComponent} from '../../utils/lazyComponent';
-import {omitVolatileQueryParamsFromSearch} from '../../utils/queryParams';
+import {getRedirectLocation} from '../../utils/queryParams';
 import {isForbiddenError, isRedirectToAuth, isUnauthenticatedError} from '../../utils/response';
 import Authentication from '../Authentication/Authentication';
 import {GetUser} from '../GetUserWrapper/GetUserWrapper';
@@ -168,11 +168,10 @@ export function Content(props: ContentProps) {
 
     const redirect = slots.get(RedirectSlot);
     // Keep query params and hash, so links like `/?search=foo` survive the redirect to home page
-    const homePageRedirect = {
-        pathname: getLocationObjectFromHref(getHomePagePath()).pathname,
-        search: omitVolatileQueryParamsFromSearch(currentLocation.search),
-        hash: currentLocation.hash,
-    };
+    const homePageRedirect = getRedirectLocation(
+        currentLocation,
+        getLocationObjectFromHref(getHomePagePath()).pathname,
+    );
     const redirectProps: RedirectProps =
         redirect?.props ?? (singleClusterMode ? {to: getClusterPath()} : {to: homePageRedirect});
 

@@ -3,7 +3,6 @@ import React from 'react';
 import {Flex, SegmentedRadioGroup, Text} from '@gravity-ui/uikit';
 import {Helmet} from 'react-helmet-async';
 import {Redirect, Route, Switch, useHistory, useLocation} from 'react-router-dom';
-import {StringParam, useQueryParam} from 'use-query-params';
 
 import {AutoRefreshControl} from '../../components/AutoRefreshControl/AutoRefreshControl';
 import {DrawerContextProvider} from '../../components/Drawer/DrawerContext';
@@ -25,7 +24,7 @@ import {uiFactory} from '../../uiFactory/uiFactory';
 import {cn} from '../../utils/cn';
 import {useSetting, useTypedDispatch} from '../../utils/hooks';
 import {useIsViewerUser} from '../../utils/hooks/useIsUserAllowedToMakeChanges';
-import {omitVolatileQueryParamsFromSearch} from '../../utils/queryParams';
+import {getRedirectLocation} from '../../utils/queryParams';
 import {isAccessError} from '../../utils/response';
 import {Clusters} from '../Clusters/Clusters';
 import {GetMetaUser} from '../GetUserWrapper/GetUserWrapper';
@@ -43,9 +42,6 @@ export function HomePage() {
     const dispatch = useTypedDispatch();
     const history = useHistory();
     const location = useLocation();
-    const redirectSearch = omitVolatileQueryParamsFromSearch(location.search);
-    // Clusters and databases lists share the `search` param, keep it when switching tabs
-    const [searchQuery] = useQueryParam('search', StringParam);
 
     const scrollContainerRef = React.useRef<HTMLDivElement>(null);
 
@@ -126,16 +122,16 @@ export function HomePage() {
     const handleTabChange = React.useCallback(
         (value: HomePageTab) => {
             saveHomePageTab(value);
+            // Clusters and databases lists share the `search` param, keep it when switching tabs.
             // The input writes to the URL with a debounce, so take the text user actually sees
-            const visibleSearch =
+            const search =
                 scrollContainerRef.current?.querySelector<HTMLInputElement>(
                     '.ydb-search input',
                 )?.value;
-            const search = visibleSearch ?? searchQuery;
             const path = getHomePagePath({activeTab: value}, {search: search || undefined});
             history.replace(path);
         },
-        [history, saveHomePageTab, searchQuery],
+        [history, saveHomePageTab],
     );
 
     const handleEnvironmentTabChange = React.useCallback(
@@ -234,17 +230,13 @@ export function HomePage() {
         const databasesPath = getLocationObjectFromHref(getDatabasesPath()).pathname;
 
         if (noEnvironmentsAvailable && homePageTab !== 'clusters') {
-            return (
-                <Redirect
-                    to={{pathname: clustersPath, search: redirectSearch, hash: location.hash}}
-                />
-            );
+            return <Redirect to={getRedirectLocation(location, clustersPath)} />;
         }
         if (homePageTab !== tabFromPath) {
             const path = getLocationObjectFromHref(
                 getHomePagePath({activeTab: homePageTab}),
             ).pathname;
-            return <Redirect to={{pathname: path, search: redirectSearch, hash: location.hash}} />;
+            return <Redirect to={getRedirectLocation(location, path)} />;
         }
 
         return (

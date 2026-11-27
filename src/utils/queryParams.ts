@@ -1,3 +1,5 @@
+import qs from 'qs';
+
 const VOLATILE_QUERY_PARAMS = ['utm_referrer'] as const;
 
 type VolatileQueryParam = (typeof VOLATILE_QUERY_PARAMS)[number];
@@ -21,15 +23,20 @@ export function omitVolatileQueryParams<T extends Record<string, unknown>>(
 }
 
 export function omitVolatileQueryParamsFromSearch(search: string) {
-    const params = new URLSearchParams(search);
-    const volatileParams = VOLATILE_QUERY_PARAMS.filter((param) => params.has(param));
+    const query = omitVolatileQueryParams(qs.parse(search, {ignoreQueryPrefix: true}));
 
-    if (volatileParams.length === 0) {
-        return search;
-    }
+    return qs.stringify(query, {
+        addQueryPrefix: true,
+        arrayFormat: 'repeat',
+        encoder: encodeURIComponent,
+    });
+}
 
-    volatileParams.forEach((param) => params.delete(param));
-    const result = params.toString();
-
-    return result ? `?${result}` : '';
+/** Location for a redirect to `pathname` that keeps the current query params and hash */
+export function getRedirectLocation(location: {search: string; hash: string}, pathname: string) {
+    return {
+        pathname,
+        search: omitVolatileQueryParamsFromSearch(location.search),
+        hash: location.hash,
+    };
 }
