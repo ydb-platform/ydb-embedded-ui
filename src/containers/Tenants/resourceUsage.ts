@@ -62,8 +62,8 @@ function configuredSize(config?: DatabaseComputeConfig) {
 export type PresetCatalogs = ReadonlyMap<string, ReadonlyMap<string, ResourcePreset>>;
 
 /**
- * The catalog of a cluster has its common presets.
- * The catalog of a cloud in the cluster also has the presets restricted to that cloud.
+ * Presets are listed for a cluster, or for a cloud in the cluster: that list also has
+ * the presets restricted to the cloud. A database reads the list it was asked about with.
  */
 export function presetCatalogKey(clusterName: string, cloudId?: string) {
     return cloudId ? JSON.stringify([clusterName, cloudId]) : clusterName;
@@ -105,9 +105,7 @@ export function allocatedResources(
         return undefined;
     }
     const {clusterName, cloudId, presetId, size} = required;
-    const preset =
-        catalogs.get(presetCatalogKey(clusterName, cloudId))?.get(presetId) ??
-        catalogs.get(presetCatalogKey(clusterName))?.get(presetId);
+    const preset = catalogs.get(presetCatalogKey(clusterName, cloudId))?.get(presetId);
     if (!preset) {
         return undefined;
     }

@@ -83,29 +83,18 @@ function usePresetCatalogs(requests: CatalogRequest[]) {
     return useTypedSelector(selectCatalogs);
 }
 
-/** Resource presets the given databases are scaled by. */
+/**
+ * Resource presets the given databases are scaled by.
+ * A database in a cloud is asked about with its cloud: the answer then also has the presets
+ * restricted to that cloud. Other databases are asked about by the cluster alone.
+ */
 export function useDatabasePresets(rows: readonly PreparedTenant[]) {
     const available =
         useGetMetaFeatureVersion('/meta/list_resource_presets') >= 1 && Boolean(window.api.meta);
-    const required = React.useMemo(
+    const requests = React.useMemo(
         () => (available ? rows.map(requiredPreset).filter((preset) => preset !== undefined) : []),
         [available, rows],
     );
 
-    const common = usePresetCatalogs(required.map(({clusterName}) => ({clusterName})));
-    // A preset restricted to some clouds is listed only for them. Most presets are common,
-    // so a cloud is asked about only when the catalog of its cluster lacks the preset.
-    const restricted = usePresetCatalogs(
-        required.filter(({clusterName, cloudId, presetId}) => {
-            const catalog = common.catalogs.get(presetCatalogKey(clusterName));
-            return cloudId && catalog && !catalog.has(presetId);
-        }),
-    );
-
-    const catalogs = React.useMemo(
-        () => new Map([...common.catalogs, ...restricted.catalogs]),
-        [common.catalogs, restricted.catalogs],
-    );
-
-    return {available, catalogs, loading: common.loading || restricted.loading};
+    return {available, ...usePresetCatalogs(requests)};
 }

@@ -535,7 +535,8 @@ function TenantsTableContent({
     const renderColumnSetup = () => {
         return (
             <TableColumnSetup
-                popupWidth={200}
+                // Titles of column groups are longer than titles of columns
+                popupWidth={myDatabases ? 300 : 200}
                 items={layout.items}
                 showStatus
                 onUpdate={(updated) =>

@@ -769,6 +769,26 @@ test('My databases displays allocations from cluster presets and groups by CPU a
     const totals = page.locator('.data-table__sticky_footer').getByRole('row');
     await expect(totals.getByRole('cell', {name: '≥ 8', exact: true})).toBeVisible();
     await expect(totals.getByRole('cell', {name: '≥ 9 GB', exact: true})).toBeVisible();
+    // Titles of column groups fit into the columns settings
+    await page.getByRole('button', {name: /^\d+\/\d+$/}).click();
+    for (const title of ['Allocated physical resources', 'YDB logical resources']) {
+        const item = page.locator('.g-popup').getByText(title, {exact: true});
+        await expect(item).toBeVisible();
+        expect(
+            await item.evaluate((node) => {
+                for (let el: HTMLElement | null = node as HTMLElement; el; el = el.parentElement) {
+                    if (el.scrollWidth > el.clientWidth) {
+                        return el.className;
+                    }
+                    if (el.classList.contains('g-popup')) {
+                        break;
+                    }
+                }
+                return 'fits';
+            }),
+        ).toBe('fits');
+    }
+    await page.keyboard.press('Escape');
     const groupBy = page.getByRole('combobox', {name: /Group by/});
     await groupBy.click();
     await expect(page.getByRole('option')).toHaveText([
@@ -798,14 +818,15 @@ test('My databases displays allocations from cluster presets and groups by CPU a
     await expect(groupBy).toContainText('Memory used / Allocated memory');
 });
 
-test('My databases asks for the presets restricted to the cloud of a database', async ({page}) => {
+test('My databases asks for presets with the cloud of a database when it has one', async ({
+    page,
+}) => {
     const twoSlots = {scale_policy: {fixed_scale: {size: 2}}};
     await mockDatabases(page, [
         {
-            Name: '/db/common',
+            Name: '/db/no-cloud',
             Type: 'Dedicated',
             Cluster: 'alpha',
-            UserAttributes: {cloud_id: 'cloud-0'},
             ControlPlane: {resource_preset_id: 'small', ...twoSlots},
         },
         {
@@ -833,13 +854,15 @@ test('My databases asks for the presets restricted to the cloud of a database', 
             .getByRole('row')
             .filter({has: page.getByRole('link', {name: database, exact: true})})
             .getByRole('cell', {name: cores, exact: true});
-    await expect(allocatedCores('common', '4')).toBeVisible();
+    await expect(allocatedCores('no-cloud', '4')).toBeVisible();
     await expect(allocatedCores('restricted', '16')).toBeVisible();
-    // The cloud of a database with a common preset is not asked about
-    expect(requests).toEqual([
-        {cluster_name: 'alpha'},
-        {cluster_name: 'alpha', cloud_id: 'cloud-1'},
-    ]);
+    expect(requests).toHaveLength(2);
+    expect(requests).toEqual(
+        expect.arrayContaining([
+            {cluster_name: 'alpha'},
+            {cluster_name: 'alpha', cloud_id: 'cloud-1'},
+        ]),
+    );
 });
 
 test('My databases hides allocated resources when meta cannot list resource presets', async ({
