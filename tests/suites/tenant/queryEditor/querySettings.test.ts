@@ -2,6 +2,7 @@ import {expect, test} from '@playwright/test';
 import type {Page, Route} from '@playwright/test';
 
 import {
+    DEFAULT_QUERY_SETTINGS,
     MAX_QUERY_TIMEOUT_SECONDS,
     QUERY_MODES,
     TRANSACTION_MODES,
@@ -55,22 +56,51 @@ test.describe('Test Query Settings', async () => {
         });
     });
 
-    test('Settings dialog opens on Gear click and closes on Cancel', async ({page}) => {
+    test('Settings dialog discards cancelled drafts and persists applied statistics', async ({
+        page,
+    }) => {
         const queryEditor = new QueryEditor(page);
         await queryEditor.clickGearButton();
 
         await expect(queryEditor.settingsDialog.isVisible()).resolves.toBe(true);
-
+        await expect(queryEditor.settingsDialog.selectedStatsLevel).toHaveAccessibleName('Full');
+        const advanced = page.getByRole('button', {name: 'Advanced settings', exact: true});
+        await expect(advanced).toHaveAttribute('aria-expanded', 'false');
+        await queryEditor.settingsDialog.expandAdvanced();
+        const tracingLabel = page.getByText('Tracing', {exact: true});
+        const tracing = page.getByRole('switch', {name: 'Tracing', exact: true});
+        await tracingLabel.click();
+        await expect(tracing).toBeChecked();
+        await tracingLabel.click();
+        await expect(tracing).not.toBeChecked();
+        await queryEditor.settingsDialog.changeStatsLevel('none');
         await queryEditor.settingsDialog.clickButton(ButtonNames.Cancel);
         await expect(queryEditor.settingsDialog.isHidden()).resolves.toBe(true);
+
+        await queryEditor.clickGearButton();
+        await expect(advanced).toHaveAttribute('aria-expanded', 'false');
+        await expect(queryEditor.settingsDialog.selectedStatsLevel).toHaveAccessibleName('Full');
+        await queryEditor.settingsDialog.changeStatsLevel('none');
+        await queryEditor.settingsDialog.clickButton(ButtonNames.Apply);
+        await expect(queryEditor.settingsDialog.isHidden()).resolves.toBe(true);
+        await page.reload();
+        await queryEditor.clickGearButton();
+        await expect(queryEditor.settingsDialog.selectedStatsLevel).toHaveAccessibleName('None');
     });
 
     test('Settings dialog saves changes and updates Gear button', async ({page}) => {
         const queryEditor = new QueryEditor(page);
         await queryEditor.clickGearButton();
 
-        await queryEditor.settingsDialog.changeQueryMode(QUERY_MODES.scan);
-        await queryEditor.settingsDialog.clickButton(ButtonNames.Save);
+        await queryEditor.settingsDialog.expandAdvanced();
+        await page.getByRole('combobox', {name: 'Query type', exact: true}).click();
+        const options = page.getByRole('option');
+        await expect(options).toHaveCount(4);
+        for (const option of await options.all()) {
+            await expect(option).toHaveAccessibleName(/\S/);
+        }
+        await page.getByRole('option', {name: 'Scan Legacy', exact: true}).click();
+        await queryEditor.settingsDialog.clickButton(ButtonNames.Apply);
 
         await expect(async () => {
             const text = await queryEditor.gearButtonText();
@@ -83,7 +113,7 @@ test.describe('Test Query Settings', async () => {
         await queryEditor.clickGearButton();
 
         await queryEditor.settingsDialog.changeQueryMode(QUERY_MODES.scan);
-        await queryEditor.settingsDialog.clickButton(ButtonNames.Save);
+        await queryEditor.settingsDialog.clickButton(ButtonNames.Apply);
         await queryEditor.hoverGearButton();
 
         const settingsActionTooltip = page
@@ -102,7 +132,7 @@ test.describe('Test Query Settings', async () => {
         // Change a setting
         await queryEditor.clickGearButton();
         await queryEditor.settingsDialog.changeQueryMode(QUERY_MODES.scan);
-        await queryEditor.settingsDialog.clickButton(ButtonNames.Save);
+        await queryEditor.settingsDialog.clickButton(ButtonNames.Apply);
 
         // Execute a script
         await queryEditor.setQuery(testQuery);
@@ -118,7 +148,7 @@ test.describe('Test Query Settings', async () => {
         // Change a setting
         await queryEditor.clickGearButton();
         await queryEditor.settingsDialog.changeQueryMode(QUERY_MODES.scan);
-        await queryEditor.settingsDialog.clickButton(ButtonNames.Save);
+        await queryEditor.settingsDialog.clickButton(ButtonNames.Apply);
 
         // Execute a script
         await queryEditor.setQuery(longRunningQuery);
@@ -135,7 +165,7 @@ test.describe('Test Query Settings', async () => {
 
         await queryEditor.settingsDialog.changeQueryMode(QUERY_MODES.scan);
         await queryEditor.settingsDialog.changeTransactionMode(TRANSACTION_MODES.snapshot);
-        await queryEditor.settingsDialog.clickButton(ButtonNames.Save);
+        await queryEditor.settingsDialog.clickButton(ButtonNames.Apply);
 
         await expect(async () => {
             const text = await queryEditor.gearButtonText();
@@ -157,12 +187,13 @@ test.describe('Test Query Settings', async () => {
         await queryEditor.clickGearButton();
 
         await queryEditor.settingsDialog.changeLimitRows(100001);
-        await queryEditor.settingsDialog.clickButton(ButtonNames.Save);
+        await queryEditor.settingsDialog.clickButton(ButtonNames.Apply);
 
-        await expect(queryEditor.settingsDialog.isLimitRowsError()).resolves.toBe(true);
-        await expect(queryEditor.settingsDialog.getLimitRowsErrorMessage()).resolves.toBe(
-            'Too big: expected number to be <=100000',
+        const message = 'Too big: expected number to be <=100000';
+        await expect(queryEditor.settingsDialog.limitRowsInput).toHaveAccessibleDescription(
+            message,
         );
+        await expect(page.getByText(message, {exact: true})).toBeVisible();
     });
 
     test('Shows error for negative limit rows', async ({page}) => {
@@ -170,29 +201,76 @@ test.describe('Test Query Settings', async () => {
         await queryEditor.clickGearButton();
 
         await queryEditor.settingsDialog.changeLimitRows(-1);
-        await queryEditor.settingsDialog.clickButton(ButtonNames.Save);
-
-        await expect(queryEditor.settingsDialog.isLimitRowsError()).resolves.toBe(true);
-        await expect(queryEditor.settingsDialog.getLimitRowsErrorMessage()).resolves.toBe(
+        await page.getByRole('button', {name: ButtonNames.Apply, exact: true}).press('Enter');
+        await expect(queryEditor.settingsDialog.limitRowsInput).toBeFocused();
+        await expect(queryEditor.settingsDialog.limitRowsInput).toHaveAccessibleDescription(
             'Too small: expected number to be >0',
         );
     });
 
-    test('Persists valid limit rows value', async ({page}) => {
-        const queryEditor = new QueryEditor(page);
-        const validValue = 50000;
+    test.describe('Saved Snapshot Read-Write', () => {
+        async function openSettingsOnViewer(page: Page, queryVersion: number) {
+            await page.route('**/viewer/capabilities*', (route) =>
+                route.fulfill({json: {Capabilities: {'/viewer/query': queryVersion}}}),
+            );
+            await Promise.all([
+                page.waitForResponse((response) => response.url().includes('/viewer/capabilities')),
+                page.reload(),
+            ]);
+            await new QueryEditor(page).clickGearButton();
+        }
 
-        // Set value and save
-        await queryEditor.clickGearButton();
-        await queryEditor.settingsDialog.changeLimitRows(validValue);
-        await queryEditor.settingsDialog.clickButton(ButtonNames.Save);
-        await expect(queryEditor.settingsDialog.isHidden()).resolves.toBe(true);
+        test.beforeEach(async ({page}) => {
+            await page.evaluate(
+                (settings) =>
+                    localStorage.setItem('queryExecutionSettings', JSON.stringify(settings)),
+                {...DEFAULT_QUERY_SETTINGS, transactionMode: TRANSACTION_MODES.snapshotrw},
+            );
+            await openSettingsOnViewer(page, 10);
+            await expect(page.getByRole('combobox', {name: 'Transaction mode'})).toHaveText(
+                'Implicit',
+            );
+        });
 
-        // Reopen and check value
-        await queryEditor.clickGearButton();
-        await expect(queryEditor.settingsDialog.getLimitRowsValue()).resolves.toBe(
-            validValue.toString(),
-        );
+        test('Changing only Limit rows preserves Snapshot Read-Write', async ({page}) => {
+            const {settingsDialog} = new QueryEditor(page);
+            const transactionMode = page.getByRole('combobox', {name: 'Transaction mode'});
+
+            await settingsDialog.changeLimitRows(50000);
+            await settingsDialog.clickButton(ButtonNames.Apply);
+            await expect(settingsDialog.isHidden()).resolves.toBe(true);
+
+            await openSettingsOnViewer(page, 11);
+            await expect(settingsDialog.getLimitRowsValue()).resolves.toBe('50000');
+            await expect(transactionMode).toHaveText('Snapshot Read-Write');
+
+            await settingsDialog.changeTransactionMode(TRANSACTION_MODES.serializable);
+            await settingsDialog.clickButton(ButtonNames.Apply);
+            await expect(settingsDialog.isHidden()).resolves.toBe(true);
+            await new QueryEditor(page).clickGearButton();
+            await expect(transactionMode).toHaveText('Serializable');
+            await transactionMode.click();
+            const options = page.getByRole('listbox');
+            await expect(options).toBeVisible();
+            await expect(options.getByRole('option', {name: /Snapshot Read-Write/})).toHaveCount(0);
+        });
+
+        test('Choosing Implicit on an older Viewer replaces Snapshot Read-Write', async ({
+            page,
+        }) => {
+            const {settingsDialog} = new QueryEditor(page);
+            await settingsDialog.changeTransactionMode(TRANSACTION_MODES.implicit);
+            await settingsDialog.clickButton(ButtonNames.Apply);
+            await expect(settingsDialog.isHidden()).resolves.toBe(true);
+            const stored = await page.evaluate(() =>
+                JSON.parse(localStorage.getItem('queryExecutionSettings') ?? 'null'),
+            );
+            expect(stored).toMatchObject({transactionMode: TRANSACTION_MODES.implicit});
+
+            await openSettingsOnViewer(page, 11);
+            const transactionMode = page.getByRole('combobox', {name: 'Transaction mode'});
+            await expect(transactionMode).toHaveText('Implicit');
+        });
     });
 
     test('Allows empty limit rows value', async ({page}) => {
@@ -200,7 +278,7 @@ test.describe('Test Query Settings', async () => {
 
         await queryEditor.clickGearButton();
         await queryEditor.settingsDialog.clearLimitRows();
-        await queryEditor.settingsDialog.clickButton(ButtonNames.Save);
+        await queryEditor.settingsDialog.clickButton(ButtonNames.Apply);
 
         await expect(queryEditor.settingsDialog.isHidden()).resolves.toBe(true);
     });
@@ -290,12 +368,42 @@ test.describe('Test Query Settings', async () => {
 
         // Enter a value exceeding MAX_QUERY_TIMEOUT_SECONDS
         await queryEditor.settingsDialog.changeTimeout(MAX_QUERY_TIMEOUT_SECONDS + 1);
-        await queryEditor.settingsDialog.clickButton(ButtonNames.Save);
+        await queryEditor.settingsDialog.clickButton(ButtonNames.Apply);
 
-        // Dialog should stay open with validation error
-        await expect(queryEditor.settingsDialog.isTimeoutError()).resolves.toBe(true);
+        const message = `Too big: expected number to be <=${MAX_QUERY_TIMEOUT_SECONDS}`;
+        await expect(queryEditor.settingsDialog.timeoutInput).toHaveAccessibleDescription(message);
+        await expect(page.getByText(message, {exact: true})).toBeVisible();
 
         await queryEditor.settingsDialog.clickButton(ButtonNames.Cancel);
+    });
+
+    test('Apply reveals and focuses an invalid field in collapsed advanced settings', async ({
+        page,
+    }) => {
+        const queryEditor = new QueryEditor(page);
+        await queryEditor.clickGearButton();
+        await queryEditor.settingsDialog.expandAdvanced();
+        const chunkSize = page.getByRole('spinbutton', {name: 'Output chunk max size'});
+        await chunkSize.pressSequentially('1e');
+        await page.getByRole('button', {name: 'Advanced settings'}).click();
+        await expect(chunkSize).toBeHidden();
+        await queryEditor.settingsDialog.clickButton(ButtonNames.Apply);
+        await expect(chunkSize).toBeFocused();
+        await chunkSize.fill('0');
+        await page.getByRole('button', {name: 'Apply', exact: true}).press('Enter');
+        await expect(chunkSize).toBeFocused();
+        await expect(chunkSize).toHaveAccessibleDescription('Too small: expected number to be >0');
+        await chunkSize.fill('1024');
+        await queryEditor.settingsDialog.clickButton(ButtonNames.Apply);
+        await expect(queryEditor.settingsDialog.isHidden()).resolves.toBe(true);
+    });
+
+    test('Footer buttons fit in the dialog at 320px', async ({page}) => {
+        await page.setViewportSize({width: 320, height: 900});
+        await new QueryEditor(page).clickGearButton();
+        const dialog = page.locator('.ydb-query-settings-dialog');
+        await expect(dialog.getByRole('button', {name: 'Apply'})).toBeInViewport({ratio: 1});
+        await expect.poll(() => dialog.evaluate((el) => el.scrollWidth - el.clientWidth)).toBe(0);
     });
 
     test('Shows error for negative timeout', async ({page}) => {
@@ -310,10 +418,11 @@ test.describe('Test Query Settings', async () => {
 
         // Enter a negative value
         await queryEditor.settingsDialog.changeTimeout(-10);
-        await queryEditor.settingsDialog.clickButton(ButtonNames.Save);
-
-        // Dialog should stay open with validation error
-        await expect(queryEditor.settingsDialog.isTimeoutError()).resolves.toBe(true);
+        await page.getByRole('button', {name: ButtonNames.Apply, exact: true}).press('Enter');
+        await expect(queryEditor.settingsDialog.timeoutInput).toBeFocused();
+        await expect(queryEditor.settingsDialog.timeoutInput).toHaveAccessibleDescription(
+            'Too small: expected number to be >0',
+        );
 
         await queryEditor.settingsDialog.clickButton(ButtonNames.Cancel);
     });
@@ -330,7 +439,7 @@ test.describe('Test Query Settings', async () => {
 
         // Enter exactly the max value
         await queryEditor.settingsDialog.changeTimeout(MAX_QUERY_TIMEOUT_SECONDS);
-        await queryEditor.settingsDialog.clickButton(ButtonNames.Save);
+        await queryEditor.settingsDialog.clickButton(ButtonNames.Apply);
 
         // Dialog should close (no error)
         await expect(queryEditor.settingsDialog.isHidden()).resolves.toBe(true);
@@ -354,7 +463,7 @@ test.describe('Test Query Settings', async () => {
         // Enable timeout and set value
         await queryEditor.settingsDialog.clickTimeoutSwitch();
         await queryEditor.settingsDialog.changeTimeout(validTimeout);
-        await queryEditor.settingsDialog.clickButton(ButtonNames.Save);
+        await queryEditor.settingsDialog.clickButton(ButtonNames.Apply);
         await expect(queryEditor.settingsDialog.isHidden()).resolves.toBe(true);
 
         // Reopen and verify
@@ -410,7 +519,7 @@ test.describe('Test Query Settings', async () => {
         await queryEditor.clickGearButton();
         await queryEditor.settingsDialog.changeQueryMode(QUERY_MODES.scan);
         await queryEditor.settingsDialog.changeTimeout(timeoutSeconds);
-        await queryEditor.settingsDialog.clickButton(ButtonNames.Save);
+        await queryEditor.settingsDialog.clickButton(ButtonNames.Apply);
 
         // Run a query
         await queryEditor.setQuery('SELECT 1;');
@@ -432,7 +541,7 @@ test.describe('Test Query Settings', async () => {
         // Clear timeout and run another query
         await queryEditor.clickGearButton();
         await queryEditor.settingsDialog.clearTimeout();
-        await queryEditor.settingsDialog.clickButton(ButtonNames.Save);
+        await queryEditor.settingsDialog.clickButton(ButtonNames.Apply);
 
         await queryEditor.setQuery('SELECT 2;');
         await queryEditor.clickRunButton();
@@ -491,7 +600,7 @@ test.describe('Test Query Settings', async () => {
         await queryEditor.clickGearButton();
 
         await queryEditor.settingsDialog.changeResourcePool('olap');
-        await queryEditor.settingsDialog.clickButton(ButtonNames.Save);
+        await queryEditor.settingsDialog.clickButton(ButtonNames.Apply);
         await expect(queryEditor.settingsDialog.isHidden()).resolves.toBe(true);
 
         await queryEditor.clickGearButton();
@@ -569,7 +678,7 @@ test.describe('Test Query Settings', async () => {
         // Select a concrete resource pool and run a query
         await queryEditor.clickGearButton();
         await queryEditor.settingsDialog.changeResourcePool('olap');
-        await queryEditor.settingsDialog.clickButton(ButtonNames.Save);
+        await queryEditor.settingsDialog.clickButton(ButtonNames.Apply);
         await queryEditor.setQuery('SELECT 1;');
         await queryEditor.clickRunButton();
 
@@ -588,7 +697,7 @@ test.describe('Test Query Settings', async () => {
         // Now switch to "No pool override" and ensure resource_pool is omitted
         await queryEditor.clickGearButton();
         await queryEditor.settingsDialog.changeResourcePool('No pool override');
-        await queryEditor.settingsDialog.clickButton(ButtonNames.Save);
+        await queryEditor.settingsDialog.clickButton(ButtonNames.Apply);
         await queryEditor.setQuery('SELECT 2;');
         await queryEditor.clickRunButton();
 

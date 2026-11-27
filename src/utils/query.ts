@@ -16,6 +16,7 @@ import type {
     IQueryResult,
     QueryAction,
     QueryMode,
+    QuerySettings,
     StatisticsMode,
     TracingLevel,
     TransactionMode,
@@ -41,7 +42,7 @@ export const TRANSACTION_MODES = {
 export const TRANSACTION_MODES_TITLES: Record<TransactionMode, string> = {
     [TRANSACTION_MODES.serializable]: 'Serializable',
     [TRANSACTION_MODES.stalero]: 'Stale Read-Only',
-    [TRANSACTION_MODES.onlinero]: 'Online Read-Only (obsolete)',
+    [TRANSACTION_MODES.onlinero]: 'Online Read-Only',
     [TRANSACTION_MODES.snapshot]: 'Snapshot Read-Only',
     [TRANSACTION_MODES.snapshotrw]: 'Snapshot Read-Write',
     [TRANSACTION_MODES.implicit]: 'Implicit',
@@ -72,7 +73,7 @@ export const TRACING_LEVELS = {
 
 export const TRACING_LEVELS_TITLES: Record<TracingLevel, string> = {
     [TRACING_LEVELS.off]: 'Off',
-    [TRACING_LEVELS.toplevel]: 'TopLevel',
+    [TRACING_LEVELS.toplevel]: 'Top Level',
     [TRACING_LEVELS.basic]: 'Basic',
     [TRACING_LEVELS.detailed]: 'Detailed',
     [TRACING_LEVELS.diagnostic]: 'Diagnostic',
@@ -100,7 +101,7 @@ export const QUERY_MODES_TITLES: Record<QueryMode, string> = {
     scan: 'Scan',
     script: 'YQL Script',
     data: 'Data',
-    query: 'YQL - QueryService',
+    query: 'YQL — QueryService',
 } as const;
 
 export const QUERY_SYNTAX = {
@@ -416,7 +417,7 @@ export const DEFAULT_QUERY_SETTINGS = {
     timeout: null,
     limitRows: 10000,
     outputChunkMaxSize: undefined,
-    statisticsMode: STATISTICS_MODES.none,
+    statisticsMode: STATISTICS_MODES.full,
     tracingLevel: TRACING_LEVELS.off,
     pragmas: defaultPragma,
     resourcePool: RESOURCE_POOL_NO_OVERRIDE_VALUE,
@@ -487,4 +488,20 @@ export const querySettingsRestoreSchema = z
 
 export function isStreamingSupportedForMode(mode: QueryMode) {
     return mode === QUERY_MODES.query;
+}
+
+export function getEffectiveTransactionMode(
+    mode: TransactionMode,
+    snapshotReadWriteAvailable: boolean,
+) {
+    return mode === TRANSACTION_MODES.snapshotrw && !snapshotReadWriteAvailable
+        ? TRANSACTION_MODES.implicit
+        : mode;
+}
+
+export function getEffectiveQueryTimeout(settings: QuerySettings, streamingEnabled: boolean) {
+    return (
+        settings.timeout ??
+        (streamingEnabled && isStreamingSupportedForMode(settings.queryMode) ? null : undefined)
+    );
 }

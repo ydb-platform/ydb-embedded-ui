@@ -1,7 +1,18 @@
 import React from 'react';
 
-import {Button, Dialog, Flex, TextArea, TextInput} from '@gravity-ui/uikit';
+import {
+    Button,
+    Dialog,
+    Disclosure,
+    HelpMark,
+    SegmentedRadioGroup,
+    Switch,
+    TextArea,
+    TextInput,
+} from '@gravity-ui/uikit';
 import {zodResolver} from '@hookform/resolvers/zod';
+import {flushSync} from 'react-dom';
+import type {FieldErrors} from 'react-hook-form';
 import {Controller, useForm} from 'react-hook-form';
 import type {z} from 'zod';
 
@@ -13,28 +24,33 @@ import {
     selectQueryAction,
     setQueryAction,
 } from '../../../../store/reducers/queryActions/queryActions';
-import type {QuerySettings} from '../../../../types/store/query';
+import type {QueryMode, QuerySettings} from '../../../../types/store/query';
 import {cn} from '../../../../utils/cn';
 import {BRAND_BUTTON_CLASS} from '../../../../utils/constants';
 import {
-    useQueryExecutionSettings,
+    useQuerySettings,
     useQueryStreamingSetting,
     useResourcePools,
     useTypedDispatch,
     useTypedSelector,
 } from '../../../../utils/hooks';
-import type {ResourcePoolValue} from '../../../../utils/query';
 import {
     RESOURCE_POOL_NO_OVERRIDE_VALUE,
+    TRACING_LEVELS,
     TRANSACTION_MODES,
+    TRANSACTION_MODES_TITLES,
+    getEffectiveQueryTimeout,
+    getEffectiveTransactionMode,
     isStreamingSupportedForMode,
     querySettingsValidationSchema,
 } from '../../../../utils/query';
+import {reachMetricaGoal} from '../../../../utils/yaMetrica';
 import {useCurrentSchema} from '../../TenantContext';
 
 import {QuerySettingsSelect} from './QuerySettingsSelect';
 import {QuerySettingsTimeout} from './QuerySettingsTimeout';
 import {QUERY_SETTINGS_FIELD_SETTINGS} from './constants';
+import {getQuerySettingsMetricaParams} from './getQuerySettingsMetricaParams';
 import i18n from './i18n';
 
 import './QuerySettingsDialog.scss';
@@ -44,12 +60,8 @@ const b = cn('ydb-query-settings-dialog');
 export function QuerySettingsDialog() {
     const dispatch = useTypedDispatch();
     const queryAction = useTypedSelector(selectQueryAction);
-    const [querySettings, setQuerySettings] = useQueryExecutionSettings();
-
-    const onClose = React.useCallback(() => {
-        dispatch(setQueryAction('idle'));
-    }, [dispatch]);
-
+    const [querySettings, setQuerySettings] = useQuerySettings();
+    const onClose = React.useCallback(() => dispatch(setQueryAction('idle')), [dispatch]);
     const onSubmit = React.useCallback(
         (data: QuerySettings) => {
             setQuerySettings(data);
@@ -62,11 +74,13 @@ export function QuerySettingsDialog() {
         <Dialog
             open={queryAction === 'settings'}
             size="s"
+            contentOverflow="auto"
             onClose={onClose}
             className={b()}
-            hasCloseButton={false}
+            modalClassName={b('modal')}
+            aria-label={i18n('action.settings')}
         >
-            <Dialog.Header caption={i18n('action.settings')} />
+            <Dialog.Header className={b('header')} caption={i18n('action.settings')} />
             <QuerySettingsForm
                 initialValues={querySettings}
                 onSubmit={onSubmit}
@@ -84,7 +98,44 @@ interface QuerySettingsFormProps {
 
 type QuerySettingsFormInput = z.input<typeof querySettingsValidationSchema>;
 
+const advancedFields = [
+    'queryMode',
+    'tracingLevel',
+    'outputChunkMaxSize',
+    'pragmas',
+    'timeout',
+] as const;
+
+function SettingRow({
+    name,
+    labelFor = name,
+    help,
+    children,
+}: {
+    name: keyof QuerySettings;
+    labelFor?: string;
+    help?: string;
+    children: React.ReactNode;
+}) {
+    const title = QUERY_SETTINGS_FIELD_SETTINGS[name].title;
+    return (
+        <div className={b('dialog-row')}>
+            <div className={b('field-title')}>
+                <label htmlFor={labelFor}>{title}</label>
+                {help && (
+                    <HelpMark aria-label={i18n('context_field-help', {field: title})}>
+                        {help}
+                    </HelpMark>
+                )}
+            </div>
+            <div className={b('control-wrapper', {[name]: true})}>{children}</div>
+        </div>
+    );
+}
+
 function QuerySettingsForm({initialValues, onSubmit, onClose}: QuerySettingsFormProps) {
+    const [baselineSettings, setBaselineSettings] = React.useState(initialValues);
+    const [advancedExpanded, setAdvancedExpanded] = React.useState(false);
     const {
         control,
         handleSubmit,
@@ -92,29 +143,24 @@ function QuerySettingsForm({initialValues, onSubmit, onClose}: QuerySettingsForm
         watch,
         formState: {errors},
     } = useForm<QuerySettingsFormInput, unknown, QuerySettings>({
-        defaultValues: initialValues,
+        defaultValues: baselineSettings,
         resolver: zodResolver(querySettingsValidationSchema),
     });
-
     const enableTracingLevel = useTracingLevelOptionAvailable();
     const enableSnapshotReadWrite = useSnapshotReadWriteAvailable();
     const [isQueryStreamingEnabled] = useQueryStreamingSetting();
     const {database} = useCurrentSchema();
     const {resourcePools, isLoading: isResourcePoolsLoading} = useResourcePools(
         database,
-        initialValues.resourcePool,
+        baselineSettings.resourcePool,
     );
-
     const resourcePoolOptions = React.useMemo(
         () => [
             {
                 value: RESOURCE_POOL_NO_OVERRIDE_VALUE,
                 content: i18n('form.resource-pool.no-override'),
             },
-            ...resourcePools.map((name) => ({
-                value: name,
-                content: name,
-            })),
+            ...resourcePools.map((name) => ({value: name, content: name})),
         ],
         [resourcePools],
     );
@@ -122,261 +168,337 @@ function QuerySettingsForm({initialValues, onSubmit, onClose}: QuerySettingsForm
     const timeout = watch('timeout');
     const resourcePool = watch('resourcePool');
     const queryMode = watch('queryMode');
-    const transactionMode = watch('transactionMode');
+    const statisticsMode = watch('statisticsMode');
 
     React.useEffect(() => {
-        if (isResourcePoolsLoading) {
+        if (
+            isResourcePoolsLoading ||
+            !resourcePool ||
+            resourcePool === RESOURCE_POOL_NO_OVERRIDE_VALUE
+        ) {
             return;
         }
-
-        if (!resourcePool || resourcePool === RESOURCE_POOL_NO_OVERRIDE_VALUE) {
-            return;
-        }
-
-        if (!resourcePools.length || !resourcePools.includes(resourcePool)) {
+        if (!resourcePools.includes(resourcePool)) {
             setValue('resourcePool', RESOURCE_POOL_NO_OVERRIDE_VALUE);
+            // A pool selected automatically is the starting point for tracking user edits.
+            setBaselineSettings((settings) => ({
+                ...settings,
+                resourcePool: RESOURCE_POOL_NO_OVERRIDE_VALUE,
+            }));
         }
     }, [isResourcePoolsLoading, resourcePools, resourcePool, setValue]);
 
-    React.useEffect(() => {
-        if (!enableSnapshotReadWrite && transactionMode === TRANSACTION_MODES.snapshotrw) {
-            setValue('transactionMode', TRANSACTION_MODES.implicit);
-        }
-    }, [enableSnapshotReadWrite, transactionMode, setValue]);
+    const transactionModeOptions = React.useMemo(
+        () =>
+            QUERY_SETTINGS_FIELD_SETTINGS.transactionMode.options.filter((option) => {
+                // Keep a previously saved mode available for this draft, including undoing an unsaved change.
+                return (
+                    option.value !== TRANSACTION_MODES.snapshotrw ||
+                    (enableSnapshotReadWrite &&
+                        baselineSettings.transactionMode === TRANSACTION_MODES.snapshotrw)
+                );
+            }),
+        [enableSnapshotReadWrite, baselineSettings.transactionMode],
+    );
 
-    const transactionModeOptions = React.useMemo(() => {
-        return QUERY_SETTINGS_FIELD_SETTINGS.transactionMode.options.filter((option) => {
-            if (option.value === TRANSACTION_MODES.snapshotrw) {
-                return enableSnapshotReadWrite;
+    const updateTimeoutForQueryMode = (mode: QueryMode) => {
+        const resetTimeout = mode === 'query';
+        if (resetTimeout) {
+            setValue('timeout', null);
+        } else if (timeout === null) {
+            setValue('timeout', '');
+        }
+
+        // Compare against the timeout this mode would apply without any manual timeout edits.
+        setBaselineSettings((settings) => ({
+            ...settings,
+            timeout: getEffectiveQueryTimeout(
+                {...settings, queryMode: mode, timeout: resetTimeout ? null : settings.timeout},
+                isQueryStreamingEnabled,
+            ),
+        }));
+    };
+
+    const submit = (data: QuerySettings) => {
+        onSubmit(data);
+
+        const params = getQuerySettingsMetricaParams(
+            baselineSettings,
+            data,
+            isQueryStreamingEnabled,
+        );
+        if (params) {
+            try {
+                reachMetricaGoal('applyQuerySettings', params);
+            } catch {
+                // The host's optional analytics counter can throw synchronously.
             }
-            return true;
-        });
-    }, [enableSnapshotReadWrite]);
+        }
+    };
+    const revealInvalidField = () => {
+        if (!advancedExpanded) {
+            // The field must be visible before native validation or react-hook-form focuses it.
+            flushSync(() => setAdvancedExpanded(true));
+        }
+    };
+    const showErrors = (formErrors: FieldErrors<QuerySettingsFormInput>) => {
+        if (advancedFields.some((field) => formErrors[field])) {
+            revealInvalidField();
+        }
+    };
 
     return (
-        <form onSubmit={handleSubmit(onSubmit)}>
+        <form onSubmit={handleSubmit(submit, showErrors)}>
             <Dialog.Body className={b('dialog-body')}>
-                <Flex direction="row" alignItems="flex-start" className={b('dialog-row')}>
-                    <label htmlFor="queryMode" className={b('field-title')}>
-                        {QUERY_SETTINGS_FIELD_SETTINGS.queryMode.title}
-                    </label>
-                    <div className={b('control-wrapper', {queryMode: true})}>
-                        <Controller
-                            name="queryMode"
-                            control={control}
-                            render={({field}) => (
-                                <QuerySettingsSelect
-                                    id="queryMode"
-                                    setting={field.value}
-                                    onUpdateSetting={(mode) => {
-                                        field.onChange(mode);
-
-                                        if (mode !== 'query' && timeout === null) {
-                                            setValue('timeout', '');
-                                        } else if (mode === 'query') {
-                                            setValue('timeout', null);
-                                        }
-                                    }}
-                                    settingOptions={QUERY_SETTINGS_FIELD_SETTINGS.queryMode.options}
-                                />
-                            )}
-                        />
-                    </div>
-                </Flex>
-                {enableTracingLevel && (
-                    <Flex direction="row" alignItems="flex-start" className={b('dialog-row')}>
-                        <label htmlFor="tracingLevel" className={b('field-title')}>
-                            {QUERY_SETTINGS_FIELD_SETTINGS.tracingLevel.title}
-                        </label>
-                        <div className={b('control-wrapper')}>
-                            <Controller
-                                name="tracingLevel"
-                                control={control}
-                                render={({field}) => (
-                                    <QuerySettingsSelect
-                                        id="tracingLevel"
-                                        setting={field.value}
-                                        onUpdateSetting={field.onChange}
-                                        settingOptions={
-                                            QUERY_SETTINGS_FIELD_SETTINGS.tracingLevel.options
-                                        }
-                                    />
-                                )}
-                            />
-                        </div>
-                    </Flex>
-                )}
-                <Flex direction="row" alignItems="flex-start" className={b('dialog-row')}>
-                    <label htmlFor="transactionMode" className={b('field-title')}>
-                        {QUERY_SETTINGS_FIELD_SETTINGS.transactionMode.title}
-                    </label>
-                    <div className={b('control-wrapper', {transactionMode: true})}>
-                        <Controller
-                            name="transactionMode"
-                            control={control}
-                            render={({field}) => (
-                                <QuerySettingsSelect
-                                    id="transactionMode"
-                                    setting={field.value}
-                                    onUpdateSetting={field.onChange}
-                                    settingOptions={transactionModeOptions}
-                                />
-                            )}
-                        />
-                    </div>
-                </Flex>
-                <Flex direction="row" alignItems="flex-start" className={b('dialog-row')}>
-                    <label htmlFor="statisticsMode" className={b('field-title')}>
-                        {QUERY_SETTINGS_FIELD_SETTINGS.statisticsMode.title}
-                    </label>
-                    <div className={b('control-wrapper', {statisticsMode: true})}>
-                        <Controller
-                            name="statisticsMode"
-                            control={control}
-                            render={({field}) => (
-                                <QuerySettingsSelect
-                                    id="statisticsMode"
-                                    setting={field.value}
-                                    onUpdateSetting={field.onChange}
-                                    settingOptions={
-                                        QUERY_SETTINGS_FIELD_SETTINGS.statisticsMode.options
-                                    }
-                                />
-                            )}
-                        />
-                    </div>
-                </Flex>
-                <Flex direction="row" alignItems="flex-start" className={b('dialog-row')}>
-                    <label htmlFor="limitRows" className={b('field-title')}>
-                        {QUERY_SETTINGS_FIELD_SETTINGS.limitRows.title}
-                    </label>
-                    <div className={b('control-wrapper')}>
-                        <Controller
-                            name="limitRows"
-                            control={control}
-                            render={({field}) => (
-                                <TextInput
-                                    id="limitRows"
-                                    type="number"
-                                    {...field}
-                                    value={field.value?.toString()}
-                                    className={b('limit-rows')}
-                                    placeholder="10000"
-                                    validationState={errors.limitRows ? 'invalid' : undefined}
-                                    errorMessage={errors.limitRows?.message}
-                                    errorPlacement="inside"
-                                    endContent={
-                                        <span className={b('postfix')}>
-                                            {i18n('form.limit.rows')}
-                                        </span>
-                                    }
-                                />
-                            )}
-                        />
-                    </div>
-                </Flex>
-                {isQueryStreamingEnabled && (
-                    <Flex direction="row" alignItems="flex-start" className={b('dialog-row')}>
-                        <label htmlFor="outputChunkMaxSize" className={b('field-title')}>
-                            {QUERY_SETTINGS_FIELD_SETTINGS.outputChunkMaxSize.title}
-                        </label>
-                        <div className={b('control-wrapper')}>
-                            <Controller
-                                name="outputChunkMaxSize"
-                                control={control}
-                                render={({field}) => (
-                                    <TextInput
-                                        id="outputChunkMaxSize"
-                                        type="number"
-                                        {...field}
-                                        value={field.value?.toString()}
-                                        className={b('output-chunk-max-size')}
-                                        placeholder="1000000"
-                                        validationState={
-                                            errors.outputChunkMaxSize ? 'invalid' : undefined
-                                        }
-                                        errorMessage={errors.outputChunkMaxSize?.message}
-                                        errorPlacement="inside"
-                                        endContent={
-                                            <span className={b('postfix')}>
-                                                {i18n('form.output.chunk.max.size.bytes')}
-                                            </span>
-                                        }
-                                    />
-                                )}
-                            />
-                        </div>
-                    </Flex>
-                )}
-                <Flex direction="row" alignItems="flex-start" className={b('dialog-row')}>
-                    <label htmlFor="resourcePool" className={b('field-title')}>
-                        {QUERY_SETTINGS_FIELD_SETTINGS.resourcePool.title}
-                    </label>
-                    <div className={b('control-wrapper', {resourcePool: true})}>
-                        <Controller
-                            name="resourcePool"
-                            control={control}
-                            render={({field}) => (
-                                <QuerySettingsSelect<ResourcePoolValue>
-                                    id="resourcePool"
-                                    setting={field.value ?? RESOURCE_POOL_NO_OVERRIDE_VALUE}
-                                    disabled={isResourcePoolsLoading || !resourcePools.length}
-                                    onUpdateSetting={(value) => field.onChange(value)}
-                                    settingOptions={resourcePoolOptions}
-                                />
-                            )}
-                        />
-                    </div>
-                </Flex>
-                <Flex direction="row" alignItems="flex-start" className={b('dialog-row')}>
-                    <label htmlFor="pragmas" className={b('field-title')}>
-                        {QUERY_SETTINGS_FIELD_SETTINGS.pragmas.title}
-                    </label>
-                    <div className={b('control-wrapper')}>
-                        <Controller
-                            name="pragmas"
-                            control={control}
-                            render={({field}) => (
-                                <TextArea
-                                    id="pragmas"
-                                    {...field}
-                                    className={b('pragmas')}
-                                    placeholder="PRAGMA OrderedColumns;"
-                                    rows={3}
-                                    validationState={errors.pragmas ? 'invalid' : undefined}
-                                    errorMessage={errors.pragmas?.message}
-                                    errorPlacement="inside"
-                                />
-                            )}
-                        />
-                    </div>
-                </Flex>
-                <Flex direction="row" alignItems="flex-start" className={b('dialog-row')}>
+                <SettingRow name="statisticsMode">
                     <Controller
-                        name="timeout"
+                        name="statisticsMode"
                         control={control}
                         render={({field}) => (
-                            <QuerySettingsTimeout
-                                id="timeout"
-                                value={field.value as string | number | null | undefined}
-                                onChange={field.onChange}
-                                onToggle={(enabled) => field.onChange(enabled ? '' : null)}
-                                validationState={errors.timeout ? 'invalid' : undefined}
-                                errorMessage={errors.timeout?.message}
-                                isDisabled={!isStreamingSupportedForMode(queryMode)}
+                            <SegmentedRadioGroup
+                                {...field}
+                                aria-label={QUERY_SETTINGS_FIELD_SETTINGS.statisticsMode.title}
+                                onUpdate={field.onChange}
+                            >
+                                {QUERY_SETTINGS_FIELD_SETTINGS.statisticsMode.options.map(
+                                    (option) => (
+                                        <SegmentedRadioGroup.Option
+                                            key={option.value}
+                                            value={option.value}
+                                        >
+                                            {option.content}
+                                        </SegmentedRadioGroup.Option>
+                                    ),
+                                )}
+                            </SegmentedRadioGroup>
+                        )}
+                    />
+                    <div className={b('description')}>
+                        {
+                            QUERY_SETTINGS_FIELD_SETTINGS.statisticsMode.options.find(
+                                (option) => option.value === statisticsMode,
+                            )?.text
+                        }
+                    </div>
+                </SettingRow>
+                <SettingRow name="limitRows" help={i18n('context_limit-rows')}>
+                    <Controller
+                        name="limitRows"
+                        control={control}
+                        render={({field: {ref, ...field}}) => (
+                            <TextInput
+                                id="limitRows"
+                                type="number"
+                                {...field}
+                                controlRef={ref}
+                                value={field.value?.toString() ?? ''}
+                                className={b('limit-rows')}
+                                placeholder="10000"
+                                validationState={errors.limitRows ? 'invalid' : undefined}
+                                errorMessage={errors.limitRows?.message}
+                                endContent={
+                                    <span className={b('postfix')}>{i18n('form.limit.rows')}</span>
+                                }
                             />
                         )}
                     />
-                </Flex>
+                </SettingRow>
+                <SettingRow name="transactionMode" help={i18n('context_transaction-mode')}>
+                    <Controller
+                        name="transactionMode"
+                        control={control}
+                        render={({field}) => {
+                            const effectiveMode = getEffectiveTransactionMode(
+                                field.value,
+                                enableSnapshotReadWrite,
+                            );
+                            // A fallback is a placeholder so explicitly picking it updates the draft.
+                            return (
+                                <QuerySettingsSelect
+                                    id="transactionMode"
+                                    ariaLabel={QUERY_SETTINGS_FIELD_SETTINGS.transactionMode.title}
+                                    setting={
+                                        field.value === effectiveMode ? field.value : undefined
+                                    }
+                                    placeholder={TRANSACTION_MODES_TITLES[effectiveMode]}
+                                    onUpdateSetting={field.onChange}
+                                    settingOptions={transactionModeOptions}
+                                />
+                            );
+                        }}
+                    />
+                </SettingRow>
+                <SettingRow name="resourcePool" help={i18n('context_resource-pool')}>
+                    <Controller
+                        name="resourcePool"
+                        control={control}
+                        render={({field}) => (
+                            <QuerySettingsSelect
+                                id="resourcePool"
+                                ariaLabel={QUERY_SETTINGS_FIELD_SETTINGS.resourcePool.title}
+                                setting={field.value ?? RESOURCE_POOL_NO_OVERRIDE_VALUE}
+                                disabled={isResourcePoolsLoading || !resourcePools.length}
+                                onUpdateSetting={field.onChange}
+                                settingOptions={resourcePoolOptions}
+                            />
+                        )}
+                    />
+                </SettingRow>
+                <Disclosure
+                    className={b('advanced')}
+                    summary={i18n('action_advanced-settings')}
+                    expanded={advancedExpanded}
+                    onUpdate={setAdvancedExpanded}
+                    arrowPosition="end"
+                    keepMounted
+                >
+                    <Disclosure.Summary>
+                        {(_props, summary) =>
+                            React.cloneElement(summary, {className: b('advanced-toggle')})
+                        }
+                    </Disclosure.Summary>
+                    <div
+                        className={b('advanced-fields')}
+                        hidden={!advancedExpanded}
+                        onInvalid={revealInvalidField}
+                    >
+                        <SettingRow name="queryMode" help={i18n('context_query-type')}>
+                            <Controller
+                                name="queryMode"
+                                control={control}
+                                render={({field}) => (
+                                    <QuerySettingsSelect
+                                        id="queryMode"
+                                        ariaLabel={QUERY_SETTINGS_FIELD_SETTINGS.queryMode.title}
+                                        setting={field.value}
+                                        onUpdateSetting={(mode) => {
+                                            field.onChange(mode);
+                                            updateTimeoutForQueryMode(mode);
+                                        }}
+                                        settingOptions={
+                                            QUERY_SETTINGS_FIELD_SETTINGS.queryMode.options
+                                        }
+                                    />
+                                )}
+                            />
+                        </SettingRow>
+                        {enableTracingLevel && (
+                            <SettingRow
+                                name="tracingLevel"
+                                labelFor="tracing-switch"
+                                help={i18n('context_tracing')}
+                            >
+                                <Controller
+                                    name="tracingLevel"
+                                    control={control}
+                                    render={({field}) => (
+                                        <div className={b('tracing')}>
+                                            <Switch
+                                                id="tracing-switch"
+                                                checked={field.value !== TRACING_LEVELS.off}
+                                                onUpdate={(enabled) =>
+                                                    field.onChange(
+                                                        enabled
+                                                            ? TRACING_LEVELS.toplevel
+                                                            : TRACING_LEVELS.off,
+                                                    )
+                                                }
+                                            />
+                                            <QuerySettingsSelect
+                                                id="tracingLevel"
+                                                ariaLabel={i18n('form.tracing-level')}
+                                                disabled={field.value === TRACING_LEVELS.off}
+                                                setting={
+                                                    field.value === TRACING_LEVELS.off
+                                                        ? TRACING_LEVELS.toplevel
+                                                        : field.value
+                                                }
+                                                onUpdateSetting={field.onChange}
+                                                settingOptions={QUERY_SETTINGS_FIELD_SETTINGS.tracingLevel.options.filter(
+                                                    (option) => option.value !== TRACING_LEVELS.off,
+                                                )}
+                                            />
+                                        </div>
+                                    )}
+                                />
+                            </SettingRow>
+                        )}
+                        {isQueryStreamingEnabled && (
+                            <SettingRow
+                                name="outputChunkMaxSize"
+                                help={i18n('context_output-chunk-max-size')}
+                            >
+                                <Controller
+                                    name="outputChunkMaxSize"
+                                    control={control}
+                                    render={({field: {ref, ...field}}) => (
+                                        <TextInput
+                                            id="outputChunkMaxSize"
+                                            type="number"
+                                            {...field}
+                                            controlRef={ref}
+                                            value={field.value?.toString() ?? ''}
+                                            className={b('output-chunk-max-size')}
+                                            placeholder="1000000"
+                                            validationState={
+                                                errors.outputChunkMaxSize ? 'invalid' : undefined
+                                            }
+                                            errorMessage={errors.outputChunkMaxSize?.message}
+                                            endContent={
+                                                <span className={b('postfix')}>
+                                                    {i18n('form.output.chunk.max.size.bytes')}
+                                                </span>
+                                            }
+                                        />
+                                    )}
+                                />
+                            </SettingRow>
+                        )}
+                        <SettingRow name="pragmas" help={i18n('context_query-prefix')}>
+                            <Controller
+                                name="pragmas"
+                                control={control}
+                                render={({field}) => (
+                                    <TextArea
+                                        id="pragmas"
+                                        {...field}
+                                        className={b('pragmas')}
+                                        placeholder="PRAGMA OrderedColumns;"
+                                        rows={3}
+                                        hasClear
+                                        validationState={errors.pragmas ? 'invalid' : undefined}
+                                        errorMessage={errors.pragmas?.message}
+                                        errorPlacement="inside"
+                                    />
+                                )}
+                            />
+                        </SettingRow>
+                        <div className={b('dialog-row')}>
+                            <Controller
+                                name="timeout"
+                                control={control}
+                                render={({field}) => (
+                                    <QuerySettingsTimeout
+                                        id="timeout"
+                                        controlRef={field.ref}
+                                        value={field.value as string | number | null | undefined}
+                                        onChange={field.onChange}
+                                        onToggle={(enabled) => field.onChange(enabled ? '' : null)}
+                                        validationState={errors.timeout ? 'invalid' : undefined}
+                                        errorMessage={errors.timeout?.message}
+                                        isDisabled={!isStreamingSupportedForMode(queryMode)}
+                                    />
+                                )}
+                            />
+                        </div>
+                    </div>
+                </Disclosure>
             </Dialog.Body>
             <Dialog.Footer
                 textButtonApply={i18n('button-done')}
                 textButtonCancel={i18n('button-cancel')}
                 onClickButtonCancel={onClose}
-                propsButtonApply={{
-                    type: 'submit',
-                    className: BRAND_BUTTON_CLASS,
-                }}
+                propsButtonApply={{type: 'submit', className: BRAND_BUTTON_CLASS}}
                 renderButtons={(buttonApply, buttonCancel) => (
                     <div className={b('buttons-container')}>
                         <Button

@@ -13,7 +13,7 @@ const testQuery = 'SELECT 1;';
 async function setStatisticsMode(queryEditor: QueryEditor, statisticsMode: StatisticsMode) {
     await queryEditor.clickGearButton();
     await queryEditor.settingsDialog.changeStatsLevel(statisticsMode);
-    await queryEditor.settingsDialog.clickButton(ButtonNames.Save);
+    await queryEditor.settingsDialog.clickButton(ButtonNames.Apply);
 }
 
 async function runQuery(queryEditor: QueryEditor) {
@@ -100,7 +100,7 @@ test.describe('Plan to SVG functionality @query-editor-redesign', () => {
             await queryEditor.clickGearButton();
             await queryEditor.settingsDialog.changeQueryMode(mode);
             await queryEditor.settingsDialog.changeStatsLevel(STATISTICS_MODES.none);
-            await queryEditor.settingsDialog.clickButton(ButtonNames.Save);
+            await queryEditor.settingsDialog.clickButton(ButtonNames.Apply);
             const query = `SELECT NodeId FROM \`${database}/.sys/nodes\` LIMIT 1;`;
             await queryEditor.setQuery(query);
 
