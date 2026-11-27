@@ -792,10 +792,10 @@ test('My databases displays allocations from cluster presets and groups by CPU a
     const groupBy = page.getByRole('combobox', {name: /Group by/});
     await groupBy.click();
     await expect(page.getByRole('option')).toHaveText([
-        'CPU used / Allocated CPU',
-        'Memory used / Allocated memory',
+        'CPU used / allocated',
+        'Memory used / allocated',
     ]);
-    await page.getByRole('option', {name: 'CPU used / Allocated CPU'}).click();
+    await page.getByRole('option', {name: 'CPU used / allocated'}).click();
     await expect(page).toHaveURL(/[?&]groupBy=cpu(?:&|$)/);
     await expect(page.getByRole('button', {name: /Insufficient data/})).toBeVisible();
     // A serverless database on shared compute is not a database with unknown allocation
@@ -808,14 +808,14 @@ test('My databases displays allocations from cluster presets and groups by CPU a
     await expect(totals.nth(1).getByText('—', {exact: true})).toHaveCount(2);
     await expect(allocated).toHaveAttribute('colspan', '2');
     await groupBy.click();
-    await page.getByRole('option', {name: 'Memory used / Allocated memory'}).click();
+    await page.getByRole('option', {name: 'Memory used / allocated'}).click();
     const lowMemory = page.getByRole('button', {name: /<50%/});
     await expect(lowMemory).toHaveAttribute('aria-expanded', 'false');
     await lowMemory.click();
     await expect(provisioned).toBeVisible();
     await page.getByPlaceholder('Database name').fill('legacy');
     await expect(page.getByRole('button', {name: /<50%/})).toHaveCount(0);
-    await expect(groupBy).toContainText('Memory used / Allocated memory');
+    await expect(groupBy).toContainText('Memory used / allocated');
 });
 
 test('My databases asks for the presets restricted to the cloud of a database', async ({page}) => {

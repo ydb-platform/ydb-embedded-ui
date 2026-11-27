@@ -19,6 +19,9 @@ export function resourceGroupTitle({lower, upper, notApplicable}: ResourceUsageG
         : i18n('value_usage-range', {lower, upper});
 }
 
+// The narrowest control that shows the longest grouping name in full
+const GROUP_BY_WIDTH = 220;
+
 export function ResourceGroupFilter({
     mode,
     onChange,
@@ -40,7 +43,7 @@ export function ResourceGroupFilter({
                 aria-label={label}
                 hasClear
                 placeholder="–"
-                width={280}
+                width={GROUP_BY_WIDTH}
                 value={mode ? [mode] : []}
                 onUpdate={([value]) => onChange(RESOURCE_GROUPINGS.find((item) => item === value))}
                 options={options}
