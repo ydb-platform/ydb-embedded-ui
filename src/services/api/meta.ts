@@ -20,14 +20,18 @@ import type {AxiosOptions} from './base';
 import {BaseMetaAPI} from './baseMeta';
 
 export class MetaAPI extends BaseMetaAPI {
-    /** With a cloud, the list also has the presets restricted to that cloud. */
+    /** One page of the catalog. With a cloud, it also has the presets restricted to that cloud. */
     listResourcePresets(
-        {clusterName, cloudId}: {clusterName: string; cloudId?: string},
+        {
+            clusterName,
+            cloudId,
+            pageToken,
+        }: {clusterName: string; cloudId?: string; pageToken?: string},
         {signal}: AxiosOptions = {},
     ) {
         return this.post<ListResourcePresetsResponse>(
             this.getPath('/meta/list_resource_presets', clusterName),
-            {cluster_name: clusterName, cloud_id: cloudId},
+            {cluster_name: clusterName, cloud_id: cloudId, page_token: pageToken},
             {},
             {requestConfig: {signal}},
         );

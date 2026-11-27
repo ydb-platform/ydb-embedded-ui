@@ -3,7 +3,10 @@ import React from 'react';
 import {createSelector} from '@reduxjs/toolkit';
 
 import {useGetMetaFeatureVersion} from '../../store/reducers/capabilities/hooks';
-import {resourcePresetsApi} from '../../store/reducers/resourcePresets';
+import {
+    isTransientResourcePresetsError,
+    resourcePresetsApi,
+} from '../../store/reducers/resourcePresets';
 import type {PreparedTenant} from '../../store/reducers/tenants/types';
 import {backend, environment} from '../../store/runtimeParams';
 import type {ResourcePreset} from '../../types/api/resourcePresets';
@@ -12,6 +15,9 @@ import {useTypedDispatch, useTypedSelector} from '../../utils/hooks';
 import {presetCatalogKey, requiredPreset} from './resourceUsage';
 
 const endpoint = resourcePresetsApi.endpoints.listResourcePresets;
+
+/** Presets almost never change, but a cluster can be briefly unavailable. */
+export const PRESETS_RETRY_DELAYS_MS = [1000, 3000];
 
 interface CatalogRequest {
     clusterName: string;
@@ -74,13 +80,41 @@ function usePresetCatalogs(requests: CatalogRequest[]) {
                             ({data, isLoading, isUninitialized}) =>
                                 !data && (isLoading || isUninitialized),
                         ),
+                        /** Queries worth asking again */
+                        failed: queries.filter((_query, index) => {
+                            const {isError, error} = results[index];
+                            return isError && isTransientResourcePresetsError(error);
+                        }),
                     };
                 },
             ),
         [queries],
     );
+    const {catalogs, loading, failed} = useTypedSelector(selectCatalogs);
 
-    return useTypedSelector(selectCatalogs);
+    // A failed catalog is asked about again by the page that needs it, so that the retries
+    // stop when the page is left and do not depend on other users of the same query.
+    const [retries, setRetries] = React.useState<Record<string, number>>({});
+    const nextRetryDelay = ({clusterName, cloudId}: CatalogRequest) =>
+        PRESETS_RETRY_DELAYS_MS[retries[presetCatalogKey(clusterName, cloudId)] ?? 0];
+    React.useEffect(() => {
+        const timers = failed.map((query) => {
+            const key = presetCatalogKey(query.clusterName, query.cloudId);
+            const delay = PRESETS_RETRY_DELAYS_MS[retries[key] ?? 0];
+            if (delay === undefined) {
+                return undefined;
+            }
+            return setTimeout(() => {
+                setRetries((current) => ({...current, [key]: (current[key] ?? 0) + 1}));
+                dispatch(endpoint.initiate(query, {subscribe: false, forceRefetch: true}));
+            }, delay);
+        });
+        return () => timers.forEach((timer) => clearTimeout(timer));
+    }, [failed, retries, dispatch]);
+
+    const retrying = failed.some((query) => nextRetryDelay(query) !== undefined);
+
+    return {catalogs, loading: loading || retrying};
 }
 
 /** Resource presets the given databases are scaled by. */

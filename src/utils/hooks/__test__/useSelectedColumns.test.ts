@@ -433,6 +433,41 @@ describe('useSelectedColumns', () => {
             ]);
         });
 
+        test('keeps default columns hidden in the legacy format hidden when they come back', () => {
+            // Saved in the legacy format on a table that had `conditional`, a default column
+            const withConditional = [...columns, {name: 'conditional'}];
+            const defaults = [...defaultColumnsIds, 'conditional'];
+            const saved: {current: unknown[]} = {current: ['col1']};
+            useSetting.mockImplementation(() => [
+                saved.current,
+                (value: unknown[]) => {
+                    saved.current = value;
+                },
+            ]);
+            const render = (tableColumns: TestColumn[]) =>
+                renderHook(() =>
+                    useSelectedColumns(tableColumns, 'test-key', columnsTitles, defaults),
+                ).result.current;
+
+            // The column is unavailable when the user changes the settings for the first time
+            const {setColumns} = render(columns);
+            React.act(() => {
+                setColumns([
+                    {id: 'col1', title: 'Column 1', selected: true},
+                    {id: 'col2', title: 'Column 2', selected: true},
+                    {id: 'col3', title: 'Column 3', selected: false},
+                    {id: 'col4', title: 'Column 4', selected: false},
+                    {id: 'col5', title: 'Column 5', selected: false},
+                ]);
+            });
+
+            expect(saved.current).toContainEqual({id: 'conditional', selected: false});
+            expect(render(withConditional).columnsToShow.map(({name}) => name)).toEqual([
+                'col1',
+                'col2',
+            ]);
+        });
+
         test('saves only table columns when nothing was saved before', () => {
             const setSavedColumns = jest.fn();
             useSetting.mockReturnValue([defaultColumnsIds, setSavedColumns]);

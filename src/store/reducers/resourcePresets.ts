@@ -1,4 +1,4 @@
-import type {ListResourcePresetsResponse} from '../../types/api/resourcePresets';
+import type {ListResourcePresetsResponse, ResourcePreset} from '../../types/api/resourcePresets';
 import {isNetworkError, isResponseError} from '../../utils/response';
 import {backend, environment} from '../runtimeParams';
 
@@ -12,21 +12,16 @@ interface ResourcePresetsParams {
     backend?: string;
 }
 
-/** Presets of a cluster almost never change, but a cluster can be briefly unavailable. */
-export const RESOURCE_PRESETS_RETRY_DELAYS_MS = [1000, 3000];
+/** A catalog is a handful of presets; the limit only stops a token that never ends. */
+const MAX_PAGES = 100;
 
-function isTransientError(error: unknown) {
+/** A cluster can be briefly unavailable: such a failure is worth asking again. */
+export function isTransientResourcePresetsError(error: unknown) {
     // A response blocked by CORS keeps its status and still reads as a network error
     if (isResponseError(error) && typeof error.status === 'number') {
         return !error.isCancelled && error.status >= 500;
     }
     return isNetworkError(error);
-}
-
-function wait(ms: number) {
-    return new Promise((resolve) => {
-        setTimeout(resolve, ms);
-    });
 }
 
 export const resourcePresetsApi = api.injectEndpoints({
@@ -37,23 +32,26 @@ export const resourcePresetsApi = api.injectEndpoints({
                 if (!meta) {
                     return {error: {message: 'Meta API is not available.'}};
                 }
-                for (let attempt = 0; ; attempt++) {
-                    try {
-                        const data = await meta.listResourcePresets(
-                            {clusterName, cloudId},
+                try {
+                    const presets: ResourcePreset[] = [];
+                    let pageToken: string | undefined;
+                    for (let page = 0; page < MAX_PAGES; page++) {
+                        const response = await meta.listResourcePresets(
+                            {clusterName, cloudId, pageToken},
                             {signal},
                         );
-                        return {data};
-                    } catch (error) {
-                        const delay = RESOURCE_PRESETS_RETRY_DELAYS_MS[attempt];
-                        if (delay === undefined || signal.aborted || !isTransientError(error)) {
-                            return {error};
+                        presets.push(...(response.resource_presets ?? []));
+                        pageToken = response.next_page_token || undefined;
+                        if (!pageToken) {
+                            break;
                         }
-                        await wait(delay);
                     }
+                    return {data: {resource_presets: presets}};
+                } catch (error) {
+                    return {error};
                 }
             },
-            // The Refresh button retries the clusters that still failed.
+            // The Refresh button asks again about the catalogs that failed.
             providesTags: ['All'],
         }),
     }),

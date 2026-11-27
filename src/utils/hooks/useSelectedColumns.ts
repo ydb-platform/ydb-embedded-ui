@@ -172,13 +172,25 @@ export const useSelectedColumns = <T extends {name: string}>(
             const unavailable = normalizedSavedColumns
                 .filter(({id}) => !available.has(id))
                 .map(({id}) => id);
-            setSavedColumns(
-                mergeColumnsPreservingHiddenPositions<OrderedColumn>(
-                    preparedColumns,
-                    normalizedSavedColumns,
-                    unavailable,
-                ),
+            const columnsToSave = mergeColumnsPreservingHiddenPositions<OrderedColumn>(
+                preparedColumns,
+                normalizedSavedColumns,
+                unavailable,
             );
+            // The legacy string format lists only selected columns: a default column missing
+            // from it was hidden by the user. If it is unavailable now, write that down, or it
+            // will look like a new column when it comes back and will be shown.
+            const isLegacyFormat =
+                Array.isArray(savedColumns) && savedColumns.every((c) => typeof c === 'string');
+            if (isLegacyFormat) {
+                const known = new Set(columnsToSave.map(({id}) => id));
+                for (const id of defaultColumnsIds) {
+                    if (!known.has(id)) {
+                        columnsToSave.push({id, selected: false});
+                    }
+                }
+            }
+            setSavedColumns(columnsToSave);
         },
         [defaultColumnsIds, normalizedSavedColumns, savedColumns, setSavedColumns],
     );

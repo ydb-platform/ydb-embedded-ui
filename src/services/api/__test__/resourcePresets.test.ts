@@ -74,60 +74,36 @@ test.each([true, false])(
     },
 );
 
-describe('a cluster that fails to list its presets', () => {
-    async function load(listResourcePresets: jest.Mock) {
-        const store = configureStore({
-            reducer: {[resourcePresetsApi.reducerPath]: resourcePresetsApi.reducer},
-            middleware: (getDefaultMiddleware) =>
-                getDefaultMiddleware({serializableCheck: false}).concat(
-                    resourcePresetsApi.middleware,
-                ),
-        });
-        const originalApi = window.api;
-        window.api = {meta: {listResourcePresets}} as unknown as YdbEmbeddedAPI;
-        jest.useFakeTimers();
-        try {
-            const request = store.dispatch(
-                resourcePresetsApi.endpoints.listResourcePresets.initiate(
-                    {clusterName: 'cluster-a'},
-                    {subscribe: false},
-                ),
-            );
-            await jest.runAllTimersAsync();
-            return await request;
-        } finally {
-            jest.useRealTimers();
-            store.dispatch(resourcePresetsApi.util.resetApiState());
-            window.api = originalApi;
-        }
+test('reads a catalog page by page until there is no next page token', async () => {
+    const pages: Record<string, object> = {
+        first: {resource_presets: [{id: 'small', cores: '2', memory: '8'}], next_page_token: 'p2'},
+        p2: {resource_presets: [{id: 'large', cores: '8', memory: '32'}], next_page_token: ''},
+    };
+    const listResourcePresets = jest.fn(
+        async ({pageToken}: {pageToken?: string}) => pages[pageToken ?? 'first'],
+    );
+    const store = configureStore({
+        reducer: {[resourcePresetsApi.reducerPath]: resourcePresetsApi.reducer},
+        middleware: (getDefaultMiddleware) =>
+            getDefaultMiddleware({serializableCheck: false}).concat(resourcePresetsApi.middleware),
+    });
+    const originalApi = window.api;
+    window.api = {meta: {listResourcePresets}} as unknown as YdbEmbeddedAPI;
+    try {
+        const {data} = await store.dispatch(
+            resourcePresetsApi.endpoints.listResourcePresets.initiate(
+                {clusterName: 'cluster-a', cloudId: 'cloud-1'},
+                {subscribe: false},
+            ),
+        );
+
+        expect(data?.resource_presets?.map(({id}) => id)).toEqual(['small', 'large']);
+        expect(listResourcePresets.mock.calls.map(([params]) => params)).toEqual([
+            {clusterName: 'cluster-a', cloudId: 'cloud-1', pageToken: undefined},
+            {clusterName: 'cluster-a', cloudId: 'cloud-1', pageToken: 'p2'},
+        ]);
+    } finally {
+        store.dispatch(resourcePresetsApi.util.resetApiState());
+        window.api = originalApi;
     }
-
-    test('is asked again after a server error', async () => {
-        const presets = {resource_presets: [{id: 'small', cores: '2', memory: '8'}]};
-        const listResourcePresets = jest
-            .fn()
-            .mockRejectedValueOnce({status: 503})
-            .mockRejectedValueOnce({message: 'Network Error'})
-            .mockResolvedValue(presets);
-
-        expect((await load(listResourcePresets)).data).toEqual(presets);
-        expect(listResourcePresets).toHaveBeenCalledTimes(3);
-    });
-
-    test('gives up after the last retry', async () => {
-        const listResourcePresets = jest.fn().mockRejectedValue({status: 503});
-
-        expect((await load(listResourcePresets)).error).toEqual({status: 503});
-        expect(listResourcePresets).toHaveBeenCalledTimes(3);
-    });
-
-    test.each([
-        ['is refused', {status: 403}],
-        ['is refused without CORS headers', {status: 403, message: 'Network Error'}],
-    ])('is not asked again when the request %s', async (_case, error) => {
-        const listResourcePresets = jest.fn().mockRejectedValue(error);
-
-        expect((await load(listResourcePresets)).isError).toBe(true);
-        expect(listResourcePresets).toHaveBeenCalledTimes(1);
-    });
 });
