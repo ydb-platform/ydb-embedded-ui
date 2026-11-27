@@ -192,21 +192,24 @@ function TenantsTableContent({
         useDatabaseIdSetting,
     ]);
 
-    const searchedTenants = React.useMemo(() => {
-        const filteredByProblems = showWithProblemsFilter
-            ? filterTenantsByProblems(tenants, withProblems)
-            : tenants;
+    const filterRows = React.useCallback(
+        (rows: DatabaseRow[]) => {
+            const filteredByProblems = showWithProblemsFilter
+                ? filterTenantsByProblems(rows, withProblems)
+                : rows;
 
-        return filterTenantsBySearch(filteredByProblems, search);
-    }, [tenants, withProblems, search, showWithProblemsFilter]);
+            return filterTenantsBySearch(filteredByProblems, search);
+        },
+        [withProblems, search, showWithProblemsFilter],
+    );
 
     const myDatabasesView = useMyDatabasesView({
         enabled: Boolean(myDatabases),
         tenants,
-        rows: searchedTenants,
+        filterRows,
         environmentName,
     });
-    const {rows: filteredTenants, groups, hasControlPlane} = myDatabasesView;
+    const {rows: filteredTenants, groups, withAllocatedResources} = myDatabasesView;
 
     const hasData = currentData !== undefined;
     const SuccessImage = getIllustration('SuccessOperation');
@@ -455,12 +458,10 @@ function TenantsTableContent({
             });
         }
 
-        return myDatabases
-            ? getMyDatabasesColumns(columns, {withAllocatedResources: hasControlPlane})
-            : columns;
+        return myDatabases ? getMyDatabasesColumns(columns, {withAllocatedResources}) : columns;
     }, [
         myDatabases,
-        hasControlPlane,
+        withAllocatedResources,
         bridgeColumnsAvailable,
         clusterName,
         additionalTenantsProps,

@@ -1,6 +1,7 @@
 import type {PreparedTenant} from '../../store/reducers/tenants/types';
 import type {ResourcePreset} from '../../types/api/resourcePresets';
 import type {DatabaseComputeConfig} from '../../types/api/tenant';
+import {parseOptionalNonNegativeNumber} from '../../utils/utils';
 
 import type {AllocatedResources, DatabaseRow} from './types';
 
@@ -45,14 +46,6 @@ export function needsPreset(row: PreparedTenant) {
     return Boolean(config?.resource_preset_id && configuredSize(config) !== undefined);
 }
 
-function parseBytes(value?: string | number) {
-    if (typeof value !== 'number' && !(typeof value === 'string' && /^\d+$/.test(value))) {
-        return undefined;
-    }
-    const bytes = Number(value);
-    return Number.isFinite(bytes) && bytes >= 0 ? bytes : undefined;
-}
-
 function allocatedAmount(value: string, size: number, unit = 1) {
     const perSlot = Number(value);
     if (!Number.isSafeInteger(perSlot) || perSlot <= 0) {
@@ -82,18 +75,13 @@ export function allocatedResources(
     };
 }
 
-function usageRatio(used?: number, capacity?: number) {
-    if (
-        typeof used !== 'number' ||
-        !Number.isFinite(used) ||
-        used < 0 ||
-        typeof capacity !== 'number' ||
-        !Number.isFinite(capacity) ||
-        capacity <= 0
-    ) {
+/** Reads the used amount the same way the table cells do. */
+function usageRatio(used: unknown, capacity?: number) {
+    const usedAmount = parseOptionalNonNegativeNumber(used);
+    if (usedAmount === undefined || !capacity || !Number.isFinite(capacity) || capacity < 0) {
         return undefined;
     }
-    return used / capacity;
+    return usedAmount / capacity;
 }
 
 export function groupByResourceUsage(
@@ -105,7 +93,7 @@ export function groupByResourceUsage(
         const ratio =
             mode === 'cpu'
                 ? usageRatio(row.CoresUsed, row.allocated?.cores)
-                : usageRatio(parseBytes(row.MemoryUsed), row.allocated?.memoryBytes);
+                : usageRatio(row.MemoryUsed, row.allocated?.memoryBytes);
         const lower =
             ratio === undefined
                 ? undefined

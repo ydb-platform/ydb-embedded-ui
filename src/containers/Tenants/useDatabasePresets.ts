@@ -1,74 +1,40 @@
 import React from 'react';
 
-import {createSelector, lruMemoize} from '@reduxjs/toolkit';
-import {shallowEqual} from 'react-redux';
-
 import {useGetMetaFeatureVersion} from '../../store/reducers/capabilities/hooks';
 import {resourcePresetsApi} from '../../store/reducers/resourcePresets';
 import type {PreparedTenant} from '../../store/reducers/tenants/types';
 import {backend, environment} from '../../store/runtimeParams';
-import {useTypedDispatch, useTypedSelector} from '../../utils/hooks';
+import type {ResourcePreset} from '../../types/api/resourcePresets';
 
 import {needsPreset} from './resourceUsage';
 
-const endpoint = resourcePresetsApi.endpoints.listResourcePresets;
-
-function getClusters(rows: readonly PreparedTenant[], available: boolean) {
+function getClusters(rows: readonly PreparedTenant[]) {
     const clusters = new Set<string>();
-    if (available) {
-        for (const row of rows) {
-            if (row.Cluster && needsPreset(row)) {
-                clusters.add(row.Cluster);
-            }
+    for (const row of rows) {
+        if (row.Cluster && needsPreset(row)) {
+            clusters.add(row.Cluster);
         }
     }
     return Array.from(clusters).sort();
 }
 
+/** Resource presets of every cluster the given databases need them from. */
 export function useDatabasePresets(rows: readonly PreparedTenant[]) {
-    const dispatch = useTypedDispatch();
-    const version = useGetMetaFeatureVersion('/meta/list_resource_presets');
-    const selectClusters = React.useMemo(
-        () => lruMemoize(getClusters, {resultEqualityCheck: shallowEqual}),
-        [],
+    const available =
+        useGetMetaFeatureVersion('/meta/list_resource_presets') >= 1 && Boolean(window.api.meta);
+    const clusterNames = React.useMemo(() => getClusters(rows), [rows]);
+    // `data` outlives a change of the clusters list, so known presets stay while new ones load.
+    const {data, isLoading} = resourcePresetsApi.useListClustersResourcePresetsQuery(
+        {clusterNames, environment, backend},
+        {skip: !available || !clusterNames.length},
     );
-    const clusters = selectClusters(rows, Boolean(window.api.meta) && version >= 1);
-    const currentEnvironment = environment;
-    const currentBackend = backend;
-    const queries = React.useMemo(
-        () =>
-            clusters.map((clusterName) => ({
-                clusterName,
-                environment: currentEnvironment,
-                backend: currentBackend,
-            })),
-        [clusters, currentEnvironment, currentBackend],
-    );
+    const catalogs = React.useMemo(() => {
+        const result = new Map<string, Map<string, ResourcePreset>>();
+        for (const [clusterName, presets] of Object.entries(data ?? {})) {
+            result.set(clusterName, new Map(presets.map((preset) => [preset.id, preset])));
+        }
+        return result;
+    }, [data]);
 
-    React.useEffect(() => {
-        const subscriptions = queries.map((params) => dispatch(endpoint.initiate(params)));
-        return () => subscriptions.forEach((subscription) => subscription.unsubscribe());
-    }, [queries, dispatch]);
-
-    const selectPresets = React.useMemo(
-        () =>
-            createSelector(
-                queries.map((params) => endpoint.select(params)),
-                (...results) => ({
-                    catalogs: new Map(
-                        results.map((result, index) => [
-                            queries[index].clusterName,
-                            new Map(
-                                result.data?.resource_presets?.map((preset) => [preset.id, preset]),
-                            ),
-                        ]),
-                    ),
-                    loading: results.some(
-                        (result) => !result.data && (result.isLoading || result.isUninitialized),
-                    ),
-                }),
-            ),
-        [queries],
-    );
-    return useTypedSelector(selectPresets);
+    return {available, catalogs, loading: isLoading};
 }

@@ -65,3 +65,32 @@ test.each([true, false])(
         }
     },
 );
+
+test('loads presets of several clusters at once and leaves out the clusters that failed', async () => {
+    const listResourcePresets = jest.fn(async ({clusterName}: {clusterName: string}) => {
+        if (clusterName === 'broken') {
+            throw new Error('unavailable');
+        }
+        return {resource_presets: [{id: 'small', cores: '2', memory: '8'}]};
+    });
+    const store = configureStore({
+        reducer: {[resourcePresetsApi.reducerPath]: resourcePresetsApi.reducer},
+        middleware: (getDefaultMiddleware) =>
+            getDefaultMiddleware({serializableCheck: false}).concat(resourcePresetsApi.middleware),
+    });
+    const originalApi = window.api;
+    window.api = {meta: {listResourcePresets}} as unknown as YdbEmbeddedAPI;
+    try {
+        const endpoint = resourcePresetsApi.endpoints.listClustersResourcePresets;
+        const load = (clusterNames: string[]) =>
+            store.dispatch(endpoint.initiate({clusterNames}, {subscribe: false}));
+
+        expect((await load(['alpha', 'broken'])).data).toEqual({
+            alpha: [{id: 'small', cores: '2', memory: '8'}],
+        });
+        expect((await load(['broken'])).isError).toBe(true);
+    } finally {
+        store.dispatch(resourcePresetsApi.util.resetApiState());
+        window.api = originalApi;
+    }
+});

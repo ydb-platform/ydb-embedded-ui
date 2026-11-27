@@ -39,12 +39,12 @@ export function isMyDatabase({Type}: DatabaseRow) {
 }
 
 interface MyDatabasesViewParams {
-    /** The cluster databases table has none of this: it gets the rows back unchanged. */
+    /** The cluster databases table has none of this: it only gets its rows filtered. */
     enabled: boolean;
-    /** All databases of the page, the source of filter options. */
+    /** All databases of the page. */
     tenants: DatabaseRow[];
-    /** Databases left after the filters shared with the cluster databases table. */
-    rows: DatabaseRow[];
+    /** The filters shared with the cluster databases table. */
+    filterRows: (rows: DatabaseRow[]) => DatabaseRow[];
     environmentName?: string;
 }
 
@@ -52,7 +52,7 @@ interface MyDatabasesViewParams {
 export function useMyDatabasesView({
     enabled,
     tenants,
-    rows,
+    filterRows,
     environmentName,
 }: MyDatabasesViewParams) {
     const [{databaseType, cluster: clusters, cloudId: cloudIds, groupBy}, setQueryParams] =
@@ -60,6 +60,18 @@ export function useMyDatabasesView({
 
     const hasControlPlane =
         enabled && tenants.some((row) => row.ControlPlane && Object.keys(row.ControlPlane).length);
+    const presets = useDatabasePresets(hasControlPlane ? tenants : EMPTY_ROWS);
+    const withAllocatedResources = hasControlPlane && presets.available;
+    // Allocated resources are set before filtering: a row stays the same object while filters change.
+    const {catalogs} = presets;
+    const databases = React.useMemo(
+        () =>
+            withAllocatedResources
+                ? tenants.map((row) => ({...row, allocated: allocatedResources(row, catalogs)}))
+                : tenants,
+        [withAllocatedResources, tenants, catalogs],
+    );
+
     const availableCloudIds = React.useMemo(() => {
         const ids = new Set<string>();
         if (enabled) {
@@ -74,38 +86,25 @@ export function useMyDatabasesView({
     }, [enabled, tenants]);
     const hasCloudIds = availableCloudIds.length > 0;
 
-    const filteredRows = React.useMemo(() => {
+    const rows = React.useMemo(() => {
+        const filtered = filterRows(databases);
         if (!enabled) {
-            return rows;
+            return filtered;
         }
         const selectedClusters = new Set(clusters);
         const selectedClouds = new Set(hasCloudIds ? cloudIds : []);
-        return rows.filter(
+        return filtered.filter(
             (row) =>
                 (!databaseType || row.Type === databaseType) &&
                 (!selectedClusters.size || selectedClusters.has(row.Cluster ?? '')) &&
                 (!selectedClouds.size || selectedClouds.has(databaseCloudId(row) ?? '')),
         );
-    }, [enabled, rows, databaseType, clusters, cloudIds, hasCloudIds]);
+    }, [enabled, filterRows, databases, databaseType, clusters, cloudIds, hasCloudIds]);
 
-    const {catalogs, loading: loadingPresets} = useDatabasePresets(
-        hasControlPlane ? filteredRows : EMPTY_ROWS,
-    );
-    const viewRows = React.useMemo(
-        () =>
-            hasControlPlane
-                ? filteredRows.map((row) => ({
-                      ...row,
-                      allocated: allocatedResources(row, catalogs),
-                  }))
-                : filteredRows,
-        [hasControlPlane, filteredRows, catalogs],
-    );
-
-    const mode = (hasControlPlane && groupBy) || undefined;
+    const mode = (withAllocatedResources && groupBy) || undefined;
     const groups = React.useMemo(
-        () => (mode ? groupByResourceUsage(viewRows, mode) : undefined),
-        [viewRows, mode],
+        () => (mode ? groupByResourceUsage(rows, mode) : undefined),
+        [rows, mode],
     );
 
     const controls = enabled ? (
@@ -133,21 +132,22 @@ export function useMyDatabasesView({
                     onChange={(values) => setQueryParams({cloudId: values}, 'replaceIn')}
                 />
             )}
-            {hasControlPlane && (
+            {withAllocatedResources && (
                 <ResourceGroupFilter
                     mode={mode}
                     onChange={(value) => setQueryParams({groupBy: value}, 'replaceIn')}
-                    loading={loadingPresets}
+                    loading={presets.loading}
                 />
             )}
         </React.Fragment>
     ) : null;
 
     return {
-        rows: viewRows,
+        rows,
         groups,
         controls,
-        hasControlPlane,
+        /** Control Plane data is present and the backend can tell what its presets mean. */
+        withAllocatedResources,
         /** Everything here that changes the set or the order of the rendered rows. */
         filters: [mode, databaseType, clusters, cloudIds],
     };

@@ -484,8 +484,8 @@ test('My databases truncates narrow column titles and keeps their help accessibl
     await expect(page.getByText('CPU currently used by the database, in cores.')).toBeVisible();
 });
 
-async function mockDatabases(page: Page, databases: TTenant[]) {
-    await mockApi(page, {});
+async function mockDatabases(page: Page, databases: TTenant[], options: MockOptions = {}) {
+    await mockApi(page, options);
     await page.route('**/meta/databases?*', (route) => route.fulfill({json: {databases}}));
 }
 
@@ -783,6 +783,36 @@ test('My databases displays allocations from cluster presets and groups by CPU a
     await page.getByPlaceholder('Database name').fill('legacy');
     await expect(page.getByRole('button', {name: /<50%/})).toHaveCount(0);
     await expect(groupBy).toContainText('Memory used / Allocated memory');
+});
+
+test('My databases hides allocated resources when meta cannot list resource presets', async ({
+    page,
+}) => {
+    await mockDatabases(
+        page,
+        [
+            {
+                Name: '/db/provisioned',
+                Type: 'Dedicated',
+                Cluster: 'alpha',
+                CoresUsed: 3,
+                ControlPlane: {resource_preset_id: 'small', scale_policy: {fixed_scale: {size: 2}}},
+            },
+        ],
+        {hasOperationsCapability: false},
+    );
+    let presetRequests = 0;
+    await page.route('**/meta/list_resource_presets*', (route) => {
+        presetRequests++;
+        return route.fulfill({json: {resource_presets: [{id: 'small', cores: '4', memory: '4'}]}});
+    });
+    await page.goto(databasesUrl + '&groupBy=cpu');
+    await expect(page.getByRole('link', {name: 'provisioned', exact: true})).toBeVisible();
+    const header = page.locator('thead').first();
+    await expect(header.getByText('Allocated physical resources', {exact: true})).toHaveCount(0);
+    await expect(page.getByRole('combobox', {name: /Group by/})).toHaveCount(0);
+    await expect(page.getByRole('button', {name: /Insufficient data/})).toHaveCount(0);
+    expect(presetRequests).toBe(0);
 });
 
 test('My databases sorts storage group counts and hides empty headers after reload', async ({
