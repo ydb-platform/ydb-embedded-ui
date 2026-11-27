@@ -66,8 +66,12 @@
             border-top: 1px solid var(--g-color-line-generic);
             background: var(--g-color-base-background);
 
-            .data-table__row_footer {
-                background-color: var(--g-color-base-info-light);
+            // Totals are not a row to pick: they keep their color under the pointer
+            .data-table__row.data-table__row_footer {
+                &,
+                &:hover {
+                    background-color: var(--g-color-base-info-light);
+                }
             }
         }
     }

@@ -6,7 +6,7 @@
     }
 
     &.ydb-keyboard-focus-active {
-        .data-table__row:hover:not(.ydb-keyboard-focused-row) {
+        .data-table__row:hover:not(.ydb-keyboard-focused-row, .data-table__row_footer) {
             background: transparent !important;
         }
     }

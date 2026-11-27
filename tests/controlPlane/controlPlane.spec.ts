@@ -926,6 +926,14 @@ test('My databases pins allocated totals while scrolling and recalculates them a
             return row && totals ? totals.y - (row.y + row.height) : undefined;
         })
         .toBeGreaterThanOrEqual(0);
+    // The totals are not a row to pick: no highlight under the pointer
+    const totalsRow = footer.getByRole('row');
+    const totalsColor = () => totalsRow.evaluate((node) => getComputedStyle(node).backgroundColor);
+    const idleColor = await totalsColor();
+    await totalsRow.hover();
+    await page.waitForTimeout(300);
+    expect(await totalsColor()).toBe(idleColor);
+    await page.mouse.move(0, 0);
     await search.fill('item-79');
     await expect(cells).toHaveText(['Total', '2', '4 GB', '1', '2']);
     await search.fill('absent');
