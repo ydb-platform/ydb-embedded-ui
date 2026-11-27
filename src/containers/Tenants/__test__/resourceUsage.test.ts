@@ -1,10 +1,5 @@
 import type {PreparedTenant} from '../../../store/reducers/tenants/types';
-import {
-    allocatedResources,
-    databaseStorageQuotas,
-    groupByResourceUsage,
-    needsPreset,
-} from '../resourceUsage';
+import {allocatedResources, groupByResourceUsage, needsPreset} from '../resourceUsage';
 
 function database(fields: Partial<PreparedTenant>): PreparedTenant {
     return {
@@ -144,68 +139,4 @@ test('keeps missing memory and missing limits out of the zero-usage bucket', () 
             rows: [missing, invalid, noAllocation],
         },
     ]);
-});
-
-test('reads usage and hard limit from the effective report, keeping distinct pool quotas', () => {
-    const overall = database({
-        DiskSpaceQuotaUsage: {Mode: 'MODE_OVERALL', Entries: [{Usage: '0', HardQuota: '100'}]},
-        StorageAllocatedSize: '9999',
-        StorageAllocatedLimit: '11111',
-        DatabaseQuotas: {data_size_hard_quota: '300'},
-        TablesStorage: [{Type: 'SSD', Size: '45'}],
-    });
-    const pools = database({
-        DiskSpaceQuotaUsage: {
-            Mode: 'MODE_STORAGE_POOL_KINDS',
-            Entries: [
-                {PoolKind: 'ssd', Usage: '95', HardQuota: '100'},
-                {PoolKind: 'hdd', Usage: '200', HardQuota: '1000'},
-                {PoolKind: 'archive', Usage: '500', HardQuota: '0'},
-            ],
-        },
-    });
-    const unknown = database({
-        DiskSpaceQuotaUsage: {Mode: 'MODE_UNSPECIFIED'},
-        TablesStorage: [{Type: 'HDD', Size: '1', HardQuota: '2'}],
-    });
-    expect(databaseStorageQuotas(overall)).toEqual([{used: 0, limit: 100, source: 'reported'}]);
-    expect(databaseStorageQuotas(pools).map((q) => [q.pool, q.used, q.limit])).toEqual([
-        ['ssd', 95, 100],
-        ['hdd', 200, 1000],
-        ['archive', 500, 0],
-    ]);
-    expect(databaseStorageQuotas(unknown)).toEqual([]);
-});
-
-test('estimates only complete database-wide usage and keeps configured limits separate', () => {
-    const legacy = database({
-        DatabaseQuotas: {data_size_hard_quota: '100'},
-        TablesStorage: [
-            {Type: 'SSD', Size: '40', Limit: '90'},
-            {Type: 'HDD', Size: '15'},
-        ],
-    });
-    expect(databaseStorageQuotas(legacy)).toEqual([{used: 55, limit: 100, source: 'configured'}]);
-    expect(
-        databaseStorageQuotas({
-            ...legacy,
-            TablesStorage: [{Type: 'SSD', Size: '0'}, {Type: 'HDD'}],
-        }),
-    ).toEqual([{used: undefined, limit: 100, source: 'configured'}]);
-    expect(
-        databaseStorageQuotas({
-            ...legacy,
-            DatabaseQuotas: undefined,
-            TablesStorage: [{Type: 'SSD', Size: '0', Limit: '90'}],
-        }),
-    ).toEqual([{used: 0, limit: undefined, source: 'configured'}]);
-    expect(
-        databaseStorageQuotas({...legacy, DatabaseQuotas: {data_size_soft_quota: '110'}})[0].limit,
-    ).toBe(110);
-    expect(
-        databaseStorageQuotas({
-            ...legacy,
-            DatabaseQuotas: {storage_quotas: [{unit_kind: 'ssd-fast', data_size_hard_quota: '60'}]},
-        }),
-    ).toEqual([{pool: 'ssd-fast', limit: 60, source: 'configured'}]);
 });

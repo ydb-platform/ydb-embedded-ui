@@ -2,20 +2,17 @@ import type React from 'react';
 
 import type {Column} from '@gravity-ui/react-data-table';
 import type {TableColumnSetupItem} from '@gravity-ui/uikit';
-import {Flex, Tooltip} from '@gravity-ui/uikit';
+import {Tooltip} from '@gravity-ui/uikit';
 
 import {TitleWithHelpMark} from '../../components/TitleWithHelpmark/TitleWithHelpmark';
 import type {PreparedTenant} from '../../store/reducers/tenants/types';
-import {formatBytes} from '../../utils/bytesParsers';
 import {EMPTY_DATA_PLACEHOLDER} from '../../utils/constants';
 import {formatNumber, formatStorageValuesToGb} from '../../utils/dataFormatters/dataFormatters';
 import {parseOptionalNonNegativeNumber} from '../../utils/utils';
 
-import {SHOW_MY_DATABASES_STORAGE_COLUMNS, DATABASES_COLUMNS_IDS as ids} from './constants';
+import {DATABASES_COLUMNS_IDS as ids} from './constants';
 import {renderOptionalNumber} from './formatters';
 import i18n from './i18n';
-import type {StorageQuota} from './resourceUsage';
-import {databaseStorageQuotas} from './resourceUsage';
 import type {DatabaseRow} from './types';
 
 const resourceGroups = [
@@ -62,10 +59,6 @@ function formatMemory(bytes: number) {
     return formatStorageValuesToGb(bytes);
 }
 
-function formatStorageSize(value: number) {
-    return formatBytes({value, fixedDecimalPlaces: value < 1000 ? 0 : 2});
-}
-
 const TOTALS_ROW: PreparedTenant = {
     sharedTenantName: undefined,
     sharedNodeIds: undefined,
@@ -76,20 +69,6 @@ const TOTALS_ROW: PreparedTenant = {
     nodesCount: 0,
     groupsCount: 0,
 };
-
-function totalQuotaLimit(row: PreparedTenant) {
-    const quotas = databaseStorageQuotas(row);
-    // An overall quota and per-pool limits can cover the same bytes.
-    const overall = quotas.find((quota) => !quota.pool);
-    const limits = (overall ? [overall] : quotas).map(({limit}) => limit);
-    if (limits.includes(0)) {
-        return Infinity;
-    }
-    if (!limits.length || !limits.every((limit): limit is number => limit !== undefined)) {
-        return undefined;
-    }
-    return limits.reduce((sum, limit) => sum + limit, 0);
-}
 
 /** The footer row of a databases table: sums over the given rows by column name. */
 export function getTotalsRow(rows: readonly DatabaseRow[]): DatabaseRow {
@@ -106,9 +85,6 @@ export function getTotalsRow(rows: readonly DatabaseRow[]): DatabaseRow {
                 count++;
             }
         }
-        if (sum === Infinity) {
-            return i18n('value_no-limit');
-        }
         if (!count) {
             return EMPTY_DATA_PLACEHOLDER;
         }
@@ -122,7 +98,7 @@ export function getTotalsRow(rows: readonly DatabaseRow[]): DatabaseRow {
         return format(sum);
     }
 
-    const totals: DatabaseRow['totals'] = {
+    const totals = {
         [ids.Name]: i18n('label_total'),
         [ids.AllocatedCPU]: total((row) => row.allocated?.cores, formatNumber),
         [ids.AllocatedMemory]: total((row) => row.allocated?.memoryBytes, formatMemory),
@@ -132,42 +108,7 @@ export function getTotalsRow(rows: readonly DatabaseRow[]): DatabaseRow {
             formatNumber,
         ),
     };
-    if (SHOW_MY_DATABASES_STORAGE_COLUMNS) {
-        totals[ids.StorageQuotaLimit] = total(totalQuotaLimit, formatStorageSize);
-    }
     return {...TOTALS_ROW, totals};
-}
-
-function renderQuotaCell(quotas: StorageQuota[], field: 'used' | 'limit') {
-    if (!quotas.length) {
-        return EMPTY_DATA_PLACEHOLDER;
-    }
-    return (
-        <Flex direction="column" alignItems="flex-end">
-            {quotas.map((quota) => {
-                const value = quota[field];
-                const amount =
-                    field === 'limit' && value === 0
-                        ? i18n('value_no-limit')
-                        : renderOptionalNumber(value, formatStorageSize);
-                const scope =
-                    quota.pool ?? (quotas.length > 1 ? i18n('label_database-quota') : undefined);
-                const text = scope ? `${scope} · ${amount}` : amount;
-                if (value !== undefined && quota.source === 'configured') {
-                    const note =
-                        field === 'used'
-                            ? i18n('tooltip_quota-estimate')
-                            : i18n('tooltip_configured-limit');
-                    return (
-                        <Tooltip key={quota.pool ?? ''} content={note}>
-                            <span tabIndex={0}>{text}</span>
-                        </Tooltip>
-                    );
-                }
-                return <span key={quota.pool ?? ''}>{text}</span>;
-            })}
-        </Flex>
-    );
 }
 
 function getAllocatedComputeColumns(): DatabaseColumn[] {
@@ -201,26 +142,6 @@ function getAllocatedComputeColumns(): DatabaseColumn[] {
     ];
 }
 
-function getStorageQuotaColumns() {
-    return (['used', 'limit'] as const).map((field): DatabaseColumn => {
-        const title = i18n(field === 'used' ? 'column_quota-used' : 'column_quota-limit');
-        const note = i18n(field === 'used' ? 'description_quota-used' : 'description_quota-limit');
-        return {
-            name: field === 'used' ? ids.StorageQuotaUsed : ids.StorageQuotaLimit,
-            header: <TitleWithHelpMark header={title} note={note} />,
-            align: 'right',
-            width: 215,
-            sortAccessor: (row) => {
-                const values = databaseStorageQuotas(row)
-                    .map((quota) => quota[field])
-                    .filter((value): value is number => value !== undefined);
-                return values.length ? Math.max(...values) : undefined;
-            },
-            render: ({row}) => renderQuotaCell(databaseStorageQuotas(row), field),
-        };
-    });
-}
-
 /** Renders the footer cell from the totals row instead of the column's own cell. */
 function withTotalsFooter(column: DatabaseColumn): DatabaseColumn {
     const {render} = column;
@@ -244,16 +165,7 @@ export function getMyDatabasesColumns(
             case ids.Type:
                 result.push({...column, render: ({row}) => row.Type});
                 break;
-            case ids.Memory:
-                result.push(column);
-                if (SHOW_MY_DATABASES_STORAGE_COLUMNS) {
-                    result.push(...getStorageQuotaColumns());
-                }
-                break;
             case ids.Storage:
-                if (SHOW_MY_DATABASES_STORAGE_COLUMNS) {
-                    result.push(column);
-                }
                 break;
             case ids.GroupsCount:
                 result.push({...column, header: i18n('column_storage-groups'), width: 150});
