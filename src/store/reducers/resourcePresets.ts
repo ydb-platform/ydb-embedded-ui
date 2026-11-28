@@ -15,6 +15,10 @@ interface ResourcePresetsParams {
 /** A catalog is a handful of presets; the limit only stops a token that never ends. */
 const MAX_PAGES = 100;
 
+const INCOMPLETE_CATALOG_ERROR = {
+    message: 'The resource presets catalog was not read to the end: its pages do not stop.',
+};
+
 /** A cluster can be briefly unavailable: such a failure is worth asking again. */
 export function isTransientResourcePresetsError(error: unknown) {
     // A response blocked by CORS keeps its status and still reads as a network error
@@ -34,18 +38,21 @@ export const resourcePresetsApi = api.injectEndpoints({
                 }
                 try {
                     const presets: ResourcePreset[] = [];
+                    const readTokens = new Set<string | undefined>();
                     let pageToken: string | undefined;
-                    for (let page = 0; page < MAX_PAGES; page++) {
+                    do {
+                        // A part of a catalog would look like a catalog without some presets
+                        if (readTokens.has(pageToken) || readTokens.size === MAX_PAGES) {
+                            return {error: INCOMPLETE_CATALOG_ERROR};
+                        }
+                        readTokens.add(pageToken);
                         const response = await meta.listResourcePresets(
                             {clusterName, cloudId, pageToken},
                             {signal},
                         );
                         presets.push(...(response.resource_presets ?? []));
                         pageToken = response.next_page_token || undefined;
-                        if (!pageToken) {
-                            break;
-                        }
-                    }
+                    } while (pageToken);
                     return {data: {resource_presets: presets}};
                 } catch (error) {
                     return {error};

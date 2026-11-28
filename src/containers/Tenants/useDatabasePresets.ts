@@ -80,10 +80,12 @@ function usePresetCatalogs(requests: CatalogRequest[]) {
                             ({data, isLoading, isUninitialized}) =>
                                 !data && (isLoading || isUninitialized),
                         ),
-                        /** Queries worth asking again */
-                        failed: queries.filter((_query, index) => {
-                            const {isError, error} = results[index];
-                            return isError && isTransientResourcePresetsError(error);
+                        /** Requests worth sending again */
+                        failed: queries.flatMap((query, index) => {
+                            const {isError, error, requestId} = results[index];
+                            return isError && isTransientResourcePresetsError(error)
+                                ? [{query, requestId}]
+                                : [];
                         }),
                     };
                 },
@@ -94,21 +96,29 @@ function usePresetCatalogs(requests: CatalogRequest[]) {
 
     // A failed catalog is asked about again by the page that needs it, so that the retries
     // stop when the page is left and do not depend on other users of the same query.
-    const [attempts, setAttempts] = React.useState<Record<string, number>>({});
+    // The attempts are counted from the last request that was not a retry: the first load
+    // and each Refresh get all of them.
+    const [attempts, setAttempts] = React.useState<
+        Record<string, {count: number; requestId: string}>
+    >({});
     const retries = React.useMemo(
         () =>
-            failed.flatMap((query) => {
+            failed.flatMap(({query, requestId}) => {
                 const key = presetCatalogKey(query.clusterName, query.cloudId);
-                const delay = PRESETS_RETRY_DELAYS_MS[attempts[key] ?? 0];
-                return delay === undefined ? [] : [{query, key, delay}];
+                const last = attempts[key];
+                const count = last && last.requestId === requestId ? last.count : 0;
+                const delay = PRESETS_RETRY_DELAYS_MS[count];
+                return delay === undefined ? [] : [{query, key, count, delay}];
             }),
         [failed, attempts],
     );
     React.useEffect(() => {
-        const timers = retries.map(({query, key, delay}) =>
+        const timers = retries.map(({query, key, count, delay}) =>
             setTimeout(() => {
-                setAttempts((current) => ({...current, [key]: (current[key] ?? 0) + 1}));
-                dispatch(endpoint.initiate(query, {subscribe: false, forceRefetch: true}));
+                const {requestId} = dispatch(
+                    endpoint.initiate(query, {subscribe: false, forceRefetch: true}),
+                );
+                setAttempts((current) => ({...current, [key]: {count: count + 1, requestId}}));
             }, delay),
         );
         return () => timers.forEach(clearTimeout);

@@ -48,7 +48,11 @@ async function setup(listResourcePresets: jest.Mock) {
     // The store hands an answer over to the hook with a short timer of its own
     const answer = () => wait(ANSWER_MS);
     await answer();
-    return {...hook, wait, answer};
+    const refresh = () =>
+        act(() => {
+            store.dispatch(resourcePresetsApi.util.invalidateTags(['All']));
+        });
+    return {...hook, wait, answer, refresh};
 }
 
 beforeEach(() => {
@@ -83,6 +87,33 @@ test('asks again about a catalog that failed for a transient reason', async () =
     expect(result.current.catalogs.get('cluster-a')?.get('small')).toEqual(
         presets.resource_presets[0],
     );
+});
+
+test('counts the attempts anew when the catalog is asked about again', async () => {
+    const refreshed = {resource_presets: [{id: 'small', cores: '4', memory: '8'}]};
+    const listResourcePresets = jest
+        .fn()
+        // The first load uses both retries
+        .mockRejectedValueOnce({status: 503})
+        .mockRejectedValueOnce({status: 503})
+        .mockResolvedValueOnce(presets)
+        // Refresh fails once
+        .mockRejectedValueOnce({status: 503})
+        .mockResolvedValue(refreshed);
+    const {result, wait, answer, refresh} = await setup(listResourcePresets);
+    for (const delay of [firstDelay, secondDelay]) {
+        await wait(delay);
+        await answer();
+    }
+    expect(result.current.catalogs.get('cluster-a')?.get('small')?.cores).toBe('2');
+
+    await refresh();
+    await answer();
+    await wait(firstDelay);
+    await answer();
+
+    expect(listResourcePresets).toHaveBeenCalledTimes(5);
+    expect(result.current.catalogs.get('cluster-a')?.get('small')?.cores).toBe('4');
 });
 
 test('gives up after the last retry', async () => {

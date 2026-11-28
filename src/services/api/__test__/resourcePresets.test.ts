@@ -74,36 +74,63 @@ test.each([true, false])(
     },
 );
 
-test('reads a catalog page by page until there is no next page token', async () => {
-    const pages: Record<string, object> = {
-        first: {resource_presets: [{id: 'small', cores: '2', memory: '8'}], next_page_token: 'p2'},
-        p2: {resource_presets: [{id: 'large', cores: '8', memory: '32'}], next_page_token: ''},
-    };
-    const listResourcePresets = jest.fn(
-        async ({pageToken}: {pageToken?: string}) => pages[pageToken ?? 'first'],
-    );
-    const store = configureStore({
-        reducer: {[resourcePresetsApi.reducerPath]: resourcePresetsApi.reducer},
-        middleware: (getDefaultMiddleware) =>
-            getDefaultMiddleware({serializableCheck: false}).concat(resourcePresetsApi.middleware),
+describe('a paged catalog', () => {
+    const page = (id: string, next = '') => ({
+        resource_presets: [{id, cores: '2', memory: '8'}],
+        next_page_token: next,
     });
-    const originalApi = window.api;
-    window.api = {meta: {listResourcePresets}} as unknown as YdbEmbeddedAPI;
-    try {
-        const {data} = await store.dispatch(
-            resourcePresetsApi.endpoints.listResourcePresets.initiate(
-                {clusterName: 'cluster-a', cloudId: 'cloud-1'},
-                {subscribe: false},
-            ),
+
+    async function load(getPage: (pageToken?: string) => object) {
+        const listResourcePresets = jest.fn(async ({pageToken}: {pageToken?: string}) =>
+            getPage(pageToken),
+        );
+        const store = configureStore({
+            reducer: {[resourcePresetsApi.reducerPath]: resourcePresetsApi.reducer},
+            middleware: (getDefaultMiddleware) =>
+                getDefaultMiddleware({serializableCheck: false}).concat(
+                    resourcePresetsApi.middleware,
+                ),
+        });
+        const originalApi = window.api;
+        window.api = {meta: {listResourcePresets}} as unknown as YdbEmbeddedAPI;
+        try {
+            const result = await store.dispatch(
+                resourcePresetsApi.endpoints.listResourcePresets.initiate(
+                    {clusterName: 'cluster-a', cloudId: 'cloud-1'},
+                    {subscribe: false},
+                ),
+            );
+            return {result, requests: listResourcePresets.mock.calls.map(([params]) => params)};
+        } finally {
+            store.dispatch(resourcePresetsApi.util.resetApiState());
+            window.api = originalApi;
+        }
+    }
+
+    test('is read page by page until there is no next page token', async () => {
+        const {result, requests} = await load((token) =>
+            token ? page('large') : page('small', 'p2'),
         );
 
-        expect(data?.resource_presets?.map(({id}) => id)).toEqual(['small', 'large']);
-        expect(listResourcePresets.mock.calls.map(([params]) => params)).toEqual([
+        expect(result.data?.resource_presets?.map(({id}) => id)).toEqual(['small', 'large']);
+        expect(requests).toEqual([
             {clusterName: 'cluster-a', cloudId: 'cloud-1', pageToken: undefined},
             {clusterName: 'cluster-a', cloudId: 'cloud-1', pageToken: 'p2'},
         ]);
-    } finally {
-        store.dispatch(resourcePresetsApi.util.resetApiState());
-        window.api = originalApi;
-    }
+    });
+
+    test('is an error, not a part of the catalog, when a page token repeats', async () => {
+        const {result, requests} = await load(() => page('small', 'again'));
+
+        expect(result.isError).toBe(true);
+        expect(result.data).toBeUndefined();
+        expect(requests).toHaveLength(2);
+    });
+
+    test('is an error when its pages do not end', async () => {
+        const {result, requests} = await load((token) => page('small', `${token ?? ''}+`));
+
+        expect(result.isError).toBe(true);
+        expect(requests).toHaveLength(100);
+    });
 });
