@@ -11,12 +11,12 @@ import {EntitiesCount} from '../../components/EntitiesCount';
 import {ResponseError} from '../../components/Errors/ResponseError';
 import {PoolsGraph} from '../../components/PoolsGraph/PoolsGraph';
 import {ProblemFilter} from '../../components/ProblemFilter/ProblemFilter';
-import {ResizeableDataTable} from '../../components/ResizeableDataTable/ResizeableDataTable';
 import {Search} from '../../components/Search';
 import {TableColumnSetup} from '../../components/TableColumnSetup/TableColumnSetup';
 import {TableWithControlsLayout} from '../../components/TableWithControlsLayout/TableWithControlsLayout';
 import {TenantNameWrapper} from '../../components/TenantNameWrapper/TenantNameWrapper';
 import {getTenantLink} from '../../components/TenantNameWrapper/utils';
+import {TitleWithHelpMark} from '../../components/TitleWithHelpmark/TitleWithHelpmark';
 import {
     useBridgeModeEnabled,
     useEmMetaAvailable,
@@ -35,11 +35,7 @@ import {State} from '../../types/api/tenant';
 import {uiFactory} from '../../uiFactory/uiFactory';
 import {formatBytes} from '../../utils/bytesParsers';
 import {cn} from '../../utils/cn';
-import {
-    BRAND_BUTTON_CLASS,
-    DEFAULT_TABLE_SETTINGS,
-    EMPTY_DATA_PLACEHOLDER,
-} from '../../utils/constants';
+import {BRAND_BUTTON_CLASS, EMPTY_DATA_PLACEHOLDER} from '../../utils/constants';
 import {
     formatCPU,
     formatNumber,
@@ -48,26 +44,38 @@ import {
 import {useAutoRefreshInterval} from '../../utils/hooks';
 import {useSelectedColumns} from '../../utils/hooks/useSelectedColumns';
 import {getIllustration} from '../../utils/illustrations';
-import {isNumeric} from '../../utils/utils';
+import {isNumeric, parseOptionalNonNegativeNumber} from '../../utils/utils';
+import {TableGroup} from '../Storage/TableGroup/TableGroup';
+import {useExpandedGroups} from '../Storage/TableGroup/useExpandedTableGroups';
 
 import type {DatabaseStatusClickHandler} from './DatabaseDrawerHealthcheck';
 import {DatabaseDrawerHealthcheck} from './DatabaseDrawerHealthcheck';
+import {DatabaseRowsTable} from './DatabaseRowsTable';
+import {resourceGroupTitle} from './ResourceGroupFilter';
 import {getDatabaseBridgeColumns} from './bridgeColumns';
 import {
     DATABASES_COLUMNS_IDS,
     DATABASES_COLUMNS_TITLES,
     DATABASES_DEFAULT_COLUMNS,
     DATABASES_REQUIRED_COLUMNS,
-    DATABASES_SELECTED_COLUMNS_KEY,
+    DATABASES_TABLE_SETTINGS_KEYS,
+    MY_DATABASES_DEFAULT_COLUMNS,
+    MY_DATABASES_TABLE_SETTINGS_KEYS,
 } from './constants';
+import {renderOptionalNumber} from './formatters';
 import i18n from './i18n';
+import {
+    getMyDatabasesColumns,
+    groupResourceColumns,
+    ungroupResourceColumns,
+} from './resourceColumns';
+import type {DatabaseRow} from './types';
+import {isMyDatabase, useMyDatabasesView} from './useMyDatabasesView';
 import {useTenantsQueryParams} from './useTenantsQueryParams';
 
 import './Tenants.scss';
 
 const b = cn('tenants');
-
-const DATABASES_COLUMNS_WIDTH_LS_KEY = 'databasesTableColumnsWidth';
 
 function formatDatabaseState(state?: State): string {
     if (!state) {
@@ -109,6 +117,7 @@ function databaseStateToLabelTheme(state?: State): LabelProps['theme'] {
 }
 
 interface TenantsTableProps {
+    myDatabases?: boolean;
     clusterName?: string;
     environmentName?: string;
 
@@ -126,93 +135,98 @@ interface TenantsTableContentProps extends TenantsTableProps {
     onStatusClick: DatabaseStatusClickHandler;
 }
 
-const TenantsTableContent = ({
+const EMPTY_TENANTS: PreparedTenant[] = [];
+
+function TenantsTableContent({
+    myDatabases,
     clusterName,
     environmentName,
     isMetaDatabasesAvailable,
-    scrollContainerRef,
-    additionalTenantsProps,
     showDomainDatabase,
     showWithProblemsFilter,
+    scrollContainerRef,
+    additionalTenantsProps,
     showPoolsColumn,
     onStatusClick,
-}: TenantsTableContentProps) => {
-    const SuccessImage = getIllustration('SuccessOperation');
-    const history = useHistory();
-
+}: TenantsTableContentProps) {
     const [autoRefreshInterval] = useAutoRefreshInterval();
     const {currentData, isFetching, error} = tenantsApi.useGetTenantsInfoQuery(
         {clusterName, environmentName, isMetaDatabasesAvailable},
         {pollingInterval: autoRefreshInterval},
     );
-
-    // Track sort state for scroll dependencies
-    const [sortParams, setSortParams] = React.useState<SortOrder | SortOrder[] | undefined>();
-
-    const isCreateDBAvailable = useEmMetaAvailable() && uiFactory.onCreateDB !== undefined;
-    const bridgeModeEnabled = useBridgeModeEnabled();
-    const tenantInfoHasBridgeFields = useViewerTenantInfoHasBridgeFields();
-    const bridgeColumnsAvailable = bridgeModeEnabled && tenantInfoHasBridgeFields;
-
-    const {domain: domainRoot, settings, isResolved: isClusterInfoResolved} = useClusterBaseInfo();
-    const loading = (isFetching && currentData === undefined) || !isClusterInfoResolved;
-
     const {search, withProblems, handleSearchChange, handleWithProblemsChange} =
         useTenantsQueryParams();
+    const {domain: domainRoot, settings, isResolved: isClusterInfoResolved} = useClusterBaseInfo();
+    const useMetaProxySetting = settings?.use_meta_proxy;
+    const useDatabaseIdSetting = settings?.use_database_id;
 
     // We should apply domain filter before other filters
     // It is done to ensure proper entities count
     // It should be 8/8 instead of 8/9 when no filters applied but show domain setting is off
     const tenants = React.useMemo(() => {
-        const rawTenants = currentData ?? [];
+        const rawTenants = currentData ?? EMPTY_TENANTS;
+        const pageTenants = myDatabases
+            ? rawTenants.filter(isMyDatabase)
+            : filterTenantsByDomain(rawTenants, showDomainDatabase);
 
-        return filterTenantsByDomain(rawTenants, showDomainDatabase);
-    }, [currentData, showDomainDatabase]);
-
-    const filteredTenants = React.useMemo(() => {
-        let filteredByProblems = tenants;
-        if (showWithProblemsFilter) {
-            filteredByProblems = filterTenantsByProblems(tenants, withProblems);
-        }
-
-        const filteredBySearch = filterTenantsBySearch(filteredByProblems, search);
-
-        return filteredBySearch;
-    }, [tenants, withProblems, search, showWithProblemsFilter]);
-
-    const useMetaProxySetting = settings?.use_meta_proxy;
-    const useDatabaseIdSetting = settings?.use_database_id;
-    const tenantLinks = React.useMemo(
-        () =>
-            new Map(
-                tenants.map((tenant) => [
+        return pageTenants.map(
+            (tenant): DatabaseRow => ({
+                ...tenant,
+                link: getTenantLink({
                     tenant,
-                    getTenantLink({
-                        tenant,
-                        additionalTenantsProps,
-                        externalLink: Boolean(environmentName),
-                        useDatabaseId: uiFactory.useDatabaseId,
-                        isMetaDatabasesAvailable,
-                        settings: {
-                            use_meta_proxy: useMetaProxySetting,
-                            use_database_id: useDatabaseIdSetting,
-                        },
-                    }),
-                ]),
-            ),
-        [
-            tenants,
-            additionalTenantsProps,
-            environmentName,
-            isMetaDatabasesAvailable,
-            useMetaProxySetting,
-            useDatabaseIdSetting,
-        ],
+                    additionalTenantsProps,
+                    externalLink: Boolean(environmentName),
+                    useDatabaseId: uiFactory.useDatabaseId,
+                    isMetaDatabasesAvailable,
+                    settings: {
+                        use_meta_proxy: useMetaProxySetting,
+                        use_database_id: useDatabaseIdSetting,
+                    },
+                }),
+            }),
+        );
+    }, [
+        currentData,
+        myDatabases,
+        showDomainDatabase,
+        additionalTenantsProps,
+        environmentName,
+        isMetaDatabasesAvailable,
+        useMetaProxySetting,
+        useDatabaseIdSetting,
+    ]);
+
+    const filterRows = React.useCallback(
+        (rows: DatabaseRow[]) => {
+            const filteredByProblems = showWithProblemsFilter
+                ? filterTenantsByProblems(rows, withProblems)
+                : rows;
+
+            return filterTenantsBySearch(filteredByProblems, search);
+        },
+        [withProblems, search, showWithProblemsFilter],
     );
 
+    const myDatabasesView = useMyDatabasesView({
+        enabled: Boolean(myDatabases),
+        tenants,
+        filterRows,
+        environmentName,
+    });
+    const {rows: filteredTenants, groups, withAllocatedResources} = myDatabasesView;
+
+    const hasData = currentData !== undefined;
+    const SuccessImage = getIllustration('SuccessOperation');
+    const history = useHistory();
+    const [sortParams, setSortParams] = React.useState<SortOrder | SortOrder[] | undefined>();
+    const isCreateDBAvailable = useEmMetaAvailable() && uiFactory.onCreateDB !== undefined;
+    const bridgeModeEnabled = useBridgeModeEnabled();
+    const tenantInfoHasBridgeFields = useViewerTenantInfoHasBridgeFields();
+    const bridgeColumnsAvailable = bridgeModeEnabled && tenantInfoHasBridgeFields;
+    const loading = (isFetching && !hasData) || !isClusterInfoResolved;
+
     const openTenant = React.useCallback(
-        (tenant: PreparedTenant) => {
-            const link = tenantLinks.get(tenant);
+        ({link}: DatabaseRow) => {
             if (!isClusterInfoResolved || !link) {
                 return;
             }
@@ -223,7 +237,7 @@ const TenantsTableContent = ({
 
             history.push(link.href);
         },
-        [tenantLinks, history, isClusterInfoResolved],
+        [history, isClusterInfoResolved],
     );
 
     const renderCreateDBButton = () => {
@@ -252,24 +266,25 @@ const TenantsTableContent = ({
                     tableFilter
                     value={search}
                     onChange={handleSearchChange}
-                    placeholder="Database name"
+                    placeholder={i18n('context_search-databases')}
                     className={b('search')}
                 />
                 {showWithProblemsFilter ? (
                     <ProblemFilter value={withProblems} onChange={handleWithProblemsChange} />
                 ) : null}
+                {myDatabasesView.controls}
                 <EntitiesCount
                     total={tenants?.length}
                     current={filteredTenants?.length || 0}
-                    label={'Databases'}
+                    label={i18n('field_databases')}
                     loading={loading}
                 />
             </React.Fragment>
         );
     };
 
-    const rawDatabasesColumns = React.useMemo(() => {
-        const columns: Column<PreparedTenant>[] = [
+    const tableColumns = React.useMemo(() => {
+        const columns: Column<DatabaseRow>[] = [
             {
                 name: DATABASES_COLUMNS_IDS.Name,
                 header: DATABASES_COLUMNS_TITLES[DATABASES_COLUMNS_IDS.Name],
@@ -279,7 +294,7 @@ const TenantsTableContent = ({
                         clusterName={clusterName}
                         additionalTenantsProps={additionalTenantsProps}
                         externalLink={Boolean(environmentName)}
-                        link={tenantLinks.get(row)}
+                        link={row.link}
                         onStatusClick={onStatusClick}
                     />
                 ),
@@ -315,42 +330,61 @@ const TenantsTableContent = ({
                 name: DATABASES_COLUMNS_IDS.State,
                 header: DATABASES_COLUMNS_TITLES[DATABASES_COLUMNS_IDS.State],
                 width: 150,
-                render: ({row}) => (
-                    <Label theme={databaseStateToLabelTheme(row.State)}>
-                        {formatDatabaseState(row.State)}
-                    </Label>
-                ),
+                render: ({row}) => {
+                    const state = formatDatabaseState(row.State);
+                    return (
+                        <Label
+                            theme={databaseStateToLabelTheme(row.State)}
+                            width="auto"
+                            title={state}
+                        >
+                            {state}
+                        </Label>
+                    );
+                },
             },
             ...(bridgeColumnsAvailable ? getDatabaseBridgeColumns() : []),
             {
                 name: DATABASES_COLUMNS_IDS.CPU,
-                header: DATABASES_COLUMNS_TITLES[DATABASES_COLUMNS_IDS.CPU],
-                width: 80,
-                render: ({row}) => {
-                    // Don't show values below 0.01 when formatted
-                    if (row.cpu && row.cpu > 10_000) {
-                        return formatCPU(row.cpu);
-                    }
-                    return EMPTY_DATA_PLACEHOLDER;
-                },
+                header: (
+                    <TitleWithHelpMark
+                        header={DATABASES_COLUMNS_TITLES[DATABASES_COLUMNS_IDS.CPU]}
+                        note={i18n('context_cpu-used')}
+                    />
+                ),
+                width: 140,
+                sortAccessor: (row) => parseOptionalNonNegativeNumber(row.CoresUsed),
+                render: ({row}) =>
+                    renderOptionalNumber(row.CoresUsed, (cores) => formatCPU(cores * 1_000_000)),
                 align: DataTable.RIGHT,
                 defaultOrder: DataTable.DESCENDING,
             },
             {
                 name: DATABASES_COLUMNS_IDS.Memory,
-                header: DATABASES_COLUMNS_TITLES[DATABASES_COLUMNS_IDS.Memory],
-                width: 120,
-                render: ({row}) =>
-                    row.memory ? formatStorageValuesToGb(row.memory) : EMPTY_DATA_PLACEHOLDER,
+                header: (
+                    <TitleWithHelpMark
+                        header={DATABASES_COLUMNS_TITLES[DATABASES_COLUMNS_IDS.Memory]}
+                        note={i18n('context_memory-used')}
+                    />
+                ),
+                width: 165,
+                sortAccessor: (row) => parseOptionalNonNegativeNumber(row.MemoryUsed),
+                render: ({row}) => renderOptionalNumber(row.MemoryUsed, formatStorageValuesToGb),
                 align: DataTable.RIGHT,
                 defaultOrder: DataTable.DESCENDING,
             },
             {
                 name: DATABASES_COLUMNS_IDS.Storage,
-                header: DATABASES_COLUMNS_TITLES[DATABASES_COLUMNS_IDS.Storage],
-                width: 120,
+                header: (
+                    <TitleWithHelpMark
+                        header={DATABASES_COLUMNS_TITLES[DATABASES_COLUMNS_IDS.Storage]}
+                        note={i18n('context_storage-used')}
+                    />
+                ),
+                width: 135,
+                sortAccessor: (row) => parseOptionalNonNegativeNumber(row.StorageAllocatedSize),
                 render: ({row}) =>
-                    row.storage ? formatStorageValuesToGb(row.storage) : EMPTY_DATA_PLACEHOLDER,
+                    renderOptionalNumber(row.StorageAllocatedSize, formatStorageValuesToGb),
                 align: DataTable.RIGHT,
                 defaultOrder: DataTable.DESCENDING,
             },
@@ -384,8 +418,8 @@ const TenantsTableContent = ({
                 name: DATABASES_COLUMNS_IDS.NodesCount,
                 header: DATABASES_COLUMNS_TITLES[DATABASES_COLUMNS_IDS.NodesCount],
                 width: 100,
-                render: ({row}) =>
-                    row.nodesCount ? formatNumber(row.nodesCount) : EMPTY_DATA_PLACEHOLDER,
+                sortAccessor: (row) => row.NodeIds?.length,
+                render: ({row}) => renderOptionalNumber(row.NodeIds?.length, formatNumber),
                 align: DataTable.RIGHT,
                 defaultOrder: DataTable.DESCENDING,
             },
@@ -393,8 +427,8 @@ const TenantsTableContent = ({
                 name: DATABASES_COLUMNS_IDS.GroupsCount,
                 header: DATABASES_COLUMNS_TITLES[DATABASES_COLUMNS_IDS.GroupsCount],
                 width: 100,
-                render: ({row}) =>
-                    row.groupsCount ? formatNumber(row.groupsCount) : EMPTY_DATA_PLACEHOLDER,
+                sortAccessor: (row) => parseOptionalNonNegativeNumber(row.StorageGroups),
+                render: ({row}) => renderOptionalNumber(row.StorageGroups, formatNumber),
                 align: DataTable.RIGHT,
                 defaultOrder: DataTable.DESCENDING,
             },
@@ -414,8 +448,10 @@ const TenantsTableContent = ({
             });
         }
 
-        return columns;
+        return myDatabases ? getMyDatabasesColumns(columns, {withAllocatedResources}) : columns;
     }, [
+        myDatabases,
+        withAllocatedResources,
         bridgeColumnsAvailable,
         clusterName,
         additionalTenantsProps,
@@ -423,25 +459,33 @@ const TenantsTableContent = ({
         handleSearchChange,
         onStatusClick,
         showPoolsColumn,
-        tenantLinks,
     ]);
 
+    const tableKeys = myDatabases
+        ? MY_DATABASES_TABLE_SETTINGS_KEYS
+        : DATABASES_TABLE_SETTINGS_KEYS;
     const {columnsToShow, columnsToSelect, setColumns} = useSelectedColumns(
-        rawDatabasesColumns,
-        DATABASES_SELECTED_COLUMNS_KEY,
+        tableColumns,
+        tableKeys.columns,
         DATABASES_COLUMNS_TITLES,
-        DATABASES_DEFAULT_COLUMNS,
+        myDatabases ? MY_DATABASES_DEFAULT_COLUMNS : DATABASES_DEFAULT_COLUMNS,
         DATABASES_REQUIRED_COLUMNS,
     );
 
-    const renderTable = () => {
-        if (filteredTenants.length === 0 && withProblems) {
-            return <SuccessImage width={200} height={200} />;
-        }
+    const layout = React.useMemo(
+        () =>
+            myDatabases
+                ? groupResourceColumns(columnsToSelect)
+                : {columns: columnsToShow, items: columnsToSelect},
+        [myDatabases, columnsToShow, columnsToSelect],
+    );
 
+    const {expandedGroups, setIsGroupExpanded} = useExpandedGroups(groups);
+
+    const renderRows = (rows: DatabaseRow[]) => {
         return (
             <div>
-                <ResizeableDataTable
+                <DatabaseRowsTable
                     onKeyboardActivate={openTenant}
                     getKeyboardRowKey={(tenant) =>
                         JSON.stringify([tenant.Cluster, tenant.Id ?? tenant.Name])
@@ -452,24 +496,54 @@ const TenantsTableContent = ({
                         tenant.Id ||
                         EMPTY_DATA_PLACEHOLDER
                     }
-                    columnsWidthLSKey={DATABASES_COLUMNS_WIDTH_LS_KEY}
-                    data={filteredTenants}
-                    columns={columnsToShow}
-                    settings={DEFAULT_TABLE_SETTINGS}
+                    columnsWidthLSKey={tableKeys.widths}
+                    data={rows}
+                    columns={layout.columns}
                     emptyDataMessage={i18n('no-databases')}
+                    sortOrder={sortParams}
                     onSortChange={setSortParams}
                 />
             </div>
         );
     };
 
+    const renderTable = () => {
+        if (!filteredTenants.length && withProblems) {
+            return <SuccessImage width={200} height={200} />;
+        }
+        if (groups) {
+            if (!groups.length) {
+                return renderRows([]);
+            }
+            return groups.map((group) => (
+                <TableGroup
+                    key={group.name}
+                    name={group.name}
+                    title={resourceGroupTitle(group)}
+                    count={group.rows.length}
+                    entityName={i18n('field_databases')}
+                    expanded={Boolean(expandedGroups[group.name])}
+                    onIsExpandedChange={setIsGroupExpanded}
+                >
+                    {renderRows(group.rows)}
+                </TableGroup>
+            ));
+        }
+        return renderRows(filteredTenants);
+    };
+
     const renderColumnSetup = () => {
         return (
             <TableColumnSetup
-                popupWidth={200}
-                items={columnsToSelect}
+                // Titles of column groups are longer than titles of columns
+                popupWidth={myDatabases ? 250 : 200}
+                items={layout.items}
                 showStatus
-                onUpdate={setColumns}
+                onUpdate={(updated) =>
+                    setColumns(
+                        myDatabases ? ungroupResourceColumns(updated, columnsToSelect) : updated,
+                    )
+                }
             />
         );
     };
@@ -491,6 +565,7 @@ const TenantsTableContent = ({
                     withProblems,
                     showDomainDatabase,
                     showWithProblemsFilter,
+                    ...myDatabasesView.filters,
                 ])}
             >
                 <TableWithControlsLayout.Controls renderExtraControls={renderExtraControls}>
@@ -500,14 +575,19 @@ const TenantsTableContent = ({
                 <TableWithControlsLayout.Table
                     scrollContainerRef={scrollContainerRef}
                     loading={loading}
-                    scrollDependencies={[search, withProblems, sortParams]}
+                    scrollDependencies={[
+                        search,
+                        withProblems,
+                        sortParams,
+                        ...myDatabasesView.filters,
+                    ]}
                 >
-                    <div>{currentData ? renderTable() : null}</div>
+                    <div>{hasData ? renderTable() : null}</div>
                 </TableWithControlsLayout.Table>
             </TableWithControlsLayout>
         </div>
     );
-};
+}
 
 export function TenantsTable(props: TenantsTableProps) {
     return (

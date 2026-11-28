@@ -453,6 +453,11 @@ async function prepareNodesPage(
             JSON.stringify([
                 {id: 'NodeId', selected: true},
                 {id: 'PDisks', selected: true},
+                // Default columns missing from saved settings are treated as new and shown
+                {id: 'Host', selected: false},
+                {id: 'Uptime', selected: false},
+                {id: 'CPU', selected: false},
+                {id: 'RAM', selected: false},
             ]),
         );
     });
@@ -965,6 +970,11 @@ test.describe('Datacenter storage screenshots', () => {
                     JSON.stringify([
                         {id: 'GroupId', selected: true},
                         {id: 'VDisksPDisks', selected: true},
+                        // Default columns missing from saved settings are treated as new and shown
+                        {id: 'PoolName', selected: false},
+                        {id: 'Erasure', selected: false},
+                        {id: 'Used', selected: false},
+                        {id: 'VDisks', selected: false},
                     ]),
                 );
             }, theme);
@@ -1064,6 +1074,11 @@ test.describe('Drive type - groups expert mode', () => {
                     JSON.stringify([
                         {id: 'GroupId', selected: true},
                         {id: 'VDisksPDisks', selected: true},
+                        // Default columns missing from saved settings are treated as new and shown
+                        {id: 'PoolName', selected: false},
+                        {id: 'Erasure', selected: false},
+                        {id: 'Used', selected: false},
+                        {id: 'VDisks', selected: false},
                     ]),
                 );
             });
@@ -1390,7 +1405,14 @@ test.describe('VDisk Coloring - Expert Mode visual snapshots', () => {
             localStorage.setItem('auto-refresh-interval', '15000');
             localStorage.setItem(
                 'storageGroupsSelectedColumns',
-                JSON.stringify([{id: 'GroupId', selected: true}]),
+                JSON.stringify([
+                    {id: 'GroupId', selected: true},
+                    // Default columns missing from saved settings are treated as new and shown
+                    {id: 'PoolName', selected: false},
+                    {id: 'Erasure', selected: false},
+                    {id: 'Used', selected: false},
+                    {id: 'VDisks', selected: false},
+                ]),
             );
         });
         await setupVDiskColoringMocks(page);
@@ -1470,7 +1492,14 @@ test.describe('VDisk Coloring - Expert Mode visual snapshots', () => {
             localStorage.setItem('auto-refresh-interval', '0');
             localStorage.setItem(
                 'storageGroupsSelectedColumns',
-                JSON.stringify([{id: 'GroupId', selected: true}]),
+                JSON.stringify([
+                    {id: 'GroupId', selected: true},
+                    // Default columns missing from saved settings are treated as new and shown
+                    {id: 'PoolName', selected: false},
+                    {id: 'Erasure', selected: false},
+                    {id: 'Used', selected: false},
+                    {id: 'VDisks', selected: false},
+                ]),
             );
         });
         await setupVDiskColoringMocks(page);

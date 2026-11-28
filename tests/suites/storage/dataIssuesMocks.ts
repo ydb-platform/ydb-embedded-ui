@@ -86,6 +86,10 @@ export async function setupDataIssuesMocks(
             JSON.stringify([
                 {id: 'GroupId', selected: true},
                 {id: 'PoolName', selected: true},
+                // Default columns missing from saved settings are treated as new and shown
+                {id: 'Erasure', selected: false},
+                {id: 'Used', selected: false},
+                {id: 'VDisks', selected: false},
             ]),
         );
         for (const key of ['nodesTableSelectedColumns', 'storageNodesSelectedColumns']) {

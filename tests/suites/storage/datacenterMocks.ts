@@ -12,6 +12,10 @@ export async function setupDatacenterDiskMocks(page: Page, theme: string, withNo
                 {id: 'GroupId', selected: true},
                 {id: 'VDisks', selected: true},
                 {id: 'VDisksPDisks', selected: true},
+                // Default columns missing from saved settings are treated as new and shown
+                {id: 'PoolName', selected: false},
+                {id: 'Erasure', selected: false},
+                {id: 'Used', selected: false},
             ]),
         );
     }, theme);

@@ -139,18 +139,33 @@ export function DataTableKeyboardNavigation<T>({
                 positions.push({element, left: element.scrollLeft});
             }
             row.scrollIntoView({block: 'nearest', behavior: 'instant'});
-            const head = tableRef.current?.querySelector<HTMLElement>('.data-table__sticky_head');
-            const overlap = head
-                ? head.getBoundingClientRect().bottom - row.getBoundingClientRect().top
-                : 0;
-            if (overlap > 0) {
-                positions
-                    .find(
-                        ({element}) =>
-                            element.scrollHeight > element.clientHeight &&
-                            /auto|scroll/.test(getComputedStyle(element).overflowY),
-                    )
-                    ?.element.scrollBy({top: -overlap, behavior: 'instant'});
+            // `nearest` knows nothing about the sticky head and footer that cover the row
+            const scroller = positions.find(
+                ({element}) =>
+                    element.scrollHeight > element.clientHeight &&
+                    /auto|scroll/.test(getComputedStyle(element).overflowY),
+            )?.element;
+            const stickyEdge = (part: 'head' | 'footer') =>
+                tableRef.current
+                    ?.querySelector<HTMLElement>(`.data-table__sticky_${part}`)
+                    ?.getBoundingClientRect();
+            // A shift moves the sticky parts too: the head of a table that was scrolling out of
+            // view comes back to its place, so the row is measured again after each shift.
+            for (let pass = 0; pass < 3; pass++) {
+                const rowRect = row.getBoundingClientRect();
+                const footerOverlap = rowRect.bottom - (stickyEdge('footer')?.top ?? Infinity);
+                const headOverlap = (stickyEdge('head')?.bottom ?? -Infinity) - rowRect.top;
+                let shift = 0;
+                if (footerOverlap > 0) {
+                    shift = footerOverlap;
+                } else if (headOverlap > 1) {
+                    // A moving head always lies 1px over the first row
+                    shift = -headOverlap;
+                }
+                if (!shift || !scroller) {
+                    break;
+                }
+                scroller.scrollBy({top: shift, behavior: 'instant'});
             }
             for (const {element, left} of positions) {
                 if (element.scrollLeft !== left) {

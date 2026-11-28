@@ -1,8 +1,19 @@
+import type {ETenantType} from '../../types/api/tenant';
 import type {ValueOf} from '../../types/common';
 
 import i18n from './i18n';
 
-export const DATABASES_SELECTED_COLUMNS_KEY = 'databasesTableSelectedColumns';
+export const MY_DATABASE_TYPES = ['Serverless', 'Dedicated'] satisfies ETenantType[];
+
+export const DATABASES_TABLE_SETTINGS_KEYS = {
+    columns: 'databasesTableSelectedColumns',
+    widths: 'databasesTableColumnsWidth',
+};
+
+export const MY_DATABASES_TABLE_SETTINGS_KEYS = {
+    columns: 'myDatabasesTableSelectedColumns',
+    widths: 'myDatabasesTableColumnsWidth',
+};
 
 export const DATABASES_COLUMNS_IDS = {
     Name: 'Name',
@@ -11,7 +22,9 @@ export const DATABASES_COLUMNS_IDS = {
     BridgeMode: 'BridgeMode',
     BridgeSyncStatus: 'BridgeSyncStatus',
     CPU: 'cpu',
+    AllocatedCPU: 'allocatedCpuCores',
     Memory: 'memory',
+    AllocatedMemory: 'allocatedMemory',
     Storage: 'storage',
     Network: 'Network',
     NodesCount: 'nodesCount',
@@ -35,7 +48,28 @@ export const DATABASES_DEFAULT_COLUMNS: DatabasesColumnId[] = [
     DATABASES_COLUMNS_IDS.GroupsCount,
     DATABASES_COLUMNS_IDS.PoolStats,
 ];
+
+export const MY_DATABASES_DEFAULT_COLUMNS: DatabasesColumnId[] = [
+    DATABASES_COLUMNS_IDS.Name,
+    DATABASES_COLUMNS_IDS.Type,
+    DATABASES_COLUMNS_IDS.State,
+    DATABASES_COLUMNS_IDS.BridgeMode,
+    DATABASES_COLUMNS_IDS.BridgeSyncStatus,
+    DATABASES_COLUMNS_IDS.CPU,
+    DATABASES_COLUMNS_IDS.AllocatedCPU,
+    DATABASES_COLUMNS_IDS.Memory,
+    DATABASES_COLUMNS_IDS.AllocatedMemory,
+    DATABASES_COLUMNS_IDS.Network,
+    DATABASES_COLUMNS_IDS.PoolStats,
+];
+
 export const DATABASES_REQUIRED_COLUMNS: DatabasesColumnId[] = [DATABASES_COLUMNS_IDS.Name];
+
+/** Allocated resources are set up as a column group and have no titles of their own. */
+type TitledColumnId = Exclude<
+    DatabasesColumnId,
+    typeof DATABASES_COLUMNS_IDS.AllocatedCPU | typeof DATABASES_COLUMNS_IDS.AllocatedMemory
+>;
 
 export const DATABASES_COLUMNS_TITLES = {
     get [DATABASES_COLUMNS_IDS.Name]() {
@@ -74,4 +108,4 @@ export const DATABASES_COLUMNS_TITLES = {
     get [DATABASES_COLUMNS_IDS.PoolStats]() {
         return i18n('column-pools');
     },
-} as const satisfies Record<DatabasesColumnId, string>;
+} as const satisfies Record<TitledColumnId, string>;

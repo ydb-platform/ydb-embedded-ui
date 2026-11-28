@@ -3,6 +3,7 @@ import {configureStore} from '@reduxjs/toolkit';
 import type {YdbEmbeddedAPI} from '../../../../services/api';
 import {parseMetaTenants} from '../../../../services/parsers/parseMetaTenants';
 import type {TTenant} from '../../../../types/api/tenant';
+import {configureUIFactory, uiFactory} from '../../../../uiFactory/uiFactory';
 import {extractErrorDetails} from '../../../../utils/errors';
 import {api} from '../../api';
 import {tenantsApi} from '../tenants';
@@ -201,4 +202,30 @@ describe('tenantsApi.getSharedDatabase', () => {
             expect.objectContaining({signal: expect.any(AbortSignal)}),
         );
     });
+});
+
+test('caches resolved clouds by environment when the same cloud IDs appear in both', async () => {
+    const previousResolver = uiFactory.resolveCloudName;
+    const resolveCloudName = jest.fn(async (ids: string[], environmentName?: string) =>
+        ids.map((id) => ({id, name: `${environmentName}-${id}`})),
+    );
+    configureUIFactory({resolveCloudName});
+    const store = createTestStore();
+    const endpoint = tenantsApi.endpoints.getDatabaseCloudNames;
+    const ids = ['cloud'];
+    try {
+        for (const environmentName of ['test', 'prod', 'test']) {
+            const result = await store.dispatch(
+                endpoint.initiate({ids, environmentName}, {subscribe: false}),
+            );
+            expect(result.data).toEqual([{id: 'cloud', name: `${environmentName}-cloud`}]);
+        }
+        expect(resolveCloudName.mock.calls).toEqual([
+            [ids, 'test'],
+            [ids, 'prod'],
+        ]);
+    } finally {
+        store.dispatch(api.util.resetApiState());
+        configureUIFactory({resolveCloudName: previousResolver});
+    }
 });

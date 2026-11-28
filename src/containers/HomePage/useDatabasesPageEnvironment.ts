@@ -1,14 +1,20 @@
 import React from 'react';
 
-import {StringParam, useQueryParam} from 'use-query-params';
+import {StringParam, useQueryParams} from 'use-query-params';
 
 import {useMetaEnvironmentsAvailable} from '../../store/reducers/capabilities/hooks';
 import {SETTING_KEYS} from '../../store/reducers/settings/constants';
 import {uiFactory} from '../../uiFactory/uiFactory';
 import {useSetting} from '../../utils/hooks';
+import {ENVIRONMENT_FILTERS_PARAMS} from '../Tenants/environmentFilters';
 
-export function useDatabasesPageEnvironment(environments?: string[]) {
-    const [envParamFromQuery, setEnvParamToQuery] = useQueryParam('env', StringParam);
+const queryParamsConfig = {env: StringParam, ...ENVIRONMENT_FILTERS_PARAMS};
+
+export function useDatabasesPageEnvironment(
+    environments: string[] | undefined,
+    {syncToUrl}: {syncToUrl: boolean},
+) {
+    const [{env: envParamFromQuery}, setQueryParams] = useQueryParams(queryParamsConfig);
 
     const [savedEnvironment, saveEnvironment] = useSetting<string | undefined>(
         SETTING_KEYS.DATABASES_PAGE_ENVIRONMENT,
@@ -41,15 +47,33 @@ export function useDatabasesPageEnvironment(environments?: string[]) {
 
     const handleEnvironmentChange = React.useCallback(
         (value: string) => {
-            setEnvParamToQuery(value, 'replaceIn');
+            // Clusters and clouds selected in one environment do not exist in another.
+            // The URL may name an environment the page could not open and has replaced.
+            const leavesEnvironment = Boolean(envParamFromQuery) && value !== envParamFromQuery;
+            setQueryParams(
+                leavesEnvironment ? {env: value, cluster: [], cloudId: []} : {env: value},
+                'replaceIn',
+            );
             saveEnvironment(value);
         },
-        [setEnvParamToQuery, saveEnvironment],
+        [envParamFromQuery, setQueryParams, saveEnvironment],
     );
+
+    // The URL names the opened environment when there is a choice, and never one that
+    // could not be opened: a link to it is replaced even with a single environment
+    const urlIsStale =
+        syncToUrl &&
+        Boolean(databasesPageEnvironment) &&
+        databasesPageEnvironment !== envParamFromQuery &&
+        Boolean(envParamFromQuery || (environments && environments.length > 1));
+    React.useEffect(() => {
+        if (urlIsStale && databasesPageEnvironment) {
+            handleEnvironmentChange(databasesPageEnvironment);
+        }
+    }, [urlIsStale, databasesPageEnvironment, handleEnvironmentChange]);
 
     return {
         databasesPageEnvironment,
-        envParamFromQuery,
         handleEnvironmentChange,
     };
 }

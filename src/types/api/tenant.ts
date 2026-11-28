@@ -67,6 +67,7 @@ export interface TTenant {
 
     StorageAllocatedLimit?: string;
     DatabaseQuotas?: DatabaseQuotas;
+    DomainState?: TDomainState;
 
     StorageUsage?: TStorageUsage[];
     QuotaUsage?: TStorageUsage[];
@@ -137,16 +138,27 @@ export interface TTenantResource {
     Count: number;
 }
 
+export interface DatabaseComputeConfig {
+    resource_preset_id?: string;
+    scale_policy?: {
+        fixed_scale?: {size?: number | string};
+    };
+}
+
 /** incomplete */
-export interface ControlPlane {
+export interface ControlPlane extends DatabaseComputeConfig {
+    cloud_id?: string;
     name?: string;
     id?: string;
     endpoint?: string;
 
     folder_id?: string;
     location_id?: string;
-    resource_preset_id?: string;
+    dedicated_database?: DatabaseComputeConfig;
+    shared_database?: DatabaseComputeConfig;
+    serverless_database?: {exclusive_compute_resources?: DatabaseComputeConfig};
 
+    // Preserve the legacy top-level shape used by database management forms.
     scale_policy?: {
         fixed_scale: {
             size?: number;
@@ -188,6 +200,12 @@ export enum ETabletVolatileState {
     'TABLET_VOLATILE_STATE_BOOTING' = 'TABLET_VOLATILE_STATE_BOOTING',
     'TABLET_VOLATILE_STATE_STARTING' = 'TABLET_VOLATILE_STATE_STARTING',
     'TABLET_VOLATILE_STATE_RUNNING' = 'TABLET_VOLATILE_STATE_RUNNING',
+}
+
+export interface TDomainState {
+    DiskQuotaExceeded?: boolean;
+    StorageSpaceExhausted?: boolean;
+    SmallBlobsQuotaExceeded?: boolean;
 }
 
 export interface DatabaseQuotas {

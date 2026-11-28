@@ -39,6 +39,8 @@ export type {
 export type {SettingProps, SettingsInfoFieldProps} from './containers/UserSettings/Setting';
 export type {AsideNavigationProps} from './containers/AsideNavigation/AsideNavigation';
 export type {ExternalQueryToOpen} from './containers/Tenant/Query/hooks/useOpenExternalQueryInEditor';
+export {useClusterResourcePresets} from './store/reducers/resourcePresets';
+export type {ResourcePreset} from './types/api/resourcePresets';
 export type {DrawerContextType} from './components/Drawer';
 export type {AccessTableProps, AccessTableRow} from './components/AccessTable/AccessTable';
 export type {GetMonitoringLink, GetMonitoringClusterLink} from './utils/monitoring';

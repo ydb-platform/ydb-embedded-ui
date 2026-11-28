@@ -87,6 +87,11 @@ export interface UIFactory<H extends string = CommonIssueCategory, T extends str
     onDeleteCluster?: HandleDeleteCluster;
 
     homePageTitle?: string;
+    /** Resolve the cloud IDs shown on My databases. Unresolved clouds are displayed by ID. */
+    resolveCloudName?: (
+        ids: string[],
+        environmentName?: string,
+    ) => Promise<{id: string; name: string}[]>;
 
     /**
      * Permanent positive indexes keyed by the full uppercase DC name.

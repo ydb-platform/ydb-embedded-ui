@@ -57,6 +57,9 @@ describe('useStorageNodesSelectedColumns', () => {
                     {id: NODES_COLUMNS_IDS.Host, selected: true},
                     {id: NODES_COLUMNS_IDS.PDisks, selected: false},
                     {id: NODES_COLUMNS_IDS.Uptime, selected: true},
+                    // Saved settings list every column, a missing default column is treated as new
+                    {id: NODES_COLUMNS_IDS.CPU, selected: false},
+                    {id: NODES_COLUMNS_IDS.RAM, selected: false},
                 ],
                 setSavedColumns,
             ]);

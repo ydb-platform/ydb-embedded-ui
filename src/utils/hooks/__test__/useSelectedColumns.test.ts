@@ -89,7 +89,7 @@ describe('useSelectedColumns', () => {
         expect(columnsToSelect[4].selected).toBe(false); // col5
     });
 
-    test('appends new columns to the end when user has custom order', () => {
+    test('keeps new non-default columns unselected when user has custom order', () => {
         const setSavedColumns = jest.fn();
         // User saved order with only col1, col2, col3
         // col4 and col5 are new columns added later
@@ -333,15 +333,152 @@ describe('useSelectedColumns', () => {
 
         const {columnsToSelect} = result.current;
 
-        // Should preserve saved order (col1, col2) and append new columns (col3, col4, col5)
+        // Should preserve saved order (col1, col2) and add new columns (col3, col4, col5)
         // 'nonexistent' is filtered out
         expect(columnsToSelect.map((c) => c.id)).toEqual(['col1', 'col2', 'col3', 'col4', 'col5']);
 
         // Check selection state
         expect(columnsToSelect[0].selected).toBe(true); // col1
         expect(columnsToSelect[1].selected).toBe(false); // col2
-        expect(columnsToSelect[2].selected).toBe(false); // col3 (new)
+        expect(columnsToSelect[2].selected).toBe(true); // col3 (new, selected by default)
         expect(columnsToSelect[3].selected).toBe(false); // col4 (new)
         expect(columnsToSelect[4].selected).toBe(false); // col5 (new)
+    });
+
+    describe('new columns', () => {
+        const renderWithOptions = () =>
+            renderHook(() =>
+                useSelectedColumns(columns, 'test-key', columnsTitles, defaultColumnsIds),
+            );
+
+        test('selects new default columns and places them after their predecessor', () => {
+            useSetting.mockReturnValue([
+                [
+                    {id: 'col4', selected: true},
+                    {id: 'col1', selected: false},
+                ],
+                jest.fn(),
+            ]);
+
+            const {columnsToSelect} = renderWithOptions().result.current;
+
+            expect(columnsToSelect.map(({id, selected}) => [id, selected])).toEqual([
+                ['col4', true],
+                ['col5', false],
+                ['col1', false],
+                ['col2', true],
+                ['col3', true],
+            ]);
+        });
+
+        test('places a new column without predecessors first', () => {
+            useSetting.mockReturnValue([[{id: 'col2', selected: true}], jest.fn()]);
+
+            const {columnsToSelect} = renderWithOptions().result.current;
+
+            expect(columnsToSelect.map(({id}) => id)).toEqual([
+                'col1',
+                'col2',
+                'col3',
+                'col4',
+                'col5',
+            ]);
+        });
+
+        test('keeps missing columns hidden for legacy string format', () => {
+            useSetting.mockReturnValue([['col3', 'col1'], jest.fn()]);
+
+            const {columnsToSelect} = renderWithOptions().result.current;
+
+            expect(columnsToSelect.map(({id, selected}) => [id, selected])).toEqual([
+                ['col3', true],
+                ['col1', true],
+                ['col2', false],
+                ['col4', false],
+                ['col5', false],
+            ]);
+        });
+    });
+
+    describe('unavailable columns', () => {
+        const renderWithOptions = () =>
+            renderHook(() =>
+                useSelectedColumns(columns, 'test-key', columnsTitles, defaultColumnsIds),
+            );
+
+        test('keeps position and selection of saved columns missing from the table', () => {
+            const setSavedColumns = jest.fn();
+            useSetting.mockReturnValue([
+                [
+                    {id: 'col1', selected: true},
+                    {id: 'extension', selected: true},
+                    {id: 'col2', selected: false},
+                ],
+                setSavedColumns,
+            ]);
+
+            const {setColumns} = renderWithOptions().result.current;
+
+            React.act(() => {
+                setColumns([
+                    {id: 'col2', title: 'Column 2', selected: true},
+                    {id: 'col1', title: 'Column 1', selected: true},
+                ]);
+            });
+
+            expect(setSavedColumns).toHaveBeenCalledWith([
+                {id: 'col2', selected: true},
+                {id: 'extension', selected: true},
+                {id: 'col1', selected: true},
+            ]);
+        });
+
+        test('keeps default columns hidden in the legacy format hidden when they come back', () => {
+            // Saved in the legacy format on a table that had `conditional`, a default column
+            const withConditional = [...columns, {name: 'conditional'}];
+            const defaults = [...defaultColumnsIds, 'conditional'];
+            const saved: {current: unknown[]} = {current: ['col1']};
+            useSetting.mockImplementation(() => [
+                saved.current,
+                (value: unknown[]) => {
+                    saved.current = value;
+                },
+            ]);
+            const render = (tableColumns: TestColumn[]) =>
+                renderHook(() =>
+                    useSelectedColumns(tableColumns, 'test-key', columnsTitles, defaults),
+                ).result.current;
+
+            // The column is unavailable when the user changes the settings for the first time
+            const {setColumns} = render(columns);
+            React.act(() => {
+                setColumns([
+                    {id: 'col1', title: 'Column 1', selected: true},
+                    {id: 'col2', title: 'Column 2', selected: true},
+                    {id: 'col3', title: 'Column 3', selected: false},
+                    {id: 'col4', title: 'Column 4', selected: false},
+                    {id: 'col5', title: 'Column 5', selected: false},
+                ]);
+            });
+
+            expect(saved.current).toContainEqual({id: 'conditional', selected: false});
+            expect(render(withConditional).columnsToShow.map(({name}) => name)).toEqual([
+                'col1',
+                'col2',
+            ]);
+        });
+
+        test('saves only table columns when nothing was saved before', () => {
+            const setSavedColumns = jest.fn();
+            useSetting.mockReturnValue([defaultColumnsIds, setSavedColumns]);
+
+            const {setColumns} = renderWithOptions().result.current;
+
+            React.act(() => {
+                setColumns([{id: 'col1', title: 'Column 1', selected: true}]);
+            });
+
+            expect(setSavedColumns).toHaveBeenCalledWith([{id: 'col1', selected: true}]);
+        });
     });
 });

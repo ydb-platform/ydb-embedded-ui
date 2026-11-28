@@ -11,6 +11,7 @@ import {KEYBOARD_FOCUS_ACTIVE_CLASS_NAME} from '../TableKeyboardNavigation/utils
 import {TableSkeleton} from '../TableSkeleton/TableSkeleton';
 
 import {DataTableKeyboardNavigation} from './DataTableKeyboardNavigation';
+import {keepSortPriority} from './keepSortPriority';
 
 import './ResizeableDataTable.scss';
 
@@ -124,6 +125,7 @@ function ResizeableDataTableContent<T>({
     loadingSkeletonRowsCount = 2,
     onSort,
     onSortChange,
+    sortOrder,
     data,
     ...props
 }: ResizeableDataTableProps<T> & {
@@ -137,10 +139,11 @@ function ResizeableDataTableContent<T>({
 
     const handleSort = React.useCallback(
         (params: SortOrder | SortOrder[] | undefined) => {
-            onSort?.(params); // Original onSort if provided
-            onSortChange?.(params); // Expose sort params to parent
+            const order = keepSortPriority(sortOrder, params);
+            onSort?.(order); // Original onSort if provided
+            onSortChange?.(order); // Expose sort params to parent
         },
-        [onSort, onSortChange],
+        [onSort, onSortChange, sortOrder],
     );
 
     // If loading is true, override the render method of each column to display a Skeleton
@@ -191,6 +194,7 @@ function ResizeableDataTableContent<T>({
                 columns={updatedColumns}
                 onResize={setTableColumnsWidth}
                 onSort={handleSort}
+                sortOrder={sortOrder}
                 settings={newSettings}
                 data={processedData}
                 {...props}

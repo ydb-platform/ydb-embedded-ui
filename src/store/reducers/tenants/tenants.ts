@@ -1,4 +1,6 @@
 import type {TTenantInfo} from '../../../types/api/tenant';
+import {uiFactory} from '../../../uiFactory/uiFactory';
+import {serializeReduxError} from '../../../utils/errors/serializeReduxError';
 import {api} from '../api';
 import {DATABASE_DATA_LIST_TAG} from '../entityDataTags';
 
@@ -7,6 +9,16 @@ import {prepareTenants} from './utils';
 
 export const tenantsApi = api.injectEndpoints({
     endpoints: (build) => ({
+        getDatabaseCloudNames: build.query({
+            queryFn: async ({ids, environmentName}: {ids: string[]; environmentName?: string}) => {
+                try {
+                    const data = await uiFactory.resolveCloudName?.(ids, environmentName);
+                    return {data: data ?? []};
+                } catch (error) {
+                    return {error: serializeReduxError(error)};
+                }
+            },
+        }),
         getTenantsInfo: build.query({
             queryFn: async (
                 {

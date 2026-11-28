@@ -5,5 +5,8 @@
   "context_unknown": "unknown database",
   "action_edit": "Edit Database",
   "action_remove": "Remove Database",
-  "action_connect-to-db": "Connect to database"
+  "action_connect-to-db": "Connect to database",
+  "value_writes-blocked": "Writes blocked",
+  "context_storage-exhausted": "The database’s storage pools are running out of space.",
+  "context_quota-blocked": "The database exceeded its storage quota. Free up space or increase the quota."
 }

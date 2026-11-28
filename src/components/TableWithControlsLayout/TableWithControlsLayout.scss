@@ -76,7 +76,7 @@
         top: var(--data-table-sticky-header-offset, 62px);
     }
 
-    .data-table__sticky_moving {
+    .data-table__sticky_head.data-table__sticky_moving {
         // Place table head right after controls
         top: var(--data-table-sticky-header-offset, 62px) !important;
     }
