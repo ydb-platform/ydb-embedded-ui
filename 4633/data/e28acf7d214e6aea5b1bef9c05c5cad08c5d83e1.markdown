@@ -1,0 +1,337 @@
+# Page snapshot
+
+```yaml
+- generic [ref=e5]:
+  - generic [ref=e8]:
+    - img [ref=e13] [cursor=pointer]:
+      - img [ref=e14]
+    - list [ref=e21]:
+      - generic [ref=e22]:
+        - listitem [ref=e23]:
+          - link "Database" [ref=e28] [cursor=pointer]:
+            - /url: /database?diagnosticsTab=database&schema=%2Flocal&database=%2Flocal&databasePage=database
+            - img [ref=e31]:
+              - img [ref=e32]
+            - generic "Database":
+              - generic: Database
+        - listitem [ref=e34]:
+          - link "Diagnostics" [ref=e39] [cursor=pointer]:
+            - /url: /database?diagnosticsTab=database&schema=%2Flocal&database=%2Flocal&databasePage=diagnostics
+            - img [ref=e42]:
+              - img [ref=e43]
+            - generic "Diagnostics":
+              - generic: Diagnostics
+        - listitem [ref=e45]:
+          - link "SQL Editor" [ref=e50] [cursor=pointer]:
+            - /url: /database?diagnosticsTab=database&schema=%2Flocal&database=%2Flocal&databasePage=query
+            - img [ref=e53]:
+              - img [ref=e54]
+            - generic "SQL Editor":
+              - generic: SQL Editor
+    - generic [ref=e56]:
+      - button "Information" [ref=e57] [cursor=pointer]:
+        - img [ref=e60]:
+          - img [ref=e61]
+        - generic "Information":
+          - generic: Information
+      - button "Settings" [ref=e63] [cursor=pointer]:
+        - img [ref=e66]:
+          - img [ref=e67]
+        - generic "Settings":
+          - generic: Settings
+      - button "Account" [ref=e69] [cursor=pointer]:
+        - img [ref=e72]:
+          - img [ref=e73]
+        - generic "Account":
+          - generic: Account
+    - button "Expand" [ref=e75] [cursor=pointer]:
+      - img [ref=e76]:
+        - img [ref=e77]
+  - generic [ref=e80]:
+    - banner [ref=e81]:
+      - list [ref=e82]:
+        - listitem [ref=e83]:
+          - link "Cluster" [ref=e84] [cursor=pointer]:
+            - link "Cluster" [ref=e85]:
+              - /url: /cluster
+              - generic [ref=e86]: Cluster
+          - generic [ref=e87]: /
+        - listitem [ref=e88]:
+          - link "local" [disabled] [ref=e89]:
+            - generic [ref=e91]: local
+        - listitem [ref=e92]:
+          - generic [ref=e93]:
+            - generic [ref=e94]:
+              - button "Copy path" [ref=e95] [cursor=pointer]:
+                - generic:
+                  - generic:
+                    - img:
+                      - img
+              - button [ref=e96] [cursor=pointer]:
+                - img [ref=e99]:
+                  - img [ref=e100]
+            - generic [ref=e103] [cursor=pointer]:
+              - img [ref=e105]:
+                - img [ref=e106]
+              - 'button "Good: 1 issue" [ref=e108]':
+                - generic [ref=e111]:
+                  - text: "Good: 1 issue"
+                  - img [ref=e112]:
+                    - img [ref=e113]
+      - generic [ref=e115]:
+        - link "Developer UI" [ref=e116] [cursor=pointer]:
+          - /url: http://localhost:8765/internal
+          - img [ref=e119]:
+            - img [ref=e120]
+          - generic [ref=e122]: Developer UI
+        - button [ref=e125] [cursor=pointer]:
+          - img [ref=e128]:
+            - img [ref=e129]
+    - main [ref=e131]:
+      - generic [ref=e135]:
+        - generic [ref=e136]: /local
+        - generic [ref=e138]:
+          - tablist [ref=e139]:
+            - tab "Overview" [selected] [ref=e140] [cursor=pointer]:
+              - link "Overview" [ref=e143]:
+                - /url: /database?diagnosticsTab=database&schema=%2Flocal&database=%2Flocal&databasePage=database
+            - tab "Queries" [ref=e144] [cursor=pointer]:
+              - link "Queries" [ref=e147]:
+                - /url: /database?diagnosticsTab=topQueries&schema=%2Flocal&database=%2Flocal&databasePage=database
+            - tab "Storage" [ref=e148] [cursor=pointer]:
+              - link "Storage" [ref=e151]:
+                - /url: /database?diagnosticsTab=storage&schema=%2Flocal&database=%2Flocal&databasePage=database
+            - tab "Network" [ref=e152] [cursor=pointer]:
+              - link "Network" [ref=e155]:
+                - /url: /database?diagnosticsTab=network&schema=%2Flocal&database=%2Flocal&databasePage=database
+            - tab "Configs" [ref=e156] [cursor=pointer]:
+              - link "Configs" [ref=e159]:
+                - /url: /database?diagnosticsTab=configs&schema=%2Flocal&database=%2Flocal&databasePage=database
+            - tab "Operations" [ref=e160] [cursor=pointer]:
+              - link "Operations" [ref=e163]:
+                - /url: /database?diagnosticsTab=operations&schema=%2Flocal&database=%2Flocal&databasePage=database
+          - generic [ref=e164]:
+            - button "Refresh" [ref=e165] [cursor=pointer]:
+              - img [ref=e168]
+            - group [ref=e171] [cursor=pointer]:
+              - combobox [ref=e172]:
+                - generic [ref=e173]: None
+              - img [ref=e174]:
+                - img [ref=e175]
+        - generic [ref=e179]:
+          - generic [ref=e181]:
+            - generic [ref=e184]:
+              - generic [ref=e186]: Queries Activity
+              - generic [ref=e187]:
+                - generic [ref=e188]:
+                  - img [ref=e190]:
+                    - img [ref=e191]
+                  - generic [ref=e193]:
+                    - generic [ref=e194]: Running Queries
+                    - generic [ref=e195]:
+                      - generic [ref=e196]: ":"
+                      - generic [ref=e197]: "0"
+                - generic [ref=e198]:
+                  - img [ref=e200]:
+                    - img [ref=e201]
+                  - generic [ref=e203]:
+                    - generic [ref=e204]: Applications
+                    - generic [ref=e205]:
+                      - generic [ref=e206]: ":"
+                      - generic [ref=e207]: "0"
+                - generic [ref=e208]:
+                  - img [ref=e210]:
+                    - img [ref=e211]
+                  - generic [ref=e213]:
+                    - generic [ref=e214]: Users
+                    - generic [ref=e215]:
+                      - generic [ref=e216]: ":"
+                      - generic [ref=e217]: "0"
+            - generic [ref=e218]:
+              - link "CPU N/A Load across all actor system pools" [ref=e220]:
+                - /url: /database?diagnosticsTab=database&schema=%2Flocal&database=%2Flocal&databasePage=database&metricsTab=cpu
+                - generic [ref=e222]:
+                  - generic [ref=e223]:
+                    - generic [ref=e224]: CPU
+                    - generic [ref=e225]:
+                      - generic [ref=e226]: N/A
+                      - img [ref=e227]:
+                        - img [ref=e228]
+                  - generic [ref=e230]: Load across all actor system pools
+              - link "Storage 0.5% Total usage including user data" [ref=e232]:
+                - /url: /database?diagnosticsTab=database&schema=%2Flocal&database=%2Flocal&databasePage=database&metricsTab=storage
+                - generic [ref=e234] [cursor=pointer]:
+                  - generic [ref=e235]:
+                    - generic [ref=e236]: Storage
+                    - generic [ref=e237]:
+                      - generic [ref=e238]: 0.5%
+                      - img [ref=e239]:
+                        - img [ref=e240]
+                  - generic [ref=e242]: Total usage including user data
+              - link "Memory N/A Total consumed by DB processes" [ref=e244]:
+                - /url: /database?diagnosticsTab=database&schema=%2Flocal&database=%2Flocal&databasePage=database&metricsTab=memory
+                - generic [ref=e246] [cursor=pointer]:
+                  - generic [ref=e247]:
+                    - generic [ref=e248]: Memory
+                    - generic [ref=e249]:
+                      - generic [ref=e250]: N/A
+                      - img [ref=e251]:
+                        - img [ref=e252]
+                  - generic [ref=e254]: Total consumed by DB processes
+          - generic [ref=e256]:
+            - generic [ref=e258]:
+              - generic [ref=e259]:
+                - generic [ref=e260]: CPU load is calculated as the cumulative usage across all actor system pools in the database except IO
+                - generic [ref=e262]: used —
+              - progressbar "CPU load is calculated as the cumulative usage across all actor system pools in the database except IO" [ref=e264]
+            - generic [ref=e266]:
+              - generic [ref=e267]:
+                - generic [ref=e269]: Top nodes by load
+                - link "See all" [ref=e270] [cursor=pointer]:
+                  - /url: /database?diagnosticsTab=nodes&schema=%2Flocal&database=%2Flocal&databasePage=diagnostics
+                  - generic [ref=e271]:
+                    - generic [ref=e272]: See all
+                    - img [ref=e273]:
+                      - img [ref=e274]
+              - generic [ref=e278]:
+                - table [ref=e281]:
+                  - rowgroup [ref=e282]:
+                    - 'row "Load # Host Version" [ref=e283]':
+                      - columnheader "Load" [ref=e284]:
+                        - generic [ref=e285]: Load
+                      - columnheader "#" [ref=e286]:
+                        - generic [ref=e287]: "#"
+                      - columnheader "Host" [ref=e288]:
+                        - generic [ref=e289]: Host
+                      - columnheader "Version" [ref=e290]:
+                        - generic [ref=e291]: Version
+                - table [ref=e294]:
+                  - rowgroup [ref=e295]:
+                    - 'row "Load # Host Version" [ref=e296]':
+                      - columnheader "Load" [ref=e297]:
+                        - generic [ref=e298]: Load
+                      - columnheader "#" [ref=e299]:
+                        - generic [ref=e300]: "#"
+                      - columnheader "Host" [ref=e301]:
+                        - generic [ref=e302]: Host
+                      - columnheader "Version" [ref=e303]:
+                        - generic [ref=e304]: Version
+                  - rowgroup [ref=e305]:
+                    - row "210% 1 localhost Copy main.5e9f4d5" [ref=e306]:
+                      - cell "210%" [ref=e307]:
+                        - generic [ref=e310]: 210%
+                      - cell "1" [ref=e311]
+                      - cell "localhost Copy" [ref=e312]:
+                        - generic [ref=e315]:
+                          - generic "localhost" [ref=e316]:
+                            - link "localhost" [ref=e317] [cursor=pointer]:
+                              - /url: /node/1/storage
+                          - generic:
+                            - button [ref=e318] [cursor=pointer]:
+                              - img [ref=e321]:
+                                - img [ref=e322]
+                            - button "Copy" [ref=e324] [cursor=pointer]:
+                              - generic:
+                                - generic:
+                                  - img:
+                                    - img
+                      - cell "main.5e9f4d5" [ref=e325]:
+                        - generic [ref=e327] [cursor=pointer]: main.5e9f4d5
+            - generic [ref=e328]:
+              - generic [ref=e329]:
+                - generic [ref=e331]: Top nodes by pools usage
+                - link "See all" [ref=e332] [cursor=pointer]:
+                  - /url: /database?diagnosticsTab=nodes&schema=%2Flocal&database=%2Flocal&databasePage=diagnostics
+                  - generic [ref=e333]:
+                    - generic [ref=e334]: See all
+                    - img [ref=e335]:
+                      - img [ref=e336]
+              - generic [ref=e340]:
+                - table [ref=e343]:
+                  - rowgroup [ref=e344]:
+                    - 'row "Pools # Host" [ref=e345]':
+                      - columnheader "Pools" [ref=e346]:
+                        - generic [ref=e347]: Pools
+                      - columnheader "#" [ref=e348]:
+                        - generic [ref=e349]: "#"
+                      - columnheader "Host" [ref=e350]:
+                        - generic [ref=e351]: Host
+                - table [ref=e354]:
+                  - rowgroup [ref=e355]:
+                    - 'row "Pools # Host" [ref=e356]':
+                      - columnheader "Pools" [ref=e357]:
+                        - generic [ref=e358]: Pools
+                      - columnheader "#" [ref=e359]:
+                        - generic [ref=e360]: "#"
+                      - columnheader "Host" [ref=e361]:
+                        - generic [ref=e362]: Host
+                  - rowgroup [ref=e363]:
+                    - row "1 localhost Copy" [ref=e364]:
+                      - cell [ref=e365]
+                      - cell "1" [ref=e377]
+                      - cell "localhost Copy" [ref=e378]:
+                        - generic [ref=e381]:
+                          - generic "localhost" [ref=e382]:
+                            - link "localhost" [ref=e383] [cursor=pointer]:
+                              - /url: /node/1/storage
+                          - generic:
+                            - button [ref=e384] [cursor=pointer]:
+                              - img [ref=e387]:
+                                - img [ref=e388]
+                            - button "Copy" [ref=e390] [cursor=pointer]:
+                              - generic:
+                                - generic:
+                                  - img:
+                                    - img
+            - generic [ref=e391]:
+              - generic [ref=e392]:
+                - generic [ref=e394]: Top shards by CPU usage
+                - link "See all" [ref=e395] [cursor=pointer]:
+                  - /url: /database?diagnosticsTab=topShards&schema=%2Flocal&database=%2Flocal&databasePage=diagnostics
+                  - generic [ref=e396]:
+                    - generic [ref=e397]: See all
+                    - img [ref=e398]:
+                      - img [ref=e399]
+              - table [ref=e406]:
+                - rowgroup [ref=e407]:
+                  - row "TabletId Path CPUCores" [ref=e408]:
+                    - columnheader "TabletId" [ref=e409]:
+                      - generic [ref=e410]: TabletId
+                    - columnheader "Path" [ref=e411]:
+                      - generic [ref=e412]: Path
+                    - columnheader "CPUCores" [ref=e413]:
+                      - generic [ref=e414]: CPUCores
+                - rowgroup [ref=e415]:
+                  - row "No data" [ref=e416]:
+                    - cell "No data" [ref=e417]
+            - generic [ref=e418]:
+              - generic [ref=e419]:
+                - generic [ref=e421]: Top queries by CPU usage
+                - link "See all" [ref=e422] [cursor=pointer]:
+                  - /url: /database?diagnosticsTab=topQueries&schema=%2Flocal&database=%2Flocal&databasePage=database
+                  - generic [ref=e423]:
+                    - generic [ref=e424]: See all
+                    - img [ref=e425]:
+                      - img [ref=e426]
+              - table [ref=e433]:
+                - rowgroup [ref=e434]:
+                  - row "Query Hash Query text CPU Time" [ref=e435]:
+                    - columnheader "Query Hash" [ref=e436]:
+                      - generic [ref=e437]: Query Hash
+                    - columnheader "Query text" [ref=e438]:
+                      - generic [ref=e439]: Query text
+                    - columnheader "CPU Time" [ref=e440]:
+                      - generic [ref=e441]: CPU Time
+                - rowgroup [ref=e442]:
+                  - row "0EA6A1BD Copy select 1 46 ms" [ref=e443] [cursor=pointer]:
+                    - cell "0EA6A1BD" [ref=e444]
+                    - cell "Copy select 1" [ref=e445]:
+                      - generic [ref=e448]:
+                        - button "Copy" [ref=e449]:
+                          - generic:
+                            - generic:
+                              - img:
+                                - img
+                        - code [ref=e452]: select 1
+                    - cell "46 ms" [ref=e453]
+```
