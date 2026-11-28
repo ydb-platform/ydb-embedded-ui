@@ -1,5 +1,7 @@
 import {useIsUserAllowedToMakeChanges} from '../../utils/hooks/useIsUserAllowedToMakeChanges';
+import {useNbsStorageAvailableInClusterView} from '../../utils/hooks/useNbsStorageAvailability';
 
+import {NbsStorage} from './NbsStorage/NbsStorage';
 import {PaginatedStorageGroups} from './PaginatedStorageGroups';
 import {PaginatedStorageNodes} from './PaginatedStorageNodes';
 import type {StorageViewContext} from './types';
@@ -29,13 +31,18 @@ export interface PaginatedStorageProps {
 
 export const PaginatedStorage = (props: PaginatedStorageProps) => {
     const {storageType} = useStorageQueryParams();
-    useSaveStorageType();
+    const nbsAvailable = useNbsStorageAvailableInClusterView();
+    useSaveStorageType(nbsAvailable);
     useSaveStorageExpertMode();
     useSaveVDisksGroupBy();
     useSavePDisksGroupBy();
     useSaveNodesVDisksGroupBy();
     useSaveNodesPDisksGroupBy();
     const isUserAllowedToMakeChanges = useIsUserAllowedToMakeChanges();
+
+    if (nbsAvailable && (storageType === 'nbs' || storageType === 'ddisks')) {
+        return <NbsStorage key={storageType} {...props} disks={storageType === 'ddisks'} />;
+    }
 
     const isNodes = storageType === 'nodes';
 

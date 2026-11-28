@@ -1,0 +1,23 @@
+{
+  "label_node": "Узел",
+  "label_pdisk": "PDisk",
+  "label_slot": "Слот DDisk",
+  "label_ddisk-state": "Состояние DDisk",
+  "label_buffer-state": "Состояние Persistent Buffer",
+  "label_used": "Выделено",
+  "label_available": "Доступно",
+  "label_total": "Лимит владельца",
+  "label_occupancy": "Заполненность DDisk",
+  "label_buffer-occupancy": "Заполненность Persistent Buffer",
+  "label_unavailable": "Нет актуального замера",
+  "label_slot-unavailable": "Диск недоступен",
+  "action_ddisk": "Открыть DDisk",
+  "action_inventory": "Показать DDisk на этом PDisk",
+  "state_ready": "Готов",
+  "state_initializing": "Инициализация",
+  "state_broken": "Отказ",
+  "state_stopping": "Остановка",
+  "state_unknown": "Неизвестно",
+  "label_failed": "Отказ физического диска",
+  "label_pool": "Пул"
+}

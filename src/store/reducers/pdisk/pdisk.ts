@@ -17,15 +17,22 @@ export const pDiskApi = api.injectEndpoints({
         getPdiskInfo: build.query({
             queryFn: async ({nodeId, pDiskId}: PDiskParams, {signal, getState, dispatch}) => {
                 const meta = getDatacenterQueryContext(getState);
-                const pDiskInfoHandlerVersion = await queryCapability('/pdisk/info', undefined, {
+                const context = {
                     getState: getState as GetState,
                     dispatch,
-                });
+                };
+                const [pDiskInfoHandlerVersion, dDisksVersion] = await Promise.all([
+                    queryCapability('/pdisk/info', undefined, context),
+                    queryCapability('/pdisk/info/ddisks', undefined, context),
+                ]);
                 const newApiAvailable = pDiskInfoHandlerVersion > 0;
 
                 let diskInfoPromise: Promise<TPDiskInfoResponse>;
                 if (newApiAvailable) {
-                    diskInfoPromise = window.api.pdisk.getPDiskInfo({nodeId, pDiskId}, {signal});
+                    diskInfoPromise = window.api.pdisk.getPDiskInfo(
+                        {nodeId, pDiskId, includeDDisks: dDisksVersion >= 1},
+                        {signal},
+                    );
                 } else {
                     diskInfoPromise = window.api.viewer
                         .getNodeWhiteboardPDiskInfo({nodeId, pDiskId}, {signal})

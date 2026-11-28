@@ -22,8 +22,8 @@ export const NODE_EXPERT_ALL_PDISK_WIDTH =
     NODE_EXPERT_ALL_VDISKS_PER_ROW * NODE_EXPERT_ALL_VDISK_WIDTH +
     (NODE_EXPERT_ALL_VDISKS_PER_ROW - 1) * NODE_EXPERT_VDISK_GAP;
 
-export interface NodeExpertVDiskLayoutItem {
-    vDisk: PreparedVDisk;
+export interface NodeExpertVDiskLayoutItem<T = PreparedVDisk> {
+    vDisk: T;
     width: number;
 }
 
@@ -33,11 +33,11 @@ function getVDiskWeight(vDisk: PreparedVDisk) {
     return Number.isFinite(allocatedSize) && allocatedSize > 0 ? allocatedSize : 1;
 }
 
-export function calculateNodeExpertVDiskRows(
-    vDisks: PreparedVDisk[],
+export function calculateNodeExpertVDiskRows<T extends PreparedVDisk>(
+    vDisks: T[],
     pDiskWidth = NODE_EXPERT_PDISK_WIDTH,
-): NodeExpertVDiskLayoutItem[][] {
-    const rows: PreparedVDisk[][] = [];
+): NodeExpertVDiskLayoutItem<T>[][] {
+    const rows: T[][] = [];
 
     for (let index = 0; index < vDisks.length; index += NODE_EXPERT_VDISKS_PER_ROW) {
         rows.push(vDisks.slice(index, index + NODE_EXPERT_VDISKS_PER_ROW));

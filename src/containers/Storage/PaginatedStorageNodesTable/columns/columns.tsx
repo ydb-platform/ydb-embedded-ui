@@ -53,6 +53,7 @@ export const getPDisksColumn = ({
                 <PDisks
                     pDisks={row.PDisks}
                     vDisks={row.VDisks}
+                    dDisks={row.DDisks}
                     viewContext={viewContext}
                     pDiskWidth={columnsSettings?.pDiskWidth}
                     pDiskHeight={columnsSettings?.pDiskHeight}

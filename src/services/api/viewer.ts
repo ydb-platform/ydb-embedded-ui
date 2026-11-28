@@ -122,6 +122,7 @@ export class ViewerAPI extends BaseYdbAPI {
             filter,
             path,
             storage,
+            includeDDisks,
             ...params
         }: NodesRequestParams,
         {concurrentId, signal}: AxiosOptions = {},
@@ -147,6 +148,7 @@ export class ViewerAPI extends BaseYdbAPI {
                 fields_required: preparedFieldsRequired,
                 path: this.getSchemaPath(path),
                 storage: isStorage,
+                include_ddisks: includeDDisks || undefined,
                 ...params,
             },
             {concurrentId, requestConfig: {signal}},

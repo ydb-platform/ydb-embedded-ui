@@ -1,4 +1,5 @@
 import type {BackendSortParam, SchemaPathParam} from './common';
+import type {TDDiskStateInfo} from './ddisk';
 import type {ECapacityAlert, EFlag} from './enums';
 import type {TPDiskStateInfo} from './pdisk';
 import type {TTabletStateInfo} from './tablet';
@@ -53,6 +54,7 @@ export interface TNodeInfo {
     SystemState: TSystemStateInfo;
     PDisks?: TPDiskStateInfo[];
     VDisks?: TVDiskStateInfo[];
+    DDisks?: TDDiskStateInfo[];
     Tablets?: TTabletStateInfo[];
 
     // Network stats
@@ -372,6 +374,7 @@ export interface NodesRequestParams {
     with?: NodesWithFilter;
 
     storage?: boolean;
+    includeDDisks?: boolean;
     tablets?: boolean;
 
     /** return nodes with less uptime in seconds */

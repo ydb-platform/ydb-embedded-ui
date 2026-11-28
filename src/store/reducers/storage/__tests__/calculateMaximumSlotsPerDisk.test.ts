@@ -20,6 +20,45 @@ describe('calculateMaximumSlotsPerDisk', () => {
         expect(calculateMaximumSlotsPerDisk(nodes, providedMaximumSlotsPerDisk)).toBe(5);
     });
 
+    test.each([
+        {maximum: undefined, expected: 3},
+        {maximum: '2', expected: 3},
+        {maximum: '5', expected: 5},
+        {maximum: 'Infinity', expected: 3},
+    ])('counts mixed slots with a server maximum of $maximum', ({maximum, expected}) => {
+        const nodes: TNodeInfo[] = [
+            {
+                NodeId: 1,
+                SystemState: {},
+                PDisks: [{PDiskId: 1}, {PDiskId: 2}],
+                VDisks: [{PDiskId: 1, VDiskSlotId: 1}],
+                DDisks: [
+                    {PDiskId: 1, DDiskSlotId: 2, PersistentBufferId: 'first-buffer'},
+                    {PDiskId: 1, DDiskSlotId: 3, PersistentBufferId: 'second-buffer'},
+                    {PDiskId: 2, DDiskSlotId: 2},
+                ],
+            },
+        ];
+
+        expect(calculateMaximumSlotsPerDisk(nodes, maximum)).toBe(expected);
+    });
+
+    test('counts DDisk-only slots without a server maximum', () => {
+        const nodes: TNodeInfo[] = [
+            {
+                NodeId: 1,
+                SystemState: {},
+                PDisks: [{PDiskId: 1}],
+                DDisks: [
+                    {PDiskId: 1, DDiskSlotId: 1, PersistentBufferId: 'first-buffer'},
+                    {PDiskId: 1, DDiskSlotId: 2, PersistentBufferId: 'second-buffer'},
+                ],
+            },
+        ];
+
+        expect(calculateMaximumSlotsPerDisk(nodes)).toBe(2);
+    });
+
     test('should return "1" for empty nodes array', () => {
         const nodes: TNodeInfo[] = [];
 

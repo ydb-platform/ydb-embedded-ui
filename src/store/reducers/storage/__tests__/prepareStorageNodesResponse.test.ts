@@ -1,4 +1,5 @@
 import type {TNodesInfo} from '../../../../types/api/nodes';
+import {TPDiskState} from '../../../../types/api/pdisk';
 import {prepareStorageNodesResponse} from '../utils';
 
 describe('prepareStorageNodesResponse', () => {
@@ -99,5 +100,43 @@ describe('prepareStorageNodesResponse', () => {
             needSort: false,
             needGroup: true,
         });
+    });
+
+    test('Should count known unavailable DDisk pairs by slot separately from missing PDisks', () => {
+        const pDisks = [
+            {PDiskId: 0, State: TPDiskState.Normal},
+            {PDiskId: 1, State: TPDiskState.DeviceIoError},
+        ];
+        const response = {
+            TotalNodes: '2',
+            FoundNodes: '2',
+            Nodes: [
+                {
+                    NodeId: 1,
+                    SystemState: {},
+                    PDisks: pDisks,
+                    DDisks: [
+                        {
+                            PDiskId: 0,
+                            DDiskSlotId: 0,
+                            DDiskStatus: 'Broken',
+                            PersistentBufferStatus: 'Stopping',
+                            HasWhiteboardData: false,
+                        },
+                        {PDiskId: 0, DDiskSlotId: 0, DDiskStatus: 'Broken'},
+                        {PDiskId: 1, DDiskSlotId: 0, PersistentBufferStatus: 'Initializing'},
+                        {PDiskId: 0, DDiskSlotId: 1, HasWhiteboardData: false},
+                        {PDiskId: 0, DDiskSlotId: 2, DDiskStatus: 'Ready'},
+                        {PDiskId: 0, DDiskStatus: 'Broken'},
+                    ],
+                },
+                {NodeId: 2, SystemState: {}, PDisks: pDisks},
+            ],
+        } satisfies TNodesInfo;
+
+        expect(prepareStorageNodesResponse(response).nodes).toEqual([
+            expect.objectContaining({Missing: 1, MissingDDiskSlots: 2}),
+            expect.objectContaining({Missing: 1, MissingDDiskSlots: undefined}),
+        ]);
     });
 });
