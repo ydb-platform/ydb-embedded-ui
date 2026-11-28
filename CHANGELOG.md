@@ -1,5 +1,13 @@
 # Changelog
 
+## [22.13.0](https://github.com/ydb-platform/ydb-embedded-ui/compare/v22.12.0...v22.13.0) (2026-11-28)
+
+
+### Features
+
+* add filters, grouping and allocated resources to databases list ([#4638](https://github.com/ydb-platform/ydb-embedded-ui/issues/4638)) ([7191b77](https://github.com/ydb-platform/ydb-embedded-ui/commit/7191b77a6add305e65407f6868bd08e1d6d5f25e))
+* **Clusters:** sync search with URL ([#4649](https://github.com/ydb-platform/ydb-embedded-ui/issues/4649)) ([d884671](https://github.com/ydb-platform/ydb-embedded-ui/commit/d88467155c98e555e4c8b6950d0e3ff023a36abd))
+
 ## [22.12.0](https://github.com/ydb-platform/ydb-embedded-ui/compare/v22.11.2...v22.12.0) (2026-11-26)
 
 
